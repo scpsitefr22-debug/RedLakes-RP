@@ -324,3 +324,29 @@ model PlatformEntityTag {
   @@unique([tagId, entityType, entityId])
   @@index([entityType, entityId])
 }
+
+// ─── REDLAKES CORE — catalogue de grades (lecture seule pour l'instant) ─────
+// Peuplé depuis apps/web/src/data/rp-grades.ts. Player.grade reste une
+// chaîne libre à ce stade — voir le plan de migration progressive validé.
+
+model Grade {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  branch       String
+  tier         String
+  departmentId String?
+  pay          Int?
+  quota        Int?
+  clearance    Int
+  description  String?
+  objectives   String[] @default([])
+  utilities    String[] @default([])
+  accessZones  String[] @default([])
+  siteSections String[] @default([])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([branch])
+  @@index([departmentId])
+}

@@ -11,6 +11,7 @@ import { SyncModule } from './sync/sync.module';
 import { ReportsModule } from './reports/reports.module';
 import { PlatformModule } from './platform/platform.module';
 import { HealthModule } from './health/health.module';
+import { GradesModule } from './grades/grades.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { HealthModule } from './health/health.module';
     GalleryModule,
     SyncModule,
     ReportsModule,
+    GradesModule,
   ],
 })
 export class AppModule {}
