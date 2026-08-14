@@ -1,11 +1,32 @@
 import { config } from "../config.js";
 
+export interface GradeInfo {
+  id: string;
+  slug: string;
+  name: string;
+  branch: string;
+  tier: string;
+  pay: number | null;
+  quota: number | null;
+  clearance: number;
+  departmentRef?: { id: string; slug: string; name: string } | null;
+}
+
+export interface FactionInfo {
+  id: string;
+  slug: string;
+  name: string;
+  color: string | null;
+}
+
 export interface PlayerProfile {
   minecraftUsername: string | null;
   avatarUrl: string | null;
   discordUsername: string | null;
   grade: string;
+  gradeInfo?: GradeInfo | null;
   faction: string;
+  factionInfo?: FactionInfo | null;
   teamName: string | null;
   rpFirstName: string | null;
   rpLastName: string | null;
@@ -105,6 +126,11 @@ export const api = {
       "GET",
       `/sync/discord/${encodeURIComponent(discordId)}`,
     );
+  },
+
+  /** Catalogue complet des grades Site-12 -- source de verite CORE (public) */
+  getGrades() {
+    return request<GradeInfo[]>("GET", "/grades");
   },
 
   /** Relaie un évènement Discord à l'API (flux RP "Transmissions de la Fondation") */

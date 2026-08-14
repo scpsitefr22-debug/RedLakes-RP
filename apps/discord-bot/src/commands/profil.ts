@@ -37,6 +37,8 @@ export const profil: Command = {
       }
 
       const seniority = new Date(p.seniority).toLocaleDateString("fr-FR");
+      const department = p.gradeInfo?.departmentRef?.name;
+      const salary = p.gradeInfo?.pay;
 
       const embed = new EmbedBuilder()
         .setColor(COLORS.redlake)
@@ -45,6 +47,10 @@ export const profil: Command = {
         .addFields(
           { name: "Grade", value: p.grade, inline: true },
           { name: "Faction", value: p.faction, inline: true },
+          ...(department ? [{ name: "Departement", value: department, inline: true }] : []),
+          ...(salary != null
+            ? [{ name: "Salaire", value: `${salary.toLocaleString("fr-FR")} $/sem.`, inline: true }]
+            : []),
           {
             name: "Identité RP",
             value:

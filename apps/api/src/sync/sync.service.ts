@@ -233,7 +233,14 @@ export class SyncService {
   async getProfileByDiscordId(discordId: string) {
     const user = await this.prisma.user.findUnique({
       where: { discordId },
-      include: { player: true },
+      include: {
+        player: {
+          include: {
+            gradeInfo: { include: { departmentRef: true } },
+            factionInfo: true,
+          },
+        },
+      },
     });
     if (!user || !user.player) {
       throw new NotFoundException('Aucun compte lié à ce Discord');
@@ -244,7 +251,9 @@ export class SyncService {
       avatarUrl: user.avatarUrl,
       discordUsername: user.discordUsername,
       grade: user.player.grade,
+      gradeInfo: user.player.gradeInfo,
       faction: user.player.faction,
+      factionInfo: user.player.factionInfo,
       teamName: user.player.teamName,
       rpFirstName: user.player.rpFirstName,
       rpLastName: user.player.rpLastName,
