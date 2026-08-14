@@ -91,6 +91,8 @@ model Player {
   id            String   @id @default(cuid())
   userId        String   @unique
   grade         String   @default("Civil")
+  gradeId       String?
+  gradeInfo     Grade?   @relation(fields: [gradeId], references: [id], onDelete: SetNull)
   faction       String   @default("Civil")
   teamName      String?
   rpFirstName   String?
@@ -107,6 +109,8 @@ model Player {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([gradeId])
 }
 
 model Application {
@@ -346,6 +350,8 @@ model Grade {
   siteSections String[] @default([])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  players Player[]
 
   @@index([branch])
   @@index([departmentId])

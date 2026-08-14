@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Grade } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -8,6 +9,8 @@ export class PlayersService {
 
   formatProfile(player: {
     grade: string;
+
+    gradeInfo: Grade | null;
 
     faction: string;
 
@@ -49,6 +52,8 @@ export class PlayersService {
   }) {
     return {
       grade: player.grade,
+
+      gradeInfo: player.gradeInfo,
 
       faction: player.faction,
 
@@ -93,6 +98,8 @@ export class PlayersService {
   async findAll() {
     const players = await this.prisma.player.findMany({
       include: {
+        gradeInfo: true,
+
         user: {
           select: {
             minecraftUsername: true,
@@ -113,6 +120,8 @@ export class PlayersService {
       id: p.id,
 
       grade: p.grade,
+
+      gradeInfo: p.gradeInfo,
 
       faction: p.faction,
 
@@ -137,6 +146,8 @@ export class PlayersService {
       where: { user: { minecraftUsername: username } },
 
       include: {
+        gradeInfo: true,
+
         user: {
           select: {
             minecraftUsername: true,
@@ -167,6 +178,8 @@ export class PlayersService {
       where: { userId },
 
       include: {
+        gradeInfo: true,
+
         user: {
           select: {
             minecraftUsername: true,

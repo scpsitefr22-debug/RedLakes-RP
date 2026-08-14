@@ -11,19 +11,35 @@ import { DiscordLinkDto } from './dto/discord-link.dto';
 import { SyncDiscordGradeDto } from './dto/sync-discord-grade.dto';
 import { PersonnelReportStatus } from '@prisma/client';
 import { clearanceForGrade } from '../players/grade-clearance';
+import { GradesService } from '../grades/grades.service';
 
 @Injectable()
 export class SyncService {
   constructor(
     private prisma: PrismaService,
     private discord: DiscordService,
+    private grades: GradesService,
   ) {}
+
+  /**
+   * Resout la clearance d'un grade en texte libre : priorite au catalogue
+   * Grade (source de vue REDLAKES CORE), repli sur l'ancienne table floue
+   * si le nom ne correspond a aucune entree du catalogue.
+   */
+  private async resolveGrade(name: string) {
+    const grade = await this.grades.findByName(name);
+    return {
+      gradeId: grade?.id ?? null,
+      clearance: grade?.clearance ?? clearanceForGrade(name),
+    };
+  }
 
   async syncRole(dto: SyncRoleDto) {
     const username = dto.minecraftUsername.trim();
     const uuid =
       dto.minecraftUuid ??
       `offline-${username.toLowerCase().replace(/[^a-z0-9_]/g, '_')}`;
+    const resolved = await this.resolveGrade(dto.grade);
 
     const user = await this.prisma.user.upsert({
       where: { minecraftUuid: uuid },
@@ -35,11 +51,12 @@ export class SyncService {
         player: {
           create: {
             grade: dto.grade,
+            gradeId: resolved.gradeId,
             faction: dto.faction ?? 'Civil',
             teamName: dto.teamName,
             rpFirstName: dto.rpFirstName,
             rpLastName: dto.rpLastName,
-            clearance: dto.clearance ?? clearanceForGrade(dto.grade),
+            clearance: dto.clearance ?? resolved.clearance,
             playtime: dto.playtime ?? 0,
             roleUpdatedAt: new Date(),
           },
@@ -56,21 +73,22 @@ export class SyncService {
         data: {
           userId: user.id,
           grade: dto.grade,
+          gradeId: resolved.gradeId,
           faction: dto.faction ?? 'Civil',
           teamName: dto.teamName,
           rpFirstName: dto.rpFirstName,
           rpLastName: dto.rpLastName,
-          clearance: dto.clearance ?? clearanceForGrade(dto.grade),
+          clearance: dto.clearance ?? resolved.clearance,
           playtime: dto.playtime ?? 0,
         },
       });
     } else {
-      const derivedClearance = clearanceForGrade(dto.grade);
       player = await this.prisma.player.update({
         where: { id: player.id },
         data: {
           grade: dto.grade,
-          clearance: dto.clearance ?? derivedClearance,
+          gradeId: resolved.gradeId,
+          clearance: dto.clearance ?? resolved.clearance,
           ...(dto.faction !== undefined && { faction: dto.faction }),
           ...(dto.teamName !== undefined && { teamName: dto.teamName }),
           ...(dto.rpFirstName !== undefined && {
@@ -251,11 +269,13 @@ export class SyncService {
       };
     }
 
+    const resolved = await this.resolveGrade(dto.grade);
     const player = await this.prisma.player.update({
       where: { id: user.player.id },
       data: {
         grade: dto.grade,
-        clearance: clearanceForGrade(dto.grade),
+        gradeId: resolved.gradeId,
+        clearance: resolved.clearance,
         roleUpdatedAt: new Date(),
       },
     });
