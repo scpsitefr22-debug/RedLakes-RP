@@ -102,7 +102,7 @@ export class PlayersService {
   async findAll() {
     const players = await this.prisma.player.findMany({
       include: {
-        gradeInfo: true,
+        gradeInfo: { include: { departmentRef: true } },
 
         factionInfo: true,
 
@@ -154,7 +154,7 @@ export class PlayersService {
       where: { user: { minecraftUsername: username } },
 
       include: {
-        gradeInfo: true,
+        gradeInfo: { include: { departmentRef: true } },
 
         factionInfo: true,
 
@@ -188,7 +188,7 @@ export class PlayersService {
       where: { userId },
 
       include: {
-        gradeInfo: true,
+        gradeInfo: { include: { departmentRef: true } },
 
         factionInfo: true,
 
