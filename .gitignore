@@ -1,0 +1,28 @@
+node_modules
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.local.example
+
+# Build outputs
+dist/
+build/
+.next/
+*.tsbuildinfo
+
+# Gradle (Minecraft plugin)
+.gradle/
+bin/
+
+# Python
+__pycache__/
+*.pyc
+scripts/.cache/
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db

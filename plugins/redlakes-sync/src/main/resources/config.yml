@@ -1,0 +1,3 @@
+api-url: "http://localhost:3001/api"
+sync-key: "change-me-redlakes-sync-secret"
+grade-permission-prefix: "redlakes.grade."

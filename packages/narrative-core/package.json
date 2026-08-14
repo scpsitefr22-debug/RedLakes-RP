@@ -1,0 +1,21 @@
+{
+  "name": "@redlakes/narrative-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc && node dist/content/chapter-01/validate-paths.js && node dist/content/chapter-01/validate-chen-paths.js",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

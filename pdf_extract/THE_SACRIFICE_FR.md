@@ -1,0 +1,2986 @@
+# Left 4 Dead: Le Sacrifice — Traduction française
+
+## Partie 1
+
+### Page 1
+**LEFT 4 DEAD**
+**LE SACRIFICE**
+**PARTIE 1**
+VALVE
+
+### Page 2
+Zoey.
+Louis.
+Francis.
+VOUS ÊTES EN SÉCURITÉ.
+
+### Page 3
+**Narration (Bill) :** TOUT CE QUE J'AI TOUJOURS VOULU, C'ÉTAIT QUE VOUS SOYEZ EN SÉCURITÉ.
+
+**Narration (Bill) :** JE SACRIFIERAIS ***ENCORE*** CENT PERSONNES POUR VOUS GARDER EN SÉCURITÉ.
+
+**Narration (Bill) :** JE SACRIFIERAIS ***MOI-MÊME***.
+
+**Narration (Bill) :** ÇA VEUT PAS DIRE QUE JE VAIS Y ALLER ***SANS ME BATTRE***.
+
+**Bill :** BIEN SÛR...
+
+**Onomatopée :** TK-CHAK
+
+**Bill :** AH, MERDE...
+
+### Page 4
+**Narration (Bill) :** Y EN A TROIS.
+
+**Narration (Bill) :** TROIS PUTAINS DE TANKS.
+
+**Narration (Bill) :** BON.
+
+**Narration (Bill) :** JE VAIS PEUT-ÊTRE D'ABORD ME TAPER UNE CLIM.
+
+**Bill :** TENEZ VOS CHEVAUX...
+
+**Bill :** ...JE SUIS AVEC VOUS DANS UNE MINUTE.
+
+### Page 5
+**Bill :** MON BOULOT EST FAIT.
+
+**Onomatopée :** KAFF
+
+**Bill :** VOYONS CE QUE VOUS AVEZ DANS LE VENTRE, VOUS **GROSSES SALOPES DE BÂTARDS.**
+
+### Page 6
+**Narration :** IL Y A UNE SEMAINE.
+
+**Francis :** HA HAHH ! C'EST L'HEURE DE JOUER À RAPPORTER, BANDE DE CONNARDS !
+
+**Francis :** JE LANCE UN TUYAU !
+
+**Onomatopées :** TICK TICK TICK TICK
+
+**Onomatopée :** WHMP
+
+**Louis :** PUTAIN DE MERDE.
+
+**Narration :** POSTE D'ÉVACUATION ECHO, PENNSYLVANIE DU NORD.
+
+### Page 7
+**Onomatopées :** TICK TICK TICK TICK TICK TICK TICK TICK
+
+**Louis :** BEAU COUP, FRANCIS.
+
+**Louis :** LA PROCHAINE FOIS, LANCE LA BOMBE **DEHORS** PAR LA FENÊTRE.
+
+**Francis :** ZOEY, T'ES PEUT-ÊTRE PAS UNE ACCRO DU BASEBALL...
+
+**Francis :** MAIS C'EST PAS BON POUR LE BRAS D'UN HOMME QUAND UN ZOMBIE S'ACCROCHE AVEC SES PUTAINS DE DENTS.
+
+**Zoey :** MERDE ! MAINTENANT ILS MONTE TOUS **ICI !**
+
+**Bill :** OUAIS, JE SAIS, LOUIS.
+
+**Francis :** JE TE DIS QUOI, LA PROCHAINE FOIS JE TE LA FOUS DANS LE CUL. APRÈS TU N'AS QU'À SERRER ET—
+
+**Francis :** ...JE DÉTESTE... LES ZOMBIES... À CE POINT-LÀ...
+
+**Onomatopées :** AKH ! PFFH !
+
+### Page 8
+**Onomatopée :** TKTKTKTKTKTKTKTK
+
+**Onomatopée :** BOOOOOOOOM
+
+**Francis (hors champ) :** ENFIN, C'ÉTAIT L'HEURE DE @#*%...
+
+**Zoey :** LES GARS ! LES SECOURS SONT LÀ !
+
+### Page 9
+**Zoey :** L'ARMÉE EST **LÀ**, LES GARS ! ON BOUGE !
+
+**Francis :** J'ARRIVE, J'ARRIVE !
+
+**Francis :** VIENS LÀ, MOCHE...
+
+**Onomatopée :** BLAM
+
+### Page 10
+**Louis :** SÉRIEUSEMENT LES GARS, ON BOUGE !
+
+**Zoey :** OÙ EST BILL ?
+
+**Zoey :** FRANCIS, IL EST OÙ ?
+
+**Francis :** LE VIEUX MOMIE À CHEVEUX BLANCS ? FUME BEAUCOUP, DÉTESTE LES ESCALIERS ?
+
+**Louis :** IL VA BIEN ?
+
+**Francis :** PRÈS DES ESCALIERS.
+
+**Francis :** J'AI L'AIR D'UN ESCALIER, MOI ? COMMENT JE SUIS CENSÉ LE SAVOIR ?
+
+### Page 11
+**Francis :** OH, POUR L'AMOUR DU CIEL...
+
+**Zoey :** GARDEZ LA PIÈCE ! ON SORT PAR LE TROU.
+
+**Zoey :** JE REVIENS TOUT DE SUITE !
+
+**Louis :** TU CROIS QU'ON DEVRAIT ALLER AVEC ELLE, MEc ?
+
+**Francis :** PEUT-ÊTRE QUE BILL EST DANS LA MERDE.
+
+**Louis :** BILL ? NAH.
+
+**Narration (Francis) :** DEUX TRUCS QUE J'AI APPRIS SUR BILL CES DERNIÈRES SEMAINES...
+
+**Narration (Francis) :** IL EST DANS UN DE SES HUMEURS VIETNAMIENNES TOUTE LA NUIT.
+
+**Narration (Francis) :** FAIS PAS LE MALIN AVEC SA BARBE DE VIEUX BOUC...
+
+*(Page sans autre texte — six vignettes de zombies)*
+
+### Page 12
+**Narration (Francis) :** ...ET NE L'INTERROMPS JAMAIS QUAND IL EST EN TRAIN DE **BOSSER.**
+
+**Bill :** NNNYAGHH !
+
+**Onomatopées :** CLICK / CLICK / CLICK / CLICK
+
+**Bill :** HNGH !
+
+**Onomatopée :** KRKK
+
+**Onomatopée :** CHKK
+
+### Page 13
+**Zoey (hors champ) :** BILL ? LES SECOURS SONT LÀ !
+
+**Zoey (hors champ) :** BILL ?
+
+**Zoey :** BILL ! FAUT MONTER, MEc ! LES SECOURS SONT LÀ !
+
+**Bill :** JE T'AI ENTENDUE LA PREMIÈRE FOIS, GAMINE.
+
+**Bill :** J'ÉTAIS JUSTE PAS ***FINI.***
+
+**Zoey :** HEH.
+
+**Bill :** J'IMAGINE QU'Y A PAS MOYEN DE PARTIR SANS—
+
+**Zoey :** NON, FRANCIS SAIT QUE C'EST ICI.
+
+**Bill :** AHHHH, BON.
+
+### Page 14
+**Louis :** FRANCIS, TU VAS ARRÊTER DE LUI PUNCHER LA TÊTE QUAND, MEc ?
+
+**Francis :** SAIS PAS. DÈS QUE ÇA DEVIENT CHIANT.
+
+**Onomatopées :** WHAM ! WHAM ! WHAM ! WHAM !
+
+**Francis :** NAN.
+
+**Francis :** TOUJOURS FUN.
+
+**Bill :** ON BOUGE !
+
+**Bill :** JE VOUS LAISSE CINQ PUTAINS DE MINUTES ET VOUS OUBLIEZ COMMENT COURIR VERS UN VÉHICULE DE SECOURS !
+
+**Bill :** ZOEY, TU PRENDS LA POINTE. JE COUVRE LE...
+
+**Onomatopée :** THOOM
+
+**Bill :** AH, POUR L'AMOUR DU CIEL...
+
+### Page 15
+**Onomatopée :** THOOM
+
+**Bill :** TANK !
+
+### Page 16
+**Zoey :** BILL !
+
+**Bill :** T'INQUIÈTE PAS POUR MOI, GAMINE !
+
+**Bill :** RECULEZ SUR LE TOIT !
+
+**Onomatopées :** THOOM THOOM THOOM
+
+**Bill :** JE JURE SUR DIEU QUE J'EN AI DÉJÀ TUÉ ***CINQUANTE*** DE VOUS, SALOPARDS...
+
+**Bill :** VOUS POURRIEZ AU MOINS AVOIR LA PUTAIN DE DÉCENCE DE TOMBER ***FACILEMENT.***
+
+**Onomatopée :** SKSSH
+
+### Page 17
+**Louis :** JE LANCE DU PROPANE !
+
+**Francis :** COMPRIS !
+
+**Onomatopée :** BOOOOOOM
+
+**Onomatopées :** BLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAMBLAM
+
+### Page 18
+**Onomatopées :** BLAM / BLAM / BLAM / BLAM / BLAM / BLAM / BLAM / BLAM
+
+**Louis :** BON.
+
+**Louis :** MAINTENANT ON PEUT TOUS SORTIR DE CETTE **PUTAIN** DE FERME ?
+
+### Page 19
+**LEFT 4 DEAD PRÉSENTE : LE SACRIFICE**
+**PARTIE 1**
+
+### Page 20
+**Louis :** BOUGE ! BOUGE !
+
+**Zoey :** FRANCIS, DÉPÊCHE-TOI !
+
+**Francis :** ATTENDS. FAUT QUE JE FASSE UN DOIGT D'HONNEUR À CE ZOMBIE.
+
+**Onomatopée :** SHLKT
+
+### Page 21
+**Zoey :** FRANCIS !
+
+**Francis :** AGGHH ! MERDE !
+
+**Louis :** JE T'AI !
+
+**Francis :** LÂCHE PAS, PUTAIN !
+
+**Louis :** JE LÂCHE PAS, MEc !
+
+**Francis :** JE RETIRE TOUTE LA MERDE QUE J'AI DITE SUR TOI !
+
+**Louis :** ATTENDS. T'AS DIT DE LA MERDE SUR MOI ?
+
+**Francis :** LÂCHE PAS LÂCHE PAS PUTAIN LÂCHE PAS !
+
+### Page 22
+**Zoey :** T'INQUIÈTE PAS, LOUIS ! JE M'EN OCCUPE !
+
+**Zoey :** PRESQUE...
+
+**Onomatopée :** BLAM
+
+**Zoey :** JE T'AI EU, SALE FREAK.
+
+**Onomatopée :** SLAM
+
+### Page 23
+**Louis :** OH PUTAIN **OUI**, C'EST COMME ÇA QU'ON FAIT !
+
+**Louis :** FINI LES GROS ZOMBIES QUI VOMISSENT, FINI LES GROS ZOMBIES QUI LANCENT DES BAGNOLES...
+
+**Louis :** FINI LES SALOPES BLANCHE-NEIGE QUI PLEURENT...
+
+**Louis :** QUE DU REPOS ET DE LA DÉTENTE DANS LA ZONE SÛRE, BÉBÉ ! HA-HAHHH !
+
+**Francis :** CALME-TOI. JE LE CROIRAI QUAND JE LE VERRAI.
+
+**Louis :** C'EST QUOI CE GENRE D'**ATTITUDE**, MEc ?
+
+**Louis :** FRANCIS, ON EST DANS UN VÉHICULE BLINDÉ.
+
+**Louis :** CONDUIT PAR L'ARMÉE. ON NOUS EMMÈNE DANS UNE ZONE SÛRE.
+
+**Louis :** TU PEUX **ENFIN** ADMETTRE QUE TOUT VA BIEN SE PASSER ?
+
+**Francis :** LOUIS, J'SUIS DÉSOLÉ DE TE L'APPRENDRE, MAIS ON EST DÉJÀ PARTIS VERS LA ZONE SÛRE **QUATRE FOIS**.
+
+**Francis :** HÉLICOPTÈRE : **CRASHÉ.**
+
+**Francis :** AVION : **CRASHÉ.**
+
+**Francis :** BATEAU : NOUS A VIRÉS ET **LAISSÉS POUR MOURIR.**
+
+**Francis :** CROIS-MOI...
+
+**Francis :** UN TRUC VA MAL TOURNER ET ON SERA TOUS MORTS.
+
+### Page 24
+**Radio :** ROCK, ICI RESCUE 9.
+
+**Radio :** ON A RÉCUPÉRÉ QUATRE TANGO MIKE. MERCI DE VOS INSTRUCTIONS.
+
+**Radio :** RESCUE 9, CONTOURNEZ ECHO ET RETOURNEZ À MILLHAVEN.
+
+**Radio :** ROCK, BIEN REÇU.
+
+**Louis :** BONJOUR ?
+
+**Louis :** HÉ, EUH... MEc, JE VOULAIS JUSTE VOUS **REMERCIER** D'AVOIR SAUVÉ NOS CULS LÀ-BAS.
+
+**Louis :** ON VA VERS LA ZONE SÛ—
+
+**Onomatopée :** TAK
+
+**Francis :** TU VOIS ?
+
+**Francis :** JE TE L'AVAIS DIT.
+
+**Francis :** ON EST PUTAIN DE FOUTUS.
+
+**Louis :** CHOUETTE, FRANCIS. C'EST UNE VRAIE ATTITUDE POSITIVE.
+
+**Bill :** OH, ALLEZ. TU PEUX PAS **VRAIMENT** ÊTRE AUSSI PUTAIN D'AVEUGLE QUE TU LE FAIS SEMBLER, SI ?
+
+### Page 25
+**Louis :** BON, PEUT-ÊTRE QUE JE PRÉFÈRE ME CONCENTRER SUR LE FAIT DE RESTER **EN VIE**, PLUTÔT QUE DE ME PLAINDRE QU'ON EST **SUR LE POINT DE MOURIR** !
+
+**Zoey :** LES GARS...
+
+**Francis :** ON EST **TOUJOURS** SUR LE POINT DE MOURIR.
+
+**Louis :** EXACTEMENT, FRANCIS ! ET ON EST **ENCORE EN VIE** !
+
+**Francis :** OUAIS. ET ON EST **TOUJOURS** SUR LE POINT DE MOURIR.
+
+**Francis :** REGARDE LA RÉALITÉ EN FACE, MEc — ON SURVIT À UNE **APOCALYPSE ZOMBIE**. C'EST UNE MERDE SANDWICH PEU IMPORTE **COMMENT** TU LA MÂCHES.
+
+**Francis :** RIEN NE S'AMÉLIORE. TOUT VA DE **PIRE EN PIRE**, TOUT LE TEMPS.
+
+**Louis :** JUSTE UNE FOIS J'AIMERAIS T'ENTENDRE **L'ADMETTRE**.
+
+**Francis :** RIEN NE SERA JAMAIS PLUS OK.
+
+**Narration (flashback — Ray) :** RAY, COMBIEN DE FOIS JE DOIS TE LE DIRE ?
+
+**Narration (flashback — Ray) :** TOUT VA ÊTRE **PARFAITEMENT BIEN**, MEc.
+
+### Page 26
+**Ray (hors champ) :** ALORS S'IL TE PLAÎT. NE ME DIS PAS QUE TU T'APPELLES MALADE.
+
+**Ray (hors champ) :** OUAIS, **NON**, LOU. JE M'APPELLE **EN FORME**. ET J'AI L'INTENTION DE LE RESTER.
+
+**Louis :** POUR L'AMOUR DU CIEL, RAY...
+
+**Ray (hors champ) :** LOU, ÉCOUTE, SANS VOULOIR TE VEXER. NORMalement J'ADORE TON ATTITUDE « VERRE À MOITIÉ PLEIN ». ÇA NOUS A SORTIS DE PAS MAL DE MAUVAISES PASSES, OK ?
+
+**Louis :** RAY.
+
+**Ray (hors champ) :** MAIS CETTE FOIS, JE JURE SUR DIEU, LE VERRE EST **CLAREMENT À MOITIÉ VIDE**. ET L'AUTRE MOITIÉ EST... JE SAIS PAS, PLEINE DE PISSAT.
+
+**Louis :** VIENS AU BUREAU, RAY.
+
+**Narration :** PHILADELPHIE. **2 JOURS APRÈS LA PREMIÈRE INFECTION.**
+
+### Page 27
+**Ray :** NON ! LOUIS. LES GENS **MEURENT**. JE VAIS PAS M'INFECTER JUSTE POUR FAIRE TOURNER LA PUTAIN DE BASE DE DONNÉES DE FRANKLIN BROTHERS !
+
+**Louis :** RAY, TU VAS PAS T'INFECTER. Y A PRESQUE PERSONNE ICI !
+
+**Ray :** Y A PLUS D'INFECTÉS DANS TON APPART'.
+
+**Ray :** BON. T'AS REGARDÉ PAR LA FENÊTRE ? C'EST COMME LA FIN DU PUTAIN DE MONDE DEHORS.
+
+**Louis :** OK. OK. MAIS — EXERCICE DE RÉFLEXION, D'ACCORD ? ET SI C'ÉTAIT **PAS** ÇA ?
+
+**Ray :** QUOI ?
+
+**Louis :** ET SI CETTE GRIPPE VERTE S'ÉTEIGNAIT D'ELLE-MÊME EN UNE SEMAINE ?
+
+**Louis :** ET SI TOUT LE MONDE S'ÉTAIT EMBALLÉ POUR RIEN, ET QUE LES SEULS DEUX GARS QUI SONT RESTÉS CALMES ET ONT GARDÉ CET ENDROIT **EN MARCHE**, C'ÉTAIT TOI ET MOI ?
+
+**Louis :** TU SAIS CE QU'ON VA **GAGNER** POUR ÇA ?
+
+**Ray :** INFECTÉ.
+
+**Louis :** VIENS AU BUREAU, RAY.
+
+**Louis :** FAIS-MOI CONFIANCE. J'AI UN **BON** PRESSENTIMENT LÀ-DESSUS.
+
+### Page 28
+**Louis :** SALE FILS DE...
+
+**Louis :** QUOI DE NEUF, MEc.
+
+**Louis :** AHHHH...
+
+**Onomatopées :** BIP BIP BIP BIP BIP BIP
+
+**Louis :** OH, PUTAIN **DE** MERDE.
+
+**Louis :** COMMENT CE **SERVEUR** PEUT ÊTRE **EN PANNE** ENCORE ?
+
+**Louis :** JE VIENS DE LE **RÉPARER**, CE FDP DE—
+
+**Onomatopée :** THMP
+
+**Louis :** OCCUPÉ, MEc.
+
+**Onomatopées :** BIP BIP BIP
+
+**Onomatopée :** THMP
+
+**Louis :** HÉ. **OCCUPÉ.** CETTE CABINE EST **OCCUPÉE.**
+
+**Louis :** Y A **QUELQU'UN** DANS CETTE CABINE **DÉJÀ.**
+
+### Page 29
+**Onomatopées :** THMP THMP THMP THMP
+
+**Affiche :** DES MAINS PROPRES SAUVENT DES VIES
+
+**Louis :** OK, C'EST QUOI CE BORDEL ? TU PEUX PAS LAISSER UN HOMME CHIER TRANQUILLE ?
+
+**Louis :** J'AI FINI DANS UNE MINUTE.
+
+**Louis :** ATTENDS JUSTE...
+
+**Louis :** ...TON...
+
+**Louis :** EUH... ÇA VA, MEc ?
+
+**Onomatopée :** ...HWUGGGHHHH...
+
+*(Page sans autre dialogue — éclaboussure de sang)*
+
+### Page 30
+**Louis :** OH, **MERDE**...
+
+### Page 31
+*(Page muette — Louis face à face avec un infecté)*
+
+### Page 32
+**Louis :** OH, MERDE !
+
+**Louis :** OH, MERDE !
+
+**Louis :** NFF !
+
+**Louis :** NE...
+
+**Louis :** RRRAGGGHHHHHHH !
+
+### Page 33
+**Louis :** ENLEVE TES PUTAINS DE MAINS DE MOI !
+
+**Onomatopée :** CRACK
+
+**Onomatopée :** CRNCH
+
+**Onomatopée :** WHND
+
+### Page 34
+**Onomatopée :** KRND
+
+**Onomatopée :** SPLK
+
+*(Page sans dialogue)*
+
+### Page 35
+**Onomatopées :** *HUHH* / *HUHH* / *HUHH* / *HUHH* / *HUHH* / *HUHH*
+
+### Page 36
+*(Page muette — Louis découvre l'horreur dans le bureau)*
+
+### Page 37
+**Onomatopée :** RINNNNNNNNNNNNNNNNG !
+
+**Onomatopée :** RINNNNNNNNNNNNNNNNG !
+
+**Onomatopée :** RINNNNNNNN
+
+### Page 38
+**Onomatopée :** NNNNNG !
+
+**Onomatopée :** RINNNNNNNNNNNNNNNNG !
+
+**Messagerie (Louis) :** SALUT ! VOUS ÊTES TOMBÉS SUR LOUIS EN INFORMATIQUE !
+
+**Messagerie (Louis) :** JE SUIS PAS À MON BUREAU EN CE MOMENT, MAIS JE VEUX QUE VOUS SACHIEZ QUE TOUT VA ÊTRE PARFAITEMENT BIEN.
+
+**Messagerie (Louis) :** LAISSEZ VOTRE NOM, VOTRE POSTE ET LA NATURE DE VOTRE URGENCE PC APRÈS LE BIP...
+
+**Affiche :** DES MAINS PROPRES SAUVENT DES VIES — CEDA
+
+### Page 39
+**Narration (Louis) :** ...ET JE PROMETS, JE VAIS REMETTRE LA VIE NORMALE POUR VOUS TRÈS BIENTÔT.
+
+**Radio :** RESCUE 9, QUEL EST VOTRE STATUT ?
+
+**Capitaine Mora :** HAVEN, ON A QUATRE TANGO MIKE POUR LE DOC. ICI LE CAPITAINE MORA. LE MAJOR EST LÀ ?
+
+**Radio :** RESCUE 9, NÉGATIF.
+
+**Capitaine Mora :** HAVEN, MERCI DE PRÉVENIR LE MAJOR QUE J'AI BESOIN DE LE BRIEFER DIRECTEMENT.
+
+**Radio :** RESCUE 9, BIEN REÇU. TU SAIS QU'IL VA DEMANDER, QU'EST-CE QUE T'AS VU ?
+
+**Capitaine Mora :** HAVEN, TU LE CROIRAIS PAS.
+
+**Capitaine Mora :** JE L'AI **VU** ET J'ARRIVE PAS À LE CROIRE.
+
+### Page 40
+**Onomatopée :** CRIIIIIIIIIC
+
+### Page 41
+**Soldat :** POSEZ VOS ARMES PAR TERRE DANS LE VÉHICULE. **MAINTENANT.**
+
+### Page 42
+**Francis :** ATTENDS. JE SAIS COMMENT ÇA SE PASSE.
+
+**Francis :** VOUS ALLEZ NOUS FAIRE UNE FOUILLE CORPORELLE, HEIN ?
+
+**Soldat :** POSEZ VOS ARMES.
+
+**Soldat :** DERNIER AVERTISSEMENT.
+
+**Francis :** BON, BON...
+
+**Francis :** HÉ, VOUS DEVRIEZ FOUILLER BILL. IL A L'AIR BIEN SUSPECT.
+
+**Bill :** FRANCIS...
+
+**Francis :** ATTENDS, J'AI UNE IDÉE. PEUT-ÊTRE QUE VOUS TROIS VOULEZ VOUS FOUILLER ENTRE VOUS.
+
+**Onomatopée :** KRNNK
+
+**Francis :** AÏE.
+
+**Onomatopée :** WHMP
+
+**Soldat :** RAMENEZ VOTRE POTE MALIN.
+
+**Soldat :** SI QUELQU'UN TENTE DE S'ÉCHAPPER, ON TIRE SUR LE CORPS.
+
+**Soldat :** BIENVENUE À MILLHAVEN.
+
+### Page 43
+**Zoey :** EUM. SALUT. JE SUIS PAS UNE MALINE.
+
+**Soldat :** CONTENT DE L'ENTENDRE, MADAME.
+
+**Zoey :** ON EST OÙ ? JE CROYAIS QU'ON NOUS EMMENAIT À LA ZONE SÛRE ECHO.
+
+**Soldat :** NÉGATIF, MADAME.
+
+**Zoey :** BON. VOUS POUVEZ AU MOINS NOUS DIRE *OÙ* VOUS NOUS EMMENEZ ?
+
+**Soldat :** TESTS.
+
+**Zoey :** OK. ET SI ON *RÉUSSIT* LE TEST ?
+
+**Zoey :** EN FAIT, TU SAIS QUOI, LAISSE TOMBER.
+
+**Zoey :** JE CROIS QUE J'AI COMPRIS.
+
+**Teaser :** PARTIE 2 — LE 21 SEPTEMBRE
+
+## Partie 2
+
+### Page 1
+**LEFT 4 DEAD**
+**LE SACRIFICE**
+**PARTIE 2**
+VALVE
+
+### Page 2
+**Narration :** MILLHAVEN. IL Y A 2 JOURS.
+
+**Mora :** ...ET QUAND ÇA **ARRIVE**, SERGENT DOWNEY...
+
+**Mora :** --SI ÇA ARRIVE--
+
+**Mora :** JE VAIS VOULOIR SAVOIR EN QUI JE PEUX ***FAIRE CONFIANCE.***
+
+**Mora :** TU ME COMPRENDS, FILS ?
+
+**Downey :** OUI MONSIEUR, LT. MORA.
+
+**Mora :** JE DIS PAS QUE ÇA ***VA*** ARRIVER, HEIN.
+
+**Mora :** JE REGARDE LES FAITS.
+
+**Mora :** ON A PAS EU DE NOUVELLES DU COMMANDEMENT DEPUIS **SIX JOURS**.
+
+**Mora :** C'EST UN FAIT.
+
+**Downey :** ON A PAS EU DE NOUVELLES DE SURVIVANTS DEPUIS **DIX**.
+
+**Downey :** ET ***ÇA***, C'EST UN FAIT.
+
+**Downey :** MÊME CES CŒURS SENSIBLES DE LA CEDA ONT ARRÊTÉ D'APPELER POUR NOUS FAIRE LA MORALE SUR COMMENT TRAITER LES PRISONNIERS.
+
+**Downey :** PAS QUE JE ME PLAIGNE DE ***ÇA.***
+
+**Mora :** TU CROIS QUE LE COMMANDEMENT NOUS A ABANDONNÉS, MONSIEUR.
+
+**Downey :** NON JE CROIS PAS.
+
+**Downey :** CE QUE JE ***PENSE***, SERGENT, C'EST QUE SI LE COMMANDEMENT ***POUVAIT*** APPELER, IL ***AURAIT*** APPELÉ.
+
+**Downey :** JE CROIS QU'ON PEUT CONSIDÉRER QU'ON EST ***SEULS.***
+
+**Downey :** ET JE CROIS QU'EVERLY A PERDU LA ***PUTAIN DE TÊTE*** DE NOUS GARDER ICI.
+
+### Page 3
+**Mora :** UN SEUL MASQUE À GAZ DÉFAILLANT.
+
+**Mora :** C'EST **TOUT** CE QU'IL FAUT POUR NOUS ENFONCER DANS LA TERRE.
+
+**Mora :** POUR MOI, CAPITAINE, ON DEVRAIT LES METTRE SUR LA **PREMIÈRE LIGNE.**
+
+**Mora :** LAISSER **EUX** SE BATTRE CONTRE CES FREAKS.
+
+**Capitaine :** LES LÂCHER, C'EST CE QUE TU DIS.
+
+**Capitaine :** LES ARMER. POUR QU'ILS S'ÉCHAPPENT. ET TUENT **ENCORE PLUS** D'INNOCENTS.
+
+**Mora :** C'EST INACCEPTABLE POUR MOI.
+
+**Mora :** CETTE AVANT-POSTE NE PEUT PLUS SE **PERMETTRE** DE TRAITER CES PRISONNIERS COMME DES CITOYENS.
+
+**Mora :** LEUR SIMPLE EXISTENCE EST UN ACTE D'AGGRESSION.
+
+**Mora :** ON EST EN **GUERRE** POUR LA PUTAIN DE SURVIE DE L'ESPÈCE HUMAINE. ET ILS SONT DU MAUVAIS **CÔTÉ** DE CETTE GUERRE.
+
+**Mora :** SI C'ÉTAIT À MOI JE DÉTRUIRAI CHACUN D'ENTRE EUX.
+
+**Capitaine :** PUTAIN DE MERDE, LIEUTENANT ! Y A DES **SURVIVANTS** DEHORS !
+
+### Page 4
+**Radio :** TANGO MIKE ?
+
+**Soldat :** ÇA DOIT ÊTRE ÇA. ILS SONT DEHORS DEPUIS... JÉSUS. **DEUX SEMAINES** MAINTENANT.
+
+**Mora :** DIS À ECHO BASE QU'ON PREND LA MISSION.
+
+**Radio :** ON VOUS ENTEND FORT ET CLAIR, SURVIVANTS. ON PRÉPARE UNE ÉQUIPE D'EXTRACTION.
+
+**Radio :** PRÉPAREZ-VOUS ET RAPPELEZ QUAND VOUS ÊTES PRÊTS.
+
+**Soldat :** ENCORE DES SURVIVANTS. LIEUTENANT...
+
+**Soldat :** ...ET SI EVERLY — MERDE. ET SI ÇA **S'AMÉLIORE** DEHORS—
+
+**Mora :** PRÉPARE-MOI UN VÉHICULE.
+
+**Mora :** JE CONDUIS MOI-MÊME JUSQU'AU POINT D'EXTRACTION DE LA FERME.
+
+**Soldat :** OUI MONSIEUR.
+
+**Mora :** ON OPÈRE DANS LE NOIR DEPUIS TROP LONGTEMPS.
+
+**Mora :** IL EST TEMPS DE SAVOIR ***EXACTEMENT*** CE QUI SE PASSE DEHORS.
+
+### Page 5
+**LEFT 4 DEAD PRÉSENTE : LE SACRIFICE**
+
+**Narration :** MILLHAVEN. MAINTENANT.
+
+**Francis (étouffé) :** ...FXNNL...
+
+**Francis (étouffé) :** ...JE TE L'AVAIS DIT, LOUIS...
+
+**Francis (étouffé) :** ...SNRXXX...
+
+**Francis (étouffé) :** ...J'AVAIS RAISON...
+
+**Francis (étouffé) :** ...PNNXX...
+
+**Francis (étouffé) :** ...TOUJOURS RAISON...
+
+**PARTIE 2**
+
+### Page 6
+**Francis :** GRFGH...
+
+**Francis :** G'DD'MMIT...
+
+**Francis :** ...JE DÉTESTE TOMBER...
+
+**Francis :** NNGH !
+
+**Francis :** AÏE.
+
+**Francis :** PUTAIN... JE ME SUIS ENCORE FAIT FRAPPER AVEC LA CROSSE ?
+
+**Louis :** OUAIP.
+
+**Francis :** C'ÉTAIT CES GARS À QUI J'AVAIS DIT DE SE FOUILLER ENTRE EUX, HEIN.
+
+**Louis :** C'ÉTAIT EUX.
+
+**Francis :** OUAIS, ÇA TIENT LA ROUTE.
+
+**Louis :** ON EST OÙ, PUTAIN ?
+
+### Page 7
+**Louis :** OÙ QU'ON SOIT, C'EST SÛR PAS LE CAMP ECHO.
+
+**Louis :** ZOEY ET BILL ?
+
+**Francis :** « AVEC LE DOCTEUR. » C'EST TOUT CE QU'ILS ME DISENT.
+
+**Francis :** BON. J'AVAIS RAISON. ON EST FOUTUS.
+
+**Louis :** BON, MAINTENANT JE DIRAIS PAS...
+
+**Francis :** OUAIS, JE SAIS CE QUE **TU** DIRAIS PAS. C'EST POUR ÇA QUE **C'EST MOI** QUI LE DIS.
+
+**Garde :** ET TU EN RÊVES.
+
+**Garde :** TU MARMONNES « JE TE L'AVAIS DIT, LOUIS » DEPUIS UNE HEURE.
+
+**Louis :** HEH. OUAIS. C'ÉTAIT UN BON RÊVE.
+
+**Garde :** APRÈS T'AS COMMENCÉ À CRIER SUR TA CHUTE.
+
+**Francis :** OH, ÇA. ON TOMBAIT TOUS LES DEUX PENDANT QUE JE TE DISAIS TES QUATRE VÉRITÉS.
+
+**Louis :** FRANCIS...
+
+**Francis :** J'ÉTAIS PLUTÔT COURAGEUX. **TOI** T'AVAIS VRAIMENT PEUR, PAR CONTRE.
+
+**Louis :** FRANCIS. MEc, JE CROIS QU'ON EST DANS UNE **SACRÉE** MERDE.
+
+**Francis :** BON, LAISSE-MOI GÉRER.
+
+**Louis :** EUM. ATTENDS. QUOI ?
+
+**Francis :** SUIS MON LEAD. J'AI UN PLAN.
+
+**Louis :** NON. FRANCIS. **NON.** PARLONS-EN D'ABORD—
+
+### Page 8
+**Francis (étouffé) :** --- ---- --- ? --- --- ! ------- ---- ---- !
+
+**Francis (étouffé) :** --- ? --- --- ! --- -- -- ! ---- --- .
+
+**Soldat 1 :** IL SAIT QU'ON L'ENTEND PAS ?
+
+**Soldat 2 :** J'IMAGINE QUE NON.
+
+**Francis (étouffé) :** --- ---- --- ! --- --- ! ------- ---- ---- !
+
+**Soldat 2 :** ATTENDS, JE BRANCHE L'INTERCOM.
+
+**Onomatopée :** SHKT
+
+**Francis :** --PARCE QUE T'ES PETIT !
+
+**Francis :** CE TRUC DE « BON FLIC, PETIT FLIC DE LA TAILLE D'UN GOSSE » MARCHE PAS SUR MOI. PARCE QUE JE SUIS FLIC ! HAH !
+
+**Francis :** LOUIS ! JE CROIS QUE ÇA MARCHE !
+
+**Francis :** REGARDE TA PETITE TÊTE DE MANDARINE ! OÙ VOUS TROUVEZ DES UNIFORMES DE L'ARMÉE SI PETITS ?
+
+**Soldat 2 :** TU ESSAIES DE M'ÉNERVER POUR QU'ON ENTRE ET QUE VOUS NOUS MAÎTRISIEZ POUR VOUS ÉCHAPPER, C'EST ÇA ?
+
+### Page 9
+**Soldat :** QUOI ? NON.
+
+**Soldat :** OK, BON, OUI. ET ALORS ?
+
+**Soldat :** JUSTE UNE INTUITION, MONSIEUR. ET OUI — JE SUIS UN PEU PETIT.
+
+**Soldat :** TOUTES LES FEMMES DE MA FAMILLE LE SONT.
+
+**Bill :** OHHH. T'ES UN...
+
+**Soldat :** SOLDAT. OUI MONSIEUR. LAISSE-MOI T'AIDER.
+
+**Soldat :** T'ES DANS UNE SALLE STÉRILE HERMÉTIQUEMENT SCELLÉE AVEC UN SYSTÈME DE VENTILATION INDÉPENDANT.
+
+**Soldat :** LA SEULE FAÇON QU'ON ENTRE, C'EST SI T'ES MORT OU EN FEU.
+
+**Soldat :** LE DOCTEUR EST AVEC TES AMIS. IL SERA LÀ DANS UNE MINUTE.
+
+**Soldat :** MAINTENANT ASSIEDS-TOI ET TAIS-TOI.
+
+**Soldat :** MONSIEUR.
+
+### Page 10
+**Francis :** C'ÉTAIT TON PLAN.
+
+**Louis :** C'ÉTAIT LA PREMIÈRE PARTIE DE MON PLAN.
+
+**Francis :** OUAIS, RÉCAPITULONS QUELQUES-UNS DE TES PLANS JUSQU'ICI.
+
+**Francis :** « VA AIDER CETTE FILLE QUI PLEURE, LOUIS. ELLE A L'AIR TRISTE. »
+
+**Francis :** « TROUVONS L'ARMÉE. ILS SAURONT QUOI FAIRE. »
+
+**Francis :** « ON EST ENFERMÉS DANS UNE PETITE PIÈCE. JE VAIS ÉNERVER LES GARS AVEC DES FUSILS POUR QU'ILS TIRENT SUR LOUIS. »
+
+**Louis :** TOUS DE BONS PLANS. TON POINT C'EST QUOI ?
+
+**Garde :** HÉ !
+
+**Garde :** VIENS ICI UNE SECONDE.
+
+**Francis :** QUI, MOI ?
+
+**Garde :** NON.
+
+**Garde :** LE MALIN.
+
+**Francis :** JE CROIS TOUJOURS QU'IL PARLE DE MOI.
+
+**Louis :** UH HUH. LAISSE-MOI ALLER VOIR QUAND MÊME.
+
+**Francis :** JE PARIE DIX BILLETS QU'IL VEUT JUSTE TE TIRER DESSUS.
+
+**Louis :** J'ESPÈRE PAS.
+
+**Louis :** J'AURAIS PU RESTER ASSIS POUR ÇA.
+
+**Garde :** OUAIS ? TU VEUX QUOI ?
+
+**Garde :** JEFF, C'EST QUOI CE BORDEL ?
+
+**Garde :** J'AI BESOIN DE SAVOIR ÇA.
+
+### Page 11
+**Garde :** VOUS ÊTES DEHORS DEPUIS DEUX SEMAINES, NON ?
+
+**Louis :** ÇA NE L'A PAS FAIT COMME ÇA. MAIS OUAIS.
+
+**Garde :** LES WHISKEY DELTA ONT ÉTÉ... EN TRAIN DE CHANGER ?
+
+**Louis :** WHISKEY DELTA ?
+
+**Garde :** MORTS-VIVANTS. ILS... TU SAIS, MUTENT ?
+
+**Louis :** TU DÉCONNES ? DEPUIS COMBIEN DE TEMPS VOUS ÊTES **COINCÉS** ICI ?
+
+**Garde :** DONC ILS NE MUTENT PAS.
+
+**Louis :** ATTENDS UNE MINUTE. VOUS AVEZ JAMAIS VU UN **BOOMER** ?
+
+**Garde :** UN « BOOMER ».
+
+**Louis :** GROS ZOMBIES GRAS QUI TE **VOMISSENT** DESSUS.
+
+**Garde :** VA TE FAIRE FOUTRE.
+
+**Louis :** OH, JE SUIS MÊME PAS ENCORE ARRIVÉ À LA PARTIE **FOIREUSE**.
+
+**Louis :** TU VOIS, LE VOMI ATTIRE D'**AUTRES** ZOMBIES. C'EST COMME... JE SAIS PAS, DE LA CATNIP OU UN TRUC DU GENRE.
+
+**Garde :** JÉSUS.
+
+**Louis :** MAIS C'EST MÊME PAS LES **PIRES**.
+
+### Page 12
+**Louis :** Y A UN TRUC QU'ON APPELLE UN ***HUNTER***.
+
+**Louis :** IL VA SAUTER DE CENT PIEDS D'UN IMMEUBLE, DIRECT SUR ***TOI***.
+
+**Louis :** ET TE DÉCHIRER LES TRIPES AVEC SES ***GRIFFES***.
+
+**Garde :** PUTAIN DE MERDE...
+
+**Louis :** ENSUITE Y A LES ***TANKS***.
+
+**Garde :** LES ZOMBIES ONT DES ***TANKS*** ?
+
+**Louis :** PAS BESOIN. CES TRUCS FONT TRENTE PIEDS DE HAUT. DES BRAS COMME DES ***TRONCS D'ARBRE***.
+
+**Louis :** ILS SOULÈVENT UNE BAGNOLE JUSTE POUR TE **TABASSER À MORT** AVEC.
+
+**Francis :** AUSSI : ***LES VAMPIRES***. HEIN, POTE ?
+
+**Francis :** OH MEc, C'EST LES PIRES.
+
+**Louis :** FRANCIS...
+
+**Francis :** SE TRANSFORMER EN CHAUVE-SOURIS. VIVRE DANS DES CHÂTEAUX.
+
+**Louis :** FRANCIS. POUR LA DERNIÈRE FOIS. Y A PAS DE VAMPIRES.
+
+**Francis :** ON LES A VUS QUAND T'ÉTAIS PARTI. T'AS RATÉ ÇA.
+
+**Louis :** QUAND J'ÉTAIS PARTI ?
+
+**Francis :** ÇA, EUH... TU SAIS, CETTE FOIS-LÀ.
+
+**Louis :** TA GUEULE.
+
+**Garde :** LT. MORA NOUS PARLAIT DE... UN TRUC QU'ON APPELLE UN SMOKER ?
+
+**Garde :** OUAIS, CELUI-LÀ IL FAIT QUOI ?
+
+**Louis :** ...IL CAPTURE SES VICTIMES AVEC SA LONGUE ***LANGUE*** EN FORME DE CORDE.
+
+### Page 13
+**Officier :** LT. MORA, TON TALENT POUR LA FICTION M'ÉTONNE.
+
+**Officier :** ÇA CONTINUE. WHISKEY DELTA ***GÉANTS***. WHISKEY DELTA ***EXPLOSIFS***.
+
+**Officier :** J'ADORE SURTOUT CELUI-CI : « WHISKEY DELTA CAPABLES DE SAUTER À DES HAUTEURS DE ***TRENTE PIEDS OU PLUS.*** »
+
+**Officier :** LES MURS DE CE COMPOUND FONT ***VINGT*** PIEDS, LT. MORA.
+
+**Officier :** SI JE NE SAVAIS PAS MIEUX, JE DIRAIS QUE TON RAPPORT EST ***FAIT SUR MESURE*** POUR SEMER LA DISCORDE DANS MES RANGS.
+
+**Mora :** JE SUIS ALLÉ À LA FERME MOI-MÊME, MONSIEUR. ***C'EST*** CE QUE J'AI VU.
+
+**Officier :** J'EN SUIS SÛR.
+
+**Officier :** ON A NOS ***ORDRES***, LT. MORA, QUE ÇA TE PLAISE OU NON. RECHERCHE ET SAUVETAGE. ON RESTE ET ON ***ATTEND.***
+
+### Page 14
+**Lieutenant :** MAJOR EVERLY. **MONSIEUR.** AVEC TOUT LE RESPECT DÛ, CETTE BASE N'EST PLUS **SÉCURISÉE.**
+
+**Lieutenant :** ECHO BASE AU NORD EST **ÉQUIPÉE** POUR UN ASSAUT PROLONGÉ.
+
+**Everly :** NOUS, **MONSIEUR**, NE LE SOMMES PAS.
+
+**Lieutenant :** ON DEVRAIT LARGUER LES PORTEURS ET—
+
+**Everly :** ABANDONNER LES SURVIVANTS SOUS NOS **SOINS**, TU VEUX DIRE.
+
+**Everly :** LIEUTENANT, JE SUIS **AU COURANT** DE TES VUES SUR LES « PORTEURS ».
+
+**Everly :** TU SERIAS **ÉTONNÉ** DE VOIR À QUEL POINT J'EN AI MARRE DE LES ENTENDRE.
+
+**Everly :** QUE CE SOIT CLAIR. IL Y A **ENCORE** UNE CHAÎNE DE COMMANDEMENT. J'AI **ENCORE** UN TRAVAIL À FAIRE. ET J'AI L'INTENTION DE **LE FAIRE.**
+
+**Everly :** TES **HISTOIRES DE FANTÔMES** SUR DES ZOMBIES QUI CASSENT DES BARRICADES ET SAUTENT PAR-DESSUS DES PUTAINS DE BÂTIMENTS NE M'AIDENT PAS !
+
+**Everly :** À PARTIR DE MAINTENANT, LAISSE-**MOI** FAIRE MON TRAVAIL. TOI FAIS LE **TIEN.** ON EST D'ACCORD, FILS ?
+
+**Lieutenant :** OUI MONSIEUR.
+
+**Everly :** BIEN. C'EST LA **DERNIÈRE FOIS** QUE JE VEUX ENTENDRE PARLER DE ÇA.
+
+**Everly :** **CONGÉ.**
+
+### Page 15
+**Mora :** « CHAÎNE DE COMMANDEMENT. » ON A PAS **ENTENDU** LE COMMANDEMENT DEPUIS NEUF JOURS.
+
+**Mora :** C'EST UNE BLAGUE DE MERDE. ON EST **SEULS** ICI.
+
+**Mora :** SE RETIRER DE CETTE BASE N'EST PAS UNE DÉFAITE. PERDRE DES HOMMES POUR LA DÉFENDRE **SI.**
+
+**Soldat :** QU'EST-CE QU'ON FAIT, MONSIEUR ?
+
+**Mora :** RASSEMBLEZ PENA, BROOKS ET DAVIS. MES QUARTIERS. 14H00.
+
+**Mora :** J'AI UN SEUL DEVOIR : ENVERS LES HOMMES QUI ONT MIS LEUR VIE SOUS MA RESPONSABILITÉ.
+
+**Mora :** JE **NE** VAIS PAS SACRIFIER MON PLATOON.
+
+**Mora :** PAS POUR EVERLY.
+
+### Page 16
+**Narration :** PAS POUR LES PORTEURS.
+
+**Docteur :** CRACHEZ, S'IL VOUS PLAÎT.
+
+**Zoey :** VOUS DÉCONNEZ.
+
+**Soldat (Rivera) :** ELLE VOUS CAUSE DES PROBLÈMES, DOC ?
+
+**Docteur :** ÇA VA, RIVERA.
+
+**Docteur :** MADEMOISELLE... S'IL VOUS PLAÎT.
+
+**Zoey :** POUR LA DERNIÈRE FOIS, JE NE SUIS PAS INFECTÉE.
+
+**Zoey :** ON A MARCHÉ, À **PIED**, HORS DE PHILADELPHIE, ET **CROYEZ**-MOI, ON A VU TOUS LES ZOMBIES SUR LE CHEMIN.
+
+**Zoey :** J'AI ÉTÉ **MORDUE**. **ÉGRATIGNÉE**. **SAIGNÉE** DESSUS. **VOMIE** DESSUS.
+
+**Zoey :** JE VAIS BIEN. **ON** VA BIEN. ON EST **IMMUNES**, DOCTEUR.
+
+**Zoey :** ON VEUT JUSTE ALLER À LA ZONE SÛRE. OK ?
+
+**Docteur :** BON, **ÇA SUFFIT.**
+
+**Docteur :** TOI. CRACHE DANS LE RÉCIPIENT.
+
+**Zoey :** MEc. SÉRIEUSEMENT ? TU VAS ME **TIRER** DESSUS SI JE NE—
+
+**Rivera :** CRACHE DANS LE RÉCIPIENT !
+
+**Zoey :** VOILÀ.
+
+**Zoey :** L'AMÉRIQUE EST EN SÉCURITÉ MAINTENANT ? ON PEUT ALLER À ECHO BASE ?
+
+### Page 17
+**Docteur :** PRESQUE. JE— J'AI BESOIN D'INSPECTER UNE DES BLESSURES DONT VOUS AVEZ PARLÉ.
+
+**Zoey :** PUTAIN DE MERDE, C'EST QUOI ÇA ? ON EST EN TRAIN DE **MOURIR** OU QUOI ?
+
+**Soldat :** MONTRE-LUI TA BLESSURE.
+
+**Zoey :** OUAIS, NON. OK ? **NON.** J'EN AI OFFICIELLEMENT MARRE DE VOUS ET DU DOCTEUR POT-À CRACHATS QUI CRIENT SANS RIEN NOUS DIRE.
+
+**Soldat :** **MONTRE-LUI TA BLESSURE !**
+
+**Zoey :** ON VEUT JUSTE—
+
+**Bill :** **HÉ !** C'EST QUOI CE **BORDEL**, MEc ?
+
+**Soldat :** VOILÀ.
+
+**Bill :** ENLÈVE TES MAINS D'ELLE.
+
+**Soldat :** HUNH.
+
+**Soldat :** RECULE, VIEUX. T'ES PAS LE HÉROS ICI.
+
+**Bill :** C'EST ÇA.
+
+**Bill :** JUSTE LA ***DISTRACTION.***
+
+### Page 18
+**Onomatopée :** WHOK
+
+**Bill :** BON, ASSEZ DE CONNERIES !
+
+**Soldat :** ON EST OÙ ?
+
+**Zoey :** POURQUOI VOUS NOUS GARDEZ ICI ?
+
+**Zoey :** PARLE !
+
+**Soldat :** NON
+
+**Soldat :** AH-HUHH
+
+**Soldat :** RESPIRE PAS SUR MOI
+
+**Soldat :** SAIGNE PAS SUR MOI S'IL TE PLAÎT JÉSUS, NON
+
+**Soldat :** NE ME TOUCHE PAS
+
+### Page 19
+**Zoey :** JE... J'AI JUSTE FRAPPÉ.
+
+**Bill :** T'AS PEUT-ÊTRE TUÉ.
+
+**Docteur :** RIVERA EST À TERRE !
+
+**Onomatopée :** THUNK
+
+**Soldat :** POSEZ VOS ARMES !
+
+**Docteur :** ON— ON VA BIEN, ON VA BIEN !
+
+**Soldat :** SORTEZ-LE D'ICI !
+
+**Soldat :** BON. OK. DONC...
+
+**Soldat :** VOUS ÊTES DES **PORTEURS**. TOUS LES DEUX.
+
+**Soldat :** VOUS NE MONTREZ AUCUN **SYMPTÔME** DU VIRUS.
+
+**Soldat :** MAIS VOUS ÊTES QUAND MÊME **INFECTÉS.**
+
+### Page 20
+**Docteur :** J'AI BIEN PEUR QUE VOUS L'AYEZ TRANSMIS PARTOUT À PHILADELPHIE.
+
+**Zoey :** OH MON DIEU.
+
+**Zoey :** DONC ***C'EST*** POUR ÇA.
+
+**Zoey :** VOUS NE NOUS AVEZ PAS ***SAUVÉS.***
+
+**Zoey :** VOUS NOUS RASSEMBLEZ TOUS.
+
+**Docteur :** OUI.
+
+**Docteur :** ET AVANT QUE VOUS VOUS INDIGNIEZ, JE VOUS RAPPELLE QUE L'ARMÉE ***AVAIT*** D'AUTRES OPTIONS.
+
+**Docteur :** C'ÉTAIT L'OPTION LA PLUS ***HUMAINE.***
+
+**Zoey :** MAIS... T'ES UN DOCTEUR.
+
+**Zoey :** T'AS... Y A UN...
+
+**Zoey :** REMÈDE ?
+
+**Docteur :** ON ESSAIE.
+
+**Docteur :** CE VIRUS DÉFIE ***TOUT*** CE QU'ON A JAMAIS VU.
+
+**Docteur :** PARFOIS IL EST AÉROPORTÉ. PARFOIS NON.
+
+**Docteur :** IL MUTE CHAQUE JOUR.
+
+**Docteur :** ON ESSAIE DE LE GUÉRIR ET ON ARRIVE MÊME PAS À LE CIBLER.
+
+**Docteur :** POUR LES PORTEURS...
+
+**Docteur :** TOUT CE QU'ON SAIT C'EST QUE LE GÈNE PORTEUR PASSE PAR LE CÔTÉ DU PÈRE.
+
+**Docteur :** TOI ET TON PÈRE ICI...
+
+**Zoey :** IL...
+
+**Zoey :** C'EST PAS MON PÈRE.
+
+### Page 21
+**Narration :** PHILADELPHIE. 2 JOURS APRÈS LA PREMIÈRE INFECTION.
+
+**Carolyn :** JE L'AI LAISSÉE VIVRE CHEZ TOI UN SEMESTRE, WADE.
+
+**Carolyn :** UN **SEMESTRE** ET ELLE ABANDONNE.
+
+**Wade :** HÉ ! JE TRAVAILLE, OK ?
+
+**Wade :** CERTAINS D'ENTRE NOUS PEUVENT PAS RESTER À LA **MAISON** TOUTE LA JOURNÉE.
+
+**Carolyn :** « MAISON ». WADE, TU LOUES UN APPART'.
+
+**Wade :** OH, C'EST VRAI, CAROLYN. **TOI ET KEVIN** VOUS VIVEZ DANS **MA** MAISON.
+
+**Zoey :** COMMENT. OSEZ. VOUS.
+
+**Zoey :** OHHHH, OUAIS.
+
+**Narration (Zoey) :** MAINTENANT ÇA ME REVIENT.
+
+### Page 22
+**Maman :** C'EST ***DRÔLE***, ZOEY ?
+
+**Maman :** TU SAIS COMBIEN LA FAC COÛTE ***CHER*** ?
+
+**Zoey :** J'AVAIS UNE ***BOURSE***, MAMAN.
+
+**Maman :** QUOI QU'IL EN SOIT. ON T'A ENVOYÉE À ALDRICH POUR APPRENDRE À ***FAIRE*** DES FILMS.
+
+**Zoey :** UH HUH.
+
+**Maman :** PAS... LES ***REGARDER*** DANS L'APPART' DE TON PÈRE TOUTE LA JOURNÉE.
+
+**Maman :** ZOMBIES ET VAMPIRES ET... C'EST DE LA MERDE, CHÉRIE.
+
+**Zoey :** C'EST PEUT-ÊTRE DE LA RECHERCHE, MAMAN.
+
+**Zoey :** SI TU CROIS LES JOURNAUX, EN TOUT CAS.
+
+**Maman :** UGH. ÇA. C'EST UNE ***GRIPPE.***
+
+**Papa :** BON, LE DIPLÔME DE CINÉ C'ÉTAIT UN PARI. ON LE SAVAIT EN Y ALLANT.
+
+**Papa :** MAINTENANT ELLE PEUT REJOINDRE LA FORCE COMME SON VIEUX.
+
+**Papa :** TU DEVRAIS LA VOIR AU STAND DE TIR ! ELLE SAIT SE DÉFENDRE AUSSI.
+
+**Maman :** WADE, ARRÊTE.
+
+**Zoey :** JE SUIS LÀ, LES GARS.
+
+**Maman :** MA FILLE NE VA PAS SE FAIRE TIRER DESSUS PAR DES TOXICOMANES JUSTE POUR GARDER L'AFFAIRE FAMILIALE EN VIE.
+
+**Zoey :** TOUJOURS LÀ.
+
+### Page 23
+**Carolyn :** TU DOIS JUSTE TE...
+
+**Carolyn :** ...APPLIQUER.
+
+**Carolyn :** WADE.
+
+**Carolyn :** WADE, Y A UN FOU SANS-ABRI DANS TON SALON.
+
+**Wade :** RESTE LOIN DE LUI, CAROLYN.
+
+**Wade :** IL A CETTE... CETTE GRIPPE.
+
+**Wade :** HÉ. POTE ? FAUT QUE TU PARTES.
+
+**Carolyn :** JÉSUS ! WADE ! FAIS QUELQUE CHOSE !
+
+**Wade :** MOM, RECULE !
+
+**Zoey :** MOM, ALLEZ !
+
+**Wade :** BON, ÇA SUFFIT. DERNIÈRE CHANCE, POTE !
+
+**Wade :** TU M'ENTENDS ? JE COMPTE JUSQU'À TROIS !
+
+**Wade :** UN !
+
+**Wade :** DEUX !
+
+### Page 24
+**Onomatopées :** BLAM BLAM BLAM
+
+**Zoey :** MAMAN.
+
+### Page 25
+**Zoey :** MAMAN !
+
+**Papa :** ZOEY, APPELLE LE 911.
+
+**Papa :** LYN ? CHÉRIE, ÇA VA ALLER.
+
+**Papa :** ZOEY, APPELLE LE 911 !
+
+**Onomatopées :** HKK / HKK
+
+**Papa :** TOUT VA BIEN, BÉBÉ.
+
+**Zoey :** OGOD / OGOD / OGOD
+
+**Onomatopées :** HKK / HKK
+
+**Papa :** TOUT VA BIEN.
+
+**Onomatopées :** HKK / HHK / HKK / HKHKKK
+
+**Papa :** TIENS BON, CHÉRIE.
+
+**Onomatopée :** HKK
+
+**Papa :** JE SUIS LÀ.
+
+**Zoey :** C'EST OCCUPÉ !
+
+**Papa :** CONTINUE D'ESSAYER !
+
+**Onomatopée :** HK
+
+**Papa :** JE SUIS LÀ, LYNNIE.
+
+**Papa :** SOIS JUSTE OK.
+
+**Onomatopée :** SSS
+
+### Page 26
+**Papa :** AAAAAGHHH !
+
+**Zoey :** PAPA !
+
+**Papa :** AIDE
+
+**Papa :** AIDE-MOI...
+
+**Zoey :** MAMAN ?
+
+**Zoey :** S'IL TE PLAÎT.
+
+**Zoey :** S'IL TE PLAÎT NE FAIS PAS ÇA...
+
+**Papa :** NE...
+
+**Onomatopée :** RRRRRAAAAAAAAAAAAA
+
+### Page 27
+**Onomatopée :** BLAM
+
+**Papa :** LYNNIE...
+
+**Zoey :** PAPA, TU ENTRES EN CHOC.
+
+**Zoey :** TIENS BON. FAUT ARRÊTER L'HÉMORRAGIE.
+
+**Zoey :** JE VAIS CHERCHER LA TROUSSE DE PREMIERS SECOURS ET— **NN !**
+
+**Papa :** TU TE SOUVIENS DE CES FILMS DE ZOMBIES QUE JE TE FAISAIS VOIR EN CACHETTE QUAND T'ÉTAIS PETITE, ZOEY ?
+
+**Zoey :** HEH. JE ME SOUVIENS COMBIEN MAMAN ÉTAIT FURIEUSE QUAND ELLE L'A **SU.**
+
+**Papa :** TU TE SOUVIENS DE LA SCÈNE DANS TOUS OÙ ILS DEVAIENT TIRER SUR LE TYPE AVANT QU'IL SE TRANSFORME ?
+
+**Zoey :** HEH. ***SNIFF*** OUAIS.
+
+**Zoey :** ON SE MOQUAIT TOUJOURS DE CETTE SCÈNE.
+
+**Papa :** JE T'AIME, ZOEY.
+
+### Page 28
+**Zoey :** JE T'AIME, PAPA.
+
+**Onomatopée :** BLAM
+
+### Page 29
+**Bill :** ILS T'ONT PAS ENCORE TUÉE À CAUSE DE MOI.
+
+**Bill :** ILS M'ONT PAS ENCORE TUÉ PARCE QU'ILS VEULENT LEUR REMÈDE.
+
+**Docteur :** ÇA LEUR EST PAS ENCORE VENU À L'ESPRIT QU'IL N'Y EN A **PEUT-ÊTRE PAS.**
+
+**Docteur :** QUE **NOUS** SOMMES PEUT-ÊTRE LE SEUL AVENIR QU'ILS ONT.
+
+**Docteur :** LES PORTEURS.
+
+**Docteur :** JE...
+
+**Docteur :** JE VEUX QUE TU M'AIDES À M'ÉCHAPPER.
+
+**Docteur :** C'EST DÉJÀ PLUS SÛR ICI. CERTAINS DES SOLDATS...
+
+**Docteur :** ILS NOUS GARDERONT EN VIE TANT QU'ILS CROIENT QUE JE PEUX ARRÊTER ÇA.
+
+**Docteur :** QUAND ILS COMPRENDRONT QUE JE PEUX PAS...
+
+### Page 30
+**Docteur :** ILS VONT NOUS METTRE CONTRE UN MUR ET NOUS TIRER DESSUS.
+
+**Docteur :** MERDE. ON EST PEUT-ÊTRE DÉJÀ TROP TARD.
+
+**Louis :** MORA.
+
+**Louis :** MORA ARRIVE.
+
+**Onomatopée :** EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+**Zoey :** T'INQUIÈTES POUR DES *SOLDATS* QUI VIENNENT NOUS TUER ?
+
+**Bill :** LES INFECTÉS SONT ATTIRÉS PAR LE **BRUIT**, DOC.
+
+**Bill :** QUEL QUE SOIT LE CON QUI EST EN CHARGE ICI, IL VIENT D'APPELER **TOUS** LES ZOMBIES DANS UN RAYON DE CENT MILES.
+
+**Zoey :** DOCTEUR, FAUT QU'ON SORTE D'ICI. **MAINTENANT.**
+
+**Zoey :** ET ON VA AVOIR BESOIN D'**ARMES.**
+
+### Page 31
+**Onomatopée :** EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+**Everly :** C'EST QUOI CE **BORDEL**... ?
+
+**Everly :** **TOI.**
+
+**Everly :** TU AS LA MOINDRE IDÉE DE CE QUE T'AS FAIT ?
+
+### Page 32
+**Mora :** J'AI DONNÉ L'ORDRE D'ÉVACUATION, MAJOR.
+
+**Mora :** VOUS ÊTES RELEVÉ DE VOTRE COMMANDEMENT.
+
+**Onomatopée :** EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+### Page 33
+**Louis :** DONC ON A INFECTÉ DES GENS TOUT CE **TEMPS** ?
+
+**Louis :** JÉSUS. CES **PILOTES**...
+
+**Louis :** **C'EST NOUS** QUI CAUSIONS LES CRASHES...
+
+**Bill :** AH, ON SAIT PAS ÇA. LE GARS DE L'HÉLICOPTÈRE DE NEWS S'ÉTAIT FAIT **MORDRE.**
+
+**Bill :** ET CES GENS DU BATEAU ?
+
+**Bill :** LEUR **MARIAGE** ALLAIT MAL, SÛR. MAIS SINON ILS AVAIENT L'AIR OK.
+
+**Francis :** MON BOULOT. JE PEUX JAMAIS RETOURNER À MON **BOULOT.**
+
+**Francis :** MERDE, ILS NOUS LAISSERONT JAMAIS RETOURNER À **RIEN** !
+
+**Francis :** C'EST FINI, FRANCIS. T'ES LA SEULE PERSONNE AVEC QUI JE PEUX ÊTRE SANS LES **TUER.**
+
+**Bill :** SUPER. MAINTENANT ON EST TOUS LES DEUX TRISTES.
+
+**Bill :** C'EST QUOI— ?
+
+**Onomatopée :** EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+**Garde :** HA HA ! **OUAIS !** TU ENTENDS ÇA ?
+
+**Garde :** OH, T'ES DANS LA MERDE MAINTENANT !
+
+**Garde 2 :** ILS SONT DANS LA MERDE ?
+
+**Louis :** FRANCIS, ON EST ENFERMÉS DANS UNE PIÈCE SANS ARMES.
+
+### Page 34
+**Francis :** BON. FINI DE RIGOLER.
+
+**Louis :** VOUS DEVEZ NOUS SORTIR D'ICI, OU VOUS ALLEZ TOUS LES DEUX **MOURIR.**
+
+**Onomatopée :** EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+**Garde :** DE QUOI TU PARLES, PUTAIN ?
+
+**Louis :** LE BRUIT. ILS SONT ATTIRÉS PAR LE **BRUIT.**
+
+**Louis :** ON A ENVIRON VINGT SECONDES POUR S'**ARMER** ET **SORTIR** D'ICI AVANT—
+
+**Onomatopée :** AAAAAUUUUUUUAAAAAAAAAAAAAAUGGGGGGGGUUUUUAUAUAUUUUHHHHHGHHH...
+
+**Louis :** OHHH, MERDE.
+
+### Page 35
+**Onomatopée :** EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEESCHKT
+
+**Voix :** ...COURS...
+
+**Francis :** LAISSEZ-NOUS SORTIR !
+
+**Louis :** C'EST ***PAS*** UNE PUTAIN DE ***ARNAQUE*** ! ON PEUT VOUS AIDER !
+
+**Garde 1 :** QU'EST-CE QUE T'EN PENSES, ANNIE ?
+
+**Garde 2 (Annie) :** JEFF, SI MORA APPREND QU'ON A LAISSÉ DES PORTEURS S'ÉCHAPPER, ON EST—
+
+**Onomatopée :** UUUUUUAAAAAAAAAAHHAAHHH...
+
+**Onomatopée :** AUUUUAUAUAUUUUHHHGHH...
+
+### Page 36
+**Onomatopée :** AUUUUAUAUAUUUUHHHHHGGHH...
+
+**Garde 1 :** TIRE PAS TIRE PAS C'EST UNE WITCH !
+
+**Garde 2 :** T'ES FOU ?
+
+**Louis :** ELLE VA PASSER DROIT DEVANT VOUS ! BAISSER VOS FUSILS, COLLEZ-VOUS AU MUR !
+
+**Francis :** MEc, JE **SAIS** CE QU'EST UNE WITCH ET ÇA SONNE COMME UN MAUVAIS CONSEIL.
+
+**Louis :** JÉSUS, **RÉFLÉCHIS** !
+
+**Louis :** POURQUOI JE **MENTIRAI** SUR ÇA ?
+
+**Louis :** VOUS DEUX, C'EST NOTRE SEULE CHANCE DE **SORTIR** D'ICI !
+
+**Louis :** S'IL VOUS PLAÎT.
+
+### Page 37
+**Soldat 1 :** C'EST TELLEMENT STUPIDE...
+
+**Soldat 2 :** ...SILENCE...
+
+### Page 38
+**Onomatopée :** CRIIIIIIIIIC
+
+**Soldat :** BON, EXPERTS EN ZOMBIES...
+
+**Soldat :** Y A UNE ARMURERIE AU BOUT DU COULOIR.
+
+**Soldat :** ON VA VOUS TROUVER DES FUSILS.
+
+**Louis :** OH, **MERDE** !
+
+**Soldat :** RECULEZ, Y A UN—
+
+### Page 39
+**Louis :** UNGH !
+
+**Onomatopée :** BRAT TAT TAT
+
+**Louis :** FRANCIS ! PRENDS-LE !
+
+**Francis :** TOUT LE MONDE REGARDE ?
+
+**Francis :** ...VOUS ALLEZ ADORER ÇA.
+
+**Louis :** RECULE !
+
+### Page 40
+**Onomatopée :** SPLLLLSH
+
+**Francis :** BLUGH.
+
+**Louis :** JE DEMANDE JUSTE. Y EN A DE CES TRUCS QU'ON PEUT TIRER ?
+
+**Bill :** JE TE DIS QUOI. DONNE-MOI TON PISTOLET.
+
+**Bill :** TIRE SUR CE QU'ON TIRE EN PREMIER.
+
+**Louis :** FAIT.
+
+**Louis :** FRANCIS, T'AS PRIS COMBIEN DE VOMI LÀ-BAS ?
+
+**Francis :** PAS MAL. ON SERA PROBABLEMENT B—
+
+**Onomatopées :** WHAM WHAM WHAM
+
+### Page 41
+**PARTIE 3 — LE 29 SEPTEMBRE**
+
+## Partie 3
+
+### Page 1
+**LEFT 4 DEAD**
+**LE SACRIFICE**
+**PARTIE 3**
+VALVE
+
+### Page 2
+AUTANT QUE JE SACHE, ÇA SE PASSE EN CE MOMENT MÊME.
+
+JE PARIE QUE MORA VA SE PRENDRE UNE COUR MARTIALE POUR ÇA. AU **MOINS**. C'EST LA GUERRE.
+
+ET IL **CONTINUE** QUAND MÊME.
+
+DIS-MOI QUE C'EST PAS UN LIEUTENANT QUI PREND SOIN DE SES PUTAINS DE SOLDATS.
+
+TU DEVRAIS PAS ENLEVER TON MASQUE, JIM.
+
+**Jim :** HEH. TU VAS DÉNONCER ÇA À LA CEDA, NATE ?
+
+**Nate :** LE VIRUS EST PAS AÉROPORTÉ.
+
+**Jim :** SI TU VOIS UN PORTEUR ESSAYER DE ME CRACHER DESSUS, TU ME PRÉVIENS.
+
+**Onomatopée :** EEEEEEEEEEEEEEEEEEEEEE
+
+**Jim :** HA !
+
+**Jim :** TU ENTENDS ÇA ?
+
+**Jim :** MERCI, LIEUTENANT MORA !
+
+**Jim :** PRÉPARE TES AFFAIRES, MON GARS.
+
+**Jim :** ON SE REPLIE VERS ECHO.
+
+**Infecté :** GHLLLGH
+
+### Page 3
+**Onomatopée :** RRRRRUUUUUURRR
+
+**Onomatopée :** SHLUKT
+
+### Page 4
+**Bill :** NUGH !
+
+**Bill :** NOGH !
+
+**Bill :** NOGHH !
+
+### Page 5
+**LEFT 4 DEAD PRÉSENTE : LE SACRIFICE**
+**PARTIE 3**
+
+### Page 6
+**Louis :** ON APPROCHE DE CET ***ARSENAL***, DOC ?
+
+**Bill :** MES BRAS COMMENCENT À LÂCHER.
+
+**Louis :** J-JUSTE DEVANT.
+
+**Zoey :** HEIN. POURQUOI LA PORTE EST COLLANTE ?
+
+**Bill :** DE LA MERDE DE BOOMER ?
+
+**Zoey :** NON. ÇA SENT PLUTÔT COMME...
+
+**Onomatopées :** BIP BIP BIP BIP
+
+### Page 7
+**Zoey :** ZOEY !
+
+**Bill :** BILL !
+
+**Louis :** OH PUTAIN, ÇA FAIT DU BIEN DE VOUS ***VOIR*** !
+
+**Sur les caisses :** BEURRE DE CACAHUÈTE MILITAIRE U.S.
+
+### Page 8
+**Louis :** PUTAIN DE MERDE, C'EST DU BEURRE DE CACAHUÈTE ?
+
+**Francis :** C'EST **BIEN** DU BEURRE DE CACAHUÈTE.
+
+**Francis :** OUI ! FORMAT ARMÉE. JE POURRAIS METTRE MA TÊTE DEDANS.
+
+**Bill :** DONNE À ZOEY.
+
+**Zoey (bouche pleine) :** MMFGHHSDFH. SHOGUHD. VOUS L'AVEZ TROUVÉ OÙ ?
+
+**Louis :** TU AS FAIM À QUEL POINT ?
+
+**Zoey :** DINGUEMENT.
+
+**Louis :** ALORS TU VEUX PROBABLEMENT PAS LE SAVOIR.
+
+**Francis :** HÉ, BILL. J'AI ENTENDU QUE VOUS ÉTIEZ ALLÉS VOIR UN DOCTEUR.
+
+**Francis :** C'EST QUOI LE DIAGNOSTIC ? TOUJOURS VIEUX ?
+
+**Bill :** MON GARS, JE SUIS PRESQUE **HEUREUX** DE REENTENDRE TES CONNERIES.
+
+**Francis :** VRAIMENT ? EUH... LES COUILLES DE KENNY ROGERS ONT APPELÉ.
+
+**Francis :** ELLES VEULENT LEUR POIL DE RETOUR SUR TA TÊTE.
+
+**Bill :** OK, NE POUSS PAS TROP.
+
+**Bill :** LOUIS.
+
+**Docteur :** CONTENT DE TE VOIR, LOUIS. ON REGARDE QUOI ICI ?
+
+### Page 9
+**Annie :** BIEN APPROVISIONNÉ. SURTOUT DES M16 ET DES PISTOLETS.
+
+**Jeff :** ANNIE ET MOI ON DISCUTAIT D'UN MOYEN DE SORTIR D'ICI. JEFF, ANNIE, VOICI BILL.
+
+**Bill :** PAS FAN DU BEURRE DE CACAHUÈTE, ANNIE ?
+
+**Annie :** PAS AU POINT D'ENLEVER MON MASQUE.
+
+**Bill :** PARLE-MOI DE CE MOYEN DE SORTIR D'ICI.
+
+**Annie :** DÉPÔT FERROVIAIRE DANS LA COUR EST. TRANSPORT DE TROUPE.
+
+**Annie :** DÉPÔT FERROVIAIRE ? C'EST DE L'AUTRE CÔTÉ DE LA ***BASE***.
+
+**Bill :** ON PARLE DE QUELLE DISTANCE ? UN QUART DE MILE ?
+
+**Annie :** UN QUART DE MILE DE ***INFECTÉS*** À FOISON.
+
+**Annie :** ET TOUT CE QU'IL Y A DE ***NOUVEAU***.
+
+**Annie :** ÇA SERAIT DU SUICIDE.
+
+**Louis :** « JEFF », C'ÉTAIT BIEN ÇA ?
+
+**Louis :** JEFF, NOUS QUATRE ON EST VENUS ICI À PIED DEPUIS ***PHILADELPHIE***.
+
+**Louis :** JE PENSE QU'ON PEUT TRAVERSER UNE COUR.
+
+### Page 10
+**Francis :** ALORS...
+
+**Francis :** T'AS UNE RELATION ASSEZ PROCHE AVEC LES COUILLES DE KENNY ROGERS POUR QU'ELLES T'***APPELLENT***, HEIN ?
+
+**Zoey :** AH OUI. EUH...
+
+**Zoey :** BON, J'AI PRIIS UN MESSAGE POUR LOUIS.
+
+**Zoey :** CONTENTE DE TE REVOIR, FRANCIS.
+
+**Zoey :** Y A PAS EU GRAND-CHOSE À RIRE AUJOURD'HUI.
+
+**Francis :** ÇA CRINT.
+
+**Zoey :** MEc. COMMENT TU **FAIS** ?
+
+**Zoey :** COMMENT TU CONTINUES À FAIRE DES BLAGUES ALORS QUE TOUT DEVIENT DE PLUS EN PLUS **MERDIQUE** ?
+
+**Francis :** PLUS MERDIQUE ?
+
+**Francis :** ZOEY, L'APOCALYPSE ZOMBIE, C'EST LA MEILLEURE CHOSE QUI ME SOIT JAMAIS **ARRIVÉE**.
+
+### Page 11
+**Narration :** PHILADELPHIE. 2 JOURS APRÈS LA PREMIÈRE INFECTION.
+
+**Francis :** C'EST BON...
+
+**Francis :** JE SUIS **FLIC**.
+
+**Étiquette :** 1 299,99 $
+
+### Page 12
+**Francis :** OK, OFFICIER.
+
+**Francis :** ET POURQUOI TU VOLES UNE TÉLÉ À ÉCRAN PLAT ?
+
+**Voleur :** EUM. C'EST...
+
+**Voleur :** DES PREUVES. POUR UN CRIME.
+
+**Étiquette :** 1 299,99 $
+
+**Francis :** UH HUH.
+
+**Francis :** ET QUEL CRIME SERAIT-CE ?
+
+**Voleur :** EUM. CELUI-CI ?
+
+**Francis :** OK, NE TIRE PAS.
+
+**Francis :** PARCE QUE JE **VAIS** COURIR MAINTENANT.
+
+### Page 13
+**Francis :** ...ET C'EST POUR ÇA QUE JE VAIS EN PRISON.
+
+**Becky :** TU VAS ME MANQUER, FRANCIS.
+
+**Francis :** OUAIS. JE VAIS... TE MANQUER AUSSI, BECKY.
+
+**Becky :** SANDRA.
+
+**Francis :** PEU IMPORTE. ON AURA LE TEMPS D'APPRENDRE NOS PRÉNOMS PENDANT LES VISITES CONJUGALES.
+
+**Becky :** À MOINS QUE TU AILLES EN PRISON DANS UN AUTRE ÉTAT, FRANCIS, TU AURAS **PAS** DE VISITES CONJUGALES.
+
+**Francis :** HA HA, OUAIS. QUOI ?
+
+**Becky :** LA PENNSYLVANIE FAIT PAS DE VISITES CONJUGALES, MON POTE.
+
+**Francis :** PUTAIN. LA PROCHAINE FOIS QUE JE ME FAIS PASSER POUR UN FLIC, RAPPELLE-MOI DE LE FAIRE EN OHIO.
+
+**Francis :** ALORS MIEUX VAUT PAS PERDRE DE TEMPS.
+
+**Becky :** ALLEZ, FRANCIS.
+
+### Page 14
+**Onomatopée :** GLOMP
+
+**Francis :** AW !
+
+**Francis :** PUTAIN, BECKY !
+
+**Onomatopée :** ...HWUGGGHHHH...
+
+**Becky :** OH MON DIEU, FRANCIS ! JE SUIS DÉSOLÉE !
+
+**Francis :** MON GILET !
+
+**Francis :** SANS OFFENSE. MAIS ÇA VAUT PAS LE COUP DE RISQUER MON GILET.
+
+**Becky :** FRANCIS. ATTENDS.
+
+**Onomatopée :** ...HCCccccCHH...
+
+### Page 15
+**Francis :** AÏE !
+
+**Francis :** PUTAIN, BECKY !
+
+**Francis :** TU ME VOMIS SUR MON GILET !
+
+**Francis :** TU ME MORDS !
+
+**Francis :** QU'EST-CE QUI SUIT, TU VAS ME CHIER DESSUS ?
+
+**Francis :** QUAND J'IRAI EN PRISON EN OHIO, T'ES **INTERDITE** DE VISITES CONJUGALES !
+
+**Francis :** OK, PEUT-ÊTRE UNE VISITE.
+
+### Page 16
+**Francis :** OH, HÉ BECKAGH PUTAIN DE MERDE !
+
+**Onomatopée :** CH-CHOOM
+
+**Francis :** WHOA.
+
+**Francis :** VOILÀ DE QUOI JE PARLE.
+
+**Duke :** TU PARLES DE QUOI ?
+
+**Francis :** DUKE, T'AS **TIRÉ** SUR SANDRA !
+
+**Duke :** NAN.
+
+### Page 17
+**Francis :** DUKE, ON VIENT TOUS DE TE VOIR LE **FAIRE**, ESPÈCE DE —
+
+**Duke :** C'ÉTAIT UNE **ZOMBIE**, IDIOT.
+
+**Duke :** JE DÉTESTE VOUS L'APPRENDRE, LES GARS, MAIS C'EST PAS LA **GRIPPE**.
+
+**Duke :** C'EST JUSTE CE QUE LE GOUVERNEMENT VEUT QU'ON **CROIE**.
+
+**Duke :** D'ABORD ILS ONT ESSAYÉ DE NOUS TUER À L'**HÉROÏNE**.
+
+**Duke :** PUIS ILS ONT CONSTRUIT LES **SATELLITES**.
+
+**Duke :** PUIS LES **TÉLÉPHONES PORTABLES**.
+
+**Duke :** RELIE LES POINTS, MON GARS.
+
+**Duke :** TOUT ÇA MENAIT À **ÇA**.
+
+**Duke :** **APOCALYPSE ZOMBIE**.
+
+**Duke :** ET T'AS MORDU À L'HAMEÇON **LIGNE, LEAD ET PLONGEON**.
+
+**Duke :** ALORS QUI EST FOU, MAINTENANT ?
+
+### Page 18
+**Francis :** TOI, DUKE.
+
+**Francis :** MAIS T'AS RAISON SUR **UNE** CHOSE.
+
+**Francis :** SI TOUT LE MONDE DEHORS EST UN ZOMBIE...
+
+**Francis :** ...ALORS TOUT LE MONDE EST ZOMBIE SAUF NOUS.
+
+**Francis :** LES ZOMBIES PEUVENT PAS NOUS METTRE EN PRISON.
+
+**Francis :** LES ZOMBIES PEUVENT **RIEN** FAIRE.
+
+**Francis :** CE SONT DES IDIOTS.
+
+**Francis :** ET ÇA VEUT DIRE...
+
+**Francis :** ...QU'ON PEUT FAIRE **TOUT CE QU'ON VEUT, PUTAIN !**
+
+**Francis :** ...JE SAIS **EXACTEMENT** CE QUE JE VEUX FAIRE.
+
+**Francis :** ET SI CES TRUCS ESSAYENT DE NOUS TUER...
+
+**Francis :** DUKE ! DANNY ! PRENEZ CE JUKE-BOX ET SUIVEZ-MOI !
+
+**Onomatopée :** WHAM
+
+### Page 19
+**Francis :** TOUT LE MONDE PREND UN FLINGUE ET UNE BIÈRE !
+
+**Francis :** LA NUIT COMMENCE À PEINE, ET ON EN A PLEIN LES DEUX !
+
+**Francis :** DANNY ! OÙ T'EN ES AVEC CE JUKE-BOX ?
+
+**Danny :** JUSTE ICI, MON GARS... *NGG*
+
+**Danny :** TU VEUX NOUS DIRE POURQUOI TU NOUS AS FAIT MONTER ÇA DE **DEUX ÉTAGES** ?
+
+**Francis :** PARCE QUE, DANNY...
+
+### Page 20
+**Francis :** ...TU PEUX PAS LANCER UNE FÊTE SANS UN PEU DE MUSIQUE.
+
+**Francis :** PUTAIN.
+
+**Francis :** IL DOIT Y EN AVOIR UN ***MILLIER***...
+
+**Francis :** 999 !
+
+**Francis :** 998 !
+
+**Francis :** 997 !
+
+### Page 21
+**Soldat :** LT. MORA ! LE MAJOR EVERLY VEUT QUE TOUT LE MONDE SE RENDE À LA COUR EST ! ILS TIENNENT BON LÀ-BAS !
+
+**Mora :** NE RÉPONDS PAS, SERGENT !
+
+**Mora :** ON EST PLUS DANS LE BUSINESS DE SAUVER LE MONDE !
+
+**Mora :** ON SE SAUVE NOUS-MÊMES !
+
+### Page 22
+**Mora :** AGH ! PUTAIN DE MERDE !
+
+**Mora :** OK, TIRE-MOI DESSUS.
+
+**Mora :** ON TROUVE UN VÉHICULE, ON SE CASSE DE CE TROU À RATS UNE BONNE FOIS POUR TOUTES.
+
+**Hendricks :** JE PEUX PAS FAIRE ÇA, MONSIEUR.
+
+**Mora :** T'AS PERDU LA TÊTE, SERGENT ?
+
+**Mora :** TIRE-MOI DESSUS !
+
+**Hendricks :** MONSIEUR, VOTRE **MASQUE** EST ENLEVÉ.
+
+### Page 23
+**Mora :** PUTAIN, HENDRICKS, C'EST UNE **ÉGRATIGNURE** !
+
+**Mora :** ME LAISSE PAS CREVER À CAUSE DE LA MERDE DE SÉCURITÉ DE LA CEDA !
+
+**Hendricks :** MONSIEUR. VOUS ÊTES **COMPROMIS**.
+
+**Mora :** ALORS JETTE-MOI UN PUTAIN DE MASQUE DE RECHANGE !
+
+**Mora :** BIEN.
+
+**Mora :** SI JE ME TRANSFORME, **TUE-MOI**.
+
+**Mora :** CONTENT ? TIRE-MOI DESSUS.
+
+**Mora :** TU M'**ENTENDS** ?
+
+**Mora :** REVIENS ICI ! C'EST UN ORDRE, SERGENT !
+
+**Hendricks :** BIEN.
+
+### Page 24
+**Bill :** OK, RECRUES, ÉCOUTEZ BIEN.
+
+**Bill :** C'EST UN QUART DE MILE JUSQU'À LA GARE.
+
+**Bill :** QUAND ON Y EST, ON MONTE DANS LE PREMIER TRAIN QUI VA VERS LE **SUD**.
+
+**Bill :** VOUS VOULEZ VENIR AVEC NOUS, C'EST VOTRE PROBLÈME.
+
+**Bill :** POUR Y ARRIVER : JE ME FICHE DE L'ENTRAÎNEMENT QUE VOUS CROYEZ AVOIR.
+
+**Bill :** VOUS RESTEZ COLLÉS. VOUS SUIVEZ. ET VOUS FAITES RIEN TANT QUE VOUS NOUS VOYEZ PAS NOUS QUATRE LE FAIRE EN PREMIER.
+
+**Bill :** VOUS **PRENEZ** DU RETARD...
+
+**Bill :** ON VOUS **LAISSE** EN ARRIÈRE.
+
+### Page 25
+**Bill :** HÉ.
+
+**Bill :** HÉ, PETITE.
+
+**Bill :** JE VOULAIS PAS INTERROMPRE TON DISCOURS DE DUR LÀ-BAS, MAIS... POURQUOI LE SUD ?
+
+**Bill :** JE RÉFLÉCHISSAIS À UN MOYEN DE SORTIR DE TOUT ÇA. POUR NOUS QUATRE.
+
+**Bill :** JE TE RACONTERAI TOUT SUR LE TRAIN, ZOEY. PROMIS.
+
+**Bill :** JUSQU'À LÀ... J'AI BESOIN QUE TU ME FASSES CONFIANCE.
+
+**Zoey :** BIEN SÛR, BILL.
+
+### Page 26
+**Bill :** AU FAIT ? JE DIS BULLSHIT.
+
+**Bill :** PAS QUESTION QUE TU LAISSes LES RECRUES EN ARRIÈRE.
+
+**Bill :** REGARDE-MOI FAIRE.
+
+**Zoey :** ET NOUS ? TU NOUS LAISSES EN ARRIÈRE AUSSI ?
+
+**Bill :** JAMAIS.
+
+**Bill :** ON REVIENT POUR LES NÔTRES.
+
+### Page 27
+**Louis :** PAS... *WHUFF* BEAUCOUP DE ZOMBIES POUR L'INSTANT.
+
+**Bill :** C'EST BIEN. C'EST TRÈS BIEN.
+
+**Bill :** NON, MON GARS. C'EST **MAL**. C'EST **TRÈS TRÈS** MAL.
+
+**Bill :** LES ZOMBIES, C'EST COMME... DES PIRANHAS. ILS SONT PAS TROP ***DIFFICILES*** SUR LEUR PROIE, TU VOIS ?
+
+**Louis :** OUI...
+
+**Bill :** LE TRUC, C'EST QUE SI TU SAUTES DANS UN LAC PLEIN DE PIRANHAS ET QU'ON T'***ATTAQUE*** PAS ?
+
+**Bill :** ÇA VEUT DIRE QU'IL Y A UN ***REQUIN*** DANS LES PARAGES.
+
+**Onomatopée :** THOOM
+
+**Louis :** LES GARS ! VOUS ENTENDEZ ÇA ? JE CROIS QU'ON FERAIT MIEUX DE...
+
+### Page 28
+**Louis :** ...GÉRER CET IDIOT QUI NOUS POINTE UN FLINGUE DESSUS.
+
+**Onomatopée :** THOOM
+
+**Louis :** EUH...
+
+**Louis :** HÉ, MON GARS ! ÇA VA ?
+
+**Fou :** C'EST DE VOTRE FAUTE
+
+**Fou :** TOUT ÇA, C'EST DE VOTRE FAUTE
+
+**Bill :** POURQUOI ON S'EST ARRÊTÉS ?
+
+**Louis :** UN TYPE AVEC UN FLINGUE.
+
+**Bill :** ET ? MOI AUSSI J'AI UN FLINGUE.
+
+**Louis :** OUI, BON. TOI T'ES PAS FOU.
+
+**Louis :** ÉCOUTE, MON GARS, Y A UN TRUC VRAIMENT ÉNORME QUI ARRIVE PAR ICI, TU DEVRAIS PEUT-ÊTRE...
+
+**Fou :** C'EST DE VOTRE FAUTE
+
+**Louis :** JE... PEU IMPORTE, MON GARS. OUAIS.
+
+### Page 29
+**Francis :** NE SOIS PAS D'ACCORD AVEC LUI !
+
+**Louis :** J'ESSAIE DE **NÉGOCIER**—
+
+**Francis :** LÀ, LAISSE-MOI ESSAYER.
+
+**Francis :** EUH... BONJOUR !
+
+**Francis :** JE SUIS FLIC. ON ENQUÊTE SUR... QUOI QUE CE SOIT QUI TE FASSE CHIER.
+
+**Francis :** ET, EUH... C'EST LA FAUTE DE LOUIS.
+
+**Louis :** LOUIS.
+
+**Fou :** LEQUEL... DE VOUS... EST **LOUIS** ?
+
+**Onomatopée :** THOOM
+
+**Zoey :** FRANCIS !
+
+**Francis :** C'EST ÇA ! **MON NOM C'EST FRANCIS.**
+
+**Fou :** MERCI, **LOUIS.**
+
+**Francis :** ÇA MARCHE...
+
+**Francis :** TOUT LE MONDE SAUF LOUIS, PRÉPAREZ-VOUS À COURIR...
+
+**Bill :** OK, ASSEZ DE CONNERIES.
+
+**Onomatopée :** THOOM
+
+### Page 30
+**Onomatopée :** WHAM
+
+### Page 31
+**Bill :** BOUGEZ VOS CULS, LES GENS !
+
+**Louis :** ...LOUIS...
+
+**Louis :** ...LOUIS...
+
+**Onomatopée :** THOOM
+
+**Louis :** L—
+
+### Page 32
+**Louis :** Y A UN HÉLICO QUI DÉCOLLE ! ON POURRAIT LE HAILLER ! ON POURRAIT—
+
+**Bill :** CONTINUEZ À BOUGER.
+
+**Onomatopée :** THOOM
+
+### Page 33
+*(Page muette — Bill face au Tank)*
+
+### Page 34
+**Louis :** AÏE.
+
+**Louis :** AÏE AÏE AÏE...
+
+**Onomatopée :** WH-TNKKKK !
+
+**Onomatopées :** GUG / GUG / GUG / GUG
+
+**Louis :** OH MERDE OH MERDE QU'EST-CE QU'ON FAIT
+
+**Annie :** COURIR ET TIRER, ANNIE !
+
+**Annie :** NE LE LAISSE PAS RACCOURCIR LA DISTANCE !
+
+### Page 35
+**Louis :** IL NOUS JETTE LA **ROUTE** DESSUS !
+
+**Bill :** OUI, ILS FONT ÇA.
+
+**Bill :** RECHARGE !
+
+**Onomatopée :** RRRRRRRRUMMMMM
+
+**Francis :** HÉ, ZOEY ! JE REVIENS TOUT DE SUITE !
+
+**Louis :** EUH. HÉ, LOUIS.
+
+### Page 36
+**Louis :** TU GÈRES BIEN, MON GARS...
+
+**Louis :** PRESQUE ARRIVÉ...
+
+**Louis :** PRÉPARE-TOI À SAUTER...
+
+**Louis :** ...D'UN VÉHICULE EN MARCHE PUTAIN C'ÉTAIT UN PLAN STUPIDE.
+
+**Onomatopée :** WHND
+
+**Onomatopée :** SCREEEEEEEE
+
+**Zoey :** BILL, POURQUOI LOUIS FAIT LA TRUC LE PLUS STUPIDE QUE J'AIE JAMAIS VU ?
+
+**Bill :** DE L'ESSENCE.
+
+**Bill :** IL PERD DE L'ESSENCE.
+
+### Page 37
+**Onomatopée :** SMASSHHHHHH
+
+**Bill :** BOUGE BOUGE BOUGE BOUGE **BOUGE !**
+
+**Francis :** LOUIS ! PUTAIN DE MERDE, MON GARS...
+
+**Louis :** *AHUH* *AHUH* HÉ, LES GARS.
+
+### Page 38
+**Onomatopée :** BATOOOOOOM
+
+**Francis :** LES VOIES FERRÉES.
+
+**Francis :** TU VOIS, FRANCIS ? JE T'AVAIS **DIT** QU'ON Y ARRIVERAIT.
+
+### Page 39
+**Jeff :** VOILÀ LE POINT DE RETRAIT. ON FERAIT MIEUX DE LES REJOINDRE.
+
+**Annie :** T'ES SÛR ? TU PEUX VENIR AVEC NOUS.
+
+**Jeff :** NAN. ON A DE L'ARTILLERIE LOURDE. UN GOULOT D'ÉTRANGLEMENT.
+
+**Jeff :** ON TIENDRA CETTE VAGUE, PUIS ON PARTIRA VERS ECHO.
+
+**Annie :** ANNIE. ILS S'ARRÊTENT JAMAIS.
+
+**Zoey :** ZOEY, ON PEUT PAS VENIR AVEC VOUS. TU LE SAIS.
+
+**Zoey :** CES MASQUES À GAZ... ILS POURRAIENT...
+
+**Zoey :** NON, JE SAIS.
+
+**Zoey :** BONNE CHANCE, LES GARS.
+
+### Page 40
+**Bill :** LE TRAIN, LES GENS ! BOUGEZ !
+
+**Louis :** LOUIS ! T'AS ENCORE CES TUBES ?
+
+**Louis :** BIEN SÛR, BILL !
+
+**Bill :** LANCE-LES !
+
+**Bill :** TOUS !
+
+### Page 41
+**Francis :** EUM. ON **SAIT** CONDUIRE UN TRAIN ?
+
+**Francis :** ON DEVRAIT PAS... JE SAIS PAS. D'ABORD LE DÉMARRER ?
+
+**Louis :** JE PEUX. AIDE-MOI À TROUVER UN VOLANT.
+
+**Louis :** CHERCHE DES FILS. JE PEUX LE DÉMARRER AU BRAS.
+
+**Onomatopées :** CHNK / CHNK
+
+### Page 42
+**Radio :** LES VOILÀ ! FEU À VOLONTÉ !
+
+**Radio :** C'EST QUOI CE BORDEL ?
+
+**Radio :** TIREZ SUR LES LANGUES !
+
+**Radio :** ILS SONT DANS LE PÉRIMÈTRE !
+
+**Radio :** GO ! GO ! GO !
+
+**Radio :** —REPLI ! REPLIEZ-VOUS !
+
+**Radio :** —MONSIEUR, LE MUR NE RÉPOND PAS !
+
+**Radio :** —TROP DE—
+
+**Radio :** —RETRAITE VERS LE—
+
+**Radio :** PUTAIN DE MERDE, ILS SONT PARTOUT—
+
+**Radio :** —IL RESTE QUE MOI ET RUSKIN ICI, ON AAEEEGH—
+
+**Radio :** MUR NORD, RÉPONDEZ !
+
+**Radio :** MUR SUD, RÉPONDEZ !
+
+**Radio :** QUELQU'UN ! Y A ENCORE QUELQU'UN DEHORS ?
+
+### Page 43
+**Zoey :** BILL, RALENTIS UNE SECONDE !
+
+**Onomatopées :** *AHUH* / *AHUH* / *AHUH*
+
+**Zoey :** BILL ? RALENTIS !
+
+**Zoey :** Y A ENCORE DES GENS QUI ARRIVENT !
+
+**Zoey :** PUTAIN !
+
+### Page 44
+**Zoey :** BILL, ILS SE FONT **MASSACRER** DEHORS !
+
+**Zoey :** ARRÊTE LE TRAIN !
+
+**Zoey :** BILL ? ARRÊTE LE—
+
+**Bill :** ZOEY.
+
+**Bill :** ON N'ARRÊTE PAS CE TRAIN.
+
+**Zoey :** JE— QUOI ? TU **DÉCONNES** ?
+
+**Zoey :** ON A DÉJÀ PERDU LE DOC PARCE QUE TU POUVAIS PAS **ATTENDRE** CINQ MINUTES !
+
+**Zoey :** BILL, ON FAIT ÇA **TOUT LE TEMPS** ! C'EST CE QU'ON **FAIT** !
+
+**Bill :** NON.
+
+**Bill :** ON PREND SOIN DE **NOS NÔTRES.**
+
+### Page 45
+**Zoey :** BILL.
+
+**Zoey :** ARRÊTE. **LE TRAIN.**
+
+**Zoey :** **BILL !**
+
+**Zoey :** **ARRÊTE CE PUTAIN DE TRAIN !**
+
+**Teaser :** PARTIE 4 — LE 5 OCTOBRE
+
+## Partie 4
+
+### Page 1
+**LEFT 4 DEAD**
+**LE SACRIFICE**
+**PARTIE 4**
+VALVE
+
+### Page 2
+**Bill :** AHHHHHHHHHH...
+
+**Bill :** CE...
+
+**Bill :** ÇA, JE DÉTESTE PAS.
+
+**Francis :** HEIN ?
+
+### Page 3
+**Louis :** HALLO ! PERMISSION D'ACCOSTER SUR VOTRE ÎLE, MONSIEUR ?
+
+**Louis :** NOUS ÉTIONS EN EAUX INTERNATIONALES, EN TRAIN D'EXPÉRIMENTER DE NOUVELLES TECHNIQUES AUDACIEUSES DE BRASSAGE DE BIÈRE… TOUT NU, QUAND L'INFECTION A FRAPPÉ.
+
+**Louis :** IL EST **MIGNON** !
+
+**Louis :** ON DEVRAIT LUI FAIRE DE LA **BIÈRE** !
+
+**Louis :** NON ! ON DEVRAIT L'**EMBRASSER** !
+
+**Louis :** YOUPIII !
+
+**Louis :** HÉ, LES GARS ! VOUS VOULEZ VENIR SUR **MON** ÎLE ?
+
+**Francis :** FERME-LA, LOUIS ! PERSONNE VEUT ALLER SUR TON ÎLE DE MERDE.
+
+### Page 4
+**Francis :** JE VAIS ÊTRE HONNÊTE AVEC VOUS : VOUS FILLES, VOUS AVEZ VRAIMENT **TOUCHÉ** LE JACKPOT.
+
+**Francis :** FRANCISLAND A TOUT : PISCINES, RESTAURANTS CINQ ÉTOILES, COURTS DE TENNIS...
+
+**Francis :** ON A MÊME UN MAJORDOME À TEMPS PLEIN !
+
+**Francis :** BILL, MONTE ÇA À LA MANSIION.
+
+**Bill :** FERME-LA, FRANCIS. UN TRUC SUR LE VIETNAM. CONNERIES.
+
+**Bill :** TU PEUX L'IGNORER. MOI JE LE FAIS.
+
+**Zoey :** FRANCIS !
+
+**Francis :** QUOI ? JE ME LES FOUS BIEN ICI.
+
+**Zoey :** FRANCIS !
+
+**Francis :** PUTAIN. OK. JE ME RÉVEILLE.
+
+### Page 5
+**Francis :** PUTAIN, **QUOI ?**
+
+**Francis :** MEc, AIDE-MOI LÀ ! COMMENT TU PEUX **PAS** T'INTÉRESSER À ÇA ?
+
+**Francis :** T'AS RAISON. JE VAIS VOIR CE QUE LES FILLES EN BIKINI EN PENSENT DE CE SUJET IMPORTANT.
+
+**Onomatopée :** ZZZZ
+
+**Zoey :** JE... JE SAIS PAS CE QUE ÇA--
+
+**Zoey :** OK.
+
+**Zoey :** MAIS JUSTE PARCE QUE **LUI**, C'EST UN IDIOT...
+
+**Zoey :** ...ÇA VEUT PAS DIRE QUE **TOI** T'ES QUITTES, BILL.
+
+**Zoey :** ZOEY. ÉCOUTE.
+
+### Page 6
+**Zoey :** LES **KEYS DE FLORIDE**, BILL ?
+
+**Zoey :** PUTAIN, JE T'AI **FAIT CONFIANCE** !
+
+**Zoey :** ON A LAISSÉ MOURIR UN **MÉDECIN**, ESPÈCE DE CON.
+
+**Zoey :** ON A LAISSÉ MOURIR DES **SOLDATS**.
+
+**Zoey :** ET POUR QUOI ? POUR QU'ON SE BARRE SUR UNE ÎLE ET QU'ON SE **CACHE** ?
+
+**Zoey :** BILL, ON **SAIT** QU'IL Y A D'AUTRES PORTEURS LÀ-DEHORS.
+
+**Zoey :** DES GENS COMME **NOUS**.
+
+**Zoey :** ON POURRAIT LES **TROUVER**.
+
+**Zoey :** ON POURRAIT SE **BATTRE**.
+
+### Page 7
+**Bill :** ZOEY, ON SE BAT DEPUIS QU'ON EST PARTIS DE PHILLY.
+
+**Bill :** ON S'EST TIRÉ DE **L'ENFER** À COUPS DE BALLES POUR ATTEINDRE CETTE ZONE SÛRE. ON A PRESQUE CREVÉ DIX FOIS.
+
+**Bill :** ON A EU DE LA **CHANCE**.
+
+**Bill :** ET ILS NOUS ONT ENFERMÉS ET ONT ESSAYÉ DE NOUS TUER.
+
+**Bill :** ON A ESSAYÉ **À TA FAÇON**.
+
+**Bill :** LES KEYS, BON...
+
+**Bill :** C'EST ASSEZ PROCHE POUR Y ALLER D'ICI. C'EST À DES **KILOMÈTRES** DE LA TERRE FERME. PLEIN D'ÎLES HABITABLES. BEAU TEMPS TOUTE L'ANNÉE.
+
+**Bill :** PLUS D'ARMÉE. PLUS DE PRISONS.
+
+**Bill :** PLUS DE **ZOMBIES**.
+
+**Bill :** JE SAIS QUE ÇA FAIT MAL, GAMINE, MAIS ON **PEUT PAS** SAUVER TOUT LE MONDE.
+
+**Bill :** ON DOIT VEILLER SUR LES NÔTRES. SINON **ON CREVÉ**. C'EST AUSSI SIMPLE QUE ÇA.
+
+### Page 8
+**Zoey :** JE SUIS PAS TRISTE PARCE QU'ON A PAS PU SAUVER TOUT LE MONDE, BILL.
+
+**Zoey :** JE SUIS EN COLÈRE PARCE QUE JE VEUX MON MONDE EN RETOUR.
+
+**Zoey :** JE VEUX DIRE, LA MOITIÉ DU TEMPS J'AI L'IMPRESSION QUE TU KIFFES ÇA.
+
+**Zoey :** JE... **DÉTESTE** ÇA.
+
+**Zoey :** JE SUIS PRÊTE À **MOURIR** SI ÇA VEUT DIRE QU'ON SE BAT.
+
+**Zoey :** SI ÇA VEUT DIRE QU'ON TROUVE D'AUTRES GENS COMME NOUS, ET QU'ON ÉLIMINE CES PUTAINS DE TRUCS DE LA **FACE** DE LA **TERRE**.
+
+**Zoey :** ET TOI TU VEUX TE BARRE SUR UNE ÎLE ET **ABANDONNER** TOUT LE MONDE ?
+
+**Zoey :** QUI D'AUTRE T'AS LAISSÉ TOMBER, BILL ?
+
+**Zoey :** QUI D'AUTRE TU VAS **LAISSER** TOMBER ?
+
+**Zoey :** MOI, EUH... J'AI JAMAIS PENSAIS QUE JE DIRAIS ÇA, MAIS...
+
+**Zoey :** JE VAIS ALLER TRAINER AVEC LOUIS.
+
+**Francis :** JE VIENS AVEC TOI.
+
+### Page 9
+**Narration :** HÔPITAL DES VÉTÉRANS
+
+**Narration :** PHILADELPHIE. 2 JOURS APRÈS LA PREMIÈRE INFECTION.
+
+**Bill :** ALORS...
+
+**Bill :** VOUS ATTENDEZ DE LA ***FAMILLE*** ?
+
+**Infirmière :** JE SUIS DÉSOLÉE, JE SUIS DÉSOLÉE, C'EST VRAI.
+
+**Bill :** VOUS...
+
+**Bill :** EUM.
+
+### Page 10
+**Interne :** ALORS.
+
+**Interne :** VOUS ÊTES VÉTÉRAN ?
+
+**Interne :** C'EST UN HÔPITAL POUR VÉTÉRANS.
+
+**Interne :** C'EST EN FAIT UNE PROCÉDURE **TRÈS** COURANTE.
+
+**Interne :** IL N'Y A ABSOLUMENT RIEN À CRAI--
+
+**Bill :** JE T'AI PAS DEMANDÉ.
+
+**Interne :** OH. EUH... OUAIS, EN FAIT TU **PEUX PAS** FUMER ICI. DÉSOLÉ. J'AURAIS DÛ TE LE DIRE PLUS TÔ--
+
+**Bill :** T'ES MÉDECIN ?
+
+**Interne :** EUM. NON, PAS ENCORE. JE SUIS INTERN.
+
+**Interne :** HA HA. TOUSSE. OUF !
+
+**Bill :** C'EST COMME UNE INFIRMIÈRE ?
+
+**Interne :** PAS... EXACTEM-- ÇA VEUT DIRE QUE J'ÉTUDIE POUR DEVENIR MÉDECIN.
+
+**Infirmière :** OOO. MONSIEUR OVERBECK, CETTE CIGARETTE...
+
+**Bill :** GAMIN ?
+
+**Infirmière :** OUI, MONSIEUR OVERBECK ?
+
+**Bill :** VA T'ENTRAÎNER AILLEURS.
+
+### Page 11
+**Interne :** JE VAIS VOUS DEMANDER DE COMPTER À REBOURS À PARTIR DE DIX, D'ACCORD, BILL ?
+
+**Bill :** OUAIS, OK...
+
+**Interne :** DIX...
+
+**Interne :** NEUF...
+
+### Page 12
+**Interne :** HUIT...
+
+**Interne :** SEP--
+
+**Interne :** SEPT...
+
+**Onomatopée :** SCHKKKKT
+
+### Page 13
+**Onomatopée :** RRRRIPPP
+
+**Bill :** JE PEUX PAS PENSER
+
+**Bill :** PUTAIN DE MÉDICAMENTS QU'ILS
+
+**Bill :** PEUVENT PAS
+
+**Bill :** NE PAS S'ÉVANOUIR
+
+**Bill :** NE PAS S'ÉVANOUIR
+
+### Page 14
+**Bill :** ATTENDS
+
+**Bill :** ATTENDS
+
+**Bill :** QUOI
+
+**Bill :** NON
+
+**Onomatopée :** CRAC !
+
+**Bill :** NNNAGH !
+
+**Bill :** OH MON DIEU
+
+**Bill :** COURS.
+
+**Bill :** EST-CE QUE ÇA ARRIVE EST-CE QUE C'EST RÉEL EST
+
+**Bill :** COURS.
+
+**Onomatopées :** ...A-HUH... / ...A-HUH... / ...A-HUH...
+
+### Page 15
+**Panneau :** PERSONNEL MÉDICAL UNIQUEMENT
+
+**Bill :** VOILÀ.
+
+**Bill :** NE PAS S'ÉVANOUIR.
+
+**Bill :** NE PAS *PANIQUER*.
+
+**Bill :** TROUVER UN TRUC TRANCHANT.
+
+**Bill :** TUER.
+
+**Bill :** PUIS RENTRER CHEZ SOI.
+
+**Bill :** ...PUTAIN, OÙ...
+
+**Bill :** ...TOUT ME FAIT MAL
+
+**Bill :** NON NE PAS
+
+**Bill :** VIEUX SI VIEUX
+
+**Bill :** PUTAIN, RESTE CONCENTRÉ !
+
+**Bill :** UN TRUC TRANCHANT.
+
+**Bill :** UN TRUC TRANCHANT.
+
+**Bill :** UN TRUC TRAN--
+
+**Bill :** HEH.
+
+### Page 16
+**Onomatopées :** ...HCCcccCHH... / ...HCCcccHHH... / ...HCCcc--
+
+**Onomatopée :** SPLTCH
+
+### Page 17
+**Panneau :** URGENCES
+
+*(Page muette)*
+
+### Page 18
+**LEFT 4 DEAD PRÉSENTE : LE SACRIFICE**
+**PARTIE 4**
+
+**Onomatopée :** CRIIIIIIIIIC
+
+**Dossier :** OVERBECK, W.
+
+### Page 19
+**Onomatopée :** RRRRRRR
+
+### Page 20
+**Bill :** ...JE ME DIS QU'ON VA VOULOIR TROUVER UNE MAISON SUR UN **CAP**.
+
+**Bill :** AVOIR UNE BONNE VUE SUR LES BATEAUX QUI ARRIVENT, TU VOIS ?
+
+**Bill :** BONNE IDÉE. IL NOUS FAUDRA AUSSI UNE **FOSSÉ** — BRÛLER TOUS LES INFECTÉS QU'ON TROUVE SUR L'ÎLE.
+
+**Francis :** MERDE, J'AVAIS OUBLIÉ ÇA.
+
+**Bill :** TROUVONS UNE ÎLE **PETITE**.
+
+**Bill :** PAS **TROP** PETITE. ON Y RESTERA PEUT-ÊTRE LONGTEMPS.
+
+**Bill :** D'AILLEURS, PARLONS **APPROVISIONNEMENT**. ON VA AVOIR BESOIN DE--
+
+**Zoey :** TU LES AS DÉJÀ VUS COMME ÇA ?
+
+**Francis :** PAS DEPUIS QUE LOUIS A MONTRÉ À BILL COMMENT FABRIQUER UNE BOMBE À TUYAU.
+
+**Zoey :** ALORS... TOI ET BILL. VOUS ÊTES TOUJOURS...
+
+### Page 21
+**Zoey :** FURIEUSE CONTRE LUI ? OUI.
+
+**Zoey :** EN SORTE DE. UGH. JE SAIS PAS.
+
+**Zoey :** TOUT ÇA EST ARRIVÉ SI VITE. TOUTE LA MERDE QU'ON A TRAVERSÉE ENSEMBLE...
+
+**Zoey :** J'AI FINI PAR VOUS VOIR COMME UNE **FAMILLE**.
+
+**Zoey :** JE VEUX DIRE...
+
+**Zoey :** J'AIME BIEN BILL. J'**ADORE** BILL.
+
+**Zoey :** JE CROIS JUSTE QUE JE **CONNAIS PAS** BILL.
+
+### Page 22
+**Francis :** BON, JE DIRAI **ÇA** POUR BILL.
+
+**Francis :** IL ÉCOUTE PAS BEAUCOUP...
+
+**Francis :** IL EST VIEUX.
+
+**Francis :** SA BARBE PUAIT.
+
+**Francis :** IL—
+
+**Zoey :** Y A UN « MAIS » QUI ARRIVE, FRANCIS ?
+
+**Francis :** C'EST ÇA. C'EST ÇA.
+
+**Francis :** ATTENDS. **SMOKER !**
+
+**Francis :** JE RECHARGE.
+
+**Francis :** ÉCOUTE. LES CONNARDS AVEC QUI JE TRAINAIS AVANT DE VOUS RENCONTRER ? DE BONS POTOS POUR BOIRE, PAS DE DOUTE. MAIS CROIS-MOI. ON SERAIT MORTS DEPUIS **DEUX SEMAINES** AVEC EUX.
+
+**Francis :** BILL FAIT PAS TOUJOURS CE QU'IL FAUT.
+
+**Francis :** MAIS IL LE FAIT TOUJOURS POUR LES BONNES RAISONS.
+
+**Louis :** HÉ ! LES GARS !
+
+### Page 23
+**Louis :** REGARDEZ ! JE CROIS QUE J'AI TROUVÉ NOTRE BATEAU !
+
+**Francis :** OH PUTAIN, UN YACHT ?
+
+**Francis :** GÉNIAL.
+
+**Bill :** ON AVAIT CONVENU DE TROUVER UN *VOILIER*, LOUIS. SI—
+
+**Louis :** ASSEZ AVEC LE VOILIER. C'EST UN BATEAU. IL FLOTTE. J'EN AI MARRE DE MARCHER.
+
+**Louis :** ON DOIT S'ARRÊTER POUR DU GASOIL, J'IRAI LE CHERCHER.
+
+**Louis :** OUAIS, ALLEZ BILL, *REGARDE* CE TRUC ! C'EST UN *PALAIS* !
+
+**Louis :** FAUT QUE TU TE DÉTENDES UAGHHH !
+
+**Zoey :** LOUIS !
+
+**Francis :** ON ARRIVE, LOUIS !
+
+**Louis :** OH, MERDE !
+
+**Louis :** AUUUUGH ! MERDE ! MERDE !
+
+**Francis :** PUTAIN, T'ES TOMBÉ DE **DEUX PIEDS**. ENCAISSE.
+
+### Page 24
+**Louis :** UN TRUC ME TIRE **VERS LE BAS**, MEc !
+
+**Francis :** C'EST LA GRAVITÉ. T'INQUIÈTE, ELLE NOUS TIRE TOUS.
+
+**Louis :** NRRRAGHH !
+
+**Francis :** ÇA VA !
+
+**Francis :** LAISSE-MOI VOIR CE PUTAIN DE TRUC QUI...
+
+**Francis :** C'EST PAS NOTRE BATEAU.
+
+**Bill :** SORTEZ TOUS UN MOLOTOV.
+
+**Bill :** DÈS QUE JE SUIS EN BAS...
+
+**Bill :** BALANCEZ-LES.
+
+**Bill :** BRÛLEZ CE BATEAU JUSQU'À LA CENDRE.
+
+**Francis :** OUAIS. ALORS... C'ÉTAIT QUOI ? UNE WITCH ?
+
+**Francis :** JE PARIE QUE C'ÉTAIT UNE WITCH.
+
+**Francis :** JE CONNAIS MES ATTAQUES DE WITCH, ET **ÇA** C'ÉTAIT UNE ATTAQUE DE WITCH.
+
+**Francis :** C'ÉTAIT UNE WITCH, NON ?
+
+### Page 25
+*(Page muette — scène filmée de Witches en bikinis)*
+
+### Page 26
+**Francis :** BON.
+
+**Francis :** ÇA FLOTTE.
+
+**Francis :** LOUIS, POURQUOI TU METS PAS TA JAMBE DEDANS, VOIR S'IL Y A DES WITCHES.
+
+**Louis :** OUAIS, C'EST DRÔLE.
+
+**Zoey :** OUAIS, VRAIMENT DRÔLE, FRANCIS.
+
+**Bill :** OK, ARRÊTEZ TOUS LES DEUX.
+
+**Bill :** COUVREZ-MOI. JE VAIS VOIR.
+
+**Bill :** BON, PUTAIN DE MERDE...
+
+### Page 27
+**Bill :** LES GAMINS...
+
+**Bill :** ...JE CROIS QU'ON VIENT DE TROUVER NOTRE TICKET POUR QUITTER LE CONTINENT.
+
+### Page 28
+**Louis :** PUTAIN ! **REGARDE** TOUT CE MATOS ! QUI AURAIT LAISSÉ TOUT ÇA **DERRIÈRE** ?
+
+**Bill :** QUELQU'UN QUI COMPTAIT **REVENIR**.
+
+**Bill :** LE **PONT** EST BAISSÉ.
+
+**Bill :** ILS ONT DÛ PARTIR POUR LE **REMONTER**.
+
+**Bill :** JE PARIE QUE CE TRUC FAIT UN **TAS** DE BRUIT QUAND IL MONTE.
+
+**Zoey :** MON DIEU.
+
+**Zoey :** ILS ONT DÛ APPELER TOUS LES ZOMBIES DE LA **VILLE** EN BAS.
+
+**Bill :** HRM.
+
+**Bill :** ET C'EST CE QU'ON VA FAIRE MAINTENANT, NON ?
+
+**Francis :** OUAIS.
+
+**Francis :** JE LE SAVAIS. PARCE QUE ÇA SONNAIT TELLEMENT STUPIDE. C'EST COMME ÇA QUE JE LE SAVAIS.
+
+### Page 29
+**Bill :** ON FAIT ÇA VITE. ON NE PREND **AUCUN** RISQUE.
+
+**Bill :** ON EST BEAUCOUP TROP PRÈS POUR SE FAIRE TUER MAINTENANT.
+
+**Bill :** LOUIS — TU RESTES AVEC LE BATEAU.
+
+**Louis :** WHOA, WHOA, **WHOA**. TU TE FOUS DE MOI ?
+
+**Bill :** TA **JAMBE** EST TOUTE PÉTÉE, FILS. ON A PAS BEAUCOUP D'**OPTIONS** ICI.
+
+**Bill :** ON REMONTE LE PONT ET ON REVIENT TE CHERCHER.
+
+**Louis :** BILL. TU VOIS CE TYPE ?
+
+**Louis :** **LUI**, IL EST RESTÉ AVEC LE BATEAU.
+
+**Bill :** OK.
+
+**Bill :** BON ARGUMENT.
+
+### Page 30
+**Bill :** MONTE TON CUL LÀ-HAUT, FRANCIS !
+
+**Bill :** APPUYER SUR LE BOUTON !
+
+**Francis :** ON VERRA BIEN QUI DONNE LES ORDRES SUR L'**ÎLE**.
+
+**Francis :** MOI.
+
+**Francis :** DONNER PLEIN D'ORDRES.
+
+**Francis :** TOI.
+
+**Francis :** « C'ÉTAIT UN SUPER ORDRE, FRANCIS. »
+
+**Francis :** « LOUIS ÉTAIT UNE CHARGE INUTILE AU FINAL. »
+
+**Francis :** « T'ES TELLEMENT PUTAIN DE MALIN. JE DEVRAIS LIRE DES TONNES DE LIVRES POUR ARRIVER À TON NIVEAU DE MALIN, PUTAIN— »
+
+### Page 31
+**Francis :** AW, TU ES F--
+
+**Zoey :** BILL !
+
+**Zoey :** RIEN NE SE PASSE !
+
+**Bill :** ÇA NE M'ÉTONNE PAS, PUTAIN.
+
+**Bill :** NOUVEAU PLAN, LES GENS !
+
+**Bill :** FRANCIS ! RESTE ICI AVEC LOUIS !
+
+**Bill :** ZOEY ! TU VIENS AVEC MOI !
+
+### Page 32
+**Bill :** ÉCOUTE, GAMINE. JE, EUH... SAIS QU'ON A PAS ÉTÉ...
+
+**Zoey :** OUBLIE.
+
+**Zoey :** LE BATEAU, C'EST LE PLAN MAINTENANT ET JE SUIS LÀ.
+
+**Zoey :** FAUT QU'ON FINISSE ÇA.
+
+**Bill :** BILL ! PAR ICI !
+
+**Bill :** PUTAIN, CE TRUC EST ANTIQUE...
+
+**Bill :** ALLEZ, DÉMARRE, ESPÈCE DE GÉNÉRATEUR DE MERDE...
+
+**Onomatopée :** GRT-GRT-GRT !
+
+### Page 33
+**Bill :** OUI !
+
+**Bill :** ON EST EN BUSINESS, BILL !
+
+**Onomatopée :** HHHHH
+
+**Onomatopée :** GRNNNNNNNNNNNNNN...
+
+**Bill :** BIEN. ALLONS SUR CETTE ÎLE DANS LES KEYS...
+
+**Onomatopée :** RRRRROOOOOAAAAARRRRRRR
+
+**Bill :** ...COMME ÇA JE N'ENTENDRAI PLUS JAMAIS CE PUTAIN DE BRUIT.
+
+### Page 34
+**Francis :** FRANCIS !
+
+**Francis :** MONTE LE PONT !
+
+**Francis :** SI ÇA MARCHE PAS, JE VAIS...
+
+**Francis :** JE SAIS PAS. CREVER, J'IMAGINE.
+
+**Onomatopée :** CRKRKRKRKRKRKRKRKRKRKRKRKRKRKRKR
+
+**Francis :** C'EST PARTI, C'EST PARTI, MONTEZ ICI !
+
+**Francis :** ON A PAS VU DE ZONE SÛRE DEPUIS LONGTEMPS, PUTAIN ! ME FAIS PAS GÂCHER MES DERNIÈRES MUNITIONS À COUVRIR VOS CULS LENTS !
+
+### Page 35
+**Francis :** OK, JE SAVAIS QUE LE PONT ALLAIT ÊTRE **FORT**, MAIS...
+
+**Francis :** PUTAIN DE MERDE, C'EST FORT.
+
+**Onomatopée :** KRKRKRKRKRKRKRKRKRKRKRKRKRKR
+
+### Page 36
+**Onomatopée :** KRKRKRKRKRKRKRKRKRKRKRKRKRKRKRKRK
+
+**Onomatopée :** ROOOOAAAAAAR
+
+**Francis :** ÉVIDEMMENT.
+
+**Francis :** INQUIÉTEZ PAS, LES GARS !
+
+**Francis :** LE PONT SERA **BIEN** REMONTÉ AVANT QU'ILS NOUS ATTEIGNENT !
+
+**Francis :** ON SERA TROP HAUT POUR QU'ILS NOUS ATTEIGNENT !
+
+### Page 37
+**Francis :** ON RESTE TRANQUILLES ? ILS VONT PROBABLEMENT JUSTE TRAINER UN PEU, PUIS—
+
+**Onomatopée :** RKRKRKRKRKRKRKR KRK RK RKK
+
+**Francis :** GÉNIAL. LE PONT S'EST ARRÊTÉ.
+
+**Francis :** RRRRRGGG ! JE LE SAVAIS ! JE DÉTESTE CE GÉNÉRATEUR !
+
+**Francis :** OH. **ET** Y A QUATRE TANKS QUI ARRIVENT VERS NOUS. **MERCI**, LOUIS.
+
+**Louis :** QUOI ?! QU'EST-CE QUE J'AI FAIT ?
+
+**Francis :** L'OPTIMISME. TU NOUS AS PORTÉ MALHEUR.
+
+**Onomatopée :** ROOOOAAAAR
+
+### Page 38
+**Bill :** LES GARS.
+
+**Bill :** J'AI UN **MAUVAIS** PRESSENTIMENT.
+
+**Francis :** ATTENDS, QUOI ?
+
+**Louis :** LOUIS, ALLEZ. ON—
+
+**Francis :** ON A VÉCU PIRE QUE **ÇA**, MEc. C'EST—
+
+**Francis :** C'EST **RIEN**.
+
+**Francis :** C'EST TOI QUI DEVRAIS ÊTRE **TRISTE**, FRANCIS.
+
+**Francis :** ON A SURVÉCU À ÇA ?
+
+**Francis :** J'ALLAIS TE DONNER UN **BOULOT** À TON CUL DE CON.
+
+**Bill :** OK, ARRÊTE AVEC CE GENRE DE DISCOURS.
+
+**Bill :** ON A ENCORE **UN PEU** DE MUNITIONS. IL NOUS FAUT JUSTE...
+
+**Bill :** ...
+
+**Bill :** **MERDE !**
+
+**Bill :** PUTAIN DE **MERDE** ! ON EST ARRIVÉS SI LOIN ! ÇA PEUT PAS **FINIR** COMME ÇA !
+
+**Bill :** JE T'AIME, ZOEY.
+
+**Bill :** JE VOUS AIME **TOUS**.
+
+**Bill :** ÉCOUTE. JE VEUX QUE TU ME **TUE** AVANT—
+
+### Page 39
+**Bill :** GARDE ÇA.
+
+**Bill :** COUVRE-MOI ! JE M'EN OCCUPE !
+
+**Zoey :** **BILL !**
+
+**Francis :** T'AS ENTENDU L'HOMME ! COUVRE-LE !
+
+### Page 40
+**Bill :** VOUS ARRÊTEREZ JAMAIS DE VENIR, HEIN ?
+
+**Bill :** À CHAQUE FOIS QUE JE CROIS QU'ON EN A FINI...
+
+**Bill :** À CHAQUE FOIS QUE JE ME DIS : « ELLE EST ENFIN EN **SÉCURITÉ**... »
+
+**Bill :** « JE PEUX ENFIN ME **REPOSER**... »
+
+**Bill :** VOUS REVENEZ.
+
+**Bill :** COMME UN MAUVAIS CAUCHEMAR.
+
+**Bill :** ET J'EN AI.
+
+**Bill :** **ASSEZ.**
+
+**Bill :** MANGEZ LE FEU, BANDE DE PUTAINS D'ANIMAUX.
+
+### Page 41
+**Francis :** ÇA VOUS A BIEN ATTIRÉ L'ATTENTION.
+
+**Francis :** PAR ICI, BANDE DE FILS DE PUTE...
+
+**Zoey :** QU'EST-CE QU'IL FAIT ?
+
+**Louis :** IL ATTIRE TOUS LES TANKS POUR QU'ILS LE SUIVENT, LOUIS !
+
+**Louis :** IL VA SE FAIRE **TUER** !
+
+### Page 42
+**Francis :** BON, PAS **TOUS** L'ONT SUIVI.
+
+**Francis :** CE PONT EST PAS ASSEZ HAUT POUR CE TANK.
+
+**Zoey :** OUAIS. ESPÉRONS JUSTE QUE BILL TROUVE CE GÉNÉRATEUR...
+
+**Zoey :** ...AVANT QUE LE TANK S'EN RENDE COMPTE.
+
+### Page 43
+**Bill :** PRESQUE.
+
+**Bill :** ALLEZ, VIEUX BON À RIEN, BOUGE-TOI.
+
+**Bill :** METS-TOI AU BOULOT.
+
+**Bill :** FAIS-LES SORTIR D'ICI. METS-LES EN SÉCURITÉ.
+
+**Bill :** NE LA DÉÇOIS PAS.
+
+**Onomatopée :** CLIC
+
+**Onomatopée :** CRK RKR KRK RKRKRKRKRKR !
+
+**Francis :** OUI !
+
+**Francis :** IL L'A FAIT !
+
+**Francis :** HA HAAAA ! IL L'A FAIT !
+
+### Page 44
+**Bill :** QUELQU'UN A DÛ BOUGER CE PONT DEPUIS QUE J'AI REGARDÉ LA DERNIÈRE FOIS.
+
+**Bill :** PARCE QU'IL A L'AIR À DES MILLIONS DE KILOMÈTRES.
+
+**Bill :** NON. PENSE PAS COMME ÇA.
+
+**Bill :** TU PEUX ENCORE Y RETOURNER.
+
+**Bill :** TU PEUX ENCORE Y RET--
+
+### Page 45
+**Onomatopée :** THOOM
+
+### Page 46
+**Onomatopées :** AH-HUGH.... / AH-HUGH.... / AH-HUGH....
+
+**Onomatopée :** TK-CHAK
+
+### Page 47
+**Bill :** AH-HGH...
+
+**Bill :** HEH.
+
+**Bill :** ATTENDS UN PEU...
+
+**Bill :** ...J'ARRIVE DANS UNE MINUTE.
+
+### Page 48
+**Francis :** OK, F*&% ÇA !
+
+**Francis :** JE VAIS CHERCHER LE VIEUX !
+
+**Zoey :** IL EST PARTI, FRANCIS.
+
+**Francis :** TU SAIS PAS ! BILL EST LE VIEUX DUR À CUIR LE PLUS CORIACE QUE J'AI JAMAIS VU, ET IL EST **LÀ-BAS** ET IL A BESOIN DE NOUS ! ON—
+
+**Zoey :** FRANCIS. **IL EST PARTI.**
+
+**Zoey :** IL A FAIT ÇA POUR **NOUS**.
+
+**Zoey :** SI TU DESCENDS, IL L'A FAIT POUR **RIEN**.
+
+**Francis :** PUTAIN.
+
+### Page 49
+**Bill :** ON VA ATTENDRE QUE ÇA PASSE.
+
+**Bill :** GARDEZ L'ŒIL OUVERT POUR LES SMOKERS.
+
+**Bill :** MAIS SINON, ON DEVRAIT ÊTRE EN SÉCURITÉ ICI-HAUT. ON RESTE TRANQUILLES, LA HORDE SE DISPERSERA.
+
+**Zoey :** ET APRÈS ?
+
+**Francis :** ON AMÈNE LOUIS AU BATEAU.
+
+**Francis :** ET ON DÉGAGE D'ICI.
+
+**Bill :** ON VEILLE SUR LES NÔTRES.
+
+### Page 50
+*(Page muette — Louis, Francis et Zoey sur le bateau face au coucher de soleil)*
+
+### Page 51
+VOUS AVEZ LU LA BD, MAINTENANT JOUEZ AU JEU
+
+**THE SACRIFICE**
+
+C'EST VOTRE FUNÉRAILLES
+
+
+
+
+

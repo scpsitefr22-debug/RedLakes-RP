@@ -1,0 +1,326 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PLAYER
+  STAFF
+  ADMIN
+}
+
+enum ApplicationType {
+  STAFF
+  MTF
+  RECHERCHE
+  ADMINISTRATION
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum LoreCategory {
+  MONDE
+  SITE
+  CHRONOLOGIE
+  GUERRES
+  CATASTROPHES
+  PERSONNAGES
+  SCP
+  FACTION
+  EVENEMENT
+}
+
+enum LoreStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum TransmissionType {
+  MESSAGE
+  ANNOUNCE
+  MEMBER_JOIN
+  MEMBER_LEAVE
+  EVENT
+  BOOST
+}
+
+model User {
+  id                String   @id @default(cuid())
+  minecraftUuid     String?  @unique
+  minecraftUsername String?  @unique
+  microsoftId       String?  @unique
+  email             String?
+  avatarUrl         String?
+  discordId         String?  @unique
+  discordUsername   String?
+  role              UserRole @default(PLAYER)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  player       Player?
+  applications Application[]
+  loreArticles LoreArticle[] @relation("AuthorArticles")
+  sessions     Session[]
+  personnelReports PersonnelReport[]
+  auditLogs        AuditLog[]
+  platformComments PlatformComment[]
+  notifications    PlatformNotification[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+model Player {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  grade         String   @default("Civil")
+  faction       String   @default("Civil")
+  teamName      String?
+  rpFirstName   String?
+  rpLastName    String?
+  playtime      Int      @default(0)
+  seniority     DateTime @default(now())
+  reputation    Int      @default(50)
+  sanctions     Int      @default(0)
+  clearance     Int      @default(1)
+  medals        String[] @default([])
+  achievements  Json     @default("[]")
+  inventory     Json     @default("[]")
+  roleUpdatedAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Application {
+  id          String            @id @default(cuid())
+  userId      String
+  type        ApplicationType
+  status      ApplicationStatus @default(PENDING)
+  experience  String
+  motivation  String
+  staffNote   String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([type])
+}
+
+model LoreArticle {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  title       String
+  excerpt     String?
+  content     String
+  category    LoreCategory
+  status      LoreStatus   @default(DRAFT)
+  clearance   Int          @default(1)
+  featured    Boolean      @default(false)
+  coverImage  String?
+  tags        String[]     @default([])
+  authorId    String?
+  publishedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  author      User?        @relation("AuthorArticles", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([status, category])
+  @@index([publishedAt])
+}
+
+model GalleryAsset {
+  id        String   @id @default(cuid())
+  title     String
+  url       String
+  faction   String?
+  type      String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model LinkCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String?
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+enum PersonnelReportType {
+  INCIDENT
+  AUTHORIZATION
+  MEMO
+  EQUIPMENT
+}
+
+enum PersonnelReportStatus {
+  PENDING
+  REVIEWED
+  ARCHIVED
+}
+
+model PersonnelReport {
+  id         String                @id @default(cuid())
+  userId     String
+  type       PersonnelReportType
+  subject    String
+  content    String
+  status     PersonnelReportStatus @default(PENDING)
+  clearance  Int                   @default(2)
+  staffNote  String?
+  reviewedBy String?
+  reviewedAt DateTime?
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+/// Évènements Discord relayés par le bot, transformés en "transmissions" RP (thème SCP).
+/// Aucun message brut privé n'est conservé : les pseudos sont codifiés (codename) et
+/// le contenu n'est stocké que pour les salons explicitement publics.
+model DiscordTransmission {
+  id               String           @id @default(cuid())
+  type             TransmissionType
+  discordMessageId String?          @unique
+  channelId        String?
+  channelLabel     String           @default("Secteur non répertorié")
+  clearance        Int              @default(3)
+  isPublic         Boolean          @default(false)
+  codename         String           @default("Entité ███")
+  authorHash       String?
+  authorDisplay    String?
+  title            String
+  body             String
+  excerpt          String?
+  occurredAt       DateTime         @default(now())
+  createdAt        DateTime         @default(now())
+
+  @@index([occurredAt])
+  @@index([clearance])
+  @@index([type])
+}
+
+// ─── Couche plateforme (audit, commentaires, notifications, tags) ───────────
+
+enum PlatformEntityType {
+  PERSONNEL_REPORT
+  APPLICATION
+  LORE_ARTICLE
+  PLAYER
+  USER
+}
+
+enum AuditAction {
+  CREATED
+  UPDATED
+  DELETED
+  ARCHIVED
+  RESTORED
+  REVIEWED
+  STATUS_CHANGED
+  COMMENT_ADDED
+  CLEARANCE_CHANGED
+  ROLE_CHANGED
+}
+
+model AuditLog {
+  id          String             @id @default(cuid())
+  entityType  PlatformEntityType
+  entityId    String
+  action      AuditAction
+  actorId     String?
+  actorLabel  String?
+  summary     String
+  metadata    Json?
+  clearance   Int                @default(1)
+  createdAt   DateTime           @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([entityType, entityId, createdAt])
+  @@index([createdAt])
+  @@index([actorId])
+}
+
+model PlatformComment {
+  id         String             @id @default(cuid())
+  entityType PlatformEntityType
+  entityId   String
+  authorId   String
+  body       String
+  internal   Boolean            @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([entityType, entityId])
+  @@index([authorId])
+}
+
+model PlatformNotification {
+  id         String              @id @default(cuid())
+  userId     String
+  title      String
+  body       String
+  entityType PlatformEntityType?
+  entityId   String?
+  readAt     DateTime?
+  createdAt  DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+model PlatformTag {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  label     String
+  color     String?
+  createdAt DateTime @default(now())
+
+  entities PlatformEntityTag[]
+}
+
+model PlatformEntityTag {
+  id         String             @id @default(cuid())
+  tagId      String
+  entityType PlatformEntityType
+  entityId   String
+  createdAt  DateTime           @default(now())
+
+  tag PlatformTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([tagId, entityType, entityId])
+  @@index([entityType, entityId])
+}

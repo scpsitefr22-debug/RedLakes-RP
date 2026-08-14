@@ -1,0 +1,21 @@
+name: RedLakesSync
+version: 1.0.0
+main: fr.redlakes.sync.RedLakesSyncPlugin
+api-version: '1.21'
+description: Synchronise grades et profils joueurs vers le site REDLAKES RP
+author: RedLakes
+website: https://redlakes.fr
+
+commands:
+  redlakessync:
+    description: Force la synchronisation de votre profil vers le site
+    usage: /redlakessync
+    permission: redlakes.sync.self
+
+permissions:
+  redlakes.sync.self:
+    description: Synchroniser son propre profil
+    default: true
+  redlakes.sync.admin:
+    description: Synchroniser n'importe quel joueur
+    default: op

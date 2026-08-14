@@ -1,0 +1,34 @@
+{
+  "name": "redlakes-discord-bot",
+  "version": "1.0.0",
+  "description": "Bot Discord officiel REDLAKES RP — liaison comptes, profils, grades, statut serveur",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "deploy": "tsx src/deploy-commands.ts",
+    "deploy:prod": "node dist/deploy-commands.js",
+    "verify": "tsx src/verify-setup.ts",
+    "setup:guild": "tsx src/run-setup.ts",
+    "roles:fix": "tsx src/run-role-fix.ts",
+    "roles:rebuild": "tsx src/run-role-rebuild.ts",
+    "roles:resume": "tsx src/run-role-resume.ts",
+    "roles:import": "tsx src/run-role-import.ts",
+    "roles:check": "tsx src/run-role-check.ts",
+    "roles:separators": "tsx src/run-role-separators.ts"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

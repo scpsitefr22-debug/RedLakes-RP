@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" fill="none">
+  <rect width="400" height="225" fill="#0a0a0a"/>
+  <rect x="20" y="20" width="360" height="185" stroke="#8b0a0a" stroke-width="1" fill="none" opacity="0.3"/>
+  <text x="200" y="100" text-anchor="middle" fill="#8b0a0a" font-family="monospace" font-size="14" opacity="0.6">[ SCREENSHOT PLACEHOLDER ]</text>
+  <text x="200" y="130" text-anchor="middle" fill="#666" font-family="monospace" font-size="11">REDLAKES RP  Minecraft</text>
+</svg>

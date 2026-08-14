@@ -1,0 +1,31 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { PrismaModule } from './prisma/prisma.module';
+import { AuthModule } from './auth/auth.module';
+import { PlayersModule } from './players/players.module';
+import { ApplicationsModule } from './applications/applications.module';
+import { LoreModule } from './lore/lore.module';
+import { SearchModule } from './search/search.module';
+import { GalleryModule } from './gallery/gallery.module';
+import { SyncModule } from './sync/sync.module';
+import { ReportsModule } from './reports/reports.module';
+import { PlatformModule } from './platform/platform.module';
+import { HealthModule } from './health/health.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    PlatformModule,
+    HealthModule,
+    AuthModule,
+    PlayersModule,
+    ApplicationsModule,
+    LoreModule,
+    SearchModule,
+    GalleryModule,
+    SyncModule,
+    ReportsModule,
+  ],
+})
+export class AppModule {}
