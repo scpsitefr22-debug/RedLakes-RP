@@ -5,11 +5,13 @@ import {
   UserRole,
 } from '@prisma/client';
 import { seedGrades } from './seed-grades';
+import { seedFactions } from './seed-factions';
 
 const prisma = new PrismaClient();
 
 async function main() {
   await seedGrades();
+  await seedFactions();
 
   const admin = await prisma.user.upsert({
     where: { minecraftUsername: 'Directeur_Site' },

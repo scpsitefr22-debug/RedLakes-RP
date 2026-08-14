@@ -74,6 +74,8 @@ model User {
   auditLogs        AuditLog[]
   platformComments PlatformComment[]
   notifications    PlatformNotification[]
+  factionsLed      Faction[]    @relation("FactionChef")
+  departmentsLed   Department[] @relation("DepartmentChef")
 }
 
 model Session {
@@ -355,4 +357,55 @@ model Grade {
 
   @@index([branch])
   @@index([departmentId])
+}
+
+// ─── REDLAKES CORE — factions et departements (catalogue additif) ──────────
+// Peuples depuis apps/web/src/data/factions.ts et site12.ts. Player.faction
+// reste une chaine libre a ce stade (meme approche progressive que Grade
+// au Lot 1 : catalogue d'abord, relation Player ensuite une fois valide).
+// budget est un champ simple pour l'instant ; a terme il sera remplace par
+// un Wallet une fois le systeme economique construit.
+
+model Faction {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  tagline     String?
+  description String?
+  history     String?
+  color       String?
+  clearance   Int      @default(1)
+  playable    Boolean  @default(true)
+  objectives  String[] @default([])
+  chefId      String?
+  chef        User?    @relation("FactionChef", fields: [chefId], references: [id], onDelete: SetNull)
+  deputyIds   String[] @default([])
+  budget      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  departments Department[]
+
+  @@index([playable])
+}
+
+model Department {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  name              String
+  factionId         String?
+  faction           Faction? @relation(fields: [factionId], references: [id], onDelete: SetNull)
+  omegaTier         String?
+  directorGradeName String?
+  color             String?
+  utilities         String[] @default([])
+  objectives        String[] @default([])
+  chefId            String?
+  chef              User?    @relation("DepartmentChef", fields: [chefId], references: [id], onDelete: SetNull)
+  deputyIds         String[] @default([])
+  budget            Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([factionId])
 }

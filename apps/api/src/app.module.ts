@@ -12,6 +12,8 @@ import { ReportsModule } from './reports/reports.module';
 import { PlatformModule } from './platform/platform.module';
 import { HealthModule } from './health/health.module';
 import { GradesModule } from './grades/grades.module';
+import { FactionsModule } from './factions/factions.module';
+import { DepartmentsModule } from './departments/departments.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { GradesModule } from './grades/grades.module';
     SyncModule,
     ReportsModule,
     GradesModule,
+    FactionsModule,
+    DepartmentsModule,
   ],
 })
 export class AppModule {}
