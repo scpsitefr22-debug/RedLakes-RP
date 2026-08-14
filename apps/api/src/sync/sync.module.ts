@@ -6,9 +6,10 @@ import { TransmissionService } from './transmission.service';
 import { DiscordService } from './discord.service';
 import { ApiKeyGuard } from './api-key.guard';
 import { GradesModule } from '../grades/grades.module';
+import { FactionsModule } from '../factions/factions.module';
 
 @Module({
-  imports: [GradesModule],
+  imports: [GradesModule, FactionsModule],
   controllers: [SyncController, TransmissionsController],
   providers: [SyncService, DiscordService, TransmissionService, ApiKeyGuard],
   exports: [SyncService, DiscordService, TransmissionService],

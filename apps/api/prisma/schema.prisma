@@ -96,6 +96,8 @@ model Player {
   gradeId       String?
   gradeInfo     Grade?   @relation(fields: [gradeId], references: [id], onDelete: SetNull)
   faction       String   @default("Civil")
+  factionId     String?
+  factionInfo   Faction? @relation(fields: [factionId], references: [id], onDelete: SetNull)
   teamName      String?
   rpFirstName   String?
   rpLastName    String?
@@ -113,6 +115,7 @@ model Player {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([gradeId])
+  @@index([factionId])
 }
 
 model Application {
@@ -342,6 +345,8 @@ model Grade {
   branch       String
   tier         String
   departmentId String?
+  departmentRefId String?
+  departmentRef   Department? @relation(fields: [departmentRefId], references: [id], onDelete: SetNull)
   pay          Int?
   quota        Int?
   clearance    Int
@@ -357,6 +362,7 @@ model Grade {
 
   @@index([branch])
   @@index([departmentId])
+  @@index([departmentRefId])
 }
 
 // ─── REDLAKES CORE — factions et departements (catalogue additif) ──────────
@@ -385,6 +391,7 @@ model Faction {
   updatedAt   DateTime @updatedAt
 
   departments Department[]
+  players     Player[]
 
   @@index([playable])
 }
@@ -406,6 +413,8 @@ model Department {
   budget            Int      @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  grades Grade[]
 
   @@index([factionId])
 }

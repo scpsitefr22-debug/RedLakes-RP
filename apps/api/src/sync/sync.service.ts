@@ -12,6 +12,7 @@ import { SyncDiscordGradeDto } from './dto/sync-discord-grade.dto';
 import { PersonnelReportStatus } from '@prisma/client';
 import { clearanceForGrade } from '../players/grade-clearance';
 import { GradesService } from '../grades/grades.service';
+import { FactionsService } from '../factions/factions.service';
 
 @Injectable()
 export class SyncService {
@@ -19,6 +20,7 @@ export class SyncService {
     private prisma: PrismaService,
     private discord: DiscordService,
     private grades: GradesService,
+    private factions: FactionsService,
   ) {}
 
   /**
@@ -34,12 +36,19 @@ export class SyncService {
     };
   }
 
+  /** Resout un nom de faction en texte libre vers le catalogue Faction. */
+  private async resolveFactionId(name: string | undefined) {
+    const faction = await this.factions.findByName(name ?? 'Civil');
+    return faction?.id ?? null;
+  }
+
   async syncRole(dto: SyncRoleDto) {
     const username = dto.minecraftUsername.trim();
     const uuid =
       dto.minecraftUuid ??
       `offline-${username.toLowerCase().replace(/[^a-z0-9_]/g, '_')}`;
     const resolved = await this.resolveGrade(dto.grade);
+    const factionId = await this.resolveFactionId(dto.faction);
 
     const user = await this.prisma.user.upsert({
       where: { minecraftUuid: uuid },
@@ -53,6 +62,7 @@ export class SyncService {
             grade: dto.grade,
             gradeId: resolved.gradeId,
             faction: dto.faction ?? 'Civil',
+            factionId,
             teamName: dto.teamName,
             rpFirstName: dto.rpFirstName,
             rpLastName: dto.rpLastName,
@@ -75,6 +85,7 @@ export class SyncService {
           grade: dto.grade,
           gradeId: resolved.gradeId,
           faction: dto.faction ?? 'Civil',
+          factionId,
           teamName: dto.teamName,
           rpFirstName: dto.rpFirstName,
           rpLastName: dto.rpLastName,
@@ -89,7 +100,7 @@ export class SyncService {
           grade: dto.grade,
           gradeId: resolved.gradeId,
           clearance: dto.clearance ?? resolved.clearance,
-          ...(dto.faction !== undefined && { faction: dto.faction }),
+          ...(dto.faction !== undefined && { faction: dto.faction, factionId }),
           ...(dto.teamName !== undefined && { teamName: dto.teamName }),
           ...(dto.rpFirstName !== undefined && {
             rpFirstName: dto.rpFirstName,
