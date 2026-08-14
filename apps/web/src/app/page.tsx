@@ -6,6 +6,7 @@ import { TransmissionsPreview } from "@/components/home/TransmissionsPreview";
 import { TimelinePreview } from "@/components/home/TimelinePreview";
 import { SCPPreview } from "@/components/home/SCPPreview";
 import { FactionsPreview } from "@/components/home/FactionsPreview";
+import { GradesPreview } from "@/components/home/GradesPreview";
 import { QuickAccess } from "@/components/home/QuickAccess";
 import { RecrutementSection } from "@/components/home/RecrutementSection";
 
@@ -22,6 +23,7 @@ export default function HomePage() {
       <TimelinePreview />
       <SCPPreview />
       <FactionsPreview />
+      <GradesPreview />
       <RecrutementSection />
       <QuickAccess />
     </>
