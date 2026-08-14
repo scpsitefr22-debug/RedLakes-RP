@@ -75,4 +75,5 @@ Toutes les vérifications côté API. Toutes les opérations économiques atomiq
 |---|---|---|
 | 1 | Modèle `Grade` (lecture seule), seed depuis `rp-grades.ts`, `GET /grades` | ✅ Livré et vérifié |
 | 2 | `Player.gradeId` → relation `Grade`, résolution du grade dans `sync.service.ts` (catalogue en priorité, ancienne table floue en repli), backfill des joueurs existants, `gradeInfo` exposé dans les réponses `/players/*` | ✅ Livré et vérifié |
-| 3+ | Faction, Department, Team, Wallet/Transaction, Mission, RpEvent, ClassifiedDocument, Sanction | À venir |
+| 3 | Modèles `Faction`/`Department` (lecture seule), seed depuis `factions.ts`/`site12.ts`, `GET /factions(/:slug)`, `GET /departments(/:slug)`, relation Faction↔Department | ✅ Livré et vérifié |
+| 4+ | `Player.factionId`/`departmentId` → relations, Team, Wallet/Transaction, Mission, RpEvent, ClassifiedDocument, Sanction, `FactionRelation` (diplomatie) | À venir |
