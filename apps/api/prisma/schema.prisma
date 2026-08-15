@@ -617,3 +617,26 @@ model GameEvent {
   @@index([type])
   @@index([clearance])
 }
+
+// ─── REDLAKES CORE — actualites (NewsArticle) ───────────────────────────────
+// "category" reste une String libre (mise-a-jour/scp/evenement/lore), meme
+// raisonnement que GameEvent.type : deja des cles de dictionnaire d'affichage
+// cote web, un enum forcerait un renommage pour aucun gain. Le detail des
+// articles reste minimal (excerpt seulement, pas de corps riche) — la page
+// statique elle-meme notait deja "a connecter au CMS", jamais fait jusqu'ici.
+
+model NewsArticle {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  excerpt   String
+  date      DateTime
+  category  String
+  image     String?
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([date])
+}

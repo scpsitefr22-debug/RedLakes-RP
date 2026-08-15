@@ -59,6 +59,7 @@ const navItems = [
       { label: "Gestion Wiki SCP (Staff)", href: "/staff/scp" },
       { label: "Gestion Personnages (Staff)", href: "/staff/personnages" },
       { label: "Gestion Événements (Staff)", href: "/staff/evenements" },
+      { label: "Gestion Actualités (Staff)", href: "/staff/actualites" },
     ],
   },
 ];

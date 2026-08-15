@@ -1,25 +1,39 @@
 import { notFound } from "next/navigation";
-import { newsArticles, categoryLabels } from "@/data/news";
+import { categoryLabels } from "@/data/news";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
+import { API_URL } from "@/lib/api";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
-export async function generateStaticParams() {
-  return newsArticles.map((a) => ({ id: a.id }));
+interface ApiNewsArticleDetail {
+  title: string;
+  excerpt: string;
+  date: string;
+  category: string;
+}
+
+async function getNewsArticle(slug: string): Promise<ApiNewsArticleDetail | null> {
+  try {
+    const res = await fetch(`${API_URL}/news/${slug}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }
 
 export default async function ActualiteDetailPage({ params }: Props) {
   const { id } = await params;
-  const article = newsArticles.find((a) => a.id === id);
+  const article = await getNewsArticle(id);
   if (!article) notFound();
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <Badge variant="classified" className="mb-4">
-        {categoryLabels[article.category]}
+        {categoryLabels[article.category as keyof typeof categoryLabels] ?? article.category}
       </Badge>
       <p className="mb-2 font-mono text-sm text-gray-600">
         {formatDate(article.date)}

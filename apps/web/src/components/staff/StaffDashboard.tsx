@@ -19,6 +19,7 @@ import {
   FlaskConical,
   User,
   Zap,
+  Newspaper,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -243,6 +244,13 @@ export function StaffDashboard() {
             Gestion des événements →
           </Link>
           <p className="text-xs text-gray-600">Brèches, invasions, crises</p>
+        </div>
+        <div className="hologram-border rounded-lg p-5">
+          <Newspaper className="mb-2 h-5 w-5 text-redlake-glow" />
+          <Link href="/staff/actualites" className="font-mono text-sm text-redlake-glow hover:underline">
+            Gestion des actualités →
+          </Link>
+          <p className="text-xs text-gray-600">Articles, mises à jour</p>
         </div>
       </div>
 

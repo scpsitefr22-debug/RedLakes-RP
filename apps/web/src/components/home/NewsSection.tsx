@@ -3,11 +3,21 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { newsArticles, categoryLabels } from "@/data/news";
+import { categoryLabels } from "@/data/news";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { ArrowRight, Radio } from "lucide-react";
 import { API_PROXY } from "@/lib/api";
+
+interface ApiNewsArticle {
+  id: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  category: string;
+  slug: string;
+  featured: boolean;
+}
 import type { Transmission } from "@/lib/transmissions";
 import { TRANSMISSION_TYPE_LABELS } from "@/lib/transmissions";
 
@@ -54,15 +64,24 @@ export function NewsSection() {
         /* API offline */
       }
 
-      const staticItems: NewsItem[] = newsArticles.map((a) => ({
-        id: a.id,
-        title: a.title,
-        excerpt: a.excerpt,
-        date: a.date,
-        category: categoryLabels[a.category],
-        featured: a.featured ?? false,
-        href: `/actualites/${a.id}`,
-      }));
+      let staticItems: NewsItem[] = [];
+      try {
+        const res = await fetch(`${API_PROXY}/news`);
+        if (res.ok) {
+          const articles = (await res.json()) as ApiNewsArticle[];
+          staticItems = articles.map((a) => ({
+            id: a.id,
+            title: a.title,
+            excerpt: a.excerpt,
+            date: a.date,
+            category: categoryLabels[a.category as keyof typeof categoryLabels] ?? a.category,
+            featured: a.featured,
+            href: `/actualites/${a.slug}`,
+          }));
+        }
+      } catch {
+        /* API offline */
+      }
 
       const merged = [...live, ...staticItems]
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
