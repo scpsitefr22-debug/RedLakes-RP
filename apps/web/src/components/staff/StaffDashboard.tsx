@@ -205,6 +205,13 @@ export function StaffDashboard() {
           </Link>
           <p className="text-xs text-gray-600">Catalogue de départements</p>
         </div>
+        <div className="hologram-border rounded-lg p-5">
+          <Users className="mb-2 h-5 w-5 text-redlake-glow" />
+          <Link href="/staff/teams" className="font-mono text-sm text-redlake-glow hover:underline">
+            Gestion des équipes →
+          </Link>
+          <p className="text-xs text-gray-600">Équipes de terrain, FIM</p>
+        </div>
       </div>
 
       <section className="hologram-border rounded-lg p-6">

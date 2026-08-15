@@ -75,6 +75,7 @@ model User {
   notifications    PlatformNotification[]
   factionsLed      Faction[]    @relation("FactionChef")
   departmentsLed   Department[] @relation("DepartmentChef")
+  teamsLed         Team[]       @relation("TeamChef")
 }
 
 model Session {
@@ -414,6 +415,34 @@ model Department {
   updatedAt         DateTime @updatedAt
 
   grades Grade[]
+  teams  Team[]
 
   @@index([factionId])
+}
+
+// ─── REDLAKES CORE — equipes (Team) ─────────────────────────────────────────
+// Generique, rattachee a un Department (jamais a une Faction directement) et
+// jamais un simple reskin des anciennes MTF. Peuplee depuis les gabarits
+// d'equipes deja definis dans apps/web/src/data/site12.ts (TeamTemplate),
+// plus les escouades FIM du departement Securite (voir Lore Bible :
+// remplacement narratif des MTF retirees au Lot 10).
+
+model Team {
+  id             String     @id @default(cuid())
+  slug           String     @unique
+  name           String
+  departmentId   String
+  department     Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  category       String
+  composition    String[]   @default([])
+  hasMedic       Boolean    @default(false)
+  customizableBy String?
+  chefId         String?
+  chef           User?      @relation("TeamChef", fields: [chefId], references: [id], onDelete: SetNull)
+  quota          Int?
+  description    String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([departmentId])
 }

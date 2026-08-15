@@ -54,6 +54,7 @@ const navItems = [
       { label: "Gestion Grades (Staff)", href: "/staff/grades" },
       { label: "Gestion Factions (Staff)", href: "/staff/factions" },
       { label: "Gestion Départements (Staff)", href: "/staff/departements" },
+      { label: "Gestion Équipes (Staff)", href: "/staff/teams" },
     ],
   },
 ];

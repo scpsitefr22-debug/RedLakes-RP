@@ -121,6 +121,12 @@ Tout le reste du corpus (Insurrection du Chaos depuis 1994, Main du Serpent 2019
 
 ---
 
-## 9. Question ouverte — non résolue, à trancher
+## 9bis. FIM et AIT — de la fiction au CORE
+
+Le modèle `Team` (générique, rattaché à `Department`) existe désormais réellement dans la base : les 5 escouades FIM (Nu-7, Epsilon-11, Alpha-1, Beta-7, Zeta-9) sont de vraies équipes du département Sécurité, gérables depuis `/staff/teams` comme n'importe quelle autre équipe — plus une fiction de lore isolée. **AIT n'a en revanche aucune escouade créée** : contrairement aux FIM, il n'existait aucune donnée existante à migrer (les anciennes `mtfUnits` ne couvraient que 5 unités, toutes rattachées à ce qui est devenu FIM). Créer des escouades AIT nommées serait inventer du canon nouveau — non fait, en attente d'une validation si tu veux leur donner des noms/compositions précises.
+
+---
+
+## 10. Question ouverte — non résolue, à trancher
 
 **"Aujourd'hui" du monde RP est maintenant fixé à 2027** par la chronologie officielle. Le contenu "récent" déjà écrit (articles d'actualité, brèche Keter-02, audit AEGIS, opération Mur de Fer) reste daté de juin 2026 dans `data/news.ts`/`data/lore.ts` — ce qui, avec un "aujourd'hui" à 2027, en fait simplement des événements de *l'année dernière* plutôt que du jour même. Je n'ai **pas** décalé ces dates individuelles : elles restent cohérentes en tant qu'archives datées, et rien ne les rend impossibles. Dis-moi si tu veux au contraire que "aujourd'hui" colle exactement à ces articles (auquel cas c'est "2026" qu'il faut lire partout, pas "2027", et c'est la ligne de clôture de la chronologie qu'il faudrait ajuster) — sinon je considère 2027 comme acquis et le reste comme "l'année passée", sans autre changement nécessaire.

@@ -14,6 +14,7 @@ import { HealthModule } from './health/health.module';
 import { GradesModule } from './grades/grades.module';
 import { FactionsModule } from './factions/factions.module';
 import { DepartmentsModule } from './departments/departments.module';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DepartmentsModule } from './departments/departments.module';
     GradesModule,
     FactionsModule,
     DepartmentsModule,
+    TeamsModule,
   ],
 })
 export class AppModule {}
