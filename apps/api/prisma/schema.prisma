@@ -65,17 +65,19 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  player       Player?
-  applications Application[]
-  loreArticles LoreArticle[] @relation("AuthorArticles")
-  sessions     Session[]
+  player           Player?
+  applications     Application[]
+  loreArticles     LoreArticle[]          @relation("AuthorArticles")
+  sessions         Session[]
   personnelReports PersonnelReport[]
   auditLogs        AuditLog[]
   platformComments PlatformComment[]
   notifications    PlatformNotification[]
-  factionsLed      Faction[]    @relation("FactionChef")
-  departmentsLed   Department[] @relation("DepartmentChef")
-  teamsLed         Team[]       @relation("TeamChef")
+  factionsLed      Faction[]              @relation("FactionChef")
+  departmentsLed   Department[]           @relation("DepartmentChef")
+  teamsLed         Team[]                 @relation("TeamChef")
+  sanctionsIssued  Sanction[]             @relation("SanctionIssuedBy")
+  sanctionsLifted  Sanction[]             @relation("SanctionLiftedBy")
 }
 
 model Session {
@@ -90,32 +92,33 @@ model Session {
 }
 
 model Player {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  grade         String   @default("Civil")
-  gradeId       String?
-  gradeInfo     Grade?   @relation(fields: [gradeId], references: [id], onDelete: SetNull)
-  faction       String   @default("Civil")
-  factionId     String?
-  factionInfo   Faction? @relation(fields: [factionId], references: [id], onDelete: SetNull)
-  teamName      String?
-  teamId        String?
-  teamInfo      Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
-  assignments   PlayerAssignment[]
-  rpFirstName   String?
-  rpLastName    String?
-  playtime      Int      @default(0)
-  seniority     DateTime @default(now())
-  reputation    Int      @default(50)
-  sanctions     Int      @default(0)
-  clearance     Int      @default(1)
-  medals        String[] @default([])
-  achievements  Json     @default("[]")
-  inventory     Json     @default("[]")
-  roleUpdatedAt DateTime @default(now())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  grade           String             @default("Civil")
+  gradeId         String?
+  gradeInfo       Grade?             @relation(fields: [gradeId], references: [id], onDelete: SetNull)
+  faction         String             @default("Civil")
+  factionId       String?
+  factionInfo     Faction?           @relation(fields: [factionId], references: [id], onDelete: SetNull)
+  teamName        String?
+  teamId          String?
+  teamInfo        Team?              @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  assignments     PlayerAssignment[]
+  sanctionRecords Sanction[]
+  rpFirstName     String?
+  rpLastName      String?
+  playtime        Int                @default(0)
+  seniority       DateTime           @default(now())
+  reputation      Int                @default(50)
+  sanctions       Int                @default(0)
+  clearance       Int                @default(1)
+  medals          String[]           @default([])
+  achievements    Json               @default("[]")
+  inventory       Json               @default("[]")
+  roleUpdatedAt   DateTime           @default(now())
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([gradeId])
   @@index([factionId])
@@ -123,18 +126,18 @@ model Player {
 }
 
 model Application {
-  id          String            @id @default(cuid())
-  userId      String
-  type        ApplicationType
-  status      ApplicationStatus @default(PENDING)
-  experience  String
-  motivation  String
-  staffNote   String?
-  reviewedBy  String?
-  reviewedAt  DateTime?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String            @id @default(cuid())
+  userId     String
+  type       ApplicationType
+  status     ApplicationStatus @default(PENDING)
+  experience String
+  motivation String
+  staffNote  String?
+  reviewedBy String?
+  reviewedAt DateTime?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([type])
@@ -263,16 +266,16 @@ enum AuditAction {
 }
 
 model AuditLog {
-  id          String             @id @default(cuid())
-  entityType  PlatformEntityType
-  entityId    String
-  action      AuditAction
-  actorId     String?
-  actorLabel  String?
-  summary     String
-  metadata    Json?
-  clearance   Int                @default(1)
-  createdAt   DateTime           @default(now())
+  id         String             @id @default(cuid())
+  entityType PlatformEntityType
+  entityId   String
+  action     AuditAction
+  actorId    String?
+  actorLabel String?
+  summary    String
+  metadata   Json?
+  clearance  Int                @default(1)
+  createdAt  DateTime           @default(now())
 
   actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
@@ -343,24 +346,24 @@ model PlatformEntityTag {
 // chaîne libre à ce stade — voir le plan de migration progressive validé.
 
 model Grade {
-  id           String   @id @default(cuid())
-  slug         String   @unique
-  name         String
-  branch       String
-  tier         String
-  departmentId String?
+  id              String      @id @default(cuid())
+  slug            String      @unique
+  name            String
+  branch          String
+  tier            String
+  departmentId    String?
   departmentRefId String?
   departmentRef   Department? @relation(fields: [departmentRefId], references: [id], onDelete: SetNull)
-  pay          Int?
-  quota        Int?
-  clearance    Int
-  description  String?
-  objectives   String[] @default([])
-  utilities    String[] @default([])
-  accessZones  String[] @default([])
-  siteSections String[] @default([])
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  pay             Int?
+  quota           Int?
+  clearance       Int
+  description     String?
+  objectives      String[]    @default([])
+  utilities       String[]    @default([])
+  accessZones     String[]    @default([])
+  siteSections    String[]    @default([])
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
   players Player[]
 
@@ -483,4 +486,47 @@ model PlayerAssignment {
   @@index([playerId])
   @@index([entityType, entityId])
   @@index([playerId, entityType, endedAt])
+}
+
+// ─── REDLAKES CORE — sanctions ──────────────────────────────────────────────
+// Donne un corps a Player.sanctions, jusqu'ici un simple compteur entier mis
+// a jour a la main sans aucun enregistrement derriere. Le compteur reste (vue
+// rapide sur /profil Discord et les fiches joueur) mais est desormais
+// synchronise depuis de vrais enregistrements — raison, type, qui l'a
+// prononcee, statut (active/expiree/levee).
+
+enum SanctionType {
+  AVERTISSEMENT
+  BLAME
+  MISE_A_PIED
+  RETROGRADATION
+  BANNISSEMENT
+}
+
+enum SanctionStatus {
+  ACTIVE
+  EXPIREE
+  LEVEE
+}
+
+model Sanction {
+  id         String         @id @default(cuid())
+  playerId   String
+  player     Player         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  type       SanctionType
+  status     SanctionStatus @default(ACTIVE)
+  reason     String
+  note       String?
+  issuedById String?
+  issuedBy   User?          @relation("SanctionIssuedBy", fields: [issuedById], references: [id], onDelete: SetNull)
+  issuedAt   DateTime       @default(now())
+  expiresAt  DateTime?
+  liftedAt   DateTime?
+  liftedById String?
+  liftedBy   User?          @relation("SanctionLiftedBy", fields: [liftedById], references: [id], onDelete: SetNull)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@index([playerId])
+  @@index([status])
 }

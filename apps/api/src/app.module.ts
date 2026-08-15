@@ -16,6 +16,7 @@ import { FactionsModule } from './factions/factions.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { TeamsModule } from './teams/teams.module';
 import { AssignmentsModule } from './assignments/assignments.module';
+import { SanctionsModule } from './sanctions/sanctions.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AssignmentsModule } from './assignments/assignments.module';
     DepartmentsModule,
     TeamsModule,
     AssignmentsModule,
+    SanctionsModule,
   ],
 })
 export class AppModule {}
