@@ -1,6 +1,12 @@
 import { siteConfig } from "@/config/site";
 
 export const authErrorMessages: Record<string, { title: string; body: string }> = {
+  discord_not_member: {
+    title: "Serveur Discord requis",
+    body:
+      "Votre compte Discord n'est pas membre du serveur REDLAKES. " +
+      "Rejoignez le Discord puis reessayez la connexion.",
+  },
   discord_not_linked: {
     title: "Dossier non rattache",
     body:

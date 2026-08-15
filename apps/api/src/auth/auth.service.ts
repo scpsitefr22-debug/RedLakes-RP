@@ -116,6 +116,11 @@ export class AuthService {
       throw new UnauthorizedException('DISCORD_OAUTH_FAILED');
     }
 
+    const isMember = await this.discord.isGuildMember(profile.id);
+    if (!isMember) {
+      throw new UnauthorizedException('DISCORD_NOT_GUILD_MEMBER');
+    }
+
     const displayName = profile.global_name || profile.username;
     const discordAvatar = profile.avatar
       ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png?size=128`

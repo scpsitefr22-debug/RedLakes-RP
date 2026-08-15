@@ -223,6 +223,35 @@ export class DiscordService {
     });
   }
 
+  /**
+   * Verifie que le compte Discord est membre du serveur REDLAKES au moment
+   * de la connexion (pas seulement au moment de la creation du compte).
+   * Retourne true si DISCORD_BOT_TOKEN/DISCORD_GUILD_ID ne sont pas
+   * configures — la verification est desactivee tant que le bot n'est pas
+   * branche, meme convention que syncMemberProfile.
+   */
+  async isGuildMember(discordId: string): Promise<boolean> {
+    const token = this.config.get<string>('DISCORD_BOT_TOKEN');
+    const guildId = this.config.get<string>('DISCORD_GUILD_ID');
+    if (!token || !guildId) return true;
+
+    try {
+      const res = await fetch(
+        `https://discord.com/api/v10/guilds/${guildId}/members/${discordId}`,
+        { headers: { Authorization: `Bot ${token}` } },
+      );
+      if (res.status === 404) return false;
+      if (!res.ok) {
+        this.logger.warn(`Verification membre Discord échouée (${res.status})`);
+        return true;
+      }
+      return true;
+    } catch (err) {
+      this.logger.warn(`Verification membre Discord échouée: ${err}`);
+      return true;
+    }
+  }
+
   private async postWebhook(
     url: string,
     body: Record<string, unknown>,

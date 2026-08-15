@@ -120,6 +120,20 @@ export function RpLoginTerminal() {
             {errorInfo.title.toUpperCase()}
           </p>
           <p className="mt-2 text-sm text-gray-400">{errorInfo.body}</p>
+          {errorCode === "discord_not_member" && (
+            <div className="mt-4 space-y-2 font-mono text-xs text-gray-500">
+              <a
+                href={siteConfig.discordInvite}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1 text-[#aab1ff] hover:underline"
+              >
+                <MessageCircle className="h-3 w-3" />
+                Rejoindre le Discord
+              </a>
+              <p>Revenez ensuite ici et reessayez la connexion.</p>
+            </div>
+          )}
           {errorCode === "discord_not_linked" && (
             <div className="mt-4 space-y-2 font-mono text-xs text-gray-500">
               <p>1. Rejoignez le serveur Discord REDLAKES</p>

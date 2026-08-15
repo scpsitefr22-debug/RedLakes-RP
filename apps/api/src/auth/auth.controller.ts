@@ -71,13 +71,15 @@ export class AuthController {
           ? err.message
           : 'DISCORD_OAUTH_FAILED';
 
-      const code = msg.includes('DISCORD_NOT_LINKED')
-        ? 'discord_not_linked'
-        : msg.includes('DISCORD_NOT_CONFIGURED')
-          ? 'discord_not_configured'
-          : msg.includes('DISCORD_OAUTH_FAILED')
-            ? 'discord_oauth_failed'
-            : 'discord_oauth_failed';
+      const code = msg.includes('DISCORD_NOT_GUILD_MEMBER')
+        ? 'discord_not_member'
+        : msg.includes('DISCORD_NOT_LINKED')
+          ? 'discord_not_linked'
+          : msg.includes('DISCORD_NOT_CONFIGURED')
+            ? 'discord_not_configured'
+            : msg.includes('DISCORD_OAUTH_FAILED')
+              ? 'discord_oauth_failed'
+              : 'discord_oauth_failed';
 
       return res.redirect(`${webUrl}/connexion?error=${code}`);
     }
