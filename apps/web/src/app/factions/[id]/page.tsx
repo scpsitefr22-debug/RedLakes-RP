@@ -24,6 +24,7 @@ export default async function FactionDetailPage({ params }: Props) {
   if (!faction) notFound();
 
   const theme = getFactionTheme(faction.slug);
+  const { icon: Icon, ...heroTheme } = theme;
   const roleCategories = getFactionRoleCategories(faction.slug);
   const totalRoles = roleCategories.reduce((n, c) => n + c.roles.length, 0);
 
@@ -31,7 +32,8 @@ export default async function FactionDetailPage({ params }: Props) {
     <FactionThemeScope theme={theme} as="section" className="mx-auto max-w-4xl px-4 py-12">
       <FactionHero
         faction={faction}
-        theme={theme}
+        theme={heroTheme}
+        icon={<Icon className="h-6 w-6" />}
         totalRoles={totalRoles}
         roleCategoryCount={roleCategories.length}
       />

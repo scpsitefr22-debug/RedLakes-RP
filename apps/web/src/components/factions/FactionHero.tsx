@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { motion, type Variants } from "framer-motion";
 import { Badge } from "@/components/ui/Badge";
 import { CLEARANCE_LABELS, type ClearanceLevel } from "@/lib/clearance";
@@ -38,16 +39,23 @@ const HERO_VARIANTS: Record<FactionTheme["motion"], Variants> = {
   },
 };
 
+/** Sans `icon` : un composant d'icône (fonction) ne peut pas traverser la
+ * frontière Server → Client Component en tant que valeur de prop brute
+ * (non sérialisable), même si ce composant ne le lit jamais — c'est la
+ * forme de l'objet passé en prop qui compte, pas son usage. */
+type ClientSafeFactionTheme = Omit<FactionTheme, "icon">;
+
 interface Props {
   faction: ApiFaction;
-  theme: FactionTheme;
+  theme: ClientSafeFactionTheme;
+  /** Icône déjà instanciée côté serveur (voir note ci-dessus). */
+  icon: ReactNode;
   totalRoles: number;
   roleCategoryCount: number;
 }
 
-export function FactionHero({ faction, theme, totalRoles, roleCategoryCount }: Props) {
+export function FactionHero({ faction, theme, icon, totalRoles, roleCategoryCount }: Props) {
   const clearance = Math.min(Math.max(faction.clearance, 1), 5) as ClearanceLevel;
-  const Icon = theme.icon;
 
   return (
     <motion.header
@@ -73,7 +81,7 @@ export function FactionHero({ faction, theme, totalRoles, roleCategoryCount }: P
           )}
           style={{ borderColor: theme.colors.primary, color: theme.colors.accent }}
         >
-          <Icon className="h-6 w-6" />
+          {icon}
         </span>
         <div>
           <h1 className="faction-heading text-4xl font-bold text-white">{faction.name}</h1>
