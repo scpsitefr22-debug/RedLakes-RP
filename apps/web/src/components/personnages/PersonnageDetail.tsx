@@ -1,18 +1,40 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { characters } from "@/data/lore";
+import { apiFetch } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
-import { CLEARANCE_LABELS } from "@/lib/clearance";
+import { CLEARANCE_LABELS, ClearanceLevel } from "@/lib/clearance";
 import { Quote, Lock, ArrowLeft } from "lucide-react";
 import { usePlayerSession, canViewClearance } from "@/hooks/usePlayerSession";
 
+interface ApiCharacter {
+  name: string;
+  title: string;
+  faction: string;
+  biography: string;
+  quotes: string[];
+  history: string[];
+  clearance: ClearanceLevel;
+}
+
 export function PersonnageDetail({ id }: { id: string }) {
   const { clearance, authenticated } = usePlayerSession();
-  const character = characters.find((c) => c.id === id);
+  const [character, setCharacter] = useState<ApiCharacter | null>(null);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    apiFetch<ApiCharacter>(`/characters/${id}`)
+      .then(setCharacter)
+      .catch(() => setNotFound(true));
+  }, [id]);
+
+  if (notFound) {
+    return <p className="text-gray-500">Personnage introuvable.</p>;
+  }
 
   if (!character) {
-    return <p className="text-gray-500">Personnage introuvable.</p>;
+    return <p className="text-gray-500">Chargement...</p>;
   }
 
   const accessible = canViewClearance(character.clearance, clearance);

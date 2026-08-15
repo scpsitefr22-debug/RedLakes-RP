@@ -571,3 +571,26 @@ model ScpObject {
   @@index([class])
   @@index([clearance])
 }
+
+// ─── REDLAKES CORE — personnages importants (Personnages) ──────────────────
+// Fiches narratives (directeurs, inspecteurs, commandants...). "faction" reste
+// une simple etiquette texte plutot qu'une relation Faction : les valeurs
+// existantes melangent des factions ("Fondation SCP") et des unites ("FIM
+// Nu-7") qui ne sont pas des factions au sens du modele Faction.
+
+model Character {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  title     String
+  faction   String
+  biography String
+  quotes    String[] @default([])
+  history   String[] @default([])
+  portrait  String?
+  clearance Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clearance])
+}

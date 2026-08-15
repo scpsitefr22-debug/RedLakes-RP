@@ -17,6 +17,7 @@ import {
   Building2,
   UserCog,
   FlaskConical,
+  User,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -227,6 +228,13 @@ export function StaffDashboard() {
             Gestion du wiki SCP →
           </Link>
           <p className="text-xs text-gray-600">Objets, classes, incidents</p>
+        </div>
+        <div className="hologram-border rounded-lg p-5">
+          <User className="mb-2 h-5 w-5 text-redlake-glow" />
+          <Link href="/staff/personnages" className="font-mono text-sm text-redlake-glow hover:underline">
+            Gestion des personnages →
+          </Link>
+          <p className="text-xs text-gray-600">Fiches narratives</p>
         </div>
       </div>
 

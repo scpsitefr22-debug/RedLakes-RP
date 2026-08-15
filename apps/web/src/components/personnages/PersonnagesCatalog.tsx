@@ -1,14 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { User, Lock } from "lucide-react";
-import { characters } from "@/data/lore";
+import { apiFetch } from "@/lib/api";
 import { ClearanceBanner } from "@/components/clearance/ClearanceBanner";
 import { usePlayerSession, canViewClearance } from "@/hooks/usePlayerSession";
 import { Badge } from "@/components/ui/Badge";
 
+interface ApiCharacter {
+  id: string;
+  slug: string;
+  name: string;
+  title: string;
+  biography: string;
+  clearance: number;
+}
+
 export function PersonnagesCatalog() {
   const { clearance } = usePlayerSession();
+  const [characters, setCharacters] = useState<ApiCharacter[]>([]);
+
+  useEffect(() => {
+    apiFetch<ApiCharacter[]>("/characters")
+      .then(setCharacters)
+      .catch(() => undefined);
+  }, []);
 
   return (
     <>
@@ -19,7 +36,7 @@ export function PersonnagesCatalog() {
           return (
             <Link
               key={char.id}
-              href={`/personnages/${char.id}`}
+              href={`/personnages/${char.slug}`}
               className="group hologram-border rounded-lg p-6 transition-all hover:border-redlake/40"
             >
               <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-redlake/30 bg-redlake/10">

@@ -18,6 +18,7 @@ import { TeamsModule } from './teams/teams.module';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { SanctionsModule } from './sanctions/sanctions.module';
 import { ScpModule } from './scp/scp.module';
+import { CharactersModule } from './characters/characters.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { ScpModule } from './scp/scp.module';
     AssignmentsModule,
     SanctionsModule,
     ScpModule,
+    CharactersModule,
   ],
 })
 export class AppModule {}
