@@ -9,6 +9,7 @@ import { seedFactions } from './seed-factions';
 import { seedTeams } from './seed-teams';
 import { seedScpObjects } from './seed-scp';
 import { seedCharacters } from './seed-characters';
+import { seedGameEvents } from './seed-events';
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,7 @@ async function main() {
   await seedTeams();
   await seedScpObjects();
   await seedCharacters();
+  await seedGameEvents();
 
   const admin = await prisma.user.upsert({
     where: { minecraftUsername: 'Directeur_Site' },

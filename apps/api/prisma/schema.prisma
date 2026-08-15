@@ -594,3 +594,26 @@ model Character {
 
   @@index([clearance])
 }
+
+// ─── REDLAKES CORE — evenements narratifs (GameEvent) ───────────────────────
+// "type" reste une String libre (breach/invasion/guerre/crise-xk/experience)
+// plutot qu'un enum Prisma : ces valeurs sont deja utilisees telles quelles
+// (avec tiret) comme cles d'affichage cote web, un enum forcerait a les
+// renommer (CRISE_XK) et casser cette correspondance pour aucun gain reel.
+
+model GameEvent {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  date        DateTime
+  type        String
+  description String
+  casualties  String?
+  outcome     String
+  clearance   Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([clearance])
+}

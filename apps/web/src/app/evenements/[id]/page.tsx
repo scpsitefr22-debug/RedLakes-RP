@@ -1,20 +1,35 @@
 import { notFound } from "next/navigation";
-import { gameEvents } from "@/data/lore";
 import { Badge } from "@/components/ui/Badge";
-import { CLEARANCE_LABELS } from "@/lib/clearance";
+import { CLEARANCE_LABELS, ClearanceLevel } from "@/lib/clearance";
 import { formatDate } from "@/lib/utils";
+import { API_URL } from "@/lib/api";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
-export async function generateStaticParams() {
-  return gameEvents.map((e) => ({ id: e.id }));
+interface ApiGameEventDetail {
+  title: string;
+  date: string;
+  description: string;
+  casualties: string | null;
+  outcome: string;
+  clearance: ClearanceLevel;
+}
+
+async function getGameEvent(slug: string): Promise<ApiGameEventDetail | null> {
+  try {
+    const res = await fetch(`${API_URL}/events/${slug}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }
 
 export default async function EvenementDetailPage({ params }: Props) {
   const { id } = await params;
-  const event = gameEvents.find((e) => e.id === id);
+  const event = await getGameEvent(id);
   if (!event) notFound();
 
   return (
