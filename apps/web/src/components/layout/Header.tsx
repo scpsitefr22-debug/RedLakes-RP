@@ -53,6 +53,8 @@ const navItems = [
       { label: "CASSIE IA", href: "/cassie" },
       { label: "CMS Lore (Staff)", href: "/lore/cms" },
       { label: "Gestion Grades (Staff)", href: "/staff/grades" },
+      { label: "Gestion Factions (Staff)", href: "/staff/factions" },
+      { label: "Gestion Départements (Staff)", href: "/staff/departements" },
     ],
   },
 ];

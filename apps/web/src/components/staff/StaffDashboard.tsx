@@ -13,6 +13,8 @@ import {
   ChevronDown,
   ChevronUp,
   Shield,
+  Landmark,
+  Building2,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -188,6 +190,20 @@ export function StaffDashboard() {
             Gestion des grades →
           </Link>
           <p className="text-xs text-gray-600">Catalogue de grades</p>
+        </div>
+        <div className="hologram-border rounded-lg p-5">
+          <Landmark className="mb-2 h-5 w-5 text-redlake-glow" />
+          <Link href="/staff/factions" className="font-mono text-sm text-redlake-glow hover:underline">
+            Gestion des factions →
+          </Link>
+          <p className="text-xs text-gray-600">Catalogue de factions</p>
+        </div>
+        <div className="hologram-border rounded-lg p-5">
+          <Building2 className="mb-2 h-5 w-5 text-redlake-glow" />
+          <Link href="/staff/departements" className="font-mono text-sm text-redlake-glow hover:underline">
+            Gestion des départements →
+          </Link>
+          <p className="text-xs text-gray-600">Catalogue de départements</p>
         </div>
       </div>
 
