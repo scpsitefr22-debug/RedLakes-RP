@@ -48,6 +48,8 @@ export async function seedFactions() {
         color: dept.color,
         utilities: dept.utilities,
         objectives: dept.objectives ?? [],
+        leadership: dept.leadership ?? [],
+        clearance: dept.clearance ?? 1,
       },
       create: {
         slug: dept.id,
@@ -58,6 +60,8 @@ export async function seedFactions() {
         color: dept.color,
         utilities: dept.utilities,
         objectives: dept.objectives ?? [],
+        leadership: dept.leadership ?? [],
+        clearance: dept.clearance ?? 1,
       },
     });
   }

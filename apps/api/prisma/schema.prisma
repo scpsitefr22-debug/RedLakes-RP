@@ -414,6 +414,8 @@ model Department {
   color             String?
   utilities         String[] @default([])
   objectives        String[] @default([])
+  leadership        String[] @default([])
+  clearance         Int      @default(1)
   chefId            String?
   chef              User?    @relation("DepartmentChef", fields: [chefId], references: [id], onDelete: SetNull)
   deputyIds         String[] @default([])

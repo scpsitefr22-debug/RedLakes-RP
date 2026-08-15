@@ -9,7 +9,10 @@ export class DepartmentsService {
   findAll(factionSlug?: string) {
     return this.prisma.department.findMany({
       where: factionSlug ? { faction: { slug: factionSlug } } : undefined,
-      include: { faction: true },
+      include: {
+        faction: true,
+        _count: { select: { grades: true, teams: true } },
+      },
       orderBy: { name: 'asc' },
     });
   }
@@ -17,7 +20,11 @@ export class DepartmentsService {
   findOne(slug: string) {
     return this.prisma.department.findUnique({
       where: { slug },
-      include: { faction: true },
+      include: {
+        faction: true,
+        grades: { orderBy: { pay: 'desc' } },
+        teams: { orderBy: [{ category: 'asc' }, { name: 'asc' }] },
+      },
     });
   }
 
