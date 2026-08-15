@@ -115,3 +115,229 @@ body {
   color: #b0b0b0;
   line-height: 1.75;
 }
+
+/* ==========================================================================
+   IDENTITÉS DE FACTION — système de thématisation
+   Consommé par FactionThemeScope (src/components/factions/). Chaque
+   faction pose data-faction / data-motif / data-motion sur son scope ;
+   ces attributs pilotent uniquement les règles ci-dessous. Rien ici ne
+   modifie le Header/Footer ni les autres pages du site.
+   ========================================================================== */
+
+.faction-scope {
+  position: relative;
+  isolation: isolate;
+}
+
+.faction-scope-content {
+  position: relative;
+  z-index: 1;
+}
+
+.faction-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.faction-scan-beam {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+}
+
+/* Panneau générique thématisé — remplace hologram-border à l'intérieur
+   d'un faction-scope pour que la couleur suive la faction affichée. */
+.faction-card {
+  position: relative;
+  border: 1px solid var(--f-border, rgba(139, 10, 10, 0.4));
+  background: linear-gradient(135deg, var(--f-surface, rgba(139, 10, 10, 0.05)) 0%, transparent 55%);
+  box-shadow: inset 0 0 30px var(--f-surface, rgba(139, 10, 10, 0.05));
+  border-radius: 0.5rem;
+}
+
+.faction-heading {
+  font-family: var(--f-heading-font, var(--font-sans)), var(--font-sans), system-ui, sans-serif;
+}
+
+.faction-accent {
+  color: var(--f-accent, var(--redlake-red-glow));
+}
+
+.faction-kicker {
+  font-family: var(--font-mono), monospace;
+  color: var(--f-accent, var(--redlake-red-glow));
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ---- Fondation (défaut du site — quasi inchangé) ------------------------ */
+[data-faction="fondation"] .faction-texture {
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139, 10, 10, 0.12), transparent 60%);
+}
+
+/* ---- AEGIS — corporate froid, salle blanche, scan ------------------------ */
+[data-motif="clinical"] .faction-heading {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+[data-motif="clinical"] .faction-card {
+  border-radius: 0;
+}
+
+[data-faction="aegis"] .faction-texture {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 32px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 32px);
+}
+
+@keyframes aegis-scan {
+  0% { top: 0%; opacity: 0; }
+  8% { opacity: 0.8; }
+  92% { opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
+}
+
+[data-faction="aegis"] .faction-scan-beam {
+  opacity: 1;
+}
+
+[data-faction="aegis"] .faction-scan-beam::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: aegis-scan 6s linear infinite;
+}
+
+/* ---- Insurrection du Chaos — pochoir, tract, glitch marqué ---------------- */
+[data-faction="chaos"] .faction-texture {
+  background-image:
+    repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.35) 0px, rgba(0, 0, 0, 0.35) 2px, transparent 2px, transparent 14px),
+    radial-gradient(circle at 20% 25%, rgba(185, 28, 28, 0.14), transparent 45%);
+}
+
+[data-motif="stencil"] .faction-card {
+  clip-path: polygon(0 6px, 6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+}
+
+@keyframes faction-glitch-heavy {
+  0%, 100% { transform: translate(0); }
+  15% { transform: translate(-3px, 2px); }
+  30% { transform: translate(3px, -1px); }
+  45% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  75% { transform: translate(-1px, 1px); }
+}
+
+[data-motif="stencil"] .faction-glitch-hover:hover {
+  animation: faction-glitch-heavy 0.25s ease infinite;
+}
+
+/* ---- Main du Serpent — occulte, grimoire, halo de bougie ------------------ */
+[data-faction="main-serpent"] .faction-texture {
+  background:
+    radial-gradient(circle at 50% 15%, rgba(201, 162, 39, 0.16), transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(74, 0, 128, 0.28), transparent 60%);
+}
+
+@keyframes faction-breathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+[data-motif="occult"] .faction-glow-pulse {
+  animation: faction-breathe 5s ease-in-out infinite;
+}
+
+/* ---- GOC — quadrillage tactique, dossier militaire ------------------------ */
+[data-faction="goc"] .faction-texture {
+  background-image:
+    linear-gradient(rgba(220, 38, 38, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 38, 38, 0.09) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+[data-motif="tactical"] .faction-heading {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ---- Gouvernement — en-tête officiel, plus lumineux ----------------------- */
+[data-faction="gouvernement"] .faction-texture {
+  background: linear-gradient(180deg, rgba(30, 58, 95, 0.12), transparent 45%);
+}
+
+[data-motif="letterhead"] .faction-scope-content {
+  color: #d8dee8;
+}
+
+/* ---- Police — insigne, gyrophare discret ---------------------------------- */
+[data-faction="police"] .faction-texture {
+  background: repeating-radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.1) 0, transparent 70px);
+}
+
+[data-motif="badge"] .faction-heading {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+@keyframes faction-siren {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.45), 0 0 26px rgba(37, 99, 235, 0.22); }
+  50% { box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.45), 0 0 26px rgba(220, 38, 38, 0.22); }
+}
+
+[data-motif="badge"] .faction-siren-pulse {
+  animation: faction-siren 2.4s ease-in-out infinite;
+}
+
+/* ---- Crime Organisé — enseigne néon, ruelle, grain ------------------------ */
+[data-faction="crime"] .faction-texture {
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes faction-neon-flicker {
+  0%, 19%, 21%, 23%, 54%, 56%, 100% { opacity: 1; }
+  20%, 22%, 55% { opacity: 0.35; }
+}
+
+[data-motif="neon"] .faction-neon-flicker {
+  animation: faction-neon-flicker 6s infinite;
+}
+
+/* Apparition échelonnée des cartes de l'index /factions */
+@keyframes faction-card-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.faction-card-reveal {
+  animation: faction-card-in 0.5s ease-out both;
+}
+
+/* Respecte les préférences de mouvement réduit : coupe les boucles
+   d'ambiance (pas les transitions ponctuelles d'apparition). */
+@media (prefers-reduced-motion: reduce) {
+  .faction-scan-beam::after,
+  .faction-glow-pulse,
+  .faction-siren-pulse,
+  .faction-neon-flicker,
+  .faction-glitch-hover:hover {
+    animation: none !important;
+  }
+
+  .faction-card-reveal {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

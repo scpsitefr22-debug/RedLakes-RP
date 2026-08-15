@@ -5,17 +5,17 @@ import {
   getFactionRoleCategories,
   type FactionRoleEntry,
 } from "@/data/faction-role-catalog";
-import { factions } from "@/data/factions";
 import { Badge } from "@/components/ui/Badge";
 import { CLEARANCE_LABELS } from "@/lib/clearance";
 import { Shield, Target, Globe } from "lucide-react";
 
 interface Props {
   factionId: string;
+  /** Couleur d'accent de la faction (thème API) — repli sur la couleur de catégorie si absente. */
+  accentColor?: string;
 }
 
-export function FactionRoleCategoriesPanel({ factionId }: Props) {
-  const faction = factions.find((f) => f.id === factionId);
+export function FactionRoleCategoriesPanel({ factionId, accentColor }: Props) {
   const categories = useMemo(() => getFactionRoleCategories(factionId), [factionId]);
   const [activeId, setActiveId] = useState(categories[0]?.id ?? "");
 
@@ -28,7 +28,7 @@ export function FactionRoleCategoriesPanel({ factionId }: Props) {
   }
 
   const active = categories.find((c) => c.id === activeId) ?? categories[0];
-  const accent = faction?.color ?? active.color;
+  const accent = accentColor ?? active.color;
 
   return (
     <div className="space-y-6">
@@ -77,7 +77,7 @@ function RoleCard({
 }) {
   return (
     <article
-      className="hologram-border rounded-lg p-5"
+      className="faction-card p-5"
       style={{ borderLeftColor: color, borderLeftWidth: 3 }}
     >
       <div className="mb-2 flex items-start justify-between gap-2">
