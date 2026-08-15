@@ -157,6 +157,14 @@ export class PlayersService {
     }));
   }
 
+  async findIdByUsername(username: string) {
+    const player = await this.prisma.player.findFirst({
+      where: { user: { minecraftUsername: username } },
+      select: { id: true },
+    });
+    return player?.id ?? null;
+  }
+
   async findByUsername(username: string) {
     const player = await this.prisma.player.findFirst({
       where: { user: { minecraftUsername: username } },

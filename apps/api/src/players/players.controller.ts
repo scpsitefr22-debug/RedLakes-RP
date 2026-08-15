@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Body,
@@ -8,8 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
+import { UserRole } from '@prisma/client';
 import { PlayersService } from './players.service';
 import { AuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 import { UpdatePlayerProfileDto } from './dto/update-player-profile.dto';
 import { SyncService } from '../sync/sync.service';
 
@@ -39,6 +43,15 @@ export class PlayersController {
   ) {
     await this.sync.updateRpIdentity(req.user.id, dto);
     return this.players.getDashboard(req.user.id);
+  }
+
+  @Get(':username/staff-id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  async findIdByUsername(@Param('username') username: string) {
+    const id = await this.players.findIdByUsername(username);
+    if (!id) throw new NotFoundException('Joueur introuvable');
+    return { id };
   }
 
   @Get(':username')

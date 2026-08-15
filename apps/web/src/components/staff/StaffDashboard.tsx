@@ -15,6 +15,7 @@ import {
   Shield,
   Landmark,
   Building2,
+  UserCog,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -211,6 +212,13 @@ export function StaffDashboard() {
             Gestion des équipes →
           </Link>
           <p className="text-xs text-gray-600">Équipes de terrain, FIM</p>
+        </div>
+        <div className="hologram-border rounded-lg p-5">
+          <UserCog className="mb-2 h-5 w-5 text-redlake-glow" />
+          <Link href="/staff/joueurs" className="font-mono text-sm text-redlake-glow hover:underline">
+            Gestion des joueurs →
+          </Link>
+          <p className="text-xs text-gray-600">Sanctions, affectations</p>
         </div>
       </div>
 

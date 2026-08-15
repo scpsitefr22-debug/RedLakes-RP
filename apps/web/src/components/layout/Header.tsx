@@ -55,6 +55,7 @@ const navItems = [
       { label: "Gestion Factions (Staff)", href: "/staff/factions" },
       { label: "Gestion Départements (Staff)", href: "/staff/departements" },
       { label: "Gestion Équipes (Staff)", href: "/staff/teams" },
+      { label: "Gestion Joueurs (Staff)", href: "/staff/joueurs" },
     ],
   },
 ];

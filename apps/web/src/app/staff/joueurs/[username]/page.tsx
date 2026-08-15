@@ -1,0 +1,304 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { apiFetch } from "@/lib/api";
+import { ArrowLeft, ShieldAlert, History, Plus, X, Check } from "lucide-react";
+
+interface PlayerProfile {
+  grade: string;
+  faction: string;
+  teamName: string | null;
+  rpFirstName: string | null;
+  rpLastName: string | null;
+  sanctions: number;
+  clearance: number;
+  user: { minecraftUsername: string; avatarUrl: string | null };
+}
+
+interface SanctionRow {
+  id: string;
+  type: string;
+  status: string;
+  reason: string;
+  note: string | null;
+  issuedAt: string;
+  liftedAt: string | null;
+}
+
+interface AssignmentRow {
+  id: string;
+  entityType: string;
+  entityId: string;
+  role: string | null;
+  startedAt: string;
+  endedAt: string | null;
+}
+
+interface EntityOption {
+  id: string;
+  name: string;
+}
+
+const SANCTION_TYPES = ["AVERTISSEMENT", "BLAME", "MISE_A_PIED", "RETROGRADATION", "BANNISSEMENT"];
+
+const inputClass =
+  "w-full rounded border border-metal bg-black px-3 py-2 text-sm text-white outline-none focus:border-redlake";
+
+export default function StaffPlayerPage() {
+  const params = useParams();
+  const username = params.username as string;
+
+  const [profile, setProfile] = useState<PlayerProfile | null>(null);
+  const [playerId, setPlayerId] = useState<string | null>(null);
+  const [sanctions, setSanctions] = useState<SanctionRow[]>([]);
+  const [assignments, setAssignments] = useState<AssignmentRow[]>([]);
+  const [factions, setFactions] = useState<EntityOption[]>([]);
+  const [departments, setDepartments] = useState<EntityOption[]>([]);
+  const [teams, setTeams] = useState<EntityOption[]>([]);
+  const [error, setError] = useState("");
+
+  const [sanctionForm, setSanctionForm] = useState({ type: "AVERTISSEMENT", reason: "" });
+  const [assignForm, setAssignForm] = useState({ entityType: "TEAM", entityId: "", role: "" });
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      const [prof, { id }] = await Promise.all([
+        apiFetch<PlayerProfile>(`/players/${username}`),
+        apiFetch<{ id: string }>(`/players/${username}/staff-id`),
+      ]);
+      setProfile(prof);
+      setPlayerId(id);
+      const [s, a] = await Promise.all([
+        apiFetch<SanctionRow[]>(`/sanctions/player/${id}`),
+        apiFetch<AssignmentRow[]>(`/assignments/player/${id}`),
+      ]);
+      setSanctions(s);
+      setAssignments(a);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? `${err.message} — connectez-vous en staff pour gérer ce profil.`
+          : "Erreur de chargement",
+      );
+    }
+  }, [username]);
+
+  useEffect(() => {
+    load();
+    apiFetch<EntityOption[]>("/factions").then(setFactions).catch(() => undefined);
+    apiFetch<EntityOption[]>("/departments").then(setDepartments).catch(() => undefined);
+    apiFetch<EntityOption[]>("/teams").then(setTeams).catch(() => undefined);
+  }, [load]);
+
+  const entityOptions = assignForm.entityType === "FACTION" ? factions
+    : assignForm.entityType === "DEPARTMENT" ? departments
+    : teams;
+
+  const createSanction = async () => {
+    if (!playerId || !sanctionForm.reason.trim()) return;
+    setSaving(true);
+    setError("");
+    try {
+      await apiFetch("/sanctions", {
+        method: "POST",
+        body: JSON.stringify({ playerId, type: sanctionForm.type, reason: sanctionForm.reason }),
+      });
+      setSanctionForm({ type: "AVERTISSEMENT", reason: "" });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const liftSanction = async (id: string) => {
+    setSaving(true);
+    try {
+      await apiFetch(`/sanctions/${id}`, { method: "PATCH", body: JSON.stringify({ status: "LEVEE" }) });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteSanction = async (id: string) => {
+    if (!confirm("Supprimer définitivement cette sanction ?")) return;
+    setSaving(true);
+    try {
+      await apiFetch(`/sanctions/${id}`, { method: "DELETE" });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const createAssignment = async () => {
+    if (!playerId || !assignForm.entityId) return;
+    setSaving(true);
+    setError("");
+    try {
+      await apiFetch("/assignments", {
+        method: "POST",
+        body: JSON.stringify({
+          playerId,
+          entityType: assignForm.entityType,
+          entityId: assignForm.entityId,
+          role: assignForm.role || undefined,
+        }),
+      });
+      setAssignForm({ entityType: "TEAM", entityId: "", role: "" });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const endAssignment = async (id: string) => {
+    setSaving(true);
+    try {
+      await apiFetch(`/assignments/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ endedAt: new Date().toISOString() }),
+      });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const labelFor = (entityType: string, entityId: string) => {
+    const pool = entityType === "FACTION" ? factions : entityType === "DEPARTMENT" ? departments : teams;
+    return pool.find((e) => e.id === entityId)?.name ?? entityId;
+  };
+
+  if (error && !profile) {
+    return <div className="mx-auto max-w-3xl px-4 py-12 text-center text-red-400">{error}</div>;
+  }
+
+  if (!profile) {
+    return <div className="mx-auto max-w-3xl px-4 py-12 text-center text-gray-500">Chargement...</div>;
+  }
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-12">
+      <Link href="/staff/joueurs" className="mb-6 inline-flex items-center gap-2 font-mono text-sm text-gray-500 hover:text-white">
+        <ArrowLeft className="h-4 w-4" /> Retour à la gestion des joueurs
+      </Link>
+
+      <h1 className="mb-1 text-3xl font-bold text-white">
+        {[profile.rpFirstName, profile.rpLastName].filter(Boolean).join(" ") || profile.user.minecraftUsername}
+      </h1>
+      <p className="mb-8 font-mono text-sm text-gray-500">
+        {profile.user.minecraftUsername} — {profile.grade} — {profile.faction}
+        {profile.teamName ? ` — ${profile.teamName}` : ""}
+      </p>
+
+      {error && (
+        <div className="mb-6 rounded border border-red-400/30 bg-red-400/10 p-4 text-sm text-red-400">{error}</div>
+      )}
+
+      {/* Sanctions */}
+      <section className="mb-10 hologram-border rounded-lg p-6">
+        <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
+          <ShieldAlert className="h-5 w-5 text-redlake-glow" /> Sanctions ({profile.sanctions})
+        </h2>
+
+        <div className="mb-4 space-y-2">
+          {sanctions.length === 0 && <p className="text-sm text-gray-600">Aucune sanction enregistrée.</p>}
+          {sanctions.map((s) => (
+            <div key={s.id} className="flex items-center justify-between rounded border border-metal p-3 text-sm">
+              <div>
+                <p className="text-white">{s.type} — {s.reason}</p>
+                <p className="font-mono text-xs text-gray-600">
+                  {new Date(s.issuedAt).toLocaleDateString("fr-FR")} — {s.status}
+                  {s.liftedAt ? ` (levée le ${new Date(s.liftedAt).toLocaleDateString("fr-FR")})` : ""}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {s.status === "ACTIVE" && (
+                  <button onClick={() => liftSanction(s.id)} disabled={saving} className="rounded border border-green-400/40 p-1.5 text-green-400 hover:bg-green-400/10 disabled:opacity-50" title="Lever">
+                    <Check className="h-4 w-4" />
+                  </button>
+                )}
+                <button onClick={() => deleteSanction(s.id)} disabled={saving} className="rounded border border-red-400/40 p-1.5 text-red-400 hover:bg-red-400/10 disabled:opacity-50" title="Supprimer">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-[1fr_2fr_auto] gap-2">
+          <select className={inputClass} value={sanctionForm.type} onChange={(e) => setSanctionForm((f) => ({ ...f, type: e.target.value }))}>
+            {SANCTION_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <input className={inputClass} placeholder="Motif" value={sanctionForm.reason} onChange={(e) => setSanctionForm((f) => ({ ...f, reason: e.target.value }))} />
+          <button onClick={createSanction} disabled={saving || !sanctionForm.reason.trim()} className="flex items-center gap-1 rounded border border-redlake bg-redlake/20 px-3 text-sm text-white hover:bg-redlake/30 disabled:opacity-50">
+            <Plus className="h-4 w-4" /> Ajouter
+          </button>
+        </div>
+      </section>
+
+      {/* Affectations */}
+      <section className="hologram-border rounded-lg p-6">
+        <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
+          <History className="h-5 w-5 text-redlake-glow" /> Historique d&apos;affectations
+        </h2>
+
+        <div className="mb-4 space-y-2">
+          {assignments.length === 0 && <p className="text-sm text-gray-600">Aucune affectation enregistrée.</p>}
+          {assignments.map((a) => (
+            <div key={a.id} className="flex items-center justify-between rounded border border-metal p-3 text-sm">
+              <div>
+                <p className="text-white">
+                  {a.entityType} — {labelFor(a.entityType, a.entityId)}{a.role ? ` (${a.role})` : ""}
+                </p>
+                <p className="font-mono text-xs text-gray-600">
+                  Depuis le {new Date(a.startedAt).toLocaleDateString("fr-FR")}
+                  {a.endedAt ? ` — terminée le ${new Date(a.endedAt).toLocaleDateString("fr-FR")}` : " — en cours"}
+                </p>
+              </div>
+              {!a.endedAt && (
+                <button onClick={() => endAssignment(a.id)} disabled={saving} className="rounded border border-red-400/40 p-1.5 text-red-400 hover:bg-red-400/10 disabled:opacity-50" title="Terminer">
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-[1fr_2fr_1fr_auto] gap-2">
+          <select
+            className={inputClass}
+            value={assignForm.entityType}
+            onChange={(e) => setAssignForm({ entityType: e.target.value, entityId: "", role: "" })}
+          >
+            <option value="FACTION">Faction</option>
+            <option value="DEPARTMENT">Département</option>
+            <option value="TEAM">Équipe</option>
+          </select>
+          <select className={inputClass} value={assignForm.entityId} onChange={(e) => setAssignForm((f) => ({ ...f, entityId: e.target.value }))}>
+            <option value="">— Choisir —</option>
+            {entityOptions.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+          </select>
+          <input className={inputClass} placeholder="Rôle (optionnel)" value={assignForm.role} onChange={(e) => setAssignForm((f) => ({ ...f, role: e.target.value }))} />
+          <button onClick={createAssignment} disabled={saving || !assignForm.entityId} className="flex items-center gap-1 rounded border border-redlake bg-redlake/20 px-3 text-sm text-white hover:bg-redlake/30 disabled:opacity-50">
+            <Plus className="h-4 w-4" /> Assigner
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
