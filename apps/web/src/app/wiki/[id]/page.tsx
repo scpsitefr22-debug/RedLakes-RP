@@ -1,28 +1,52 @@
 import { notFound } from "next/navigation";
-import { scpObjects, classColors } from "@/data/scp";
+import { classColors, SCPClass } from "@/data/scp";
 import { Badge } from "@/components/ui/Badge";
 import { cn, formatDate } from "@/lib/utils";
-import { CLEARANCE_LABELS } from "@/lib/clearance";
+import { CLEARANCE_LABELS, ClearanceLevel } from "@/lib/clearance";
 import { AlertTriangle, FlaskConical, FileText } from "lucide-react";
+import { API_URL } from "@/lib/api";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
-export async function generateStaticParams() {
-  return scpObjects.map((s) => ({ id: s.id }));
+interface ApiScpDetail {
+  number: string;
+  name: string;
+  class: SCPClass;
+  threatLevel: number;
+  containment: string;
+  history: string;
+  description: string;
+  incidents: { date: string; summary: string }[];
+  tests: { date: string; researcher: string; result: string }[];
+  addendums: { author: string; content: string }[];
+  containmentCost: string | null;
+  personnelAssigned: number | null;
+  breachCount: number | null;
+  clearance: ClearanceLevel;
+}
+
+async function getScpObject(slug: string): Promise<ApiScpDetail | null> {
+  try {
+    const res = await fetch(`${API_URL}/scp/${slug}`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
-  const scp = scpObjects.find((s) => s.id === id);
+  const scp = await getScpObject(id);
   if (!scp) return { title: "SCP introuvable" };
   return { title: `${scp.number} — ${scp.name}` };
 }
 
 export default async function SCPDetailPage({ params }: Props) {
   const { id } = await params;
-  const scp = scpObjects.find((s) => s.id === id);
+  const scp = await getScpObject(id);
   if (!scp) notFound();
 
   return (
@@ -53,15 +77,15 @@ export default async function SCPDetailPage({ params }: Props) {
           <div className="mt-4 grid grid-cols-3 gap-4 font-mono text-sm">
             <div>
               <p className="text-gray-600">Coût mensuel</p>
-              <p className="text-white">{scp.stats.containmentCost}</p>
+              <p className="text-white">{scp.containmentCost ?? "—"}</p>
             </div>
             <div>
               <p className="text-gray-600">Personnel</p>
-              <p className="text-white">{scp.stats.personnelAssigned}</p>
+              <p className="text-white">{scp.personnelAssigned ?? "—"}</p>
             </div>
             <div>
               <p className="text-gray-600">Brèches</p>
-              <p className="text-white">{scp.stats.breachCount}</p>
+              <p className="text-white">{scp.breachCount ?? "—"}</p>
             </div>
           </div>
         </section>

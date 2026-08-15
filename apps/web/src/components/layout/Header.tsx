@@ -56,6 +56,7 @@ const navItems = [
       { label: "Gestion Départements (Staff)", href: "/staff/departements" },
       { label: "Gestion Équipes (Staff)", href: "/staff/teams" },
       { label: "Gestion Joueurs (Staff)", href: "/staff/joueurs" },
+      { label: "Gestion Wiki SCP (Staff)", href: "/staff/scp" },
     ],
   },
 ];

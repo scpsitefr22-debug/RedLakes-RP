@@ -532,3 +532,42 @@ model Sanction {
   @@index([playerId])
   @@index([status])
 }
+
+// ─── REDLAKES CORE — objets SCP (Wiki) ──────────────────────────────────────
+// Contenu riche et structure (classe, niveau de menace, confinement,
+// incidents/tests/addendums, stats) — trop specifique pour LoreArticle
+// (texte libre generique). Migre depuis apps/web/src/data/scp.ts, jamais
+// modelise jusqu'ici malgre 5 fiches deja ecrites.
+
+enum ScpClass {
+  Safe
+  Euclid
+  Keter
+  Thaumiel
+  Apollyon
+}
+
+model ScpObject {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  number            String
+  name              String
+  class             ScpClass
+  threatLevel       Int
+  containment       String
+  history           String
+  description       String
+  image             String?
+  incidents         Json     @default("[]")
+  tests             Json     @default("[]")
+  addendums         Json     @default("[]")
+  containmentCost   String?
+  personnelAssigned Int?
+  breachCount       Int?
+  clearance         Int      @default(1)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([class])
+  @@index([clearance])
+}

@@ -1,13 +1,38 @@
 import Link from "next/link";
-import { scpObjects, classColors } from "@/data/scp";
+import { classColors, SCPClass } from "@/data/scp";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
+import { API_URL } from "@/lib/api";
 
 export const metadata = {
   title: "Wiki SCP",
 };
 
-export default function WikiPage() {
+interface ApiScpObject {
+  id: string;
+  slug: string;
+  number: string;
+  name: string;
+  class: SCPClass;
+  threatLevel: number;
+  description: string;
+  personnelAssigned: number | null;
+  clearance: number;
+}
+
+async function getScpObjects(): Promise<ApiScpObject[]> {
+  try {
+    const res = await fetch(`${API_URL}/scp`, { next: { revalidate: 60 } });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
+export default async function WikiPage() {
+  const scpObjects = await getScpObjects();
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
       <div className="mb-12">
@@ -30,35 +55,41 @@ export default function WikiPage() {
         ))}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {scpObjects.map((scp) => (
-          <Link
-            key={scp.id}
-            href={`/wiki/${scp.id}`}
-            className="group hologram-border rounded-lg p-6 transition-all hover:border-redlake/40"
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <span className="font-mono text-lg font-bold text-redlake-glow">
-                {scp.number}
-              </span>
-              <Badge className={cn("border", classColors[scp.class])}>
-                {scp.class}
-              </Badge>
-            </div>
-            <h2 className="mb-2 text-xl font-bold text-white group-hover:text-redlake-glow">
-              {scp.name}
-            </h2>
-            <p className="mb-4 line-clamp-3 text-sm text-gray-500">
-              {scp.description}
-            </p>
-            <div className="flex gap-4 font-mono text-xs text-gray-600">
-              <span>Menace {scp.threatLevel}/5</span>
-              <span>{scp.stats.personnelAssigned} agents</span>
-              <span>Niv. {scp.clearance}</span>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {scpObjects.length === 0 ? (
+        <div className="hologram-border rounded-lg p-8 text-center text-gray-500">
+          Aucun objet disponible pour le moment.
+        </div>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {scpObjects.map((scp) => (
+            <Link
+              key={scp.id}
+              href={`/wiki/${scp.slug}`}
+              className="group hologram-border rounded-lg p-6 transition-all hover:border-redlake/40"
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <span className="font-mono text-lg font-bold text-redlake-glow">
+                  {scp.number}
+                </span>
+                <Badge className={cn("border", classColors[scp.class])}>
+                  {scp.class}
+                </Badge>
+              </div>
+              <h2 className="mb-2 text-xl font-bold text-white group-hover:text-redlake-glow">
+                {scp.name}
+              </h2>
+              <p className="mb-4 line-clamp-3 text-sm text-gray-500">
+                {scp.description}
+              </p>
+              <div className="flex gap-4 font-mono text-xs text-gray-600">
+                <span>Menace {scp.threatLevel}/5</span>
+                <span>{scp.personnelAssigned ?? "—"} agents</span>
+                <span>Niv. {scp.clearance}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
