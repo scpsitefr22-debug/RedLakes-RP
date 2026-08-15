@@ -13,7 +13,6 @@ const SECTIONS: Record<string, { label: string; path: string; desc: string }> = 
   wiki: { label: "Wiki SCP", path: "/wiki", desc: "Fiches des anomalies confinees." },
   factions: { label: "Factions", path: "/factions", desc: "Fondation, AEGIS, Chaos, Main du Serpent..." },
   aegis: { label: "A.E.G.I.S.", path: "/factions/aegis", desc: "Autorite de controle supranationale." },
-  mtf: { label: "MTF", path: "/factions/mtf", desc: "Mobile Task Forces." },
   site12: { label: "Site-12", path: "/departements/site-12", desc: "Organigramme complet." },
   carte: { label: "Carte", path: "/carte", desc: "Carte interactive de REDLAKES." },
   lore: { label: "Lore", path: "/lore", desc: "Univers, chronologie, personnages." },

@@ -12,7 +12,6 @@ const applicationTypes = [
   { id: "STAFF", name: "Staff", description: "Modération, administration, support joueurs." },
   { id: "LORE", name: "Rédacteur Lore", description: "SCP, factions, personnages, chronologie." },
   { id: "BUILD", name: "Builder / Map", description: "Site-12, ville, zones RP, égouts." },
-  { id: "MTF", name: "MTF", description: "Mobile Task Force — interventions et événements." },
   { id: "RECHERCHE", name: "Recherche", description: "Chercheurs, scientifiques, archivistes." },
   { id: "ADMINISTRATION", name: "Community / Admin", description: "Discord, communication, logistique." },
 ];

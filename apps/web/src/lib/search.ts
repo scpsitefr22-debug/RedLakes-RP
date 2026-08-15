@@ -1,5 +1,5 @@
 import { scpObjects } from "@/data/scp";
-import { factions, mtfUnits } from "@/data/factions";
+import { factions } from "@/data/factions";
 import { loreSections, characters, gameEvents } from "@/data/lore";
 import { newsArticles } from "@/data/news";
 import { mapLocations } from "@/data/map";
@@ -8,7 +8,7 @@ import { site12Departments } from "@/data/site12";
 export interface SearchResult {
   id: string;
   title: string;
-  type: "scp" | "faction" | "lore" | "event" | "news" | "location" | "character" | "department" | "mtf";
+  type: "scp" | "faction" | "lore" | "event" | "news" | "location" | "character" | "department";
   href: string;
   excerpt: string;
 }
@@ -43,18 +43,6 @@ export function searchAll(query: string): SearchResult[] {
         type: "faction",
         href: `/factions/${f.id}`,
         excerpt: f.tagline,
-      });
-    }
-  });
-
-  mtfUnits.forEach((m) => {
-    if (m.name.toLowerCase().includes(q) || m.codename.toLowerCase().includes(q)) {
-      results.push({
-        id: m.id,
-        title: `${m.name} (${m.codename})`,
-        type: "mtf",
-        href: `/factions/mtf/${m.id}`,
-        excerpt: m.motto,
       });
     }
   });

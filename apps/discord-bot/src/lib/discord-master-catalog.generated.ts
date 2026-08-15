@@ -7,7 +7,7 @@
 
 export type DiscordBranch =
   | "omega" | "direction" | "securite" | "scientifique"
-  | "maintenance" | "general" | "classes" | "mtf"
+  | "maintenance" | "general" | "classes"
   | "titres" | "aegis" | "chaos" | "serpent" | "goc"
   | "civil" | "gouvernement" | "police" | "illegal";
 
@@ -62,11 +62,6 @@ export const GRADE_DISPLAY_NAMES: Record<string, string> =
   "Soldat": "👮 Soldat",
   "Caporal Garde": "🛡️ Caporal Garde",
   "Soldat Garde": "🛡️ Soldat Garde",
-  "🎖️ Commandant MTF": "🎖️ Commandant MTF",
-  "⚔️ Chef d'escouade MTF": "⚔️ Chef d'escouade MTF",
-  "🪖 Opérateur MTF": "🪖 Opérateur MTF",
-  "🔧 Spécialiste MTF": "🔧 Spécialiste MTF",
-  "📋 Recrue MTF": "📋 Recrue MTF",
   "Superviseur d'Experience": "🧪 Superviseur d'Expérience",
   "Superviseur de SCP": "☣️ Superviseur de SCP",
   "Responsable d'Autorisation": "📋 Responsable d'Autorisation",
@@ -370,31 +365,6 @@ export const DISCORD_FOUNDATION_GRADES: DiscordFoundationGrade[] =
     "excelName": "Soldat Garde",
     "displayName": "🛡️ Soldat Garde",
     "branch": "securite"
-  },
-  {
-    "excelName": "🎖️ Commandant MTF",
-    "displayName": "🎖️ Commandant MTF",
-    "branch": "mtf"
-  },
-  {
-    "excelName": "⚔️ Chef d'escouade MTF",
-    "displayName": "⚔️ Chef d'escouade MTF",
-    "branch": "mtf"
-  },
-  {
-    "excelName": "🪖 Opérateur MTF",
-    "displayName": "🪖 Opérateur MTF",
-    "branch": "mtf"
-  },
-  {
-    "excelName": "🔧 Spécialiste MTF",
-    "displayName": "🔧 Spécialiste MTF",
-    "branch": "mtf"
-  },
-  {
-    "excelName": "📋 Recrue MTF",
-    "displayName": "📋 Recrue MTF",
-    "branch": "mtf"
   },
   {
     "excelName": "Superviseur d'Experience",
@@ -1025,16 +995,6 @@ export const DISCORD_GRADE_SECTIONS: DiscordGradeSection[] =
       "👮 Soldat",
       "🛡️ Caporal Garde",
       "🛡️ Soldat Garde"
-    ]
-  },
-  {
-    "separator": "╰┈➤ 🚁 Forces Mobiles (MTF)",
-    "roles": [
-      "🎖️ Commandant MTF",
-      "⚔️ Chef d'escouade MTF",
-      "🪖 Opérateur MTF",
-      "🔧 Spécialiste MTF",
-      "📋 Recrue MTF"
     ]
   },
   {

@@ -1,15 +1,3 @@
-export interface MTFUnit {
-  id: string;
-  name: string;
-  codename: string;
-  motto: string;
-  history: string;
-  missions: string[];
-  equipment: string[];
-  personnel: number;
-  logo?: string;
-}
-
 export interface Faction {
   id: string;
   name: string;
@@ -29,59 +17,6 @@ export interface Faction {
   color: string;
   playable: boolean;
 }
-
-export const mtfUnits: MTFUnit[] = [
-  {
-    id: "nu-7",
-    name: "MTF Nu-7",
-    codename: "Hammer Down",
-    motto: "Quand la force brute est la seule réponse.",
-    history: "Unité d'assaut lourde spécialisée dans les opérations de grande envergure.",
-    missions: ["Assaut de positions fortifiées", "Confinement de entités hostiles", "Sécurisation de zones"],
-    equipment: ["Armement lourd", "Véhicules blindés", "Explosifs tactiques"],
-    personnel: 24,
-  },
-  {
-    id: "epsilon-11",
-    name: "MTF Epsilon-11",
-    codename: "Nine Tailed Fox",
-    motto: "Le confinement avant tout.",
-    history: "Unité de réponse aux brèches. Déployée lors de l'incident Keter de 2015.",
-    missions: ["Réponse aux brèches", "Reconfinement", "Évacuation du personnel"],
-    equipment: ["Fusils d'assaut", "Équipement de confinement mobile", "Drones de surveillance"],
-    personnel: 18,
-  },
-  {
-    id: "alpha-1",
-    name: "MTF Alpha-1",
-    codename: "Red Right Hand",
-    motto: "Les mains du Conseil.",
-    history: "Unité d'élite directement sous l'autorité du Conseil Oméga.",
-    missions: ["Protection du Conseil", "Opérations classifiées", "Élimination de menaces internes"],
-    equipment: ["Armement expérimental", "Accès Niveau 5", "Véhicules aériens"],
-    personnel: 12,
-  },
-  {
-    id: "beta-7",
-    name: "MTF Beta-7",
-    codename: "Maz Hatters",
-    motto: "Contre les toxines, contre le monde.",
-    history: "Spécialisée dans les anomalies biologiques et chimiques.",
-    missions: ["Décontamination", "Confinement biologique", "Analyse de pathogènes"],
-    equipment: ["Hazmat avancé", "Laboratoires mobiles", "Agents neutralisants"],
-    personnel: 15,
-  },
-  {
-    id: "zeta-9",
-    name: "MTF Zeta-9",
-    codename: "Mole Rats",
-    motto: "Dans l'obscurité, nous trouvons.",
-    history: "Unité d'exploration souterraine et de récupération.",
-    missions: ["Exploration de zones inconnues", "Récupération d'artefacts", "Cartographie"],
-    equipment: ["Équipement de spéléologie", "Lampes UV", "Capteurs sismiques"],
-    personnel: 10,
-  },
-];
 
 export const factions: Faction[] = [
   {

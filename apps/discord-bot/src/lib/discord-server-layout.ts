@@ -43,7 +43,7 @@ const CIVIL_LAYOUT: { separator: string; match: (role: string) => boolean }[] = 
 function branchForSeparator(separator: string): BranchId {
   if (separator.includes("OMEGA") || separator.includes("Conseil")) return "omega";
   if (separator.includes("DIRECTION") || separator.includes("Site")) return "direction";
-  if (separator.includes("Sécurité") || separator.includes("Securite") || separator.includes("MTF"))
+  if (separator.includes("Sécurité") || separator.includes("Securite"))
     return "securite";
   if (separator.includes("Scientifique")) return "scientifique";
   if (separator.includes("Maintenance")) return "maintenance";

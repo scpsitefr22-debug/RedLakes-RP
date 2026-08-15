@@ -48,7 +48,6 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-gray-500">
               <li><Link href="/factions/fondation" className="hover:text-white">Fondation SCP</Link></li>
               <li><Link href="/factions/aegis" className="hover:text-white">A.E.G.I.S.</Link></li>
-              <li><Link href="/factions/mtf" className="hover:text-white">MTF</Link></li>
               <li><Link href="/departements" className="hover:text-white">Départements</Link></li>
             </ul>
           </div>

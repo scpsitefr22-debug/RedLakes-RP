@@ -13,7 +13,6 @@ const TYPES = [
   { label: "Staff", value: "STAFF", desc: "Moderation, administration, support." },
   { label: "Redacteur Lore", value: "LORE", desc: "SCP, factions, chronologie." },
   { label: "Builder / Map", value: "BUILD", desc: "Site-12, ville, zones RP." },
-  { label: "MTF", value: "MTF", desc: "Interventions et evenements." },
   { label: "Recherche", value: "RECHERCHE", desc: "Chercheurs, scientifiques." },
   { label: "Community / Admin", value: "ADMINISTRATION", desc: "Discord, communication." },
 ];

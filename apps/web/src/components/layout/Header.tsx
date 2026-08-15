@@ -32,7 +32,6 @@ const navItems = [
     href: "/factions",
     children: [
       { label: "Factions", href: "/factions" },
-      { label: "MTF", href: "/factions/mtf" },
       { label: "Départements", href: "/departements" },
       { label: "Site-12", href: "/departements/site-12" },
       { label: "Grades", href: "/grades" },

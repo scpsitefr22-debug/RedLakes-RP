@@ -60,7 +60,6 @@ function inferBranchFromSeparator(name: string): BranchId {
   if (name.includes("OMEGA")) return "omega";
   if (name.includes("DIRECTION")) return "direction";
   if (name.includes("Sécurité") || name.includes("Securite")) return "securite";
-  if (name.includes("MTF")) return "securite";
   if (name.includes("Scientifique")) return "scientifique";
   if (name.includes("Maintenance")) return "maintenance";
   if (name.includes("Générale") || name.includes("Generale")) return "general";

@@ -24,7 +24,6 @@ export const DISCORD_ROLE_CATEGORIES = [
   "━━━ 👑 CONSEIL OMEGA ━━━",
   "━━━ 🏛️ DIRECTION SITE-12 ━━━",
   "╰┈➤ 🔫 Branche Sécurité",
-  "╰┈➤ 🚁 Forces Mobiles (MTF)",
   "╰┈➤ 🔬 Branche Scientifique",
   "╰┈➤ 🔧 Branche Maintenance",
   "╰┈➤ 📋 Branche Générale",
@@ -217,7 +216,7 @@ export function getFoundationGrades(): FoundationGradeDef[] {
   return DISCORD_FOUNDATION_GRADES.map((g) => ({
     layoutLabel: g.excelName,
     displayName: g.displayName,
-    branch: (g.branch === "mtf" ? "securite" : g.branch) as BranchId,
+    branch: g.branch as BranchId,
   }));
 }
 
@@ -285,9 +284,7 @@ export function lookupCatalogRole(name: string): CatalogRoleHit | null {
       const foundation = DISCORD_FOUNDATION_GRADES.find(
         (g) => g.displayName === display || g.excelName === excel,
       );
-      const branch = (foundation?.branch === "mtf"
-        ? "securite"
-        : foundation?.branch ?? "general") as BranchId;
+      const branch = (foundation?.branch ?? "general") as BranchId;
       return { displayName: display, branch };
     }
   }
@@ -305,7 +302,6 @@ function branchForSeparator(separator: string): BranchId {
   if (separator.includes("DIRECTION")) return "direction";
   if (separator.includes("Sécurité") || separator.includes("Securite"))
     return "securite";
-  if (separator.includes("MTF")) return "securite";
   if (separator.includes("Scientifique")) return "scientifique";
   if (separator.includes("Maintenance")) return "maintenance";
   if (separator.includes("Générale") || separator.includes("Generale"))

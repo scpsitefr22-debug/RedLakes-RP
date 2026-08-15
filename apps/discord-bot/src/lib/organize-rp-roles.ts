@@ -239,7 +239,6 @@ function branchForSeparatorName(separator: string): BranchId {
   if (separator.includes("DIRECTION")) return "direction";
   if (separator.includes("Sécurité") || separator.includes("Securite"))
     return "securite";
-  if (separator.includes("MTF")) return "securite";
   if (separator.includes("Scientifique")) return "scientifique";
   if (separator.includes("Maintenance")) return "maintenance";
   if (separator.includes("Générale") || separator.includes("Generale"))

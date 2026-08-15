@@ -8,7 +8,7 @@ export default function PersonnagesPage() {
       <div className="mb-12">
         <h1 className="text-4xl font-bold text-white">Personnages importants</h1>
         <p className="mt-4 text-gray-500">
-          Directeurs, inspecteurs, commandants MTF et figures clés — dossiers filtrés
+          Directeurs, inspecteurs et figures clés — dossiers filtrés
           par habilitation.
         </p>
       </div>
