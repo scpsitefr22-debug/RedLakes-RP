@@ -52,6 +52,7 @@ const navItems = [
       { label: "Archives classifiées", href: "/archives" },
       { label: "CASSIE IA", href: "/cassie" },
       { label: "CMS Lore (Staff)", href: "/lore/cms" },
+      { label: "Gestion Grades (Staff)", href: "/staff/grades" },
     ],
   },
 ];

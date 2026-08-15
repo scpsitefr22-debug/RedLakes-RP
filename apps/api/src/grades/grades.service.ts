@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Grade } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateGradeDto, UpdateGradeDto } from './dto/grade.dto';
 
 const DIACRITICS_RE = /[\u0300-\u036f]/g;
 
@@ -37,6 +38,33 @@ export class GradesService {
       where: { slug },
       include: { departmentRef: true },
     });
+  }
+
+  findById(id: string) {
+    return this.prisma.grade.findUnique({
+      where: { id },
+      include: { departmentRef: true },
+    });
+  }
+
+  create(dto: CreateGradeDto) {
+    return this.prisma.grade.create({
+      data: {
+        ...dto,
+        objectives: dto.objectives ?? [],
+        utilities: dto.utilities ?? [],
+        accessZones: dto.accessZones ?? [],
+        siteSections: dto.siteSections ?? [],
+      },
+    });
+  }
+
+  update(id: string, dto: UpdateGradeDto) {
+    return this.prisma.grade.update({ where: { id }, data: dto });
+  }
+
+  remove(id: string) {
+    return this.prisma.grade.delete({ where: { id } });
   }
 
   /**

@@ -12,6 +12,7 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
+  Shield,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -180,6 +181,13 @@ export function StaffDashboard() {
             Registre personnel →
           </Link>
           <p className="text-xs text-gray-600">Base joueurs</p>
+        </div>
+        <div className="hologram-border rounded-lg p-5">
+          <Shield className="mb-2 h-5 w-5 text-redlake-glow" />
+          <Link href="/staff/grades" className="font-mono text-sm text-redlake-glow hover:underline">
+            Gestion des grades →
+          </Link>
+          <p className="text-xs text-gray-600">Catalogue de grades</p>
         </div>
       </div>
 
