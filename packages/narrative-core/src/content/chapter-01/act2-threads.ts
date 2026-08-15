@@ -119,7 +119,7 @@ export const CHAPTER_01_ACT2_THREADS: MessageThread[] = [
   {
     id: "liaison-mtf-junior",
     characterId: "liaison-mtf-junior",
-    label: "MTF Nu-7 — Liaison",
+    label: "FIM Nu-7 — Liaison",
     entryNodeId: "intro",
     unlockRequires: [
       ...OFFICE_LEFT,
@@ -134,7 +134,7 @@ export const CHAPTER_01_ACT2_THREADS: MessageThread[] = [
           {
             id: "mtf1",
             sender: "character",
-            text: "Reyes, liaison MTF Nu-7. Le Directeur m'a dit que vous étiez… fiable.",
+            text: "Reyes, liaison FIM Nu-7. Le Directeur m'a dit que vous étiez… fiable.",
             delaySeconds: 5,
           },
           {

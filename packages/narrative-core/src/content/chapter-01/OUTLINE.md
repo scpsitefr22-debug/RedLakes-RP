@@ -9,7 +9,7 @@ Premier jour au Site-12. Le joueur reçoit son terminal sécurisé, est briefé 
 ### Acte I — Activation
 - Scène immersive : bureau du Directeur
 - Choix saga `ch1_briefing_response` : professionnel / curieux / réticent
-- Débloque contacts conditionnels (MTF, chercheur junior, Class-D)
+- Débloque contacts conditionnels (FIM, chercheur junior, Class-D)
 
 ### Acte II — Anomalie (pivot saga)
 - Dr. Chen — choix structurant `ch1_dr_chen_fate` :

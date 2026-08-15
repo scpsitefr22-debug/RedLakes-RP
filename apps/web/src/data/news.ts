@@ -45,8 +45,8 @@ export const newsArticles: NewsArticle[] = [
     featured: true,
   },
   {
-    id: "mtf-nu7-deployment",
-    title: "Déploiement MTF Nu-7 — Opération Mur de Fer",
+    id: "fim-nu7-deployment",
+    title: "Déploiement FIM Nu-7 — Opération Mur de Fer",
     excerpt:
       "L'escouade « Hammer Down » a été mobilisée pour sécuriser la zone industrielle après activité CI détectée.",
     date: "2026-06-01",

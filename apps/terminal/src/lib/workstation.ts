@@ -42,7 +42,7 @@ export const DEPARTMENTS = [
   "Recherche",
   "Sécurité",
   "RH",
-  "MTF",
+  "FIM",
   "Maintenance",
 ] as const;
 
@@ -60,8 +60,8 @@ export function getCharacterDepartment(characterId: string): Department {
     "chercheur-junior-euclid": "Recherche",
     "agent-securite-perimetre": "Sécurité",
     "responsable-class-d": "Sécurité",
-    "liaison-mtf-junior": "MTF",
-    "commandant-nu7": "MTF",
+    "liaison-mtf-junior": "FIM",
+    "commandant-nu7": "FIM",
     "technicien-maintenance": "Maintenance",
   };
   return map[characterId] ?? "Admin";

@@ -86,7 +86,7 @@ Site-12 — Personnel clearance 1-2
 En cas d'alerte confinement :
 1. Retourner au poste de travail assigné.
 2. Attendre consignes messagerie #alertes-site12.
-3. Ne pas emprunter les couloirs Keter sans escorte MTF.
+3. Ne pas emprunter les couloirs Keter sans escorte FIM.
 
 Dernière simulation : 12 juin 2026 — délai moyen 4 min 12 s.`,
   },
@@ -152,7 +152,7 @@ Pour tests actifs et données brutes : clearance 2+ requise.`,
     content: `CIRCULATION INTERNE — NON OFFICIEL
 
 Des agents prétendent qu'un inspecteur AEGIS a été aperçu dans l'aile administrative.
-Aucune convocation publique. Aucun déploiement MTF.
+Aucune convocation publique. Aucun déploiement FIM.
 
 « Quand AEGIS regarde, tout le monde ferme sa messagerie. »
 
@@ -343,7 +343,7 @@ export const INCIDENT_ENTRIES: IncidentEntry[] = [
     date: "2026-06-01",
     title: "Opération Mur de Fer",
     status: "Résolu",
-    detail: "Déploiement MTF Nu-7. Zone industrielle sécurisée.",
+    detail: "Déploiement FIM Nu-7. Zone industrielle sécurisée.",
   },
   {
     id: "inc-rituel",

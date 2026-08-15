@@ -48,9 +48,9 @@ function getResponse(input: string, gns: GlobalNarrativeSave): string {
 
   if (lower.includes("nu-7") || lower.includes("nu7") || lower.includes("vance")) {
     if (gns.sagaChoices["ch2_nu7_response"]) {
-      return `MTF Nu-7 — Commandant Vance. Votre réponse à l'exercice : ${String(gns.sagaChoices["ch2_nu7_response"])}.`;
+      return `FIM Nu-7 — Commandant Vance. Votre réponse à l'exercice : ${String(gns.sagaChoices["ch2_nu7_response"])}.`;
     }
-    return "MTF Nu-7 — déploiement réservé aux situations de confinement critique.";
+    return "FIM Nu-7 — déploiement réservé aux situations de confinement critique.";
   }
 
   if (gns.sagaChoices["ch1_dr_chen_fate"] === "saved") {

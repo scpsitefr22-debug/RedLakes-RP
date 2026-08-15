@@ -18,9 +18,9 @@ const CASSIE_RESPONSES: Record<string, string> = {
     "A.E.G.I.S. (Autorité Exécutive de Garantie des Intérêts Suprêmes) est une instance supranationale qui contrôle les dérives de la Fondation. Elle intervient rarement, toujours par rapports écrits. « La Fondation protège l'humanité. AEGIS décide jusqu'où elle a le droit d'aller. »",
   grade:
     "Site-12 possède plus de 70 grades répartis en 4 départements. Le Conseil Oméga (O1-O5) domine la hiérarchie, suivi du Directeur de Site (10 000$), puis les directeurs de département et les grades opérationnels.",
-  mtf: "Les MTF (Mobile Task Forces) sont les unités d'élite : Nu-7 « Hammer Down » pour l'assaut lourd, Epsilon-11 « Nine Tailed Fox » pour les brèches, Alpha-1 « Red Right Hand » pour les opérations classifiées.",
+  fim: "Les FIM (Forces d'Intervention Mobiles) sont stationnées en permanence au Site-12, sous l'autorité du Directeur de la Sécurité : Nu-7 « Hammer Down » pour l'assaut lourd, Epsilon-11 « Nine Tailed Fox » pour les brèches, Alpha-1 « Red Right Hand » pour les opérations classifiées.",
   rejoindre:
-    "Pour rejoindre REDLAKES RP, lancez Minecraft Java et connectez-vous à play.redlakes.fr. Consultez les candidatures pour Staff, MTF ou Recherche sur /candidatures.",
+    "Pour rejoindre REDLAKES RP, lancez Minecraft Java et connectez-vous à play.redlakes.fr. Consultez les candidatures pour Staff, Recherche ou Lore sur /candidatures.",
 };
 
 function getCassieResponse(input: string): string {
@@ -29,7 +29,8 @@ function getCassieResponse(input: string): string {
   if (lower.includes("scp") || lower.includes("confin")) return CASSIE_RESPONSES.scp;
   if (lower.includes("grade") || lower.includes("site-12") || lower.includes("hiérarch"))
     return CASSIE_RESPONSES.grade;
-  if (lower.includes("mtf") || lower.includes("task force")) return CASSIE_RESPONSES.mtf;
+  if (lower.includes("fim") || lower.includes("mtf") || lower.includes("intervention mobile"))
+    return CASSIE_RESPONSES.fim;
   if (lower.includes("rejoindre") || lower.includes("serveur") || lower.includes("connect"))
     return CASSIE_RESPONSES.rejoindre;
 
@@ -142,7 +143,7 @@ export default function CassiePage() {
       </div>
 
       <div className="mt-6 flex flex-wrap justify-center gap-2">
-        {["Qu'est-ce qu'AEGIS ?", "Grades Site-12", "MTF disponibles", "Comment rejoindre ?"].map(
+        {["Qu'est-ce qu'AEGIS ?", "Grades Site-12", "FIM disponibles", "Comment rejoindre ?"].map(
           (q) => (
             <button
               key={q}

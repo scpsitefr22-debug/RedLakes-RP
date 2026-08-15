@@ -17,16 +17,17 @@ export const characters: Character[] = [
     title: "Directeur du Site-12",
     faction: "Fondation SCP",
     biography:
-      "À la tête du Site-12 depuis 2019. Ancien chercheur promu après l'incident Keter de 2015. Connu pour sa gestion pragmatique des crises. Sous sa direction, le site a connu une expansion majeure des protocoles de confinement et l'intégration des équipes Elite et Prestige.",
+      "À la tête du Site-12 depuis 2025. Ancien chercheur promu après la brèche Keter survenue peu après la mise en service du Site. Connu pour sa gestion pragmatique des crises. Sous sa direction, le site a connu une expansion majeure des protocoles de confinement et l'intégration des équipes Elite et Prestige.",
     quotes: [
       "Le Conseil Oméga est informé.",
       "Les pertes sont acceptables dans le cadre du protocole.",
       "AEGIS observe. Nous continuons.",
     ],
     history: [
-      "2015 — Survit à la brèche Keter en tant que superviseur",
-      "2019 — Promotion au rang de Directeur de Site",
-      "2023 — Gestion de la crise de gouvernance O5",
+      "2024 — Intègre le Site-12 lors de sa mise en service",
+      "2025 — Survit à la brèche Keter en tant que superviseur",
+      "2025 — Promotion au rang de Directeur de Site",
+      "2026 — Gestion de la crise de gouvernance du Conseil Oméga",
       "2026 — Audition AEGIS niveau 3 — Conformité Forcée",
     ],
     clearance: 3,
@@ -53,13 +54,14 @@ export const characters: Character[] = [
   {
     id: "commandant-nu7",
     name: "Commandant Vance",
-    title: "Commandant MTF Nu-7",
-    faction: "MTF Nu-7",
+    title: "Commandant FIM Nu-7",
+    faction: "FIM Nu-7",
     biography:
-      "Vétéran de 15 ans au sein de la Fondation. A dirigé l'opération Mur de Fer en juin 2026. Connu pour sa discipline et son refus des demi-mesures.",
+      "Vétéran de 15 ans au sein de la Fondation, transféré au Site-12 lors de sa mise en service. A dirigé l'opération Mur de Fer en juin 2026. Connu pour sa discipline et son refus des demi-mesures.",
     quotes: ["Quand Nu-7 déploie, c'est qu'il n'y a plus d'autre option."],
     history: [
-      "2018 — Participation à la réponse brèche Keter",
+      "2024 — Transfert au Site-12 lors de sa mise en service",
+      "2025 — Participation à la réponse à la brèche Keter",
       "2026-06-01 — Opération Mur de Fer réussie",
     ],
     clearance: 2,
@@ -125,10 +127,10 @@ Sur le serveur Minecraft, chaque joueur incarne un acteur de cet univers : agent
   {
     id: "histoire-site12",
     title: "Histoire du Site-12",
-    excerpt: "La branche principale de REDLAKES depuis 1962.",
+    excerpt: "Le dernier grand bastion de la Fondation, sous la métropole de RedLake.",
     category: "site",
     featured: true,
-    content: `Le Site-12 est la branche principale du complexe REDLAKES. Fondé en 1962 sous couvert d'une installation industrielle, il abrite aujourd'hui :
+    content: `Après la chute de Site-7, Site-8, Site-19, Site-17 et Site-22 entre 2011 et 2015, la Fondation concentre toutes ses ressources restantes sur un objectif unique : construire la plus grande installation de son histoire. Le Projet Site-12 (2017-2023) s'achève avec la mise en service du site en 2024, sous la future métropole de RedLake. Les survivants des anciens Sites y sont transférés ; il abrite aujourd'hui :
 
 • Le Conseil Oméga (O1 à O5)
 • 4 départements : Sécurité, Recherche, Maintenance, Général
@@ -136,8 +138,9 @@ Sur le serveur Minecraft, chaque joueur incarne un acteur de cet univers : agent
 • 23 chambres Class-D actives
 • 4 chambres spéciales (Class-B, Class-S)
 • Secteurs Keter, Euclid et Safe
+• Les FIM et AIT, stationnées en permanence
 
-Le site est surveillé indirectement par A.E.G.I.S. depuis 2001. Toute dérive éthique majeure peut déclencher un audit.`,
+Le site est surveillé indirectement par A.E.G.I.S. depuis sa création en 2016. Toute dérive éthique majeure peut déclencher un audit.`,
     clearance: 1,
   },
   {
@@ -146,7 +149,7 @@ Le site est surveillé indirectement par A.E.G.I.S. depuis 2001. Toute dérive �
     excerpt: "La Fondation protège l'humanité. AEGIS décide jusqu'où elle a le droit d'aller.",
     category: "faction",
     featured: true,
-    content: `A.E.G.I.S. (Autorité Exécutive de Garantie des Intérêts Suprêmes) est une instance supranationale de contrôle.
+    content: `A.E.G.I.S. (Autorité Exécutive de Garantie des Intérêts Suprêmes) est une instance supranationale de contrôle, née en 2016 en réaction directe à l'incident de Brolver. Composée de grandes familles, d'industriels et de financiers — pas de fonctionnaires — sa mission est de financer la Fondation et de veiller à ce qu'un drame comme Brolver ne puisse plus jamais se reproduire.
 
 Elle ne contient pas les anomalies — elle contient ceux qui les contiennent.
 
@@ -200,10 +203,10 @@ La police municipale maintient l'ordre en surface. La Fondation tolère une cert
   },
   {
     id: "guerre-interne",
-    title: "Guerre Interne O5",
-    excerpt: "Crise de gouvernance en 2023.",
+    title: "Guerre Interne — Crise de gouvernance du Conseil Oméga",
+    excerpt: "Crise de gouvernance en 2026.",
     category: "guerres",
-    content: `En 2023, un conflit entre directeurs de site et le Conseil Oméga a ébranlé la gouvernance de REDLAKES.
+    content: `En 2026, un conflit entre directeurs de département et le Conseil Oméga a ébranlé la gouvernance du Site-12.
 
 CAUSES :
 • Abus d'autorité RP répétés
@@ -219,22 +222,22 @@ CONSÉQUENCES :
   },
   {
     id: "catastrophe-keter",
-    title: "Catastrophe Keter 2015",
-    excerpt: "Brèche majeure — 23 agents perdus.",
+    title: "Catastrophe Keter 2025",
+    excerpt: "Brèche majeure — 23 agents perdus, un an après la mise en service du Site.",
     category: "catastrophes",
-    content: `Le 22 juillet 2015, une brèche majeure dans le secteur Keter a marqué l'histoire du Site-12.
+    content: `Le 22 juillet 2025, un an à peine après sa mise en service, une brèche majeure dans le secteur Keter a marqué la jeune histoire du Site-12.
 
 DÉROULEMENT :
 • Défaillance système de surveillance
 • Perte de 23 agents de sécurité
-• Déploiement MTF Epsilon-11 « Nine Tailed Fox »
+• Déploiement FIM Epsilon-11 « Nine Tailed Fox »
 • Reconfinement après 3 heures
 
 CONSÉQUENCES :
 • Site placé sous surveillance renforcée 6 mois
 • Révision complète des protocoles Keter
 • Promotion du futur Directeur de Site
-• Premier contact documenté avec A.E.G.I.S.`,
+• Premier audit documenté d'A.E.G.I.S. sur le Site-12`,
     clearance: 2,
   },
   {
@@ -245,7 +248,7 @@ CONSÉQUENCES :
     featured: true,
     content: `REDLAKES RP est un serveur Minecraft Java mêlant :
 
-SCP ROLEPLAY — Confinement, recherche, protocoles, MTF
+SCP ROLEPLAY — Confinement, recherche, protocoles, FIM
 DARKRP — Ville, économie, jobs civils, police
 UNIVERS ORIGINAL — Lore propriétaire, AEGIS, Main du Serpent
 HORREUR & CONSPIRATION — Archives classifiées, audits, dérives éthiques
@@ -271,13 +274,13 @@ Le Projet ████ a été gelé suite à l'inspection.`,
   {
     id: "conseil-omega",
     title: "Le Conseil Oméga",
-    excerpt: "Hiérarchie suprême du Site-12.",
+    excerpt: "Hiérarchie suprême du Site-12, héritière de l'ancien Conseil O5.",
     category: "site",
-    content: `Le Conseil Oméga gouverne le Site-12 depuis ses origines.
+    content: `Le Conseil Oméga a remplacé l'ancien Conseil O5 en 2016, dans le cadre de la Réforme qui a suivi l'incident de Brolver. Il gouverne le Site-12 depuis sa mise en service en 2024.
 
 STRUCTURE :
 • Président du Conseil (O1) — autorité suprême, 20 000 $/sem., 1 poste
-• Vice-Président — Sécurité (O2) — bras droit, branche Sécurité & MTF
+• Vice-Président — Sécurité (O2) — bras droit, branche Sécurité, FIM et AIT
 • Conseiller — Sciences (O3) — branche Scientifique
 • Conseiller — Maintenance (O4) — branche Maintenance
 • Conseiller — Services (O5) — secrétariat, restauration, communication
@@ -321,7 +324,7 @@ export const gameEvents: GameEvent[] = [
     title: "Opération Mur de Fer",
     date: "2026-06-01",
     type: "invasion",
-    description: "Déploiement MTF Nu-7 en zone industrielle.",
+    description: "Déploiement FIM Nu-7 en zone industrielle.",
     outcome: "Zone sécurisée. Activité CI repoussée.",
     clearance: 1,
   },

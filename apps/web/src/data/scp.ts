@@ -48,7 +48,7 @@ export const scpObjects: SCPObject[] = [
     class: "Euclid",
     threatLevel: 3,
     containment: "Cellule humanoïde standard. Interaction supervisée uniquement.",
-    history: "Récupéré lors d'une opération MTF en zone urbaine.",
+    history: "Récupéré lors d'une opération FIM en zone urbaine.",
     description:
       "Entité humanoïde croyant soigner une « peste » invisible. Ses « guérisons » transforment les victimes en entités hostiles.",
     incidents: [
@@ -72,7 +72,7 @@ export const scpObjects: SCPObject[] = [
     description:
       "Entité humanoïde extrêmement docile jusqu'à ce qu'un être vivant observe son visage. État de chasse irréversible.",
     incidents: [
-      { date: "2018-07-22", summary: "Incident majeur — déploiement MTF Alpha-1." },
+      { date: "2018-07-22", summary: "Incident majeur — déploiement FIM Alpha-1." },
       { date: "2026-01-05", summary: "Tentative de photographie — confinement maintenu." },
     ],
     tests: [],
@@ -88,8 +88,8 @@ export const scpObjects: SCPObject[] = [
     name: "[DONNÉES SUPPRIMÉES]",
     class: "Keter",
     threatLevel: 5,
-    containment: "Secteur Keter-02. Accès Niveau 4+. MTF en standby permanent.",
-    history: "Transféré depuis Site-19 en juin 2026. Projet gelé par AEGIS.",
+    containment: "Secteur Keter-02. Accès Niveau 4+. FIM en standby permanent.",
+    history: "Récupéré dans les décombres du Site-19 lors de sa chute en 2013, maintenu en confinement d'urgence jusqu'à son transfert au Site-12 lors de sa mise en service en 2024. Projet gelé par AEGIS en juin 2026.",
     description: "Informations classifiées. Consultation requiert autorisation du Directeur de Site.",
     incidents: [
       { date: "2026-06-15", summary: "Brèche partielle — contenue en 47 minutes." },

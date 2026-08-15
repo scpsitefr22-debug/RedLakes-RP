@@ -72,7 +72,7 @@ async function main() {
       excerpt:
         'Complexe principal de REDLAKES avec 70+ grades et 4 départements.',
       content:
-        'Le Site-12 est la branche principale du serveur Minecraft REDLAKES RP. Fondé en 1962, il abrite le Conseil Oméga, les départements Sécurité, Recherche, Maintenance et Général.\n\nLa hiérarchie complète est disponible sur le site dans la section Départements.',
+        'Le Site-12 est la branche principale du serveur Minecraft REDLAKES RP. Construit entre 2017 et 2023 puis mis en service en 2024 sous la métropole de RedLake, il est aujourd\'hui le dernier grand bastion de la Fondation. Il abrite le Conseil Oméga, les départements Sécurité, Recherche, Maintenance et Général.\n\nLa hiérarchie complète est disponible sur le site dans la section Départements.',
       category: LoreCategory.SITE,
       status: LoreStatus.PUBLISHED,
       clearance: 1,
@@ -109,9 +109,9 @@ async function main() {
       type: 'evenement',
     },
     {
-      title: 'Déploiement MTF Nu-7',
+      title: 'Déploiement FIM Nu-7',
       url: '/gallery/mtf-nu7.svg',
-      faction: 'MTF',
+      faction: 'FIM',
       type: 'evenement',
     },
     {

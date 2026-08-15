@@ -109,7 +109,7 @@ export const CHAPTER_01_DIRECTOR_OFFICE: DirectorOfficeScene = {
         {
           id: "d4",
           sender: "character",
-          text: "Bien. Le Conseil Oméga est informé. La MTF Nu-7 sera représentée au briefing — ne les fixez pas dans les yeux.",
+          text: "Bien. Le Conseil Oméga est informé. La FIM Nu-7 sera représentée au briefing — ne les fixez pas dans les yeux.",
           delaySeconds: 3,
         },
       ],

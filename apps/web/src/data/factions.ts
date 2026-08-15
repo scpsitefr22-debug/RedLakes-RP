@@ -23,8 +23,8 @@ export const factions: Faction[] = [
     id: "fondation",
     name: "Fondation SCP",
     tagline: "Nous sécurisons, nous contenons, nous protégeons.",
-    description: "Organisation secrète dédiée au confinement des anomalies. Site-12 est la branche principale de REDLAKES. Les grades se méritent par le RP — pas de système de niveaux automatique.",
-    history: "Présente depuis 1947. Contrôle le destin de l'humanité dans l'ombre.",
+    description: "Organisation secrète dédiée au confinement des anomalies. Site-12, dernier grand bastion de la Fondation, est sa branche principale sous la métropole de RedLake. Les grades se méritent par le RP — pas de système de niveaux automatique.",
+    history: "Fondée en 1948. Après la chute de plusieurs de ses plus grands Sites entre 2011 et 2015, elle a reconstruit sa puissance autour du Site-12, opérationnel depuis 2024.",
     objectives: ["Confiner les anomalies", "Protéger l'humanité", "Maintenir le secret"],
     grades: [
       { name: "Directeur", description: "Autorité suprême du site" },
@@ -45,7 +45,7 @@ export const factions: Faction[] = [
     description:
       "Autorité Exécutive de Garantie des Intérêts Suprêmes. Instance supranationale de contrôle. Elle ne contient pas les anomalies — elle contient ceux qui les contiennent.",
     history:
-      "Née après plusieurs incidents mondiaux quand certains États ont compris que la Fondation n'est ni élue ni responsable devant les peuples.",
+      "Née en 2016 en réaction directe à l'incident de Brolver, quand plusieurs puissances ont exigé une supervision plus stricte de la Fondation. Financée par de grandes familles, des industriels et des financiers — pas des fonctionnaires.",
     objectives: [
       "Servir d'instance de contrôle supranationale",
       "Agir comme pare-feu contre les dérives de la Fondation",

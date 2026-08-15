@@ -112,8 +112,8 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
   "liaison-mtf-junior": {
     id: "liaison-mtf-junior",
     name: "Sgt. Reyes",
-    title: "Liaison MTF Nu-7 (junior)",
-    faction: "MTF Nu-7",
+    title: "Liaison FIM Nu-7 (junior)",
+    faction: "FIM Nu-7",
     avatarColor: "#dc2626",
     personality: ["disciplined", "formal", "ambitious"],
     goals: ["prove_worth_to_vance", "prepare_deployments"],
@@ -148,8 +148,8 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
   "commandant-nu7": {
     id: "commandant-nu7",
     name: "Commandant Vance",
-    title: "MTF Nu-7",
-    faction: "MTF Nu-7",
+    title: "FIM Nu-7",
+    faction: "FIM Nu-7",
     avatarColor: "#dc2626",
     personality: ["disciplined", "direct"],
     goals: ["contain_threats"],

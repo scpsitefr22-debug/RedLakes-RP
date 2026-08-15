@@ -20,7 +20,7 @@ export const CHAPTER_02_THREADS: MessageThread[] = [
           {
             id: "n2",
             sender: "character",
-            text: "Commandant Vance, MTF Nu-7. À partir d'aujourd'hui, vous allez voir ce que « protocole » veut vraiment dire.",
+            text: "Commandant Vance, FIM Nu-7. À partir d'aujourd'hui, vous allez voir ce que « protocole » veut vraiment dire.",
             delaySeconds: 4,
           },
         ],
@@ -159,7 +159,7 @@ export const CHAPTER_02_THREADS: MessageThread[] = [
           {
             id: "cl2-2",
             sender: "character",
-            text: "Présence enregistrée. MTF Nu-7 valide votre dossier opérationnel.",
+            text: "Présence enregistrée. FIM Nu-7 valide votre dossier opérationnel.",
             delaySeconds: 2,
           },
           {
