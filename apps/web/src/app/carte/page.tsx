@@ -1,10 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { mapLocations, locationTypeLabels } from "@/data/map";
+import { useEffect, useState } from "react";
+import { locationTypeLabels } from "@/data/map";
 import { Badge } from "@/components/ui/Badge";
 import { MapPin, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
+
+interface ApiMapLocation {
+  id: string;
+  slug: string;
+  name: string;
+  type: string;
+  x: number;
+  y: number;
+  description: string;
+  history: string;
+  danger: number;
+  faction: string | null;
+}
 
 const typeColors: Record<string, string> = {
   site: "bg-redlake/20 border-redlake/40",
@@ -19,8 +33,16 @@ const typeColors: Record<string, string> = {
 };
 
 export default function CartePage() {
+  const [locations, setLocations] = useState<ApiMapLocation[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
-  const location = mapLocations.find((l) => l.id === selected);
+
+  useEffect(() => {
+    apiFetch<ApiMapLocation[]>("/map")
+      .then(setLocations)
+      .catch(() => undefined);
+  }, []);
+
+  const location = locations.find((l) => l.id === selected);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
@@ -47,7 +69,7 @@ export default function CartePage() {
                 backgroundSize: "40px 40px",
               }}
             />
-            {mapLocations.map((loc) => (
+            {locations.map((loc) => (
               <button
                 key={loc.id}
                 onClick={() => setSelected(loc.id)}
@@ -82,7 +104,7 @@ export default function CartePage() {
               <div className="mb-4 flex items-start justify-between">
                 <div>
                   <Badge className={cn("mb-2 border", typeColors[location.type])}>
-                    {locationTypeLabels[location.type]}
+                    {locationTypeLabels[location.type as keyof typeof locationTypeLabels] ?? location.type}
                   </Badge>
                   <h2 className="text-xl font-bold text-white">{location.name}</h2>
                 </div>

@@ -60,6 +60,7 @@ const navItems = [
       { label: "Gestion Personnages (Staff)", href: "/staff/personnages" },
       { label: "Gestion Événements (Staff)", href: "/staff/evenements" },
       { label: "Gestion Actualités (Staff)", href: "/staff/actualites" },
+      { label: "Gestion Carte (Staff)", href: "/staff/carte" },
     ],
   },
 ];

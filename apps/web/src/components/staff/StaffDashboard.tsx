@@ -20,6 +20,7 @@ import {
   User,
   Zap,
   Newspaper,
+  MapPin,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -251,6 +252,13 @@ export function StaffDashboard() {
             Gestion des actualités →
           </Link>
           <p className="text-xs text-gray-600">Articles, mises à jour</p>
+        </div>
+        <div className="hologram-border rounded-lg p-5">
+          <MapPin className="mb-2 h-5 w-5 text-redlake-glow" />
+          <Link href="/staff/carte" className="font-mono text-sm text-redlake-glow hover:underline">
+            Gestion de la carte →
+          </Link>
+          <p className="text-xs text-gray-600">Emplacements, coordonnées</p>
         </div>
       </div>
 

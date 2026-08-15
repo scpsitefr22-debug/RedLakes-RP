@@ -21,6 +21,7 @@ import { ScpModule } from './scp/scp.module';
 import { CharactersModule } from './characters/characters.module';
 import { EventsModule } from './events/events.module';
 import { NewsModule } from './news/news.module';
+import { MapModule } from './map/map.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { NewsModule } from './news/news.module';
     CharactersModule,
     EventsModule,
     NewsModule,
+    MapModule,
   ],
 })
 export class AppModule {}

@@ -640,3 +640,28 @@ model NewsArticle {
   @@index([category])
   @@index([date])
 }
+
+// ─── REDLAKES CORE — carte interactive (MapLocation) ────────────────────────
+// "type" reste une String libre (site/surface/ville/egouts/...), meme
+// raisonnement que GameEvent.type/NewsArticle.category. "faction" reste une
+// String libre comme sur Character : les valeurs melangent factions reelles
+// et groupes qui n'en sont pas (Main du Serpent, Chaos Insurgency, GOC).
+// x/y sont des coordonnees en pourcentage (0-100) pour le positionnement
+// absolu sur la carte cote client.
+
+model MapLocation {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  type        String
+  x           Float
+  y           Float
+  description String
+  history     String
+  danger      Int
+  faction     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+}
