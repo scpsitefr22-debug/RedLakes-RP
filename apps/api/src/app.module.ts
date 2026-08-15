@@ -15,6 +15,7 @@ import { GradesModule } from './grades/grades.module';
 import { FactionsModule } from './factions/factions.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { TeamsModule } from './teams/teams.module';
+import { AssignmentsModule } from './assignments/assignments.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { TeamsModule } from './teams/teams.module';
     FactionsModule,
     DepartmentsModule,
     TeamsModule,
+    AssignmentsModule,
   ],
 })
 export class AppModule {}

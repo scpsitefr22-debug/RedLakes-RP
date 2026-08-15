@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Grade, Faction } from '@prisma/client';
+import { Grade, Faction, Team } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -17,6 +17,8 @@ export class PlayersService {
     factionInfo: Faction | null;
 
     teamName: string | null;
+
+    teamInfo: Team | null;
 
     rpFirstName: string | null;
 
@@ -63,6 +65,8 @@ export class PlayersService {
 
       teamName: player.teamName,
 
+      teamInfo: player.teamInfo,
+
       rpFirstName: player.rpFirstName,
 
       rpLastName: player.rpLastName,
@@ -106,6 +110,8 @@ export class PlayersService {
 
         factionInfo: true,
 
+        teamInfo: true,
+
         user: {
           select: {
             minecraftUsername: true,
@@ -135,6 +141,8 @@ export class PlayersService {
 
       teamName: p.teamName,
 
+      teamInfo: p.teamInfo,
+
       rpFirstName: p.rpFirstName,
 
       rpLastName: p.rpLastName,
@@ -157,6 +165,8 @@ export class PlayersService {
         gradeInfo: { include: { departmentRef: true } },
 
         factionInfo: true,
+
+        teamInfo: true,
 
         user: {
           select: {
@@ -191,6 +201,8 @@ export class PlayersService {
         gradeInfo: { include: { departmentRef: true } },
 
         factionInfo: true,
+
+        teamInfo: true,
 
         user: {
           select: {

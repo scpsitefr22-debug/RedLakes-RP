@@ -99,6 +99,9 @@ model Player {
   factionId     String?
   factionInfo   Faction? @relation(fields: [factionId], references: [id], onDelete: SetNull)
   teamName      String?
+  teamId        String?
+  teamInfo      Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  assignments   PlayerAssignment[]
   rpFirstName   String?
   rpLastName    String?
   playtime      Int      @default(0)
@@ -116,6 +119,7 @@ model Player {
 
   @@index([gradeId])
   @@index([factionId])
+  @@index([teamId])
 }
 
 model Application {
@@ -444,5 +448,39 @@ model Team {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
+  players Player[]
+
   @@index([departmentId])
+}
+
+// ─── REDLAKES CORE — historique des affectations (PlayerAssignment) ────────
+// Journal append-only : qui a appartenu a quelle Faction/Department/Team,
+// depuis quand, jusqu'a quand. Complete les relations "etat courant" deja
+// presentes sur Player (gradeId/factionId/teamId) sans les remplacer —
+// repond a "qui dirigeait ce departement en janvier ?" plutot que juste
+// "qui le dirige maintenant ?". Table polymorphe unique plutot que 3 tables
+// quasi identiques (PlayerFaction/PlayerDepartment/PlayerTeam), sur le meme
+// principe deja utilise par AuditLog/PlatformComment (entityType+entityId).
+
+enum AssignmentEntityType {
+  FACTION
+  DEPARTMENT
+  TEAM
+}
+
+model PlayerAssignment {
+  id         String               @id @default(cuid())
+  playerId   String
+  player     Player               @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  entityType AssignmentEntityType
+  entityId   String
+  role       String?
+  note       String?
+  startedAt  DateTime             @default(now())
+  endedAt    DateTime?
+  createdAt  DateTime             @default(now())
+
+  @@index([playerId])
+  @@index([entityType, entityId])
+  @@index([playerId, entityType, endedAt])
 }
