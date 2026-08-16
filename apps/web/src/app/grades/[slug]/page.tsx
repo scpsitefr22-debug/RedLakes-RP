@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Award, Banknote, MapPin, ShieldCheck, Users } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
-import { CLEARANCE_LABELS, type ClearanceLevel } from "@/lib/clearance";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
 import {
   BRANCH_LABELS,
@@ -40,8 +39,6 @@ export default async function GradeDetailPage({ params }: Props) {
   const grade = await getGrade(slug);
   if (!grade) notFound();
 
-  const clearance = Math.min(Math.max(grade.clearance, 1), 5) as ClearanceLevel;
-
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="mb-8 hologram-border rounded-lg p-8">
@@ -60,10 +57,11 @@ export default async function GradeDetailPage({ params }: Props) {
             </Link>
           </p>
         )}
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Badge variant="classified">{CLEARANCE_LABELS[clearance]}</Badge>
-          {grade.tier && <Badge>{TIER_LABELS[grade.tier] ?? grade.tier}</Badge>}
-        </div>
+        {grade.tier && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Badge>{TIER_LABELS[grade.tier] ?? grade.tier}</Badge>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">

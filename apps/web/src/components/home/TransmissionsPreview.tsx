@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, Radio } from "lucide-react";
+import { Radio } from "lucide-react";
 import {
   getTransmissions,
   TRANSMISSION_TYPE_LABELS,
   foundationTimestamp,
 } from "@/lib/transmissions";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 /**
  * Aperçu du flux Discord → Site sur la page d'accueil.
@@ -20,23 +21,12 @@ export async function TransmissionsPreview() {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <p className="mb-2 flex items-center gap-2 font-mono text-xs tracking-widest text-redlake-glow">
-              <Radio className="h-3 w-3" />
-              RÉSEAU SITE-12
-            </p>
-            <h2 className="text-3xl font-bold text-white">
-              Transmissions de la Fondation
-            </h2>
-          </div>
-          <Link
-            href="/transmissions"
-            className="hidden items-center gap-1 font-mono text-sm text-gray-400 hover:text-redlake-glow sm:flex"
-          >
-            Voir le flux complet <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+        <SectionHeader
+          kicker="RÉSEAU SITE-12"
+          title="Transmissions de la Fondation"
+          icon={Radio}
+          action={{ label: "Voir le flux complet", href: "/transmissions" }}
+        />
 
         <div className="grid gap-4 md:grid-cols-2">
           {items.map((t) => (

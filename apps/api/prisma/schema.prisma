@@ -111,7 +111,6 @@ model Player {
   seniority       DateTime           @default(now())
   reputation      Int                @default(50)
   sanctions       Int                @default(0)
-  clearance       Int                @default(1)
   medals          String[]           @default([])
   achievements    Json               @default("[]")
   inventory       Json               @default("[]")
@@ -144,22 +143,22 @@ model Application {
 }
 
 model LoreArticle {
-  id          String       @id @default(cuid())
-  slug        String       @unique
-  title       String
-  excerpt     String?
-  content     String
-  category    LoreCategory
-  status      LoreStatus   @default(DRAFT)
-  clearance   Int          @default(1)
-  featured    Boolean      @default(false)
-  coverImage  String?
-  tags        String[]     @default([])
-  authorId    String?
-  publishedAt DateTime?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  author      User?        @relation("AuthorArticles", fields: [authorId], references: [id], onDelete: SetNull)
+  id                      String       @id @default(cuid())
+  slug                    String       @unique
+  title                   String
+  excerpt                 String?
+  content                 String
+  category                LoreCategory
+  status                  LoreStatus   @default(DRAFT)
+  restrictedDepartmentIds String[]     @default([])
+  featured                Boolean      @default(false)
+  coverImage              String?
+  tags                    String[]     @default([])
+  authorId                String?
+  publishedAt             DateTime?
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+  author                  User?        @relation("AuthorArticles", fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([status, category])
   @@index([publishedAt])
@@ -356,7 +355,6 @@ model Grade {
   departmentRef   Department? @relation(fields: [departmentRefId], references: [id], onDelete: SetNull)
   pay             Int?
   quota           Int?
-  clearance       Int
   description     String?
   objectives      String[]    @default([])
   utilities       String[]    @default([])
@@ -387,7 +385,6 @@ model Faction {
   description String?
   history     String?
   color       String?
-  clearance   Int      @default(1)
   playable    Boolean  @default(true)
   objectives  String[] @default([])
   chefId      String?
@@ -415,7 +412,6 @@ model Department {
   utilities         String[] @default([])
   objectives        String[] @default([])
   leadership        String[] @default([])
-  clearance         Int      @default(1)
   chefId            String?
   chef              User?    @relation("DepartmentChef", fields: [chefId], references: [id], onDelete: SetNull)
   deputyIds         String[] @default([])
@@ -548,28 +544,27 @@ enum ScpClass {
 }
 
 model ScpObject {
-  id                String   @id @default(cuid())
-  slug              String   @unique
-  number            String
-  name              String
-  class             ScpClass
-  threatLevel       Int
-  containment       String
-  history           String
-  description       String
-  image             String?
-  incidents         Json     @default("[]")
-  tests             Json     @default("[]")
-  addendums         Json     @default("[]")
-  containmentCost   String?
-  personnelAssigned Int?
-  breachCount       Int?
-  clearance         Int      @default(1)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                      String   @id @default(cuid())
+  slug                    String   @unique
+  number                  String
+  name                    String
+  class                   ScpClass
+  threatLevel             Int
+  containment             String
+  history                 String
+  description             String
+  image                   String?
+  incidents               Json     @default("[]")
+  tests                   Json     @default("[]")
+  addendums               Json     @default("[]")
+  containmentCost         String?
+  personnelAssigned       Int?
+  breachCount             Int?
+  restrictedDepartmentIds String[] @default([])
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   @@index([class])
-  @@index([clearance])
 }
 
 // ─── REDLAKES CORE — personnages importants (Personnages) ──────────────────
@@ -579,20 +574,18 @@ model ScpObject {
 // Nu-7") qui ne sont pas des factions au sens du modele Faction.
 
 model Character {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-  title     String
-  faction   String
-  biography String
-  quotes    String[] @default([])
-  history   String[] @default([])
-  portrait  String?
-  clearance Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([clearance])
+  id                      String   @id @default(cuid())
+  slug                    String   @unique
+  name                    String
+  title                   String
+  faction                 String
+  biography               String
+  quotes                  String[] @default([])
+  history                 String[] @default([])
+  portrait                String?
+  restrictedDepartmentIds String[] @default([])
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 }
 
 // ─── REDLAKES CORE — evenements narratifs (GameEvent) ───────────────────────
@@ -602,20 +595,19 @@ model Character {
 // renommer (CRISE_XK) et casser cette correspondance pour aucun gain reel.
 
 model GameEvent {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  date        DateTime
-  type        String
-  description String
-  casualties  String?
-  outcome     String
-  clearance   Int      @default(1)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                      String   @id @default(cuid())
+  slug                    String   @unique
+  title                   String
+  date                    DateTime
+  type                    String
+  description             String
+  casualties              String?
+  outcome                 String
+  restrictedDepartmentIds String[] @default([])
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   @@index([type])
-  @@index([clearance])
 }
 
 // ─── REDLAKES CORE — actualites (NewsArticle) ───────────────────────────────

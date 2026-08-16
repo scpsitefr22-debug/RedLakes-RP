@@ -12,7 +12,6 @@ interface ApiFactionFull {
   description: string | null;
   history: string | null;
   color: string | null;
-  clearance: number;
   playable: boolean;
   objectives: string[];
   chefId: string | null;
@@ -59,7 +58,6 @@ export default function EditFactionPage() {
         description: faction.description ?? "",
         history: faction.history ?? "",
         color: faction.color ?? "",
-        clearance: faction.clearance,
         playable: faction.playable,
         objectives: faction.objectives.join(", "),
         chefId: faction.chefId ?? "",

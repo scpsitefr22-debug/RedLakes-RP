@@ -47,7 +47,6 @@ export default function EditGradePage() {
         departmentRefId: grade.departmentRef?.id ?? "",
         pay: grade.pay?.toString() ?? "",
         quota: grade.quota?.toString() ?? "",
-        clearance: grade.clearance,
         description: grade.description ?? "",
         objectives: grade.objectives.join(", "),
         utilities: grade.utilities.join(", "),

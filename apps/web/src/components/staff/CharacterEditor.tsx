@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { Save, ArrowLeft, Trash2 } from "lucide-react";
+import { DepartmentMultiSelect } from "@/components/staff/DepartmentMultiSelect";
 
 export interface CharacterFormData {
   slug: string;
@@ -15,7 +16,7 @@ export interface CharacterFormData {
   quotes: string;
   history: string;
   portrait: string;
-  clearance: string;
+  restrictedDepartmentIds: string[];
 }
 
 interface CharacterEditorProps {
@@ -35,7 +36,7 @@ export function CharacterEditor({ initial, characterId, mode }: CharacterEditorP
     quotes: initial?.quotes ?? "",
     history: initial?.history ?? "",
     portrait: initial?.portrait ?? "",
-    clearance: initial?.clearance ?? "1",
+    restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -69,7 +70,7 @@ export function CharacterEditor({ initial, characterId, mode }: CharacterEditorP
         quotes: toLines(form.quotes),
         history: toLines(form.history),
         portrait: form.portrait || undefined,
-        clearance: Number(form.clearance) || 1,
+        restrictedDepartmentIds: form.restrictedDepartmentIds,
       };
 
       if (mode === "create") {
@@ -148,10 +149,10 @@ export function CharacterEditor({ initial, characterId, mode }: CharacterEditorP
             <input className={inputClass} value={form.faction} onChange={(e) => update("faction", e.target.value)} placeholder="Fondation SCP" />
           </div>
         </div>
-        <div>
-          <label className="mb-1 block font-mono text-xs text-gray-500">Habilitation requise (1-5)</label>
-          <input type="number" min={1} max={5} className={inputClass} value={form.clearance} onChange={(e) => update("clearance", e.target.value)} />
-        </div>
+        <DepartmentMultiSelect
+          value={form.restrictedDepartmentIds}
+          onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
+        />
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">Biographie</label>
           <textarea rows={4} className={inputClass} value={form.biography} onChange={(e) => update("biography", e.target.value)} />

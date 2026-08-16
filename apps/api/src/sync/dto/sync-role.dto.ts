@@ -29,11 +29,6 @@ export class SyncRoleDto {
 
   @IsOptional()
   @IsInt()
-  @Min(1)
-  clearance?: number;
-
-  @IsOptional()
-  @IsInt()
   @Min(0)
   playtime?: number;
 }

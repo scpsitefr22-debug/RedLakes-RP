@@ -89,8 +89,7 @@ export class ReportsService {
       );
     }
 
-    const clearance =
-      user.player.clearance || clearanceForGrade(user.player.grade);
+    const clearance = clearanceForGrade(user.player.grade);
 
     const actorLabel =
       user.minecraftUsername ?? user.discordUsername ?? 'Agent';

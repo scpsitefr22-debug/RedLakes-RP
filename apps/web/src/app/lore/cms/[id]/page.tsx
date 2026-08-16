@@ -48,7 +48,9 @@ export default function EditLorePage() {
         content: article.content as string,
         category: article.category as string,
         status: article.status as string,
-        clearance: article.clearance as number,
+        restrictedDepartmentIds: Array.isArray(article.restrictedDepartmentIds)
+          ? (article.restrictedDepartmentIds as string[])
+          : [],
         featured: article.featured as boolean,
         tags: Array.isArray(article.tags) ? (article.tags as string[]).join(", ") : "",
       }}

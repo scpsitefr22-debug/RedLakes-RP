@@ -30,8 +30,6 @@ export class PlayersService {
 
     sanctions: number;
 
-    clearance: number;
-
     medals: string[];
 
     achievements: unknown;
@@ -76,8 +74,6 @@ export class PlayersService {
       reputation: player.reputation,
 
       sanctions: player.sanctions,
-
-      clearance: player.clearance,
 
       medals: player.medals,
 
@@ -155,6 +151,15 @@ export class PlayersService {
 
       user: p.user,
     }));
+  }
+
+  /** Departement courant du joueur, derive de son grade actuel. */
+  async getDepartmentId(userId: string): Promise<string | null> {
+    const player = await this.prisma.player.findUnique({
+      where: { userId },
+      select: { gradeInfo: { select: { departmentRefId: true } } },
+    });
+    return player?.gradeInfo?.departmentRefId ?? null;
   }
 
   async findIdByUsername(username: string) {

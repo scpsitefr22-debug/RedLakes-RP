@@ -8,6 +8,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateLoreDto, UpdateLoreDto } from './dto/lore.dto';
 import { LoreStatus } from '@prisma/client';
 import { SearchService } from '../search/search.service';
+import {
+  filterByDepartment,
+  isVisibleToDepartment,
+} from '../common/department-visibility';
 
 @Injectable()
 export class LoreService {
@@ -17,20 +21,18 @@ export class LoreService {
     private search: SearchService,
   ) {}
 
-  async findPublished(clearance = 1) {
-    return this.prisma.loreArticle.findMany({
-      where: {
-        status: LoreStatus.PUBLISHED,
-        clearance: { lte: clearance },
-      },
+  async findPublished(departmentId: string | null = null) {
+    const articles = await this.prisma.loreArticle.findMany({
+      where: { status: LoreStatus.PUBLISHED },
       orderBy: { publishedAt: 'desc' },
       include: {
         author: { select: { minecraftUsername: true } },
       },
     });
+    return filterByDepartment(articles, departmentId);
   }
 
-  async findBySlug(slug: string, clearance = 1) {
+  async findBySlug(slug: string, departmentId: string | null = null) {
     const article = await this.prisma.loreArticle.findUnique({
       where: { slug },
       include: {
@@ -40,8 +42,8 @@ export class LoreService {
     if (!article || article.status !== LoreStatus.PUBLISHED) {
       throw new NotFoundException('Article introuvable');
     }
-    if (article.clearance > clearance) {
-      throw new NotFoundException('Habilitation insuffisante');
+    if (!isVisibleToDepartment(article.restrictedDepartmentIds, departmentId)) {
+      throw new NotFoundException('Accès restreint à un autre département');
     }
     return article;
   }

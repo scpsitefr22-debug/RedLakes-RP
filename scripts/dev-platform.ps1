@@ -47,7 +47,7 @@ if (Test-PortListening 5432) {
 Write-Host ""
 Write-Step 3 5 "API NestJS (port 3001)"
 $apiScript = Join-Path $PSScriptRoot "start-api.ps1"
-Start-Process powershell.exe -ArgumentList @(
+Start-Process pwsh.exe -ArgumentList @(
     "-NoExit",
     "-ExecutionPolicy", "Bypass",
     "-Command", "`$Host.UI.RawUI.WindowTitle='REDLAKES | API :3001'; & '$apiScript'"
@@ -57,7 +57,7 @@ $apiReady = Wait-ForHttp -Url "$($cfg.ApiUrl)/health" -Label "API" -TimeoutSec 9
 Write-Host ""
 Write-Step 4 5 "Site Next.js (port 3000)"
 $webScript = Join-Path $PSScriptRoot "start-web.ps1"
-Start-Process powershell.exe -ArgumentList @(
+Start-Process pwsh.exe -ArgumentList @(
     "-NoExit",
     "-ExecutionPolicy", "Bypass",
     "-Command", "`$Host.UI.RawUI.WindowTitle='REDLAKES | Site :3000'; & '$webScript' -SkipStop"
@@ -70,7 +70,7 @@ if ($AvecBot) {
     $botEnv = Join-Path $root "apps\discord-bot\.env"
     if (Test-Path $botEnv) {
         $botScript = Join-Path $PSScriptRoot "start-bot.ps1"
-        Start-Process powershell.exe -ArgumentList @(
+        Start-Process pwsh.exe -ArgumentList @(
             "-NoExit",
             "-ExecutionPolicy", "Bypass",
             "-Command", "`$Host.UI.RawUI.WindowTitle='REDLAKES | Bot Discord'; & '$botScript'"

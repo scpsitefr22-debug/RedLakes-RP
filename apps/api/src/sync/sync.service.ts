@@ -10,7 +10,6 @@ import { SyncRoleDto } from './dto/sync-role.dto';
 import { DiscordLinkDto } from './dto/discord-link.dto';
 import { SyncDiscordGradeDto } from './dto/sync-discord-grade.dto';
 import { PersonnelReportStatus } from '@prisma/client';
-import { clearanceForGrade } from '../players/grade-clearance';
 import { GradesService } from '../grades/grades.service';
 import { FactionsService } from '../factions/factions.service';
 
@@ -23,17 +22,10 @@ export class SyncService {
     private factions: FactionsService,
   ) {}
 
-  /**
-   * Resout la clearance d'un grade en texte libre : priorite au catalogue
-   * Grade (source de vue REDLAKES CORE), repli sur l'ancienne table floue
-   * si le nom ne correspond a aucune entree du catalogue.
-   */
+  /** Resout le nom d'un grade en texte libre vers le catalogue Grade. */
   private async resolveGrade(name: string) {
     const grade = await this.grades.findByName(name);
-    return {
-      gradeId: grade?.id ?? null,
-      clearance: grade?.clearance ?? clearanceForGrade(name),
-    };
+    return { gradeId: grade?.id ?? null };
   }
 
   /** Resout un nom de faction en texte libre vers le catalogue Faction. */
@@ -66,7 +58,6 @@ export class SyncService {
             teamName: dto.teamName,
             rpFirstName: dto.rpFirstName,
             rpLastName: dto.rpLastName,
-            clearance: dto.clearance ?? resolved.clearance,
             playtime: dto.playtime ?? 0,
             roleUpdatedAt: new Date(),
           },
@@ -89,7 +80,6 @@ export class SyncService {
           teamName: dto.teamName,
           rpFirstName: dto.rpFirstName,
           rpLastName: dto.rpLastName,
-          clearance: dto.clearance ?? resolved.clearance,
           playtime: dto.playtime ?? 0,
         },
       });
@@ -99,14 +89,12 @@ export class SyncService {
         data: {
           grade: dto.grade,
           gradeId: resolved.gradeId,
-          clearance: dto.clearance ?? resolved.clearance,
           ...(dto.faction !== undefined && { faction: dto.faction, factionId }),
           ...(dto.teamName !== undefined && { teamName: dto.teamName }),
           ...(dto.rpFirstName !== undefined && {
             rpFirstName: dto.rpFirstName,
           }),
           ...(dto.rpLastName !== undefined && { rpLastName: dto.rpLastName }),
-          ...(dto.clearance !== undefined && { clearance: dto.clearance }),
           ...(dto.playtime !== undefined && { playtime: dto.playtime }),
           roleUpdatedAt: new Date(),
         },
@@ -260,7 +248,6 @@ export class SyncService {
       playtime: user.player.playtime,
       reputation: user.player.reputation,
       sanctions: user.player.sanctions,
-      clearance: user.player.clearance,
       medals: user.player.medals,
       roleUpdatedAt: user.player.roleUpdatedAt,
       seniority: user.player.seniority,
@@ -295,7 +282,6 @@ export class SyncService {
       data: {
         grade: dto.grade,
         gradeId: resolved.gradeId,
-        clearance: resolved.clearance,
         roleUpdatedAt: new Date(),
       },
     });

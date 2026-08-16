@@ -1,17 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateGameEventDto, UpdateGameEventDto } from './dto/game-event.dto';
+import {
+  filterByDepartment,
+  isVisibleToDepartment,
+} from '../common/department-visibility';
 
 @Injectable()
 export class EventsService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
+  async findAll(departmentId: string | null = null) {
+    const events = await this.prisma.gameEvent.findMany({
+      orderBy: { date: 'desc' },
+    });
+    return filterByDepartment(events, departmentId);
+  }
+
+  findAllAdmin() {
     return this.prisma.gameEvent.findMany({ orderBy: { date: 'desc' } });
   }
 
-  findOne(slug: string) {
-    return this.prisma.gameEvent.findUnique({ where: { slug } });
+  async findOne(slug: string, departmentId: string | null = null) {
+    const event = await this.prisma.gameEvent.findUnique({ where: { slug } });
+    if (!event) return null;
+    if (!isVisibleToDepartment(event.restrictedDepartmentIds, departmentId)) {
+      throw new NotFoundException('Accès restreint à un autre département');
+    }
+    return event;
   }
 
   findById(id: string) {

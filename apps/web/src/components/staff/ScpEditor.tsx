@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { Save, ArrowLeft, Trash2 } from "lucide-react";
+import { DepartmentMultiSelect } from "@/components/staff/DepartmentMultiSelect";
 
 const SCP_CLASSES = ["Safe", "Euclid", "Keter", "Thaumiel", "Apollyon"];
 
@@ -24,7 +25,7 @@ export interface ScpFormData {
   containmentCost: string;
   personnelAssigned: string;
   breachCount: string;
-  clearance: string;
+  restrictedDepartmentIds: string[];
 }
 
 interface ScpEditorProps {
@@ -53,7 +54,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
     containmentCost: initial?.containmentCost ?? "",
     personnelAssigned: initial?.personnelAssigned ?? "",
     breachCount: initial?.breachCount ?? "",
-    clearance: initial?.clearance ?? "1",
+    restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -99,7 +100,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
         containmentCost: form.containmentCost || undefined,
         personnelAssigned: form.personnelAssigned === "" ? undefined : Number(form.personnelAssigned),
         breachCount: form.breachCount === "" ? undefined : Number(form.breachCount),
-        clearance: form.clearance === "" ? undefined : Number(form.clearance),
+        restrictedDepartmentIds: form.restrictedDepartmentIds,
       };
 
       if (mode === "create") {
@@ -175,7 +176,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
           <label className="mb-1 block font-mono text-xs text-gray-500">Nom</label>
           <input className={inputClass} value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="La Sculpture" />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Classe</label>
             <select className={inputClass} value={form.class} onChange={(e) => update("class", e.target.value)}>
@@ -186,11 +187,11 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
             <label className="mb-1 block font-mono text-xs text-gray-500">Niveau de menace</label>
             <input type="number" min={0} max={5} className={inputClass} value={form.threatLevel} onChange={(e) => update("threatLevel", e.target.value)} />
           </div>
-          <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Habilitation requise</label>
-            <input type="number" min={1} max={5} className={inputClass} value={form.clearance} onChange={(e) => update("clearance", e.target.value)} />
-          </div>
         </div>
+        <DepartmentMultiSelect
+          value={form.restrictedDepartmentIds}
+          onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
+        />
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">Confinement</label>
           <textarea rows={2} className={inputClass} value={form.containment} onChange={(e) => update("containment", e.target.value)} />

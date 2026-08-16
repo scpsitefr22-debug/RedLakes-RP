@@ -1,4 +1,3 @@
-import type { ClearanceLevel } from "./clearance";
 import {
   findGradeMeta,
   normalizeGradeId,
@@ -68,13 +67,6 @@ export function canAccessSiteSection(
   const meta = getGradeMeta(grade);
   if (!meta) return section === "overview" || section === "fondation";
   return meta.siteSections.includes(section);
-}
-
-export function canAccessWithClearance(
-  userClearance: ClearanceLevel,
-  required: ClearanceLevel,
-): boolean {
-  return userClearance >= required;
 }
 
 export function getAccessibleSections(grade: string | null | undefined): SiteSection[] {

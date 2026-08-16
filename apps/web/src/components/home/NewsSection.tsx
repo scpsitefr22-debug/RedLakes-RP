@@ -6,8 +6,9 @@ import { motion } from "framer-motion";
 import { categoryLabels } from "@/data/news";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
-import { ArrowRight, Radio } from "lucide-react";
+import { Radio } from "lucide-react";
 import { API_PROXY } from "@/lib/api";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 interface ApiNewsArticle {
   id: string;
@@ -97,20 +98,11 @@ export function NewsSection() {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-              TRANSMISSIONS RÉCENTES
-            </p>
-            <h2 className="text-3xl font-bold text-white">Actualités</h2>
-          </div>
-          <Link
-            href="/actualites"
-            className="hidden items-center gap-1 font-mono text-sm text-gray-400 hover:text-redlake-glow sm:flex"
-          >
-            Toutes les actualités <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+        <SectionHeader
+          kicker="TRANSMISSIONS RÉCENTES"
+          title="Actualités"
+          action={{ label: "Toutes les actualités", href: "/actualites" }}
+        />
 
         {items.length === 0 ? (
           <p className="text-gray-500">Chargement des transmissions…</p>
@@ -152,7 +144,7 @@ export function NewsSection() {
                   <Link
                     key={article.id}
                     href={article.href}
-                    className="flex items-center justify-between rounded border border-metal/50 px-4 py-3 transition-colors hover:border-redlake/30 hover:bg-redlake/5"
+                    className="panel-flat flex items-center justify-between rounded px-4 py-3 transition-colors hover:border-redlake/30 hover:bg-redlake/5"
                   >
                     <div>
                       <p className="text-sm font-medium text-white">{article.title}</p>

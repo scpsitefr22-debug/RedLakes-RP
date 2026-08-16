@@ -6,7 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { DiscordService } from '../sync/discord.service';
-import { User, UserRole } from '@prisma/client';
+import { User } from '@prisma/client';
 import { randomBytes } from 'crypto';
 
 export type AuthUser = User & {
@@ -17,7 +17,6 @@ export type AuthUser = User & {
     playtime: number;
     reputation: number;
     sanctions: number;
-    clearance: number;
     medals: string[];
     achievements: unknown;
   } | null;

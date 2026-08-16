@@ -22,7 +22,6 @@ export async function seedScpObjects() {
         containmentCost: scp.stats.containmentCost,
         personnelAssigned: scp.stats.personnelAssigned,
         breachCount: scp.stats.breachCount,
-        clearance: scp.clearance,
       },
       create: {
         slug: scp.id,
@@ -40,7 +39,6 @@ export async function seedScpObjects() {
         containmentCost: scp.stats.containmentCost,
         personnelAssigned: scp.stats.personnelAssigned,
         breachCount: scp.stats.breachCount,
-        clearance: scp.clearance,
       },
     });
   }

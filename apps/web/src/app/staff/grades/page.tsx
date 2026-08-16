@@ -12,7 +12,6 @@ interface StaffGrade {
   name: string;
   branch: string;
   tier: string;
-  clearance: number;
 }
 
 export default function StaffGradesPage() {
@@ -75,7 +74,6 @@ export default function StaffGradesPage() {
                 </p>
               </div>
             </div>
-            <span className="font-mono text-xs text-gray-500">Niv. {grade.clearance}</span>
           </Link>
         ))}
       </div>

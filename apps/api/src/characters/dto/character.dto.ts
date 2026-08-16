@@ -1,11 +1,4 @@
-import {
-  IsArray,
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
-  MinLength,
-} from 'class-validator';
+import { IsArray, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateCharacterDto {
   @IsString()
@@ -40,9 +33,9 @@ export class CreateCharacterDto {
   portrait?: string;
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  clearance?: number;
+  @IsArray()
+  @IsString({ each: true })
+  restrictedDepartmentIds?: string[];
 }
 
 export class UpdateCharacterDto {
@@ -77,7 +70,7 @@ export class UpdateCharacterDto {
   portrait?: string;
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  clearance?: number;
+  @IsArray()
+  @IsString({ each: true })
+  restrictedDepartmentIds?: string[];
 }

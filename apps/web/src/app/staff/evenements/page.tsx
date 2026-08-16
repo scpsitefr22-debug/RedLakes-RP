@@ -11,7 +11,6 @@ interface StaffGameEvent {
   title: string;
   date: string;
   type: string;
-  clearance: number;
 }
 
 export default function StaffEvenementsPage() {
@@ -20,7 +19,7 @@ export default function StaffEvenementsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<StaffGameEvent[]>("/events")
+    apiFetch<StaffGameEvent[]>("/events/cms")
       .then(setEvents)
       .catch(() => setError("Impossible de charger les événements — API indisponible."))
       .finally(() => setLoading(false));
@@ -74,7 +73,6 @@ export default function StaffEvenementsPage() {
                 </p>
               </div>
             </div>
-            <span className="font-mono text-xs text-gray-500">Niv. {e.clearance}</span>
           </Link>
         ))}
       </div>

@@ -11,7 +11,6 @@ interface StaffCharacter {
   name: string;
   title: string;
   faction: string;
-  clearance: number;
 }
 
 export default function StaffPersonnagesPage() {
@@ -20,7 +19,7 @@ export default function StaffPersonnagesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<StaffCharacter[]>("/characters")
+    apiFetch<StaffCharacter[]>("/characters/cms")
       .then(setCharacters)
       .catch(() => setError("Impossible de charger les personnages — API indisponible."))
       .finally(() => setLoading(false));
@@ -72,7 +71,6 @@ export default function StaffPersonnagesPage() {
                 <p className="font-mono text-xs text-gray-600">{c.title} — {c.faction}</p>
               </div>
             </div>
-            <span className="font-mono text-xs text-gray-500">Niv. {c.clearance}</span>
           </Link>
         ))}
       </div>

@@ -21,7 +21,7 @@ interface ApiScpFull {
   containmentCost: string | null;
   personnelAssigned: number | null;
   breachCount: number | null;
-  clearance: number;
+  restrictedDepartmentIds: string[];
 }
 
 export default function EditScpPage() {
@@ -64,7 +64,7 @@ export default function EditScpPage() {
         containmentCost: scp.containmentCost ?? "",
         personnelAssigned: scp.personnelAssigned?.toString() ?? "",
         breachCount: scp.breachCount?.toString() ?? "",
-        clearance: scp.clearance.toString(),
+        restrictedDepartmentIds: scp.restrictedDepartmentIds,
       }}
     />
   );

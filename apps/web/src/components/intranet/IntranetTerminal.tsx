@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { MyReportsPanel } from "@/components/intranet/MyReportsPanel";
-import { CLEARANCE_LABELS, type ClearanceLevel } from "@/lib/clearance";
 import {
   getAccessibleSections,
   SITE_SECTION_LABELS,
@@ -26,7 +25,7 @@ type ReportType = "INCIDENT" | "AUTHORIZATION" | "MEMO" | "EQUIPMENT";
 interface PlayerProfile {
   grade: string;
   faction: string;
-  clearance: number;
+  gradeInfo?: { departmentRef?: { name: string } | null } | null;
   rpFirstName?: string | null;
   rpLastName?: string | null;
   user: { minecraftUsername: string; role: string };
@@ -114,10 +113,7 @@ export function IntranetTerminal() {
     );
   }
 
-  const clearance = Math.min(
-    Math.max(Math.round(player.clearance), 1),
-    5,
-  ) as ClearanceLevel;
+  const departmentName = player.gradeInfo?.departmentRef?.name ?? null;
   const sections = getAccessibleSections(player.grade);
   const rpName = [player.rpFirstName, player.rpLastName].filter(Boolean).join(" ");
 
@@ -135,12 +131,9 @@ export function IntranetTerminal() {
             </p>
           </div>
           <div className="rounded border border-redlake/30 bg-redlake/10 px-4 py-2 text-center">
-            <p className="font-mono text-[10px] text-gray-500">HABILITATION</p>
+            <p className="font-mono text-[10px] text-gray-500">DÉPARTEMENT</p>
             <p className="font-mono text-lg font-bold text-redlake-glow">
-              Niveau {clearance}
-            </p>
-            <p className="font-mono text-[10px] text-gray-600">
-              {CLEARANCE_LABELS[clearance]}
+              {departmentName ?? "Aucun"}
             </p>
           </div>
         </div>

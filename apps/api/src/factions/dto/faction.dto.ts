@@ -34,11 +34,6 @@ export class CreateFactionDto {
   color?: string;
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  clearance?: number;
-
-  @IsOptional()
   @IsBoolean()
   playable?: boolean;
 
@@ -82,11 +77,6 @@ export class UpdateFactionDto {
   @IsOptional()
   @IsString()
   color?: string;
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  clearance?: number;
 
   @IsOptional()
   @IsBoolean()

@@ -7,22 +7,43 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { UserRole } from '@prisma/client';
 import { EventsService } from './events.service';
 import { CreateGameEventDto, UpdateGameEventDto } from './dto/game-event.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { PlayersService } from '../players/players.service';
+
+type OptionalAuthRequest = Request & { user?: { id: string } };
 
 @Controller('events')
 export class EventsController {
-  constructor(private events: EventsService) {}
+  constructor(
+    private events: EventsService,
+    private players: PlayersService,
+  ) {}
+
+  private async departmentIdOf(req: OptionalAuthRequest) {
+    return req.user ? this.players.getDepartmentId(req.user.id) : null;
+  }
 
   @Get()
-  findAll() {
-    return this.events.findAll();
+  @UseGuards(OptionalAuthGuard)
+  async findAll(@Req() req: OptionalAuthRequest) {
+    return this.events.findAll(await this.departmentIdOf(req));
+  }
+
+  @Get('cms')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  findAllAdmin() {
+    return this.events.findAllAdmin();
   }
 
   @Get('by-id/:id')
@@ -35,8 +56,12 @@ export class EventsController {
   }
 
   @Get(':slug')
-  async findOne(@Param('slug') slug: string) {
-    const event = await this.events.findOne(slug);
+  @UseGuards(OptionalAuthGuard)
+  async findOne(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
+    const event = await this.events.findOne(
+      slug,
+      await this.departmentIdOf(req),
+    );
     if (!event) throw new NotFoundException('Événement introuvable');
     return event;
   }

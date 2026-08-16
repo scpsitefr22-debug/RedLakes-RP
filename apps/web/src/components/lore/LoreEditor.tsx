@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { Save, ArrowLeft, Trash2 } from "lucide-react";
+import { DepartmentMultiSelect } from "@/components/staff/DepartmentMultiSelect";
 
 const CATEGORIES = [
   "MONDE", "SITE", "CHRONOLOGIE", "GUERRES", "CATASTROPHES",
@@ -20,7 +21,7 @@ export interface LoreFormData {
   content: string;
   category: string;
   status: string;
-  clearance: number;
+  restrictedDepartmentIds: string[];
   featured: boolean;
   tags: string;
 }
@@ -40,7 +41,7 @@ export function LoreEditor({ initial, articleId, mode }: LoreEditorProps) {
     content: initial?.content ?? "",
     category: initial?.category ?? "MONDE",
     status: initial?.status ?? "DRAFT",
-    clearance: initial?.clearance ?? 1,
+    restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
     featured: initial?.featured ?? false,
     tags: initial?.tags ?? "",
   });
@@ -142,7 +143,7 @@ export function LoreEditor({ initial, articleId, mode }: LoreEditorProps) {
           <label className="mb-1 block font-mono text-xs text-gray-500">Extrait</label>
           <input className={inputClass} value={form.excerpt} onChange={(e) => update("excerpt", e.target.value)} />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Catégorie</label>
             <select className={inputClass} value={form.category} onChange={(e) => update("category", e.target.value)}>
@@ -159,16 +160,11 @@ export function LoreEditor({ initial, articleId, mode }: LoreEditorProps) {
               ))}
             </select>
           </div>
-          <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Habilitation (1-5)</label>
-            <input
-              type="number" min={1} max={5}
-              className={inputClass}
-              value={form.clearance}
-              onChange={(e) => update("clearance", parseInt(e.target.value))}
-            />
-          </div>
         </div>
+        <DepartmentMultiSelect
+          value={form.restrictedDepartmentIds}
+          onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
+        />
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">Tags (séparés par virgule)</label>
           <input className={inputClass} value={form.tags} onChange={(e) => update("tags", e.target.value)} placeholder="aegis, faction, lore" />

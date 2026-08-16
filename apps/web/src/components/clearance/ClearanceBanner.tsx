@@ -2,16 +2,15 @@
 
 import Link from "next/link";
 import { Shield, Lock } from "lucide-react";
-import { CLEARANCE_LABELS } from "@/lib/clearance";
 import { usePlayerSession } from "@/hooks/usePlayerSession";
 
 export function ClearanceBanner() {
-  const { loading, authenticated, clearance } = usePlayerSession();
+  const { loading, authenticated, departmentName } = usePlayerSession();
 
   if (loading) {
     return (
       <p className="mb-6 font-mono text-xs text-gray-600">
-        Vérification de l&apos;habilitation…
+        Vérification de l&apos;accréditation…
       </p>
     );
   }
@@ -28,13 +27,14 @@ export function ClearanceBanner() {
           <p className="font-mono text-sm text-gray-400">
             {authenticated ? (
               <>
-                Habilitation niveau{" "}
-                <span className="text-redlake-glow">{clearance}</span> —{" "}
-                {CLEARANCE_LABELS[clearance]}
+                Accès —{" "}
+                <span className="text-redlake-glow">
+                  {departmentName ?? "Personnel sans département"}
+                </span>
               </>
             ) : (
               <>
-                Visiteur non identifié — habilitation minimale (niveau 1).{" "}
+                Visiteur non identifié — contenu public uniquement.{" "}
                 <Link href="/connexion" className="text-redlake-glow hover:underline">
                   Se connecter
                 </Link>

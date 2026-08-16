@@ -2,30 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api";
-import type { ClearanceLevel } from "@/lib/clearance";
 
 export interface PlayerSession {
   loading: boolean;
   authenticated: boolean;
-  clearance: ClearanceLevel;
+  departmentId: string | null;
+  departmentName: string | null;
   username: string | null;
   displayName: string | null;
   role: string | null;
   discordLinked: boolean;
 }
 
-const GUEST_CLEARANCE = 1 as ClearanceLevel;
+const GUEST_STATE: PlayerSession = {
+  loading: true,
+  authenticated: false,
+  departmentId: null,
+  departmentName: null,
+  username: null,
+  displayName: null,
+  role: null,
+  discordLinked: false,
+};
 
 export function usePlayerSession(): PlayerSession {
-  const [state, setState] = useState<PlayerSession>({
-    loading: true,
-    authenticated: false,
-    clearance: GUEST_CLEARANCE,
-    username: null,
-    displayName: null,
-    role: null,
-    discordLinked: false,
-  });
+  const [state, setState] = useState<PlayerSession>(GUEST_STATE);
 
   useEffect(() => {
     (async () => {
@@ -37,63 +38,44 @@ export function usePlayerSession(): PlayerSession {
             displayName: string;
             role: string;
             discordLinked: boolean;
-            player?: { clearance: number };
           };
         }>("/auth/me");
 
         if (!auth.authenticated || !auth.user) {
-          setState({
-            loading: false,
-            authenticated: false,
-            clearance: GUEST_CLEARANCE,
-            username: null,
-            displayName: null,
-            role: null,
-            discordLinked: false,
-          });
+          setState({ ...GUEST_STATE, loading: false });
           return;
         }
 
-        let clearance = auth.user.player?.clearance;
-        if (clearance === undefined) {
-          const profile = await apiFetch<{ clearance: number }>("/players/me");
-          clearance = profile.clearance;
+        let departmentId: string | null = null;
+        let departmentName: string | null = null;
+        try {
+          const profile = await apiFetch<{
+            gradeInfo?: {
+              departmentRefId: string | null;
+              departmentRef?: { name: string } | null;
+            } | null;
+          }>("/players/me");
+          departmentId = profile.gradeInfo?.departmentRefId ?? null;
+          departmentName = profile.gradeInfo?.departmentRef?.name ?? null;
+        } catch {
+          /* pas de fiche joueur — accès public uniquement */
         }
-
-        const level = Math.min(
-          Math.max(Math.round(clearance ?? 1), 1),
-          5,
-        ) as ClearanceLevel;
 
         setState({
           loading: false,
           authenticated: true,
-          clearance: level,
+          departmentId,
+          departmentName,
           username: auth.user.username,
           displayName: auth.user.displayName,
           role: auth.user.role,
           discordLinked: auth.user.discordLinked,
         });
       } catch {
-        setState({
-          loading: false,
-          authenticated: false,
-          clearance: GUEST_CLEARANCE,
-          username: null,
-          displayName: null,
-          role: null,
-          discordLinked: false,
-        });
+        setState({ ...GUEST_STATE, loading: false });
       }
     })();
   }, []);
 
   return state;
-}
-
-export function canViewClearance(
-  required: number,
-  userClearance: ClearanceLevel,
-): boolean {
-  return userClearance >= required;
 }

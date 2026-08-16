@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { PenLine, Hammer, Shield, MessageSquare } from "lucide-react";
 import { siteConfig } from "@/config/site";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const roles = [
   {
@@ -38,16 +39,12 @@ export function RecrutementSection() {
   return (
     <section className="border-t border-redlake/10 bg-classified py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 text-center">
-          <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-            RECRUTEMENT PRÉ-OUVERTURE
-          </p>
-          <h2 className="text-3xl font-bold text-white">Rejoignez le projet</h2>
-          <p className="mx-auto mt-4 max-w-xl text-gray-500">
-            Le serveur n&apos;est pas encore ouvert, mais nous recrutons dès maintenant
-            pour construire REDLAKES ensemble.
-          </p>
-        </div>
+        <SectionHeader
+          align="center"
+          kicker="RECRUTEMENT PRÉ-OUVERTURE"
+          title="Rejoignez le projet"
+          description="Le serveur n'est pas encore ouvert, mais nous recrutons dès maintenant pour construire REDLAKES ensemble."
+        />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {roles.map((role, i) => (

@@ -13,7 +13,6 @@ interface PlayerProfile {
   rpFirstName: string | null;
   rpLastName: string | null;
   sanctions: number;
-  clearance: number;
   user: { minecraftUsername: string; avatarUrl: string | null };
 }
 

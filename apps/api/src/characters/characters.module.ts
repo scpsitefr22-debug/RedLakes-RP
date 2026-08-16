@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { CharactersService } from './characters.service';
 import { CharactersController } from './characters.controller';
 import { AuthModule } from '../auth/auth.module';
+import { PlayersModule } from '../players/players.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, PlayersModule],
   controllers: [CharactersController],
   providers: [CharactersService],
   exports: [CharactersService],

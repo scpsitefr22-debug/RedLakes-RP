@@ -13,7 +13,6 @@ export interface FactionFormData {
   description: string;
   history: string;
   color: string;
-  clearance: number;
   playable: boolean;
   objectives: string;
   chefId: string;
@@ -36,7 +35,6 @@ export function FactionEditor({ initial, factionId, mode }: FactionEditorProps) 
     description: initial?.description ?? "",
     history: initial?.history ?? "",
     color: initial?.color ?? "",
-    clearance: initial?.clearance ?? 1,
     playable: initial?.playable ?? true,
     objectives: initial?.objectives ?? "",
     chefId: initial?.chefId ?? "",
@@ -46,7 +44,7 @@ export function FactionEditor({ initial, factionId, mode }: FactionEditorProps) 
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const update = (key: keyof FactionFormData, value: string | number | boolean) => {
+  const update = (key: keyof FactionFormData, value: string | boolean) => {
     setForm((f) => ({ ...f, [key]: value }));
     if (key === "name" && mode === "create") {
       const slug = (value as string)
@@ -73,7 +71,6 @@ export function FactionEditor({ initial, factionId, mode }: FactionEditorProps) 
         description: form.description || undefined,
         history: form.history || undefined,
         color: form.color || undefined,
-        clearance: form.clearance,
         playable: form.playable,
         objectives: toArray(form.objectives),
         chefId: form.chefId || undefined,
@@ -170,19 +167,10 @@ export function FactionEditor({ initial, factionId, mode }: FactionEditorProps) 
           <label className="mb-1 block font-mono text-xs text-gray-500">Historique</label>
           <textarea rows={3} className={inputClass} value={form.history} onChange={(e) => update("history", e.target.value)} />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Couleur (hex)</label>
             <input className={inputClass} value={form.color} onChange={(e) => update("color", e.target.value)} placeholder="#c41e1e" />
-          </div>
-          <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Habilitation (min. 1)</label>
-            <input
-              type="number" min={1}
-              className={inputClass}
-              value={form.clearance}
-              onChange={(e) => update("clearance", parseInt(e.target.value) || 1)}
-            />
           </div>
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Budget</label>

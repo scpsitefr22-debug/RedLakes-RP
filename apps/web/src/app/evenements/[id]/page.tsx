@@ -1,6 +1,4 @@
 import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
-import { CLEARANCE_LABELS, ClearanceLevel } from "@/lib/clearance";
 import { formatDate } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
 
@@ -14,7 +12,6 @@ interface ApiGameEventDetail {
   description: string;
   casualties: string | null;
   outcome: string;
-  clearance: ClearanceLevel;
 }
 
 async function getGameEvent(slug: string): Promise<ApiGameEventDetail | null> {
@@ -34,9 +31,6 @@ export default async function EvenementDetailPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <Badge variant="classified" className="mb-4">
-        {CLEARANCE_LABELS[event.clearance]}
-      </Badge>
       <p className="mb-2 font-mono text-sm text-gray-600">
         {formatDate(event.date)}
       </p>

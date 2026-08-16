@@ -12,7 +12,6 @@ interface LoreArticle {
   title: string;
   status: string;
   category: string;
-  clearance: number;
   updatedAt: string;
 }
 
@@ -95,7 +94,7 @@ export default function LoreCmsPage() {
                 <div>
                   <h3 className="font-bold text-white">{article.title}</h3>
                   <p className="font-mono text-xs text-gray-600">
-                    /{article.slug} — {article.category} — Niv. {article.clearance}
+                    /{article.slug} — {article.category}
                   </p>
                 </div>
               </div>

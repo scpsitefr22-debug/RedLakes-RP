@@ -60,7 +60,7 @@ function Show-Status {
 function Start-DiscordBot {
     if (-not (Test-PathOk $RedlakesRoot "Dossier REDLAKES")) { return }
     $botScript = Join-Path $RedlakesRoot "scripts\start-bot.ps1"
-    Start-Process powershell.exe -ArgumentList @(
+    Start-Process pwsh.exe -ArgumentList @(
         "-NoExit", "-ExecutionPolicy", "Bypass", "-File", "`"$botScript`""
     )
     Write-Host "  Bot Discord : fenetre ouverte." -ForegroundColor Green

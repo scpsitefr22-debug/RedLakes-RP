@@ -1,21 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, ScpClass } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateScpObjectDto, UpdateScpObjectDto } from './dto/scp-object.dto';
+import {
+  filterByDepartment,
+  isVisibleToDepartment,
+} from '../common/department-visibility';
 
 @Injectable()
 export class ScpService {
   constructor(private prisma: PrismaService) {}
 
-  findAll(scpClass?: ScpClass) {
-    return this.prisma.scpObject.findMany({
+  async findAll(scpClass?: ScpClass, departmentId: string | null = null) {
+    const objects = await this.prisma.scpObject.findMany({
       where: scpClass ? { class: scpClass } : undefined,
       orderBy: { number: 'asc' },
     });
+    return filterByDepartment(objects, departmentId);
   }
 
-  findOne(slug: string) {
-    return this.prisma.scpObject.findUnique({ where: { slug } });
+  findAllAdmin() {
+    return this.prisma.scpObject.findMany({ orderBy: { number: 'asc' } });
+  }
+
+  async findOne(slug: string, departmentId: string | null = null) {
+    const scp = await this.prisma.scpObject.findUnique({ where: { slug } });
+    if (!scp) return null;
+    if (!isVisibleToDepartment(scp.restrictedDepartmentIds, departmentId)) {
+      throw new NotFoundException('Accès restreint à un autre département');
+    }
+    return scp;
   }
 
   findById(id: string) {

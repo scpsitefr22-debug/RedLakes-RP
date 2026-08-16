@@ -3,7 +3,6 @@
 import type { ReactNode } from "react";
 import { motion, type Variants } from "framer-motion";
 import { Badge } from "@/components/ui/Badge";
-import { CLEARANCE_LABELS, type ClearanceLevel } from "@/lib/clearance";
 import type { FactionTheme } from "@/lib/faction-themes";
 import type { ApiFaction } from "@/lib/faction-api";
 import { cn } from "@/lib/utils";
@@ -55,8 +54,6 @@ interface Props {
 }
 
 export function FactionHero({ faction, theme, icon, totalRoles, roleCategoryCount }: Props) {
-  const clearance = Math.min(Math.max(faction.clearance, 1), 5) as ClearanceLevel;
-
   return (
     <motion.header
       initial="hidden"
@@ -90,7 +87,6 @@ export function FactionHero({ faction, theme, icon, totalRoles, roleCategoryCoun
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Badge variant="classified">{CLEARANCE_LABELS[clearance]}</Badge>
         {faction.playable && (
           <span className="inline-flex items-center rounded border border-green-400/30 bg-green-400/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-green-400">
             Jouable

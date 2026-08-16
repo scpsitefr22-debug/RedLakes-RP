@@ -17,7 +17,6 @@ interface ApiScpObject {
   threatLevel: number;
   description: string;
   personnelAssigned: number | null;
-  clearance: number;
 }
 
 async function getScpObjects(): Promise<ApiScpObject[]> {
@@ -84,7 +83,6 @@ export default async function WikiPage() {
               <div className="flex gap-4 font-mono text-xs text-gray-600">
                 <span>Menace {scp.threatLevel}/5</span>
                 <span>{scp.personnelAssigned ?? "—"} agents</span>
-                <span>Niv. {scp.clearance}</span>
               </div>
             </Link>
           ))}

@@ -9,7 +9,6 @@ export interface ApiGrade {
   departmentId: string | null;
   pay: number | null;
   quota: number | null;
-  clearance: number;
   description: string | null;
   objectives: string[];
   utilities: string[];

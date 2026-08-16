@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { Save, ArrowLeft, Trash2 } from "lucide-react";
+import { DepartmentMultiSelect } from "@/components/staff/DepartmentMultiSelect";
 
 const EVENT_TYPES = ["breach", "invasion", "guerre", "crise-xk", "experience"];
 
@@ -16,7 +17,7 @@ export interface GameEventFormData {
   description: string;
   casualties: string;
   outcome: string;
-  clearance: string;
+  restrictedDepartmentIds: string[];
 }
 
 interface GameEventEditorProps {
@@ -35,7 +36,7 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
     description: initial?.description ?? "",
     casualties: initial?.casualties ?? "",
     outcome: initial?.outcome ?? "",
-    clearance: initial?.clearance ?? "1",
+    restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -65,7 +66,7 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
         description: form.description,
         casualties: form.casualties || undefined,
         outcome: form.outcome,
-        clearance: Number(form.clearance) || 1,
+        restrictedDepartmentIds: form.restrictedDepartmentIds,
       };
 
       if (mode === "create") {
@@ -134,7 +135,7 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
           </label>
           <input className={inputClass} value={form.slug} onChange={(e) => update("slug", e.target.value)} disabled={mode === "edit"} />
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Date</label>
             <input type="date" className={inputClass} value={form.date} onChange={(e) => update("date", e.target.value)} />
@@ -145,11 +146,11 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
               {EVENT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
-          <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Habilitation requise</label>
-            <input type="number" min={1} max={5} className={inputClass} value={form.clearance} onChange={(e) => update("clearance", e.target.value)} />
-          </div>
         </div>
+        <DepartmentMultiSelect
+          value={form.restrictedDepartmentIds}
+          onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
+        />
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">Description</label>
           <textarea rows={3} className={inputClass} value={form.description} onChange={(e) => update("description", e.target.value)} />

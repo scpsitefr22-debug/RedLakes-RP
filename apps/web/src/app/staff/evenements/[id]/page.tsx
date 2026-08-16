@@ -13,7 +13,7 @@ interface ApiGameEventFull {
   description: string;
   casualties: string | null;
   outcome: string;
-  clearance: number;
+  restrictedDepartmentIds: string[];
 }
 
 export default function EditGameEventPage() {
@@ -48,7 +48,7 @@ export default function EditGameEventPage() {
         description: event.description,
         casualties: event.casualties ?? "",
         outcome: event.outcome,
-        clearance: event.clearance.toString(),
+        restrictedDepartmentIds: event.restrictedDepartmentIds,
       }}
     />
   );

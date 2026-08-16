@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { classColors, SCPClass } from "@/data/scp";
 import { Badge } from "@/components/ui/Badge";
 import { cn, formatDate } from "@/lib/utils";
-import { CLEARANCE_LABELS, ClearanceLevel } from "@/lib/clearance";
 import { AlertTriangle, FlaskConical, FileText } from "lucide-react";
 import { API_URL } from "@/lib/api";
 
@@ -24,7 +23,6 @@ interface ApiScpDetail {
   containmentCost: string | null;
   personnelAssigned: number | null;
   breachCount: number | null;
-  clearance: ClearanceLevel;
 }
 
 async function getScpObject(slug: string): Promise<ApiScpDetail | null> {
@@ -58,9 +56,6 @@ export default async function SCPDetailPage({ params }: Props) {
           </span>
           <Badge className={cn("border", classColors[scp.class])}>
             {scp.class}
-          </Badge>
-          <Badge variant="classified">
-            {CLEARANCE_LABELS[scp.clearance]}
           </Badge>
         </div>
         <h1 className="mb-4 text-4xl font-bold text-white">{scp.name}</h1>

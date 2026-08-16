@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
 import { BRANCH_LABELS, BRANCH_ORDER, type ApiGrade } from "@/lib/grade-labels";
 
 export function GradesCatalog({ grades }: { grades: ApiGrade[] }) {
@@ -96,7 +95,6 @@ export function GradesCatalog({ grades }: { grades: ApiGrade[] }) {
                   >
                     <div className="mb-2 flex items-start justify-between gap-2">
                       <h3 className="font-bold text-white">{grade.name}</h3>
-                      <Badge variant="classified">Niv. {grade.clearance}</Badge>
                     </div>
                     {grade.departmentRef && (
                       <p className="mb-1 text-xs text-gray-500">

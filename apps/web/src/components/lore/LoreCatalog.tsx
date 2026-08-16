@@ -3,69 +3,27 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BookOpen, Star } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
 import { loreCategories } from "@/data/lore";
 import { ClearanceBanner } from "@/components/clearance/ClearanceBanner";
-import { usePlayerSession } from "@/hooks/usePlayerSession";
-import { fetchCmsLore, type LoreArticleView } from "@/lib/lore-feed";
-import { loreSections } from "@/data/lore";
-import { Lock } from "lucide-react";
-
-function staticArticles(clearance: number): LoreArticleView[] {
-  return loreSections
-    .filter((s) => s.clearance <= clearance)
-    .map((s) => ({
-      id: s.id,
-      slug: s.id,
-      title: s.title,
-      excerpt: s.excerpt,
-      content: s.content,
-      category: s.category,
-      categoryLabel: loreCategories[s.category] ?? s.category,
-      clearance: s.clearance,
-      featured: s.featured ?? false,
-      source: "static" as const,
-    }));
-}
+import { getMergedLoreArticles, type LoreArticleView } from "@/lib/lore-feed";
 
 export function LoreCatalog() {
-  const { clearance, loading: sessionLoading } = usePlayerSession();
   const [articles, setArticles] = useState<LoreArticleView[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (sessionLoading) return;
     (async () => {
-      const cms = await fetchCmsLore(clearance);
-      const cmsSlugs = new Set(cms.map((a) => a.slug));
-      const staticFiltered = staticArticles(clearance).filter(
-        (s) => !cmsSlugs.has(s.slug),
-      );
-      const merged = [...cms, ...staticFiltered].sort((a, b) => {
-        if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        return a.title.localeCompare(b.title, "fr");
-      });
-      setArticles(merged);
+      setArticles(await getMergedLoreArticles());
       setLoading(false);
     })();
-  }, [clearance, sessionLoading]);
+  }, []);
 
   const featured = articles.filter((s) => s.featured);
   const categories = [...new Set(articles.map((a) => a.category))];
 
-  const lockedCount = loreSections.filter(
-    (s) => s.clearance > clearance,
-  ).length;
-
   return (
     <>
       <ClearanceBanner />
-      {lockedCount > 0 && (
-        <p className="mb-6 flex items-center gap-2 font-mono text-xs text-gray-600">
-          <Lock className="h-3 w-3" />
-          {lockedCount} article(s) classifié(s) masqué(s) à votre niveau.
-        </p>
-      )}
       {loading ? (
         <p className="text-gray-500">Chargement de l&apos;encyclopédie…</p>
       ) : (
@@ -86,7 +44,6 @@ export function LoreCatalog() {
                       {section.title}
                     </h3>
                     <p className="line-clamp-2 text-sm text-gray-500">{section.excerpt}</p>
-                    <Badge className="mt-2">Niv. {section.clearance}</Badge>
                   </Link>
                 ))}
               </div>
@@ -117,7 +74,6 @@ export function LoreCatalog() {
                         <p className="line-clamp-2 text-sm text-gray-500">
                           {section.excerpt}
                         </p>
-                        <Badge className="mt-2">Niv. {section.clearance}</Badge>
                       </div>
                     </Link>
                   ))}

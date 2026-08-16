@@ -9,7 +9,6 @@ interface StaffFaction {
   id: string;
   slug: string;
   name: string;
-  clearance: number;
   playable: boolean;
   departments: { id: string }[];
 }
@@ -75,7 +74,7 @@ export default function StaffFactionsPage() {
               </div>
             </div>
             <span className="font-mono text-xs text-gray-500">
-              {faction.playable ? "Jouable" : "Masquée"} — Niv. {faction.clearance}
+              {faction.playable ? "Jouable" : "Masquée"}
             </span>
           </Link>
         ))}

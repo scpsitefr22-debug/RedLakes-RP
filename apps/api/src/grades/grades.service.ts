@@ -29,7 +29,7 @@ export class GradesService {
     return this.prisma.grade.findMany({
       where: branch ? { branch } : undefined,
       include: { departmentRef: true },
-      orderBy: [{ branch: 'asc' }, { clearance: 'desc' }, { name: 'asc' }],
+      orderBy: [{ branch: 'asc' }, { pay: 'desc' }, { name: 'asc' }],
     });
   }
 

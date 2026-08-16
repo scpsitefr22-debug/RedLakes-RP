@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { User, Award, Shield, ArrowLeft, Clock } from "lucide-react";
+import { User, Award, ArrowLeft, Clock } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { findGradeMeta } from "@/data/rp-grades";
-import { CLEARANCE_LABELS } from "@/lib/clearance";
 
 export async function generateMetadata({
   params,
@@ -40,7 +39,6 @@ export default async function JoueurProfilePage({
 
   const rpName = [player.rpFirstName, player.rpLastName].filter(Boolean).join(" ");
   const meta = findGradeMeta(player.grade);
-  const clearance = Math.min(Math.max(player.clearance ?? 1, 1), 5) as 1 | 2 | 3 | 4 | 5;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
@@ -90,13 +88,6 @@ export default async function JoueurProfilePage({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded border border-metal/40 p-4">
-            <p className="mb-1 flex items-center gap-1 font-mono text-[10px] text-gray-600">
-              <Shield className="h-3 w-3" /> Habilitation
-            </p>
-            <p className="font-mono text-lg text-redlake-glow">Niveau {clearance}</p>
-            <p className="text-xs text-gray-500">{CLEARANCE_LABELS[clearance]}</p>
-          </div>
           <div className="rounded border border-metal/40 p-4">
             <p className="mb-1 font-mono text-[10px] text-gray-600">Réputation</p>
             <p className="font-mono text-lg text-white">{player.reputation}/100</p>

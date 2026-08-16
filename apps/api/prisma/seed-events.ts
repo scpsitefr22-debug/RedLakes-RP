@@ -14,7 +14,6 @@ export async function seedGameEvents() {
         description: e.description,
         casualties: e.casualties,
         outcome: e.outcome,
-        clearance: e.clearance,
       },
       create: {
         slug: e.id,
@@ -24,7 +23,6 @@ export async function seedGameEvents() {
         description: e.description,
         casualties: e.casualties,
         outcome: e.outcome,
-        clearance: e.clearance,
       },
     });
   }

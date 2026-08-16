@@ -4,21 +4,18 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { factions } from "@/data/factions";
 import { Shield } from "lucide-react";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function FactionsPreview() {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 text-center">
-          <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-            ORGANISATIONS ACTIVES
-          </p>
-          <h2 className="text-3xl font-bold text-white">Factions</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-gray-500">
-            De la Fondation SCP à A.E.G.I.S., en passant par l&apos;Insurrection du Chaos
-            et la Main du Serpent — chaque faction façonne le destin de REDLAKES.
-          </p>
-        </div>
+        <SectionHeader
+          align="center"
+          kicker="ORGANISATIONS ACTIVES"
+          title="Factions"
+          description="De la Fondation SCP à A.E.G.I.S., en passant par l'Insurrection du Chaos et la Main du Serpent — chaque faction façonne le destin de REDLAKES."
+        />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {factions.map((faction, i) => (

@@ -2,12 +2,9 @@ import {
   IsString,
   IsEnum,
   IsOptional,
-  IsInt,
   IsBoolean,
   IsArray,
   MinLength,
-  Min,
-  Max,
 } from 'class-validator';
 import { LoreCategory, LoreStatus } from '@prisma/client';
 
@@ -36,10 +33,9 @@ export class CreateLoreDto {
   status?: LoreStatus;
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  @Max(5)
-  clearance?: number;
+  @IsArray()
+  @IsString({ each: true })
+  restrictedDepartmentIds?: string[];
 
   @IsOptional()
   @IsBoolean()
@@ -77,8 +73,9 @@ export class UpdateLoreDto {
   status?: LoreStatus;
 
   @IsOptional()
-  @IsInt()
-  clearance?: number;
+  @IsArray()
+  @IsString({ each: true })
+  restrictedDepartmentIds?: string[];
 
   @IsOptional()
   @IsBoolean()

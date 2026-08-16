@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { classColors, SCPClass } from "@/data/scp";
-import { Badge } from "@/components/ui/Badge";
-import { cn } from "@/lib/utils";
+import type { SCPClass } from "@/data/scp";
+import { ThreatIndicator } from "@/components/ui/ThreatIndicator";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { API_URL } from "@/lib/api";
 
 interface ApiScpObject {
@@ -32,20 +32,11 @@ export async function SCPPreview() {
   return (
     <section className="border-y border-redlake/10 bg-classified py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-              BASE DE DONNÉES SCP
-            </p>
-            <h2 className="text-3xl font-bold text-white">Wiki SCP</h2>
-          </div>
-          <Link
-            href="/wiki"
-            className="font-mono text-sm text-gray-400 hover:text-redlake-glow"
-          >
-            Voir tous les SCP →
-          </Link>
-        </div>
+        <SectionHeader
+          kicker="BASE DE DONNÉES SCP"
+          title="Wiki SCP"
+          action={{ label: "Voir tous les SCP", href: "/wiki" }}
+        />
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {scpObjects.map((scp) => (
@@ -58,9 +49,7 @@ export async function SCPPreview() {
                 <span className="font-mono text-sm font-bold text-redlake-glow">
                   {scp.number}
                 </span>
-                <Badge className={cn("border", classColors[scp.class])}>
-                  {scp.class}
-                </Badge>
+                <ThreatIndicator scpClass={scp.class} />
               </div>
               <h3 className="mb-2 text-lg font-bold text-white group-hover:text-redlake-glow">
                 {scp.name}

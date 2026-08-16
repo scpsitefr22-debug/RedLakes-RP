@@ -52,7 +52,6 @@ export function FactionCard({ faction, index }: Props) {
 
         <div className="mt-4 flex gap-3 font-mono text-xs">
           {faction.playable && <span className="text-green-400">JOUABLE</span>}
-          <span className="text-gray-600">Niv. {faction.clearance}</span>
           {faction.departments.length > 0 && (
             <span className="text-gray-600">
               {faction.departments.length} département{faction.departments.length > 1 ? "s" : ""}

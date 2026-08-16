@@ -23,7 +23,6 @@ export interface ApiFaction {
   description: string | null;
   history: string | null;
   color: string | null;
-  clearance: number;
   playable: boolean;
   objectives: string[];
   chefId: string | null;

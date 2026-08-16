@@ -28,7 +28,7 @@ export default function StaffScpPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<StaffScpObject[]>("/scp")
+    apiFetch<StaffScpObject[]>("/scp/cms")
       .then(setObjects)
       .catch(() => setError("Impossible de charger le wiki — API indisponible."))
       .finally(() => setLoading(false));

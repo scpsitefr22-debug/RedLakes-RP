@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { MapPin, Bot, FileLock, Users, Image } from "lucide-react";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const quickLinks = [
   {
@@ -20,7 +21,7 @@ const quickLinks = [
   {
     icon: FileLock,
     title: "Archives Classifiées",
-    description: "Contenu débloqué selon votre niveau d'habilitation.",
+    description: "Contenu débloqué selon votre département d'affectation.",
     href: "/archives",
   },
   {
@@ -41,12 +42,7 @@ export function QuickAccess() {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 text-center">
-          <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-            ACCÈS RAPIDE
-          </p>
-          <h2 className="text-3xl font-bold text-white">Systèmes Interactifs</h2>
-        </div>
+        <SectionHeader align="center" kicker="ACCÈS RAPIDE" title="Systèmes Interactifs" />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {quickLinks.map((link, i) => (

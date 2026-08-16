@@ -13,7 +13,6 @@ import {
   LogOut,
   RefreshCw,
   MessageCircle,
-  Shield,
   Terminal,
 } from "lucide-react";
 import { apiFetch, checkApiAvailable } from "@/lib/api";
@@ -21,6 +20,7 @@ import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
 import { siteConfig } from "@/config/site";
 import { findGradeMeta } from "@/data/rp-grades";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
+import { MetricCard } from "@/components/ui/MetricCard";
 
 interface PlayerData {
   grade: string;
@@ -31,7 +31,6 @@ interface PlayerData {
   playtime: number;
   reputation: number;
   sanctions: number;
-  clearance: number;
   medals: string[];
   achievements: { name: string; date: string }[];
   roleUpdatedAt?: string;
@@ -209,73 +208,57 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <div className="mb-8 hologram-border rounded-lg p-6">
-        <div className="flex flex-wrap items-center gap-4">
+      <div className="mb-8 panel-elevated rounded-lg p-6">
+        <div className="flex flex-wrap items-start gap-5 sm:flex-nowrap">
           <Image
             src={player.user.avatarUrl}
             alt={player.user.minecraftUsername}
-            width={72}
-            height={72}
-            className="rounded-full border border-redlake/30"
+            width={80}
+            height={80}
+            className="shrink-0 rounded-full border border-redlake/30"
           />
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-white">
-              {player.user.discordUsername ?? player.user.minecraftUsername}
-            </h2>
-            {player.user.discordUsername &&
-              player.user.minecraftUsername &&
-              player.user.discordUsername !== player.user.minecraftUsername && (
-                <p className="font-mono text-xs text-gray-600">
-                  Dossier : {player.user.minecraftUsername}
-                </p>
-              )}
-            <p className="text-sm text-gray-400">
-              {player.grade} — {player.faction}
-              {player.teamName && (
-                <span className="text-gray-500"> · {player.teamName}</span>
-              )}
-            </p>
-            {(player.rpFirstName || player.rpLastName) && (
-              <p className="mt-1 text-sm text-gray-300">
-                Identité RP : {[player.rpFirstName, player.rpLastName].filter(Boolean).join(" ")}
-              </p>
-            )}
-            <p className="mt-1 font-mono text-[10px] text-gray-600">
-              Pseudo Discord :{" "}
-              {[
-                player.grade,
-                [player.rpFirstName, player.rpLastName].filter(Boolean).join(" ") ||
-                  player.teamName,
-              ]
-                .filter(Boolean)
-                .join(" · ")
-                .slice(0, 32)}
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1 rounded border border-redlake/30 bg-redlake/10 px-2 py-0.5 font-mono text-[10px] text-redlake-glow">
-                <Shield className="h-3 w-3" />
-                Habilitation niveau {player.clearance}
-              </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-bold text-white">
+                  {player.user.discordUsername ?? player.user.minecraftUsername}
+                </h2>
+                {player.user.discordUsername &&
+                  player.user.minecraftUsername &&
+                  player.user.discordUsername !== player.user.minecraftUsername && (
+                    <p className="font-mono text-xs text-gray-600">
+                      Dossier : {player.user.minecraftUsername}
+                    </p>
+                  )}
+              </div>
               {player.user.discordLinked && (
-                <span className="inline-flex items-center gap-1 rounded border border-[#5865F2]/30 bg-[#5865F2]/10 px-2 py-0.5 font-mono text-[10px] text-[#aab1ff]">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded border border-[#5865F2]/30 bg-[#5865F2]/10 px-2 py-0.5 font-mono text-[10px] text-[#aab1ff]">
                   <MessageCircle className="h-3 w-3" />
-                  {player.user.discordUsername ?? "Discord verifie"}
+                  {player.user.discordUsername ?? "Discord vérifié"}
                 </span>
               )}
             </div>
-            {player.roleUpdatedAt && (
-              <p className="mt-2 font-mono text-[10px] text-gray-600">
-                Derniere mise a jour du grade :{" "}
-                {new Date(player.roleUpdatedAt).toLocaleString("fr-FR")}
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded border border-redlake/30 bg-redlake/10 px-2.5 py-1 font-mono text-xs text-redlake-glow">
+                {player.grade}
+              </span>
+              <span className="rounded border border-metal/50 px-2.5 py-1 font-mono text-xs text-gray-400">
+                {player.faction}
+              </span>
+              {player.teamName && (
+                <span className="rounded border border-metal/50 px-2.5 py-1 font-mono text-xs text-gray-400">
+                  {player.teamName}
+                </span>
+              )}
+            </div>
+
+            {(player.rpFirstName || player.rpLastName) && (
+              <p className="mt-3 text-sm text-gray-300">
+                Identité RP : {[player.rpFirstName, player.rpLastName].filter(Boolean).join(" ")}
               </p>
             )}
-            <Link
-              href="/intranet"
-              className="mt-4 inline-flex items-center gap-2 rounded border border-redlake/40 bg-redlake/10 px-4 py-2 font-mono text-xs text-redlake-glow hover:text-white"
-            >
-              <Terminal className="h-4 w-4" />
-              Ouvrir le terminal intranet
-            </Link>
+
             {(() => {
               const meta = findGradeMeta(player.grade);
               if (!meta) return null;
@@ -283,6 +266,22 @@ export default function DashboardPage() {
                 <p className="mt-2 text-xs text-gray-500">{meta.description}</p>
               );
             })()}
+
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <Link
+                href="/intranet"
+                className="inline-flex items-center gap-2 rounded border border-redlake/40 bg-redlake/10 px-4 py-2 font-mono text-xs text-redlake-glow hover:text-white"
+              >
+                <Terminal className="h-4 w-4" />
+                Ouvrir le terminal intranet
+              </Link>
+              {player.roleUpdatedAt && (
+                <p className="font-mono text-[10px] text-gray-600">
+                  Dernière mise à jour du grade :{" "}
+                  {new Date(player.roleUpdatedAt).toLocaleString("fr-FR")}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -291,8 +290,8 @@ export default function DashboardPage() {
         const meta = findGradeMeta(player.grade);
         if (!meta?.siteSections.length) return null;
         return (
-          <section className="mb-8 hologram-border rounded-lg p-6">
-            <h3 className="mb-4 font-bold text-white">Acces site selon votre grade</h3>
+          <section className="mb-8 panel-flat rounded-lg p-6">
+            <h3 className="mb-4 font-bold text-white">Accès site selon votre grade</h3>
             <div className="flex flex-wrap gap-2">
               {meta.siteSections.map((s) => (
                 <span
@@ -312,7 +311,7 @@ export default function DashboardPage() {
         );
       })()}
 
-      <section className="mb-8 hologram-border rounded-lg p-6">
+      <section className="mb-8 panel-flat rounded-lg p-6">
         <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
           <User className="h-5 w-5 text-redlake-glow" />
           Identité RP
@@ -365,7 +364,7 @@ export default function DashboardPage() {
         </p>
       </section>
 
-      <section className="mb-8 hologram-border rounded-lg p-6">
+      <section className="mb-8 panel-flat rounded-lg p-6">
         <h3 className="mb-2 flex items-center gap-2 font-bold text-white">
           <MessageCircle className="h-5 w-5 text-[#aab1ff]" />
           Liaison Discord
@@ -424,28 +423,20 @@ export default function DashboardPage() {
       </section>
 
       <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-        {[
-          { icon: Clock, label: "Temps de service", value: formatPlaytime(player.playtime) },
-          { icon: User, label: "Statut", value: player.grade },
-          { icon: Award, label: "Reputation", value: `${player.reputation}/100` },
-          { icon: AlertTriangle, label: "Sanctions", value: String(player.sanctions) },
-        ].map((stat) => (
-          <div key={stat.label} className="hologram-border rounded-lg p-4 text-center">
-            <stat.icon className="mx-auto mb-2 h-5 w-5 text-redlake-glow" />
-            <p className="font-mono text-lg font-bold text-white">{stat.value}</p>
-            <p className="text-xs text-gray-600">{stat.label}</p>
-          </div>
-        ))}
+        <MetricCard icon={Clock} label="Temps de service" value={formatPlaytime(player.playtime)} />
+        <MetricCard icon={User} label="Statut" value={player.grade} />
+        <MetricCard icon={Award} label="Réputation" value={`${player.reputation}/100`} />
+        <MetricCard icon={AlertTriangle} label="Sanctions" value={player.sanctions} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <section className="hologram-border rounded-lg p-6">
+        <section className="panel-flat rounded-lg p-6">
           <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
             <Award className="h-5 w-5 text-redlake-glow" /> Distinctions
           </h3>
           <div className="space-y-2">
             {player.achievements.length === 0 ? (
-              <p className="text-sm text-gray-600">Aucune distinction enregistree.</p>
+              <p className="text-sm text-gray-600">Aucune distinction enregistrée.</p>
             ) : (
               player.achievements.map((a) => (
                 <div key={a.name} className="rounded border border-metal/50 p-3">
@@ -457,20 +448,26 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <section className="hologram-border rounded-lg p-6">
+        <section className="panel-flat rounded-lg p-6">
           <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
-            <Package className="h-5 w-5 text-redlake-glow" /> Medailles
+            <Package className="h-5 w-5 text-redlake-glow" /> Médailles
           </h3>
-          <p className="text-sm text-gray-600">
-            {player.medals.length === 0
-              ? "Aucune medaille attribuee."
-              : player.medals.join(", ")}
-          </p>
+          <div className="space-y-2">
+            {player.medals.length === 0 ? (
+              <p className="text-sm text-gray-600">Aucune médaille attribuée.</p>
+            ) : (
+              player.medals.map((m) => (
+                <div key={m} className="rounded border border-metal/50 p-3">
+                  <p className="text-sm text-white">{m}</p>
+                </div>
+              ))
+            )}
+          </div>
         </section>
       </div>
 
       {myApplications.length > 0 && (
-        <section className="mb-8 hologram-border rounded-lg p-6">
+        <section className="mb-8 panel-flat rounded-lg p-6">
           <h3 className="mb-4 font-bold text-white">Mes candidatures</h3>
           <ul className="space-y-2 font-mono text-sm">
             {myApplications.map((app) => (

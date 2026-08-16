@@ -31,7 +31,6 @@ export interface GradeFormData {
   departmentRefId: string;
   pay: string;
   quota: string;
-  clearance: number;
   description: string;
   objectives: string;
   utilities: string;
@@ -57,7 +56,6 @@ export function GradeEditor({ initial, gradeId, mode }: GradeEditorProps) {
     departmentRefId: initial?.departmentRefId ?? "",
     pay: initial?.pay ?? "",
     quota: initial?.quota ?? "",
-    clearance: initial?.clearance ?? 1,
     description: initial?.description ?? "",
     objectives: initial?.objectives ?? "",
     utilities: initial?.utilities ?? "",
@@ -73,10 +71,7 @@ export function GradeEditor({ initial, gradeId, mode }: GradeEditorProps) {
       .catch(() => undefined);
   }, []);
 
-  const update = (
-    key: keyof GradeFormData,
-    value: string | number,
-  ) => {
+  const update = (key: keyof GradeFormData, value: string) => {
     setForm((f) => ({ ...f, [key]: value }));
     if (key === "name" && mode === "create") {
       const slug = (value as string)
@@ -105,7 +100,6 @@ export function GradeEditor({ initial, gradeId, mode }: GradeEditorProps) {
         departmentRefId: form.departmentRefId || undefined,
         pay: form.pay === "" ? undefined : Number(form.pay),
         quota: form.quota === "" ? undefined : Number(form.quota),
-        clearance: form.clearance,
         description: form.description || undefined,
         objectives: toArray(form.objectives),
         utilities: toArray(form.utilities),
@@ -217,7 +211,7 @@ export function GradeEditor({ initial, gradeId, mode }: GradeEditorProps) {
             ))}
           </select>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Salaire ($/sem.)</label>
             <input type="number" className={inputClass} value={form.pay} onChange={(e) => update("pay", e.target.value)} />
@@ -225,15 +219,6 @@ export function GradeEditor({ initial, gradeId, mode }: GradeEditorProps) {
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Quota</label>
             <input type="number" className={inputClass} value={form.quota} onChange={(e) => update("quota", e.target.value)} />
-          </div>
-          <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Habilitation (1-5)</label>
-            <input
-              type="number" min={1} max={5}
-              className={inputClass}
-              value={form.clearance}
-              onChange={(e) => update("clearance", parseInt(e.target.value) || 1)}
-            />
           </div>
         </div>
         <div>

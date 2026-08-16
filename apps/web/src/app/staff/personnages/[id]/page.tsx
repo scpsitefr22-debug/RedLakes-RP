@@ -14,7 +14,7 @@ interface ApiCharacterFull {
   quotes: string[];
   history: string[];
   portrait: string | null;
-  clearance: number;
+  restrictedDepartmentIds: string[];
 }
 
 export default function EditCharacterPage() {
@@ -50,7 +50,7 @@ export default function EditCharacterPage() {
         quotes: character.quotes.join("\n"),
         history: character.history.join("\n"),
         portrait: character.portrait ?? "",
-        clearance: character.clearance.toString(),
+        restrictedDepartmentIds: character.restrictedDepartmentIds,
       }}
     />
   );

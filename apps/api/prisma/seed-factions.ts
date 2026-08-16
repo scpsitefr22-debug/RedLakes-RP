@@ -14,7 +14,6 @@ export async function seedFactions() {
         description: faction.description,
         history: faction.history,
         color: faction.color,
-        clearance: faction.clearance,
         playable: faction.playable,
         objectives: faction.objectives,
       },
@@ -25,7 +24,6 @@ export async function seedFactions() {
         description: faction.description,
         history: faction.history,
         color: faction.color,
-        clearance: faction.clearance,
         playable: faction.playable,
         objectives: faction.objectives,
       },
@@ -49,7 +47,6 @@ export async function seedFactions() {
         utilities: dept.utilities,
         objectives: dept.objectives ?? [],
         leadership: dept.leadership ?? [],
-        clearance: dept.clearance ?? 1,
       },
       create: {
         slug: dept.id,
@@ -61,7 +58,6 @@ export async function seedFactions() {
         utilities: dept.utilities,
         objectives: dept.objectives ?? [],
         leadership: dept.leadership ?? [],
-        clearance: dept.clearance ?? 1,
       },
     });
   }

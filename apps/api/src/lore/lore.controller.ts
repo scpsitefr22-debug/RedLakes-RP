@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,16 +14,28 @@ import { UserRole } from '@prisma/client';
 import { LoreService } from './lore.service';
 import { CreateLoreDto, UpdateLoreDto } from './dto/lore.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { PlayersService } from '../players/players.service';
+
+type OptionalAuthRequest = Request & { user?: { id: string } };
 
 @Controller('lore')
 export class LoreController {
-  constructor(private lore: LoreService) {}
+  constructor(
+    private lore: LoreService,
+    private players: PlayersService,
+  ) {}
+
+  private async departmentIdOf(req: OptionalAuthRequest) {
+    return req.user ? this.players.getDepartmentId(req.user.id) : null;
+  }
 
   @Get()
-  findPublished(@Query('clearance') clearance?: string) {
-    return this.lore.findPublished(clearance ? parseInt(clearance) : 1);
+  @UseGuards(OptionalAuthGuard)
+  async findPublished(@Req() req: OptionalAuthRequest) {
+    return this.lore.findPublished(await this.departmentIdOf(req));
   }
 
   @Get('cms')
@@ -35,8 +46,9 @@ export class LoreController {
   }
 
   @Get(':slug')
-  findOne(@Param('slug') slug: string, @Query('clearance') clearance?: string) {
-    return this.lore.findBySlug(slug, clearance ? parseInt(clearance) : 1);
+  @UseGuards(OptionalAuthGuard)
+  async findOne(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
+    return this.lore.findBySlug(slug, await this.departmentIdOf(req));
   }
 
   @Post()

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import type { ApiGrade } from "@/lib/grade-labels";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 /**
  * Aperçu du Conseil Oméga sur la page d'accueil, tiré du catalogue de
@@ -27,16 +28,12 @@ export async function GradesPreview() {
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-12 text-center">
-          <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-            HIÉRARCHIE SITE-12
-          </p>
-          <h2 className="text-3xl font-bold text-white">Conseil Oméga</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-gray-500">
-            Cinq sièges gouvernent le Site-12 dans l&apos;ombre. Grades, clearance,
-            rémunération — l&apos;organigramme complet est consultable en direct.
-          </p>
-        </div>
+        <SectionHeader
+          align="center"
+          kicker="HIÉRARCHIE SITE-12"
+          title="Conseil Oméga"
+          description="Cinq sièges gouvernent le Site-12 dans l'ombre. Grades, rémunération, effectifs — l'organigramme complet est consultable en direct."
+        />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {omega.map((grade) => (

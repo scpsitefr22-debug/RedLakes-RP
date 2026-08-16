@@ -15,7 +15,6 @@ export async function seedCharacters() {
         quotes: c.quotes,
         history: c.history,
         portrait: c.portrait,
-        clearance: c.clearance,
       },
       create: {
         slug: c.id,
@@ -26,7 +25,6 @@ export async function seedCharacters() {
         quotes: c.quotes,
         history: c.history,
         portrait: c.portrait,
-        clearance: c.clearance,
       },
     });
   }

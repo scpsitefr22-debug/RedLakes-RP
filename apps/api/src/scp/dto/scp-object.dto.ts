@@ -84,9 +84,9 @@ export class CreateScpObjectDto {
   breachCount?: number;
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  clearance?: number;
+  @IsArray()
+  @IsString({ each: true })
+  restrictedDepartmentIds?: string[];
 }
 
 export class UpdateScpObjectDto {
@@ -150,7 +150,7 @@ export class UpdateScpObjectDto {
   breachCount?: number;
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  clearance?: number;
+  @IsArray()
+  @IsString({ each: true })
+  restrictedDepartmentIds?: string[];
 }

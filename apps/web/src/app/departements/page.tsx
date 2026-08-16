@@ -11,7 +11,6 @@ interface ApiDepartment {
   directorGradeName: string | null;
   utilities: string[];
   objectives: string[];
-  clearance: number;
   _count: { grades: number; teams: number };
 }
 
@@ -80,7 +79,7 @@ export default async function DepartementsPage() {
                 ))}
               </div>
               <p className="mt-3 font-mono text-xs text-gray-600">
-                {dept._count.grades} grades • {dept._count.teams} équipes • Niv. {dept.clearance}
+                {dept._count.grades} grades • {dept._count.teams} équipes
               </p>
             </Link>
           ))}
