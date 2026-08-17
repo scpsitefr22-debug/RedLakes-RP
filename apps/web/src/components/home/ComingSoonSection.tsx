@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import { Clock, BookOpen, Users, Shield, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/config/site";
+import { useSystemStatus } from "@/hooks/useSystemStatus";
 
 export function ComingSoonSection() {
+  const { recruitmentOpen } = useSystemStatus();
   return (
     <section className="border-y border-redlake/20 bg-redlake/5 py-16">
       <div className="mx-auto max-w-4xl px-4 text-center">
@@ -63,7 +65,7 @@ export function ComingSoonSection() {
             <Button href="/wiki" variant="primary">
               Explorer l&apos;encyclopédie
             </Button>
-            {siteConfig.recruitmentOpen && (
+            {recruitmentOpen && (
               <Button href="/candidatures" variant="secondary">
                 Candidater avant l&apos;ouverture
               </Button>

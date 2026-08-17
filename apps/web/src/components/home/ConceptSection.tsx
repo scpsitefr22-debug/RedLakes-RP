@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FlaskConical, Landmark, BookOpen, Box } from "lucide-react";
-import { siteConfig } from "@/config/site";
+import { useSystemStatus } from "@/hooks/useSystemStatus";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const concepts = [
@@ -33,6 +33,7 @@ const concepts = [
 ];
 
 export function ConceptSection() {
+  const { serverOpen } = useSystemStatus();
   return (
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-4">
@@ -60,7 +61,7 @@ export function ConceptSection() {
           ))}
         </div>
 
-        {!siteConfig.serverOpen && (
+        {!serverOpen && (
           <p className="mt-10 text-center font-mono text-sm text-gray-600">
             ▌ Phase actuelle : construction du lore et recrutement de l&apos;équipe
           </p>

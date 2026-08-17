@@ -22,6 +22,7 @@ import { CharactersModule } from './characters/characters.module';
 import { EventsModule } from './events/events.module';
 import { NewsModule } from './news/news.module';
 import { MapModule } from './map/map.module';
+import { SystemModule } from './system/system.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { MapModule } from './map/map.module';
     EventsModule,
     NewsModule,
     MapModule,
+    SystemModule,
   ],
 })
 export class AppModule {}

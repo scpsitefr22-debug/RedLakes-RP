@@ -168,17 +168,12 @@ export class SyncService {
       data: { used: true },
     });
 
-    if (user.player) {
-      await this.discord.syncMemberProfile({
-        discordId: dto.discordId,
-        minecraftUsername: user.minecraftUsername ?? 'Joueur',
-        grade: user.player.grade,
-        faction: user.player.faction,
-        teamName: user.player.teamName,
-        rpFirstName: user.player.rpFirstName,
-        rpLastName: user.player.rpLastName,
-      });
-    }
+    // Pas d'appel à discord.syncMemberProfile() ici : ce endpoint n'est
+    // jamais atteint que depuis le hub Discord (POST /sync/discord/link,
+    // ApiKeyGuard), qui refait lui-même GET /sync/discord/:id + applique
+    // le rôle/pseudo juste après cet appel. Écrire ici en plus dupliquait
+    // la résolution rôle↔grade avec une implémentation indépendante
+    // (discord-role-registry.ts) pouvant diverger de celle du bot.
 
     await this.discord.notifyAccountLinked({
       minecraftUsername: user.minecraftUsername ?? 'Joueur',
@@ -304,11 +299,19 @@ export class SyncService {
     };
   }
 
-  /** Identité RP (prénom/nom) — site ou bot Discord */
+  /**
+   * Identité RP (prénom/nom) — site ou bot Discord.
+   * syncDiscord=false quand l'appelant est le bot lui-même (il refait déjà
+   * GET /sync/discord/:id + applique le rôle/pseudo juste après) — évite la
+   * même double-écriture que linkDiscord(). Reste à true par défaut pour le
+   * site, seul écrivain sur ce chemin.
+   */
   async updateRpIdentity(
     userId: string,
     data: { rpFirstName?: string; rpLastName?: string; teamName?: string },
+    options: { syncDiscord?: boolean } = {},
   ) {
+    const { syncDiscord = true } = options;
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { player: true },
@@ -330,7 +333,7 @@ export class SyncService {
       },
     });
 
-    if (user.discordId) {
+    if (syncDiscord && user.discordId) {
       await this.discord.syncMemberProfile({
         discordId: user.discordId,
         minecraftUsername: user.minecraftUsername ?? 'Joueur',
@@ -362,7 +365,9 @@ export class SyncService {
     if (!user?.player) {
       throw new NotFoundException("Compte non lié — utilise /link d'abord");
     }
-    return this.updateRpIdentity(user.id, data);
+    // syncDiscord: false — le hub Discord (/identite) refait lui-même
+    // GET /sync/discord/:id + applique le rôle/pseudo juste après cet appel.
+    return this.updateRpIdentity(user.id, data, { syncDiscord: false });
   }
 
   async listPendingReports() {

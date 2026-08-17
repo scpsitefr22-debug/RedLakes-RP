@@ -7,6 +7,7 @@ import { ClipboardList, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
 import { siteConfig } from "@/config/site";
+import { useSystemStatus } from "@/hooks/useSystemStatus";
 
 const applicationTypes = [
   { id: "STAFF", name: "Staff", description: "Modération, administration, support joueurs." },
@@ -36,6 +37,7 @@ const statusLabels: Record<string, { label: string; color: string }> = {
 
 function CandidaturesForm() {
   const router = useRouter();
+  const { serverOpen } = useSystemStatus();
   const searchParams = useSearchParams();
   const typeFromUrl = searchParams.get("type");
   const initialType =
@@ -127,7 +129,7 @@ function CandidaturesForm() {
           Le serveur n&apos;est pas encore ouvert — nous recrutons dès maintenant pour
           construire REDLAKES. Connectez-vous avant de soumettre un dossier.
         </p>
-        {!siteConfig.serverOpen && (
+        {!serverOpen && (
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <div className="inline-flex items-center gap-2 rounded border border-yellow-400/30 bg-yellow-400/10 px-3 py-1 font-mono text-xs text-yellow-400">
               <Clock className="h-3 w-3" />

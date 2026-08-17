@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { AlertTriangle, Clock, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/config/site";
+import { useSystemStatus } from "@/hooks/useSystemStatus";
 import Image from "next/image";
 
 export function HeroBanner() {
+  const { serverOpen, recruitmentOpen } = useSystemStatus();
   return (
     <section className="relative min-h-[85vh] overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-redlake-dark/40 via-black to-black" />
@@ -35,7 +37,7 @@ export function HeroBanner() {
           transition={{ duration: 0.8 }}
         >
           <Badge variant="classified" className="mb-6">
-            {siteConfig.serverOpen ? (
+            {serverOpen ? (
               <>
                 <AlertTriangle className="mr-1 inline h-3 w-3" />
                 Site-12 // Accès Restreint
@@ -98,7 +100,7 @@ export function HeroBanner() {
           transition={{ delay: 1 }}
           className="flex flex-wrap justify-center gap-4"
         >
-          {siteConfig.serverOpen ? (
+          {serverOpen ? (
             <Button href={`minecraft://${siteConfig.serverIp}`} variant="primary">
               Rejoindre le serveur
             </Button>
@@ -110,7 +112,7 @@ export function HeroBanner() {
           <Button href="/wiki" variant="secondary">
             Explorer l&apos;encyclopédie
           </Button>
-          {siteConfig.recruitmentOpen && (
+          {recruitmentOpen && (
             <Button href="/candidatures" variant="ghost">
               Rejoindre l&apos;équipe
             </Button>

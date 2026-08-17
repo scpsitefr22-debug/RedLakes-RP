@@ -641,6 +641,22 @@ model NewsArticle {
 // x/y sont des coordonnees en pourcentage (0-100) pour le positionnement
 // absolu sur la carte cote client.
 
+// ─── REDLAKES CORE — état système (System State) ────────────────────────────
+// Source unique pour "le serveur est-il ouvert ?" / "recrutement ouvert ?" —
+// remplace apps/web/src/config/site.ts (serverOpen/recruitmentOpen) et la
+// variable d'environnement SERVER_OPEN du bot Discord, qui étaient deux
+// copies éditées indépendamment sans synchronisation entre elles.
+// Ligne unique (id fixe "singleton") plutôt qu'une table de config à clé/
+// valeur générique : seulement 3 booléens à ce stade, pas besoin de plus.
+
+model SystemState {
+  id              String   @id @default("singleton")
+  serverOpen      Boolean  @default(false)
+  recruitmentOpen Boolean  @default(true)
+  maintenance     Boolean  @default(false)
+  updatedAt       DateTime @updatedAt
+}
+
 model MapLocation {
   id          String   @id @default(cuid())
   slug        String   @unique

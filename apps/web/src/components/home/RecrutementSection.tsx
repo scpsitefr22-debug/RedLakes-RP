@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { PenLine, Hammer, Shield, MessageSquare } from "lucide-react";
-import { siteConfig } from "@/config/site";
+import { useSystemStatus } from "@/hooks/useSystemStatus";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const roles = [
@@ -34,7 +34,8 @@ const roles = [
 ];
 
 export function RecrutementSection() {
-  if (!siteConfig.recruitmentOpen) return null;
+  const { recruitmentOpen } = useSystemStatus();
+  if (!recruitmentOpen) return null;
 
   return (
     <section className="border-t border-redlake/10 bg-classified py-20">

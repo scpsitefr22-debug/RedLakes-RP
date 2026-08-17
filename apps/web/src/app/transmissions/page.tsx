@@ -1,6 +1,7 @@
 import { Radio, AlertTriangle, MessageCircle } from "lucide-react";
 import { getTransmissions } from "@/lib/transmissions";
 import { siteConfig } from "@/config/site";
+import { getSystemStatus } from "@/lib/system-status";
 import { TransmissionsFeedConnected } from "@/components/transmissions/TransmissionsFeedConnected";
 
 export const metadata = {
@@ -10,7 +11,10 @@ export const metadata = {
 };
 
 export default async function TransmissionsPage() {
-  const transmissions = await getTransmissions(60);
+  const [transmissions, { serverOpen }] = await Promise.all([
+    getTransmissions(60),
+    getSystemStatus(),
+  ]);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
@@ -30,7 +34,7 @@ export default async function TransmissionsPage() {
         </p>
       </div>
 
-      {!siteConfig.serverOpen && (
+      {!serverOpen && (
         <div className="mb-8 flex items-start gap-3 rounded-lg border border-yellow-400/30 bg-yellow-400/5 p-4">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-400" />
           <div className="text-sm text-gray-400">

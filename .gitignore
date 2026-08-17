@@ -26,3 +26,6 @@ scripts/.cache/
 *.log
 .DS_Store
 Thumbs.db
+
+# PDF extraction scans (large binary files, not needed for collaborators)
+pdf_extract/
