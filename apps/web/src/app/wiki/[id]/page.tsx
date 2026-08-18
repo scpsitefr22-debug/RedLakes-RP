@@ -13,8 +13,7 @@ import { ClassifiedPlaceholder } from "@/components/wiki/ClassifiedPlaceholder";
 import { DeclassificationOverlay } from "@/components/wiki/DeclassificationOverlay";
 import { RecordScpView } from "@/components/wiki/RecordScpView";
 import { DangerComparison } from "@/components/wiki/DangerComparison";
-import { PrintReportButton } from "@/components/wiki/PrintReportButton";
-import { ContainmentMap } from "@/components/wiki/ContainmentMap";
+import { OfficialReportView } from "@/components/wiki/OfficialReportView";
 import { linkifyScpRefs } from "@/lib/scp-linkify";
 
 interface Props {
@@ -105,20 +104,17 @@ export default async function SCPDetailPage({ params }: Props) {
         name={scp.name}
         scpClass={scp.class}
       />
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
-        <nav className="flex items-center gap-1 font-mono text-xs text-gray-600">
-          <Link href="/wiki" className="hover:text-redlake-glow">
-            Encyclopédie
-          </Link>
-          <ChevronRight className="h-3 w-3" />
-          <Link href="/wiki" className="hover:text-redlake-glow">
-            Wiki SCP
-          </Link>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-gray-400">{scp.number}</span>
-        </nav>
-        <PrintReportButton />
-      </div>
+      <nav className="mb-6 flex items-center gap-1 font-mono text-xs text-gray-600">
+        <Link href="/wiki" className="hover:text-redlake-glow">
+          Encyclopédie
+        </Link>
+        <ChevronRight className="h-3 w-3" />
+        <Link href="/wiki" className="hover:text-redlake-glow">
+          Wiki SCP
+        </Link>
+        <ChevronRight className="h-3 w-3" />
+        <span className="text-gray-400">{scp.number}</span>
+      </nav>
 
       <div className="relative mb-8 hologram-border rounded-lg p-8">
         <ClassificationStamp
@@ -141,9 +137,14 @@ export default async function SCPDetailPage({ params }: Props) {
         )}
       </div>
 
-      <div className="mb-8">
-        <ContainmentMap scpClass={scp.class} />
-      </div>
+      <OfficialReportView
+        number={scp.number}
+        scpClass={scp.class}
+        containment={scp.containment}
+        description={scp.description}
+        history={scp.history}
+        addendums={scp.addendums}
+      />
 
       <div className="prose-redlake space-y-8">
         <section className="hologram-border rounded-lg p-6">

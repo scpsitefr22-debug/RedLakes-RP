@@ -119,30 +119,6 @@ body {
     0 0 0 1px rgba(139, 10, 10, 0.08);
 }
 
-/* Export "rapport officiel" — masque le chrome du site et force un rendu
-   lisible sur papier (fond blanc, texte noir) sans toucher au theme ecran. */
-@media print {
-  header,
-  footer,
-  .no-print {
-    display: none !important;
-  }
-  body {
-    background: white !important;
-    color: black !important;
-  }
-  * {
-    color: black !important;
-    border-color: #999 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-  .scanlines::before,
-  .crt-noise::after {
-    display: none !important;
-  }
-}
-
 .classified-stamp {
   font-family: var(--font-mono), monospace;
   letter-spacing: 0.2em;
