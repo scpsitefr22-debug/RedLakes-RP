@@ -12,6 +12,11 @@ import {
   ClipboardList,
   Terminal,
   Siren,
+  Eye,
+  Radio,
+  Globe,
+  Sparkles,
+  Skull,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { MyReportsPanel } from "@/components/intranet/MyReportsPanel";
@@ -51,6 +56,52 @@ function getReportTypes(theme: FactionTheme) {
     icon: REPORT_ICONS[value],
   }));
 }
+
+interface OpsBoardConfig {
+  title: string;
+  icon: typeof Siren;
+  emptyText: string;
+  footerText: string;
+}
+
+const OPS_BOARDS: Partial<Record<string, OpsBoardConfig>> = {
+  police: {
+    title: "Mains courantes actives",
+    icon: Siren,
+    emptyText: "Aucune intervention consignée pour le moment.",
+    footerText: "Interventions du service — visibles par tout le RPD.",
+  },
+  aegis: {
+    title: "Dossiers de supervision",
+    icon: Eye,
+    emptyText: "Aucun dossier de supervision ouvert pour le moment.",
+    footerText: "Visible par les membres actuels du Directoire.",
+  },
+  chaos: {
+    title: "Renseignement opérationnel",
+    icon: Radio,
+    emptyText: "Aucun renseignement remonté pour le moment.",
+    footerText: "Ce qui circule ici ne remonte à personne d'autre.",
+  },
+  goc: {
+    title: "Rapports d'anomalie",
+    icon: Globe,
+    emptyText: "Aucune anomalie signalée pour le moment.",
+    footerText: "Coordination inter-cellules GOC.",
+  },
+  "main-serpent": {
+    title: "Présages rompus",
+    icon: Sparkles,
+    emptyText: "Aucun présage rompu consigné pour le moment.",
+    footerText: "Visible par ceux qui savent lire entre les lignes.",
+  },
+  crime: {
+    title: "Activité du territoire",
+    icon: Skull,
+    emptyText: "Aucune activité consignée pour le moment.",
+    footerText: "Ce qui se dit ici reste entre nous.",
+  },
+};
 
 const SECTION_LINKS: Partial<Record<SiteSection, string>> = {
   "transmissions-public": "/transmissions",
@@ -260,14 +311,14 @@ export function IntranetTerminal() {
 
       {factionSlug === "gouvernement" && <MunicipalAdvisory />}
 
-      {factionSlug === "police" && (
+      {factionSlug && OPS_BOARDS[factionSlug] && (
         <FactionLog
           color={theme.color}
-          title="Mains courantes actives"
-          icon={Siren}
+          title={OPS_BOARDS[factionSlug]!.title}
+          icon={OPS_BOARDS[factionSlug]!.icon}
           onlyTypes={["INCIDENT"]}
-          emptyText="Aucune intervention consignée pour le moment."
-          footerText="Interventions du service — visibles par tout le RPD."
+          emptyText={OPS_BOARDS[factionSlug]!.emptyText}
+          footerText={OPS_BOARDS[factionSlug]!.footerText}
         />
       )}
 
