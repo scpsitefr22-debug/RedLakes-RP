@@ -14,6 +14,7 @@ import {
   RefreshCw,
   MessageCircle,
   Terminal,
+  CalendarDays,
 } from "lucide-react";
 import { apiFetch, checkApiAvailable } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -21,10 +22,12 @@ import { siteConfig } from "@/config/site";
 import { findGradeMeta } from "@/data/rp-grades";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
 import { MetricCard } from "@/components/ui/MetricCard";
+import { getFactionTheme } from "@/lib/faction-theme";
 
 interface PlayerData {
   grade: string;
   faction: string;
+  factionInfo?: { slug: string } | null;
   teamName?: string | null;
   rpFirstName?: string | null;
   rpLastName?: string | null;
@@ -34,6 +37,7 @@ interface PlayerData {
   medals: string[];
   achievements: { name: string; date: string }[];
   roleUpdatedAt?: string;
+  seniority?: string;
   user: {
     minecraftUsername: string;
     minecraftUuid: string;
@@ -59,6 +63,18 @@ function formatPlaytime(minutes: number) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${h}h ${m}m`;
+}
+
+function formatSeniority(iso?: string) {
+  if (!iso) return "—";
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+  if (days < 1) return "Aujourd'hui";
+  if (days < 30) return `${days} j`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} mois`;
+  const years = Math.floor(months / 12);
+  const remMonths = months % 12;
+  return remMonths > 0 ? `${years} an${years > 1 ? "s" : ""} ${remMonths} mois` : `${years} an${years > 1 ? "s" : ""}`;
 }
 
 export default function DashboardPage() {
@@ -191,12 +207,17 @@ export default function DashboardPage() {
     );
   }
 
+  const theme = getFactionTheme(player.factionInfo?.slug);
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-            DOSSIER PERSONNEL // SITE-12
+          <p
+            className="mb-2 font-mono text-xs tracking-widest"
+            style={{ color: theme.color }}
+          >
+            DOSSIER PERSONNEL // {theme.label.toUpperCase()}
           </p>
           <h1 className="text-4xl font-bold text-white">Tableau de bord</h1>
         </div>
@@ -422,8 +443,9 @@ export default function DashboardPage() {
         </button>
       </section>
 
-      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-5">
         <MetricCard icon={Clock} label="Temps de service" value={formatPlaytime(player.playtime)} />
+        <MetricCard icon={CalendarDays} label="Ancienneté" value={formatSeniority(player.seniority)} />
         <MetricCard icon={User} label="Statut" value={player.grade} />
         <MetricCard icon={Award} label="Réputation" value={`${player.reputation}/100`} />
         <MetricCard icon={AlertTriangle} label="Sanctions" value={player.sanctions} />

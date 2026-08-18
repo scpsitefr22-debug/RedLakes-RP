@@ -36,6 +36,8 @@ export class PlayersService {
 
     roleUpdatedAt: Date;
 
+    seniority: Date;
+
     user: {
       minecraftUsername: string | null;
 
@@ -80,6 +82,8 @@ export class PlayersService {
       achievements: player.achievements,
 
       roleUpdatedAt: player.roleUpdatedAt,
+
+      seniority: player.seniority,
 
       user: {
         minecraftUsername: player.user.minecraftUsername,
