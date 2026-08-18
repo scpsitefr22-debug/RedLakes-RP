@@ -15,6 +15,7 @@ import {
 import { apiFetch } from "@/lib/api";
 import { MyReportsPanel } from "@/components/intranet/MyReportsPanel";
 import { MunicipalAdvisory } from "@/components/intranet/MunicipalAdvisory";
+import { FactionLog } from "@/components/intranet/FactionLog";
 import {
   getAccessibleSections,
   SITE_SECTION_LABELS,
@@ -257,6 +258,8 @@ export function IntranetTerminal() {
       )}
 
       {factionSlug === "gouvernement" && <MunicipalAdvisory />}
+
+      {factionSlug && <FactionLog color={theme.color} />}
 
       <div className="grid gap-8 lg:grid-cols-2">
         <section className="hologram-border rounded-lg p-6">

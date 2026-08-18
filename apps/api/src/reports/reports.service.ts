@@ -105,6 +105,8 @@ export class ReportsService {
         content: dto.content.trim(),
 
         clearance,
+
+        factionId: user.player.factionId,
       },
 
       include: {
@@ -193,6 +195,52 @@ export class ReportsService {
         take,
       }),
 
+      this.prisma.personnelReport.count({ where }),
+    ]);
+
+    return toPaginatedResult(items, total, page, limit);
+  }
+
+  /**
+   * Journal partage entre membres d'une meme faction — visible pour tous
+   * les membres actuels, pas seulement le staff. N'expose ni staffNote ni
+   * reviewedBy (echange prive avec le staff), uniquement le contenu que
+   * l'auteur a lui-meme choisi de deposer.
+   */
+  async findByFaction(userId: string, query: ListReportsQueryDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { player: { select: { factionId: true } } },
+    });
+    const factionId = user?.player?.factionId;
+    if (!factionId) {
+      return toPaginatedResult([], 0, 1, resolvePagination(query).limit);
+    }
+
+    const { skip, take, page, limit } = resolvePagination(query);
+    const where = this.buildWhere({ factionId }, query);
+
+    const [items, total] = await Promise.all([
+      this.prisma.personnelReport.findMany({
+        where,
+        orderBy: this.resolveOrderBy(query),
+        skip,
+        take,
+        select: {
+          id: true,
+          type: true,
+          subject: true,
+          content: true,
+          status: true,
+          createdAt: true,
+          user: {
+            select: {
+              minecraftUsername: true,
+              player: { select: { rpFirstName: true, rpLastName: true, grade: true } },
+            },
+          },
+        },
+      }),
       this.prisma.personnelReport.count({ where }),
     ]);
 

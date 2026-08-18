@@ -41,6 +41,15 @@ export class ReportsController {
     return this.reports.findMine(req.user.id, query);
   }
 
+  @Get('faction')
+  @UseGuards(AuthGuard)
+  faction(
+    @Req() req: Request & { user: { id: string } },
+    @Query() query: ListReportsQueryDto,
+  ) {
+    return this.reports.findByFaction(req.user.id, query);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard)
   one(
