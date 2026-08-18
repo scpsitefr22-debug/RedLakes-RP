@@ -11,6 +11,7 @@ import {
   Wrench,
   ClipboardList,
   Terminal,
+  Siren,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { MyReportsPanel } from "@/components/intranet/MyReportsPanel";
@@ -258,6 +259,17 @@ export function IntranetTerminal() {
       )}
 
       {factionSlug === "gouvernement" && <MunicipalAdvisory />}
+
+      {factionSlug === "police" && (
+        <FactionLog
+          color={theme.color}
+          title="Mains courantes actives"
+          icon={Siren}
+          onlyTypes={["INCIDENT"]}
+          emptyText="Aucune intervention consignée pour le moment."
+          footerText="Interventions du service — visibles par tout le RPD."
+        />
+      )}
 
       {factionSlug && <FactionLog color={theme.color} />}
 
