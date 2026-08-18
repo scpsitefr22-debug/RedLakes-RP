@@ -10,6 +10,7 @@ import { ThreatGauge } from "@/components/wiki/ThreatGauge";
 import { ClassificationStamp } from "@/components/wiki/ClassificationStamp";
 import { ScpAccessDenied } from "@/components/wiki/ScpAccessDenied";
 import { ClassifiedPlaceholder } from "@/components/wiki/ClassifiedPlaceholder";
+import { DeclassificationOverlay } from "@/components/wiki/DeclassificationOverlay";
 import { linkifyScpRefs } from "@/lib/scp-linkify";
 
 interface Props {
@@ -78,6 +79,7 @@ export default async function SCPDetailPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
+      <DeclassificationOverlay number={scp.number} />
       <nav className="mb-6 flex items-center gap-1 font-mono text-xs text-gray-600">
         <Link href="/wiki" className="hover:text-redlake-glow">
           Encyclopédie

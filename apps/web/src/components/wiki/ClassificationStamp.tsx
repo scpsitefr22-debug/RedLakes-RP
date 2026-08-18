@@ -19,7 +19,7 @@ export function ClassificationStamp({
   return (
     <div
       className={cn(
-        "pointer-events-none absolute right-4 top-4 rotate-[6deg] select-none rounded border-[3px] px-3 py-1 text-center font-mono text-[10px] font-black uppercase tracking-widest opacity-80 sm:text-xs",
+        "glitch absolute right-4 top-4 rotate-[6deg] cursor-default select-none rounded border-[3px] px-3 py-1 text-center font-mono text-[10px] font-black uppercase tracking-widest opacity-80 sm:text-xs",
         stampColor[scpClass]
       )}
     >
