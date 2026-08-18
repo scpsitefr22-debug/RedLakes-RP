@@ -2,6 +2,8 @@ import type { SCPClass } from "@/data/scp";
 import { API_URL } from "@/lib/api";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { WikiCatalog } from "@/components/wiki/WikiCatalog";
+import { TerminalSearch } from "@/components/wiki/TerminalSearch";
+import { RecentlyViewed } from "@/components/wiki/RecentlyViewed";
 
 export const metadata = {
   title: "Wiki SCP",
@@ -38,6 +40,9 @@ export default async function WikiPage() {
         title="Wiki SCP"
         description="Encyclopédie complète des objets, entités et phénomènes confinés. Chaque fiche contient historique, protocoles, journaux d'incidents et addendums."
       />
+
+      <TerminalSearch />
+      <RecentlyViewed />
 
       {scpObjects.length === 0 ? (
         <div className="hologram-border rounded-lg p-8 text-center text-gray-500">

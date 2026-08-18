@@ -11,6 +11,10 @@ import { ClassificationStamp } from "@/components/wiki/ClassificationStamp";
 import { ScpAccessDenied } from "@/components/wiki/ScpAccessDenied";
 import { ClassifiedPlaceholder } from "@/components/wiki/ClassifiedPlaceholder";
 import { DeclassificationOverlay } from "@/components/wiki/DeclassificationOverlay";
+import { RecordScpView } from "@/components/wiki/RecordScpView";
+import { DangerComparison } from "@/components/wiki/DangerComparison";
+import { PrintReportButton } from "@/components/wiki/PrintReportButton";
+import { ContainmentMap } from "@/components/wiki/ContainmentMap";
 import { linkifyScpRefs } from "@/lib/scp-linkify";
 
 interface Props {
@@ -38,6 +42,20 @@ type ScpFetchResult =
   | { status: "found"; scp: ApiScpDetail }
   | { status: "denied" }
   | { status: "not-found" };
+
+async function getThreatPercentile(currentSlug: string, currentLevel: number): Promise<number | null> {
+  try {
+    const res = await fetch(`${API_URL}/scp`, { next: { revalidate: 300 } });
+    if (!res.ok) return null;
+    const list: { slug: string; threatLevel: number }[] = await res.json();
+    const others = list.filter((s) => s.slug !== currentSlug);
+    if (others.length === 0) return null;
+    const lowerOrEqual = others.filter((s) => s.threatLevel <= currentLevel).length;
+    return Math.round((lowerOrEqual / others.length) * 100);
+  } catch {
+    return null;
+  }
+}
 
 async function getScpObject(slug: string): Promise<ScpFetchResult> {
   const cookieStore = await cookies();
@@ -76,21 +94,31 @@ export default async function SCPDetailPage({ params }: Props) {
   if (result.status === "denied") return <ScpAccessDenied />;
 
   const scp = result.scp;
+  const percentile = await getThreatPercentile(scp.number.toLowerCase(), scp.threatLevel);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <DeclassificationOverlay number={scp.number} />
-      <nav className="mb-6 flex items-center gap-1 font-mono text-xs text-gray-600">
-        <Link href="/wiki" className="hover:text-redlake-glow">
-          Encyclopédie
-        </Link>
-        <ChevronRight className="h-3 w-3" />
-        <Link href="/wiki" className="hover:text-redlake-glow">
-          Wiki SCP
-        </Link>
-        <ChevronRight className="h-3 w-3" />
-        <span className="text-gray-400">{scp.number}</span>
-      </nav>
+      <RecordScpView
+        slug={scp.number.toLowerCase()}
+        number={scp.number}
+        name={scp.name}
+        scpClass={scp.class}
+      />
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
+        <nav className="flex items-center gap-1 font-mono text-xs text-gray-600">
+          <Link href="/wiki" className="hover:text-redlake-glow">
+            Encyclopédie
+          </Link>
+          <ChevronRight className="h-3 w-3" />
+          <Link href="/wiki" className="hover:text-redlake-glow">
+            Wiki SCP
+          </Link>
+          <ChevronRight className="h-3 w-3" />
+          <span className="text-gray-400">{scp.number}</span>
+        </nav>
+        <PrintReportButton />
+      </div>
 
       <div className="relative mb-8 hologram-border rounded-lg p-8">
         <ClassificationStamp
@@ -108,6 +136,13 @@ export default async function SCPDetailPage({ params }: Props) {
         <h1 className="mb-4 max-w-[80%] text-4xl font-bold text-white">{scp.name}</h1>
         <p className="mb-4 text-gray-400">{linkifyScpRefs(scp.description, scp.number.toLowerCase())}</p>
         <ThreatGauge level={scp.threatLevel} scpClass={scp.class} />
+        {percentile !== null && (
+          <DangerComparison percentile={percentile} level={scp.threatLevel} />
+        )}
+      </div>
+
+      <div className="mb-8">
+        <ContainmentMap scpClass={scp.class} />
       </div>
 
       <div className="prose-redlake space-y-8">
