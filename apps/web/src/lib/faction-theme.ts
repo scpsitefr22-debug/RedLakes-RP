@@ -61,6 +61,12 @@ const FACTION_THEMES: Record<string, FactionTheme> = {
     color: "#4a0080",
     network: "SANS NOM",
   },
+  civil: {
+    label: "Civil & Ville",
+    tagline: "La vie continue à la surface. Rien à voir avec ce qui se passe sous terre.",
+    color: "#6b7280",
+    network: "RÉSEAU // VILLE DE REDLAKES",
+  },
 };
 
 export function getFactionTheme(slug: string | null | undefined): FactionTheme {

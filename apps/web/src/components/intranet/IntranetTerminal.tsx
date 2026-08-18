@@ -57,6 +57,12 @@ const SECTION_LINKS: Partial<Record<SiteSection, string>> = {
   overview: "/departements/site-12",
 };
 
+interface FactionGrade {
+  slug: string;
+  name: string;
+  tier: string;
+}
+
 export function IntranetTerminal() {
   const router = useRouter();
   const [player, setPlayer] = useState<PlayerProfile | null>(null);
@@ -67,6 +73,7 @@ export function IntranetTerminal() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [reportsRefresh, setReportsRefresh] = useState(0);
+  const [factionGrades, setFactionGrades] = useState<FactionGrade[]>([]);
 
   const load = useCallback(async () => {
     try {
@@ -77,6 +84,20 @@ export function IntranetTerminal() {
       }
       const profile = await apiFetch<PlayerProfile>("/players/me");
       setPlayer(profile);
+
+      const factionSlug = profile.factionInfo?.slug;
+      if (factionSlug && factionSlug !== "fondation") {
+        try {
+          const grades = await apiFetch<FactionGrade[]>(
+            `/grades?branch=${factionSlug}`,
+          );
+          setFactionGrades(
+            [...grades].sort((a, b) => Number(a.tier) - Number(b.tier)),
+          );
+        } catch {
+          setFactionGrades([]);
+        }
+      }
     } catch {
       router.replace("/connexion");
     } finally {
@@ -195,6 +216,34 @@ export function IntranetTerminal() {
             Ces accès reflètent votre grade in-game. Les transmissions Discord sont filtrées
             selon votre habilitation réelle.
           </p>
+        </section>
+      )}
+
+      {!isFondation && factionGrades.length > 0 && (
+        <section className="hologram-border rounded-lg p-6">
+          <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
+            <Shield className="h-5 w-5" style={{ color: theme.color }} />
+            Hiérarchie — {theme.label}
+          </h3>
+          <div className="space-y-1.5">
+            {factionGrades.map((g) => {
+              const isMine = g.name === player.grade;
+              return (
+                <div
+                  key={g.slug}
+                  className={cn(
+                    "flex items-center gap-3 rounded border px-3 py-1.5 font-mono text-xs",
+                    isMine ? "border-current" : "border-metal/40 text-gray-400",
+                  )}
+                  style={isMine ? { color: theme.color, background: `${theme.color}14` } : undefined}
+                >
+                  <span className="w-6 text-right text-gray-600">{g.tier}</span>
+                  <span>{g.name}</span>
+                  {isMine && <span className="ml-auto text-[10px]">← vous</span>}
+                </div>
+              );
+            })}
+          </div>
         </section>
       )}
 
