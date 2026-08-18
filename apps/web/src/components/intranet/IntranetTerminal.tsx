@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Wrench,
   ClipboardList,
+  Terminal,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { MyReportsPanel } from "@/components/intranet/MyReportsPanel";
@@ -18,6 +19,7 @@ import {
   SITE_SECTION_LABELS,
   type SiteSection,
 } from "@/lib/grade-access";
+import { getFactionTheme } from "@/lib/faction-theme";
 import { cn } from "@/lib/utils";
 
 type ReportType = "INCIDENT" | "AUTHORIZATION" | "MEMO" | "EQUIPMENT";
@@ -25,6 +27,7 @@ type ReportType = "INCIDENT" | "AUTHORIZATION" | "MEMO" | "EQUIPMENT";
 interface PlayerProfile {
   grade: string;
   faction: string;
+  factionInfo?: { slug: string; name: string; color: string | null } | null;
   gradeInfo?: { departmentRef?: { name: string } | null } | null;
   rpFirstName?: string | null;
   rpLastName?: string | null;
@@ -116,64 +119,84 @@ export function IntranetTerminal() {
   const departmentName = player.gradeInfo?.departmentRef?.name ?? null;
   const sections = getAccessibleSections(player.grade);
   const rpName = [player.rpFirstName, player.rpLastName].filter(Boolean).join(" ");
+  const factionSlug = player.factionInfo?.slug ?? null;
+  const theme = getFactionTheme(factionSlug);
+  const isFondation = factionSlug === "fondation";
 
   return (
     <div className="space-y-8">
-      <div className="hologram-border rounded-lg p-6">
+      <div
+        className="rounded-lg border p-6"
+        style={{ borderColor: `${theme.color}66`, background: `${theme.color}0d` }}
+      >
+        <p
+          className="mb-2 flex items-center gap-2 font-mono text-xs tracking-widest"
+          style={{ color: theme.color }}
+        >
+          <Terminal className="h-3 w-3" />
+          {theme.network}
+        </p>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-xs text-gray-600">SESSION ACTIVE</p>
             <h2 className="text-xl font-bold text-white">
               {rpName || player.user.minecraftUsername}
             </h2>
             <p className="text-sm text-gray-400">
-              {player.grade} — {player.faction}
+              {player.grade} — {theme.label}
             </p>
+            <p className="mt-2 max-w-md text-xs text-gray-500">{theme.tagline}</p>
           </div>
-          <div className="rounded border border-redlake/30 bg-redlake/10 px-4 py-2 text-center">
-            <p className="font-mono text-[10px] text-gray-500">DÉPARTEMENT</p>
-            <p className="font-mono text-lg font-bold text-redlake-glow">
-              {departmentName ?? "Aucun"}
-            </p>
-          </div>
+          {departmentName && (
+            <div
+              className="rounded border px-4 py-2 text-center"
+              style={{ borderColor: `${theme.color}4d`, background: `${theme.color}1a` }}
+            >
+              <p className="font-mono text-[10px] text-gray-500">DÉPARTEMENT</p>
+              <p className="font-mono text-lg font-bold" style={{ color: theme.color }}>
+                {departmentName}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      <section className="hologram-border rounded-lg p-6">
-        <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
-          <Shield className="h-5 w-5 text-redlake-glow" />
-          Secteurs accessibles (selon grade)
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {sections.map((s) => {
-            const href = SECTION_LINKS[s];
-            const label = SITE_SECTION_LABELS[s] ?? s;
-            if (href) {
+      {isFondation && (
+        <section className="hologram-border rounded-lg p-6">
+          <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
+            <Shield className="h-5 w-5 text-redlake-glow" />
+            Secteurs accessibles (selon grade)
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {sections.map((s) => {
+              const href = SECTION_LINKS[s];
+              const label = SITE_SECTION_LABELS[s] ?? s;
+              if (href) {
+                return (
+                  <Link
+                    key={s}
+                    href={href}
+                    className="rounded border border-redlake/30 bg-redlake/5 px-3 py-1.5 font-mono text-xs text-redlake-glow transition-colors hover:bg-redlake/15"
+                  >
+                    {label}
+                  </Link>
+                );
+              }
               return (
-                <Link
+                <span
                   key={s}
-                  href={href}
-                  className="rounded border border-redlake/30 bg-redlake/5 px-3 py-1.5 font-mono text-xs text-redlake-glow transition-colors hover:bg-redlake/15"
+                  className="rounded border border-metal/50 px-3 py-1.5 font-mono text-xs text-gray-500"
                 >
                   {label}
-                </Link>
+                </span>
               );
-            }
-            return (
-              <span
-                key={s}
-                className="rounded border border-metal/50 px-3 py-1.5 font-mono text-xs text-gray-500"
-              >
-                {label}
-              </span>
-            );
-          })}
-        </div>
-        <p className="mt-4 font-mono text-xs text-gray-600">
-          Ces accès reflètent votre grade in-game. Les transmissions Discord sont filtrées
-          selon votre habilitation réelle.
-        </p>
-      </section>
+            })}
+          </div>
+          <p className="mt-4 font-mono text-xs text-gray-600">
+            Ces accès reflètent votre grade in-game. Les transmissions Discord sont filtrées
+            selon votre habilitation réelle.
+          </p>
+        </section>
+      )}
 
       <div className="grid gap-8 lg:grid-cols-2">
         <section className="hologram-border rounded-lg p-6">
