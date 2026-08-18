@@ -14,12 +14,13 @@ import {
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { MyReportsPanel } from "@/components/intranet/MyReportsPanel";
+import { MunicipalAdvisory } from "@/components/intranet/MunicipalAdvisory";
 import {
   getAccessibleSections,
   SITE_SECTION_LABELS,
   type SiteSection,
 } from "@/lib/grade-access";
-import { getFactionTheme } from "@/lib/faction-theme";
+import { getFactionTheme, type FactionTheme } from "@/lib/faction-theme";
 import { cn } from "@/lib/utils";
 
 type ReportType = "INCIDENT" | "AUTHORIZATION" | "MEMO" | "EQUIPMENT";
@@ -34,12 +35,20 @@ interface PlayerProfile {
   user: { minecraftUsername: string; role: string };
 }
 
-const REPORT_TYPES: { value: ReportType; label: string; icon: typeof FileText }[] = [
-  { value: "INCIDENT", label: "Rapport d'incident", icon: AlertTriangle },
-  { value: "AUTHORIZATION", label: "Demande d'autorisation", icon: Shield },
-  { value: "MEMO", label: "Mémo interne", icon: FileText },
-  { value: "EQUIPMENT", label: "Réquisition matériel", icon: Wrench },
-];
+const REPORT_ICONS: Record<ReportType, typeof FileText> = {
+  INCIDENT: AlertTriangle,
+  AUTHORIZATION: Shield,
+  MEMO: FileText,
+  EQUIPMENT: Wrench,
+};
+
+function getReportTypes(theme: FactionTheme) {
+  return (Object.keys(REPORT_ICONS) as ReportType[]).map((value) => ({
+    value,
+    label: theme.reportLabels[value],
+    icon: REPORT_ICONS[value],
+  }));
+}
 
 const SECTION_LINKS: Partial<Record<SiteSection, string>> = {
   "transmissions-public": "/transmissions",
@@ -247,6 +256,8 @@ export function IntranetTerminal() {
         </section>
       )}
 
+      {factionSlug === "gouvernement" && <MunicipalAdvisory />}
+
       <div className="grid gap-8 lg:grid-cols-2">
         <section className="hologram-border rounded-lg p-6">
           <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
@@ -259,7 +270,7 @@ export function IntranetTerminal() {
           </p>
           <form onSubmit={submitReport} className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
-              {REPORT_TYPES.map((t) => (
+              {getReportTypes(theme).map((t) => (
                 <button
                   key={t.value}
                   type="button"
