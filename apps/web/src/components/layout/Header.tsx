@@ -14,8 +14,23 @@ import {
 import { siteConfig } from "@/config/site";
 import { GlobalSearch } from "./GlobalSearch";
 import { HeaderAuth } from "./HeaderAuth";
+import { usePlayerSession } from "@/hooks/usePlayerSession";
 
-const navItems = [
+const STAFF_ROLES = new Set(["STAFF", "ADMIN"]);
+
+interface NavChild {
+  label: string;
+  href: string;
+  staffOnly?: boolean;
+}
+
+interface NavItem {
+  label: string;
+  href: string;
+  children?: NavChild[];
+}
+
+const navItems: NavItem[] = [
   {
     label: "Encyclopédie",
     href: "/wiki",
@@ -50,17 +65,17 @@ const navItems = [
       { label: "Joueurs", href: "/joueurs" },
       { label: "Archives classifiées", href: "/archives" },
       { label: "CASSIE IA", href: "/cassie" },
-      { label: "CMS Lore (Staff)", href: "/lore/cms" },
-      { label: "Gestion Grades (Staff)", href: "/staff/grades" },
-      { label: "Gestion Factions (Staff)", href: "/staff/factions" },
-      { label: "Gestion Départements (Staff)", href: "/staff/departements" },
-      { label: "Gestion Équipes (Staff)", href: "/staff/teams" },
-      { label: "Gestion Joueurs (Staff)", href: "/staff/joueurs" },
-      { label: "Gestion Wiki SCP (Staff)", href: "/staff/scp" },
-      { label: "Gestion Personnages (Staff)", href: "/staff/personnages" },
-      { label: "Gestion Événements (Staff)", href: "/staff/evenements" },
-      { label: "Gestion Actualités (Staff)", href: "/staff/actualites" },
-      { label: "Gestion Carte (Staff)", href: "/staff/carte" },
+      { label: "CMS Lore (Staff)", href: "/lore/cms", staffOnly: true },
+      { label: "Gestion Grades (Staff)", href: "/staff/grades", staffOnly: true },
+      { label: "Gestion Factions (Staff)", href: "/staff/factions", staffOnly: true },
+      { label: "Gestion Départements (Staff)", href: "/staff/departements", staffOnly: true },
+      { label: "Gestion Équipes (Staff)", href: "/staff/teams", staffOnly: true },
+      { label: "Gestion Joueurs (Staff)", href: "/staff/joueurs", staffOnly: true },
+      { label: "Gestion Wiki SCP (Staff)", href: "/staff/scp", staffOnly: true },
+      { label: "Gestion Personnages (Staff)", href: "/staff/personnages", staffOnly: true },
+      { label: "Gestion Événements (Staff)", href: "/staff/evenements", staffOnly: true },
+      { label: "Gestion Actualités (Staff)", href: "/staff/actualites", staffOnly: true },
+      { label: "Gestion Carte (Staff)", href: "/staff/carte", staffOnly: true },
     ],
   },
 ];
@@ -69,6 +84,13 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const session = usePlayerSession();
+  const isStaff = STAFF_ROLES.has(session.role ?? "");
+
+  const visibleNavItems = navItems.map((item) => ({
+    ...item,
+    children: item.children?.filter((child) => !child.staffOnly || isStaff),
+  }));
 
   return (
     <>
@@ -90,7 +112,7 @@ export function Header() {
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <div
                 key={item.label}
                 className="relative"
@@ -159,7 +181,7 @@ export function Header() {
 
         {mobileOpen && (
           <nav className="border-t border-redlake/20 bg-black/95 px-4 py-4 lg:hidden">
-            {navItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <div key={item.label} className="mb-2">
                 <Link
                   href={item.href}
