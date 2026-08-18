@@ -5,6 +5,7 @@ import { CreateScpObjectDto, UpdateScpObjectDto } from './dto/scp-object.dto';
 import {
   filterByDepartment,
   isVisibleToDepartment,
+  redactAddendums,
 } from '../common/department-visibility';
 
 @Injectable()
@@ -16,7 +17,9 @@ export class ScpService {
       where: scpClass ? { class: scpClass } : undefined,
       orderBy: { number: 'asc' },
     });
-    return filterByDepartment(objects, departmentId);
+    return filterByDepartment(objects, departmentId).map((scp) =>
+      redactAddendums(scp, departmentId),
+    );
   }
 
   findAllAdmin() {
@@ -29,7 +32,7 @@ export class ScpService {
     if (!isVisibleToDepartment(scp.restrictedDepartmentIds, departmentId)) {
       throw new NotFoundException('Accès restreint à un autre département');
     }
-    return scp;
+    return redactAddendums(scp, departmentId);
   }
 
   findById(id: string) {

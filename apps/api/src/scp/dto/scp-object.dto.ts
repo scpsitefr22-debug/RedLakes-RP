@@ -23,6 +23,7 @@ class TestDto {
 class AddendumDto {
   author!: string;
   content!: string;
+  restrictedDepartmentIds?: string[];
 }
 
 export class CreateScpObjectDto {

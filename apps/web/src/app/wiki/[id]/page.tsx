@@ -1,9 +1,16 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { classColors, SCPClass } from "@/data/scp";
 import { Badge } from "@/components/ui/Badge";
 import { cn, formatDate } from "@/lib/utils";
-import { AlertTriangle, FlaskConical, FileText } from "lucide-react";
+import { AlertTriangle, FlaskConical, FileText, ChevronRight } from "lucide-react";
 import { API_URL } from "@/lib/api";
+import { ThreatGauge } from "@/components/wiki/ThreatGauge";
+import { ClassificationStamp } from "@/components/wiki/ClassificationStamp";
+import { ScpAccessDenied } from "@/components/wiki/ScpAccessDenied";
+import { ClassifiedPlaceholder } from "@/components/wiki/ClassifiedPlaceholder";
+import { linkifyScpRefs } from "@/lib/scp-linkify";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -19,37 +26,75 @@ interface ApiScpDetail {
   description: string;
   incidents: { date: string; summary: string }[];
   tests: { date: string; researcher: string; result: string }[];
-  addendums: { author: string; content: string }[];
+  addendums: { author: string; content?: string; redacted?: boolean }[];
   containmentCost: string | null;
   personnelAssigned: number | null;
   breachCount: number | null;
+  restrictedDepartmentIds: string[];
 }
 
-async function getScpObject(slug: string): Promise<ApiScpDetail | null> {
+type ScpFetchResult =
+  | { status: "found"; scp: ApiScpDetail }
+  | { status: "denied" }
+  | { status: "not-found" };
+
+async function getScpObject(slug: string): Promise<ScpFetchResult> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("redlakes_token")?.value;
+
   try {
-    const res = await fetch(`${API_URL}/scp/${slug}`, { next: { revalidate: 60 } });
-    if (!res.ok) return null;
-    return res.json();
+    const res = await fetch(`${API_URL}/scp/${slug}`, {
+      cache: "no-store",
+      headers: token ? { Cookie: `redlakes_token=${token}` } : undefined,
+    });
+    if (res.ok) return { status: "found", scp: await res.json() };
+    if (res.status === 404) {
+      const body = await res.json().catch(() => null);
+      if (typeof body?.message === "string" && body.message.includes("restreint")) {
+        return { status: "denied" };
+      }
+    }
+    return { status: "not-found" };
   } catch {
-    return null;
+    return { status: "not-found" };
   }
 }
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
-  const scp = await getScpObject(id);
-  if (!scp) return { title: "SCP introuvable" };
-  return { title: `${scp.number} — ${scp.name}` };
+  const result = await getScpObject(id);
+  if (result.status !== "found") return { title: "SCP introuvable" };
+  return { title: `${result.scp.number} — ${result.scp.name}` };
 }
 
 export default async function SCPDetailPage({ params }: Props) {
   const { id } = await params;
-  const scp = await getScpObject(id);
-  if (!scp) notFound();
+  const result = await getScpObject(id);
+
+  if (result.status === "not-found") notFound();
+  if (result.status === "denied") return <ScpAccessDenied />;
+
+  const scp = result.scp;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
-      <div className="mb-8 hologram-border rounded-lg p-8">
+      <nav className="mb-6 flex items-center gap-1 font-mono text-xs text-gray-600">
+        <Link href="/wiki" className="hover:text-redlake-glow">
+          Encyclopédie
+        </Link>
+        <ChevronRight className="h-3 w-3" />
+        <Link href="/wiki" className="hover:text-redlake-glow">
+          Wiki SCP
+        </Link>
+        <ChevronRight className="h-3 w-3" />
+        <span className="text-gray-400">{scp.number}</span>
+      </nav>
+
+      <div className="relative mb-8 hologram-border rounded-lg p-8">
+        <ClassificationStamp
+          scpClass={scp.class}
+          restricted={scp.restrictedDepartmentIds.length > 0}
+        />
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <span className="font-mono text-2xl font-bold text-redlake-glow">
             {scp.number}
@@ -58,8 +103,9 @@ export default async function SCPDetailPage({ params }: Props) {
             {scp.class}
           </Badge>
         </div>
-        <h1 className="mb-4 text-4xl font-bold text-white">{scp.name}</h1>
-        <p className="text-gray-400">{scp.description}</p>
+        <h1 className="mb-4 max-w-[80%] text-4xl font-bold text-white">{scp.name}</h1>
+        <p className="mb-4 text-gray-400">{linkifyScpRefs(scp.description, scp.number.toLowerCase())}</p>
+        <ThreatGauge level={scp.threatLevel} scpClass={scp.class} />
       </div>
 
       <div className="prose-redlake space-y-8">
@@ -68,7 +114,7 @@ export default async function SCPDetailPage({ params }: Props) {
             <AlertTriangle className="h-5 w-5 text-redlake-glow" />
             Protocole de confinement
           </h2>
-          <p>{scp.containment}</p>
+          <p>{linkifyScpRefs(scp.containment)}</p>
           <div className="mt-4 grid grid-cols-3 gap-4 font-mono text-sm">
             <div>
               <p className="text-gray-600">Coût mensuel</p>
@@ -87,7 +133,7 @@ export default async function SCPDetailPage({ params }: Props) {
 
         <section className="hologram-border rounded-lg p-6">
           <h2 className="mb-4 text-xl font-bold text-white">Historique</h2>
-          <p>{scp.history}</p>
+          <p>{linkifyScpRefs(scp.history)}</p>
         </section>
 
         {scp.incidents.length > 0 && (
@@ -102,7 +148,7 @@ export default async function SCPDetailPage({ params }: Props) {
                   <p className="font-mono text-xs text-redlake-glow">
                     {formatDate(inc.date)}
                   </p>
-                  <p className="text-gray-400">{inc.summary}</p>
+                  <p className="text-gray-400">{linkifyScpRefs(inc.summary)}</p>
                 </div>
               ))}
             </div>
@@ -121,7 +167,7 @@ export default async function SCPDetailPage({ params }: Props) {
                   <p className="font-mono text-xs text-gray-600">
                     {formatDate(test.date)} — {test.researcher}
                   </p>
-                  <p className="text-gray-400">{test.result}</p>
+                  <p className="text-gray-400">{linkifyScpRefs(test.result)}</p>
                 </div>
               ))}
             </div>
@@ -134,7 +180,11 @@ export default async function SCPDetailPage({ params }: Props) {
             {scp.addendums.map((add, i) => (
               <div key={i} className="mb-4 border-l-2 border-yellow-400/30 pl-4">
                 <p className="font-mono text-xs text-yellow-400">{add.author}</p>
-                <p className="text-gray-400">{add.content}</p>
+                {add.redacted ? (
+                  <ClassifiedPlaceholder />
+                ) : (
+                  <p className="text-gray-400">{linkifyScpRefs(add.content!)}</p>
+                )}
               </div>
             ))}
           </section>

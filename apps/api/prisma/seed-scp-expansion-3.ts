@@ -1,4 +1,5 @@
 import { PrismaClient, ScpClass } from '@prisma/client';
+import { withO5Restrictions } from './seed-addendum-restrictions';
 
 const prisma = new PrismaClient();
 
@@ -13,7 +14,7 @@ interface ScpSeed {
   description: string;
   incidents: { date: string; summary: string }[];
   tests: { date: string; researcher: string; result: string }[];
-  addendums: { author: string; content: string }[];
+  addendums: { author: string; content: string; restrictedDepartmentIds?: string[] }[];
   containmentCost?: string;
   personnelAssigned?: number;
   breachCount?: number;
@@ -1249,7 +1250,8 @@ const entries: ScpSeed[] = [
 ];
 
 export async function seedScpExpansion3() {
-  for (const scp of entries) {
+  const patched = await withO5Restrictions(prisma, entries);
+  for (const scp of patched) {
     const { slug, incidents, tests, addendums, ...rest } = scp;
     await prisma.scpObject.upsert({
       where: { slug },
