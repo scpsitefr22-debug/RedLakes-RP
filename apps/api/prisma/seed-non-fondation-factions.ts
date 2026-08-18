@@ -137,7 +137,7 @@ function slugify(text: string): string {
 }
 
 export async function seedNonFondationFactions() {
-  await prisma.faction.upsert({
+  const civilFaction = await prisma.faction.upsert({
     where: { slug: 'civil' },
     update: {},
     create: {
@@ -151,6 +151,19 @@ export async function seedNonFondationFactions() {
       objectives: [],
     },
   });
+
+  // Player.faction ("Civil") est un texte libre historique qui ne
+  // correspondait a aucune Faction avant ce script — on rattache
+  // maintenant factionId pour que ces joueurs profitent du meme systeme
+  // que les autres factions (cf. backfill-player-factions.ts, qui ne
+  // pouvait pas resoudre "Civil" tant que cette Faction n'existait pas).
+  const civilBackfill = await prisma.player.updateMany({
+    where: { faction: 'Civil', factionId: null },
+    data: { factionId: civilFaction.id },
+  });
+  if (civilBackfill.count > 0) {
+    console.log(`Joueurs "Civil" rattachés à la Faction : ${civilBackfill.count}`);
+  }
 
   let departmentCount = 0;
   let gradeCount = 0;
