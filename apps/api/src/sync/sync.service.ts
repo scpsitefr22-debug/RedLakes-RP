@@ -9,7 +9,7 @@ import { DiscordService } from './discord.service';
 import { SyncRoleDto } from './dto/sync-role.dto';
 import { DiscordLinkDto } from './dto/discord-link.dto';
 import { SyncDiscordGradeDto } from './dto/sync-discord-grade.dto';
-import { PersonnelReportStatus } from '@prisma/client';
+import { AssignmentEntityType, PersonnelReportStatus } from '@prisma/client';
 import { GradesService } from '../grades/grades.service';
 import { FactionsService } from '../factions/factions.service';
 
@@ -25,13 +25,53 @@ export class SyncService {
   /** Resout le nom d'un grade en texte libre vers le catalogue Grade. */
   private async resolveGrade(name: string) {
     const grade = await this.grades.findByName(name);
-    return { gradeId: grade?.id ?? null };
+    return {
+      gradeId: grade?.id ?? null,
+      departmentRefId: grade?.departmentRefId ?? null,
+    };
   }
 
   /** Resout un nom de faction en texte libre vers le catalogue Faction. */
   private async resolveFactionId(name: string | undefined) {
     const faction = await this.factions.findByName(name ?? 'Civil');
     return faction?.id ?? null;
+  }
+
+  private async departmentRefIdForGrade(
+    gradeId: string | null,
+  ): Promise<string | null> {
+    if (!gradeId) return null;
+    const grade = await this.prisma.grade.findUnique({
+      where: { id: gradeId },
+      select: { departmentRefId: true },
+    });
+    return grade?.departmentRefId ?? null;
+  }
+
+  /**
+   * Journalise un changement de faction/departement dans PlayerAssignment
+   * (historique de carriere) — ferme l'affectation precedente (endedAt) et
+   * ouvre la nouvelle. No-op si rien n'a change.
+   */
+  private async recordAssignmentChange(
+    playerId: string,
+    entityType: AssignmentEntityType,
+    previousEntityId: string | null,
+    newEntityId: string | null,
+  ) {
+    if (previousEntityId === newEntityId) return;
+    const now = new Date();
+    if (previousEntityId) {
+      await this.prisma.playerAssignment.updateMany({
+        where: { playerId, entityType, entityId: previousEntityId, endedAt: null },
+        data: { endedAt: now },
+      });
+    }
+    if (newEntityId) {
+      await this.prisma.playerAssignment.create({
+        data: { playerId, entityType, entityId: newEntityId, startedAt: now },
+      });
+    }
   }
 
   async syncRole(dto: SyncRoleDto) {
@@ -41,6 +81,19 @@ export class SyncService {
       `offline-${username.toLowerCase().replace(/[^a-z0-9_]/g, '_')}`;
     const resolved = await this.resolveGrade(dto.grade);
     const factionId = await this.resolveFactionId(dto.faction);
+
+    // Capture l'etat AVANT ecriture — l'upsert ci-dessous peut creer le
+    // joueur avec le grade/faction deja resolus, ce qui rendrait toute
+    // comparaison "avant/apres" faite apres coup invalide pour un nouveau
+    // joueur (il n'y aurait alors jamais d'affectation initiale journalisee).
+    const existingPlayer = await this.prisma.user.findUnique({
+      where: { minecraftUuid: uuid },
+      include: { player: true },
+    });
+    const previousFactionIdSnapshot = existingPlayer?.player?.factionId ?? null;
+    const previousDepartmentRefIdSnapshot = await this.departmentRefIdForGrade(
+      existingPlayer?.player?.gradeId ?? null,
+    );
 
     const user = await this.prisma.user.upsert({
       where: { minecraftUuid: uuid },
@@ -100,6 +153,19 @@ export class SyncService {
         },
       });
     }
+
+    await this.recordAssignmentChange(
+      player.id,
+      AssignmentEntityType.FACTION,
+      previousFactionIdSnapshot,
+      player.factionId ?? null,
+    );
+    await this.recordAssignmentChange(
+      player.id,
+      AssignmentEntityType.DEPARTMENT,
+      previousDepartmentRefIdSnapshot,
+      resolved.departmentRefId,
+    );
 
     if (user.discordId) {
       await this.discord.syncMemberProfile({
@@ -271,6 +337,9 @@ export class SyncService {
       };
     }
 
+    const previousDepartmentRefId = await this.departmentRefIdForGrade(
+      user.player.gradeId,
+    );
     const resolved = await this.resolveGrade(dto.grade);
     const player = await this.prisma.player.update({
       where: { id: user.player.id },
@@ -280,6 +349,13 @@ export class SyncService {
         roleUpdatedAt: new Date(),
       },
     });
+
+    await this.recordAssignmentChange(
+      player.id,
+      AssignmentEntityType.DEPARTMENT,
+      previousDepartmentRefId,
+      resolved.departmentRefId,
+    );
 
     await this.discord.notifyRoleChange({
       minecraftUsername: user.minecraftUsername ?? 'Joueur',

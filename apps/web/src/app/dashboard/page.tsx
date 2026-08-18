@@ -22,6 +22,7 @@ import { siteConfig } from "@/config/site";
 import { findGradeMeta } from "@/data/rp-grades";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
 import { MetricCard } from "@/components/ui/MetricCard";
+import { CareerTimeline } from "@/components/dashboard/CareerTimeline";
 import { getFactionTheme } from "@/lib/faction-theme";
 
 interface PlayerData {
@@ -450,6 +451,8 @@ export default function DashboardPage() {
         <MetricCard icon={Award} label="Réputation" value={`${player.reputation}/100`} />
         <MetricCard icon={AlertTriangle} label="Sanctions" value={player.sanctions} />
       </div>
+
+      <CareerTimeline />
 
       <div className="grid gap-6 md:grid-cols-2">
         <section className="panel-flat rounded-lg p-6">

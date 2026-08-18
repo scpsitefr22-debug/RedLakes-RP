@@ -35,6 +35,12 @@ export class PlayersController {
     return this.players.getDashboard(req.user.id);
   }
 
+  @Get('me/career')
+  @UseGuards(AuthGuard)
+  getMyCareer(@Req() req: Request & { user: { id: string } }) {
+    return this.players.getCareerHistory(req.user.id);
+  }
+
   @Patch('me')
   @UseGuards(AuthGuard)
   async updateMe(

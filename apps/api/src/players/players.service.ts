@@ -245,4 +245,55 @@ export class PlayersService {
 
     return this.formatProfile(player);
   }
+
+  /**
+   * Historique de carriere reel — alimente par PlayerAssignment, ecrit
+   * automatiquement a chaque changement de faction/departement (voir
+   * SyncService.recordAssignmentChange). Retourne un intitule lisible au
+   * lieu du cuid brut de l'entite.
+   */
+  async getCareerHistory(userId: string) {
+    const player = await this.prisma.player.findUnique({ where: { userId } });
+    if (!player) throw new NotFoundException('Profil joueur introuvable');
+
+    const assignments = await this.prisma.playerAssignment.findMany({
+      where: { playerId: player.id },
+      orderBy: { startedAt: 'desc' },
+    });
+
+    const factionIds = assignments
+      .filter((a) => a.entityType === 'FACTION')
+      .map((a) => a.entityId);
+    const departmentIds = assignments
+      .filter((a) => a.entityType === 'DEPARTMENT')
+      .map((a) => a.entityId);
+
+    const [factions, departments] = await Promise.all([
+      factionIds.length
+        ? this.prisma.faction.findMany({
+            where: { id: { in: factionIds } },
+            select: { id: true, name: true },
+          })
+        : [],
+      departmentIds.length
+        ? this.prisma.department.findMany({
+            where: { id: { in: departmentIds } },
+            select: { id: true, name: true },
+          })
+        : [],
+    ]);
+    const factionNames = new Map(factions.map((f) => [f.id, f.name]));
+    const departmentNames = new Map(departments.map((d) => [d.id, d.name]));
+
+    return assignments.map((a) => ({
+      id: a.id,
+      entityType: a.entityType,
+      label:
+        a.entityType === 'FACTION'
+          ? (factionNames.get(a.entityId) ?? 'Faction inconnue')
+          : (departmentNames.get(a.entityId) ?? 'Département inconnu'),
+      startedAt: a.startedAt,
+      endedAt: a.endedAt,
+    }));
+  }
 }
