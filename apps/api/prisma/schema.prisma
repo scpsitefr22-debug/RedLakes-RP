@@ -78,6 +78,7 @@ model User {
   teamsLed         Team[]                 @relation("TeamChef")
   sanctionsIssued  Sanction[]             @relation("SanctionIssuedBy")
   sanctionsLifted  Sanction[]             @relation("SanctionLiftedBy")
+  scpProposals     ScpObject[]
 }
 
 model Session {
@@ -249,6 +250,7 @@ enum PlatformEntityType {
   LORE_ARTICLE
   PLAYER
   USER
+  SCP_OBJECT
 }
 
 enum AuditAction {
@@ -543,9 +545,15 @@ enum ScpClass {
   Apollyon
 }
 
+enum ScpProposalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model ScpObject {
-  id                      String   @id @default(cuid())
-  slug                    String   @unique
+  id                      String            @id @default(cuid())
+  slug                    String            @unique
   number                  String
   name                    String
   class                   ScpClass
@@ -554,17 +562,24 @@ model ScpObject {
   history                 String
   description             String
   image                   String?
-  incidents               Json     @default("[]")
-  tests                   Json     @default("[]")
-  addendums               Json     @default("[]")
+  incidents               Json              @default("[]")
+  tests                   Json              @default("[]")
+  addendums               Json              @default("[]")
   containmentCost         String?
   personnelAssigned       Int?
   breachCount             Int?
-  restrictedDepartmentIds String[] @default([])
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  restrictedDepartmentIds String[]          @default([])
+  status                  ScpProposalStatus @default(APPROVED)
+  submittedById           String?
+  submittedBy             User?             @relation(fields: [submittedById], references: [id], onDelete: SetNull)
+  staffNote               String?
+  reviewedBy              String?
+  reviewedAt              DateTime?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
 
   @@index([class])
+  @@index([status])
 }
 
 // ─── REDLAKES CORE — personnages importants (Personnages) ──────────────────

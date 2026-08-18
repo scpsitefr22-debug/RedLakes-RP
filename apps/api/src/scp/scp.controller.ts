@@ -12,9 +12,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { ScpClass, UserRole } from '@prisma/client';
+import { ScpClass, ScpProposalStatus, UserRole } from '@prisma/client';
 import { ScpService } from './scp.service';
 import { CreateScpObjectDto, UpdateScpObjectDto } from './dto/scp-object.dto';
+import { ProposeScpDto } from './dto/propose-scp.dto';
+import { ReviewScpDto } from './dto/review-scp.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -22,6 +24,7 @@ import { Roles } from '../auth/roles.decorator';
 import { PlayersService } from '../players/players.service';
 
 type OptionalAuthRequest = Request & { user?: { id: string } };
+type AuthedRequest = Request & { user: { id: string } };
 
 @Controller('scp')
 export class ScpController {
@@ -46,8 +49,8 @@ export class ScpController {
   @Get('cms')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
-  findAllAdmin() {
-    return this.scp.findAllAdmin();
+  findAllAdmin(@Query('status') status?: ScpProposalStatus) {
+    return this.scp.findAllAdmin(status);
   }
 
   @Get('by-id/:id')
@@ -57,6 +60,12 @@ export class ScpController {
     const scp = await this.scp.findById(id);
     if (!scp) throw new NotFoundException('Objet SCP introuvable');
     return scp;
+  }
+
+  @Post('propose')
+  @UseGuards(AuthGuard)
+  propose(@Req() req: AuthedRequest, @Body() dto: ProposeScpDto) {
+    return this.scp.propose(req.user.id, dto);
   }
 
   @Get(':slug')
@@ -72,6 +81,17 @@ export class ScpController {
   @Roles(UserRole.STAFF, UserRole.ADMIN)
   create(@Body() dto: CreateScpObjectDto) {
     return this.scp.create(dto);
+  }
+
+  @Patch(':id/review')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  review(
+    @Req() req: AuthedRequest,
+    @Param('id') id: string,
+    @Body() dto: ReviewScpDto,
+  ) {
+    return this.scp.review(id, req.user.id, dto.status, dto.staffNote);
   }
 
   @Patch(':id')
