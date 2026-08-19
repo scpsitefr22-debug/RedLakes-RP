@@ -4,6 +4,7 @@ import {
   NotFoundException,
   Param,
   Patch,
+  Post,
   Body,
   Req,
   UseGuards,
@@ -39,6 +40,27 @@ export class PlayersController {
   @UseGuards(AuthGuard)
   getMyCareer(@Req() req: Request & { user: { id: string } }) {
     return this.players.getCareerHistory(req.user.id);
+  }
+
+  @Get('me/characters')
+  @UseGuards(AuthGuard)
+  listMyCharacters(@Req() req: Request & { user: { id: string } }) {
+    return this.players.listCharacters(req.user.id);
+  }
+
+  @Post('me/characters')
+  @UseGuards(AuthGuard)
+  createCharacter(@Req() req: Request & { user: { id: string } }) {
+    return this.players.createCharacter(req.user.id);
+  }
+
+  @Post('me/characters/:id/activate')
+  @UseGuards(AuthGuard)
+  activateCharacter(
+    @Req() req: Request & { user: { id: string } },
+    @Param('id') id: string,
+  ) {
+    return this.players.activateCharacter(req.user.id, id);
   }
 
   @Patch('me')

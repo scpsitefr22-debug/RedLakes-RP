@@ -1,7 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Grade, Faction, Team } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+
+const MAX_CHARACTERS_PER_ACCOUNT = 5;
 
 @Injectable()
 export class PlayersService {
@@ -321,5 +327,61 @@ export class PlayersService {
       startedAt: a.startedAt,
       endedAt: a.endedAt,
     }));
+  }
+
+  /** Tous les personnages d'un compte, avec lequel est actuellement actif. */
+  async listCharacters(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { activeCharacterId: true },
+    });
+
+    const characters = await this.prisma.player.findMany({
+      where: { userId },
+      include: { factionInfo: true, gradeInfo: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return characters.map((c) => ({
+      id: c.id,
+      grade: c.grade,
+      gradeInfo: c.gradeInfo,
+      faction: c.faction,
+      factionInfo: c.factionInfo,
+      rpFirstName: c.rpFirstName,
+      rpLastName: c.rpLastName,
+      createdAt: c.createdAt,
+      isActive: c.id === user?.activeCharacterId,
+    }));
+  }
+
+  /** Nouveau personnage — demarre Civil, comme un compte flambant neuf. */
+  async createCharacter(userId: string) {
+    const count = await this.prisma.player.count({ where: { userId } });
+    if (count >= MAX_CHARACTERS_PER_ACCOUNT) {
+      throw new BadRequestException(
+        `Maximum ${MAX_CHARACTERS_PER_ACCOUNT} personnages par compte`,
+      );
+    }
+    return this.prisma.player.create({
+      data: { userId, grade: 'Civil', faction: 'Civil' },
+    });
+  }
+
+  /** Change le personnage actif du compte (doit lui appartenir). */
+  async activateCharacter(userId: string, characterId: string) {
+    const character = await this.prisma.player.findUnique({
+      where: { id: characterId },
+    });
+    if (!character || character.userId !== userId) {
+      throw new NotFoundException('Personnage introuvable');
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { activeCharacterId: characterId },
+    });
+
+    return this.getDashboard(userId);
   }
 }

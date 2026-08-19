@@ -23,6 +23,7 @@ import { findGradeMeta } from "@/data/rp-grades";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { CareerTimeline } from "@/components/dashboard/CareerTimeline";
+import { CharacterSwitcher } from "@/components/dashboard/CharacterSwitcher";
 import { getFactionTheme } from "@/lib/faction-theme";
 
 interface PlayerData {
@@ -307,6 +308,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <CharacterSwitcher onSwitched={refreshProfile} />
 
       {(() => {
         const meta = findGradeMeta(player.grade);
