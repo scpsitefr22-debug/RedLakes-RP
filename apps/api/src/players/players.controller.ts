@@ -50,8 +50,11 @@ export class PlayersController {
 
   @Post('me/characters')
   @UseGuards(AuthGuard)
-  createCharacter(@Req() req: Request & { user: { id: string } }) {
-    return this.players.createCharacter(req.user.id);
+  createCharacter(
+    @Req() req: Request & { user: { id: string } },
+    @Body() dto: UpdatePlayerProfileDto,
+  ) {
+    return this.players.createCharacter(req.user.id, dto);
   }
 
   @Post('me/characters/:id/activate')

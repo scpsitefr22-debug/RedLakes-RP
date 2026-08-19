@@ -356,7 +356,10 @@ export class PlayersService {
   }
 
   /** Nouveau personnage — demarre Civil, comme un compte flambant neuf. */
-  async createCharacter(userId: string) {
+  async createCharacter(
+    userId: string,
+    data: { rpFirstName?: string; rpLastName?: string } = {},
+  ) {
     const count = await this.prisma.player.count({ where: { userId } });
     if (count >= MAX_CHARACTERS_PER_ACCOUNT) {
       throw new BadRequestException(
@@ -364,7 +367,13 @@ export class PlayersService {
       );
     }
     return this.prisma.player.create({
-      data: { userId, grade: 'Civil', faction: 'Civil' },
+      data: {
+        userId,
+        grade: 'Civil',
+        faction: 'Civil',
+        rpFirstName: data.rpFirstName || null,
+        rpLastName: data.rpLastName || null,
+      },
     });
   }
 

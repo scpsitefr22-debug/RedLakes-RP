@@ -20,6 +20,9 @@ export function CharacterSwitcher({ onSwitched }: { onSwitched?: () => void }) {
   const [characters, setCharacters] = useState<Character[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [newFirstName, setNewFirstName] = useState("");
+  const [newLastName, setNewLastName] = useState("");
 
   const load = () => {
     apiFetch<Character[]>("/players/me/characters")
@@ -47,7 +50,16 @@ export function CharacterSwitcher({ onSwitched }: { onSwitched?: () => void }) {
     setBusy(true);
     setError(null);
     try {
-      await apiFetch("/players/me/characters", { method: "POST" });
+      await apiFetch("/players/me/characters", {
+        method: "POST",
+        body: JSON.stringify({
+          rpFirstName: newFirstName.trim() || undefined,
+          rpLastName: newLastName.trim() || undefined,
+        }),
+      });
+      setNewFirstName("");
+      setNewLastName("");
+      setCreating(false);
       load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Impossible de créer un personnage.");
@@ -105,15 +117,65 @@ export function CharacterSwitcher({ onSwitched }: { onSwitched?: () => void }) {
         })}
       </div>
 
-      <button
-        type="button"
-        onClick={createCharacter}
-        disabled={busy || characters.length >= 5}
-        className="mt-4 flex items-center gap-2 rounded border border-metal px-4 py-2 font-mono text-xs text-gray-400 transition-colors hover:border-redlake hover:text-white disabled:opacity-50"
-      >
-        <UserPlus className="h-3.5 w-3.5" />
-        {characters.length >= 5 ? "Maximum atteint (5)" : "Créer un nouveau personnage"}
-      </button>
+      {creating ? (
+        <div className="mt-4 rounded border border-metal p-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block font-mono text-xs text-gray-500">Prénom RP</span>
+              <input
+                type="text"
+                value={newFirstName}
+                onChange={(e) => setNewFirstName(e.target.value)}
+                maxLength={32}
+                placeholder="Jean"
+                className="w-full rounded border border-metal bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-redlake/50"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1 block font-mono text-xs text-gray-500">Nom RP</span>
+              <input
+                type="text"
+                value={newLastName}
+                onChange={(e) => setNewLastName(e.target.value)}
+                maxLength={32}
+                placeholder="Dupont"
+                className="w-full rounded border border-metal bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-redlake/50"
+              />
+            </label>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              onClick={createCharacter}
+              disabled={busy}
+              className="rounded border border-redlake/40 bg-redlake/10 px-4 py-2 font-mono text-xs text-redlake-glow hover:text-white disabled:opacity-50"
+            >
+              {busy ? "Création…" : "Confirmer"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setCreating(false)}
+              disabled={busy}
+              className="rounded border border-metal px-4 py-2 font-mono text-xs text-gray-500 hover:text-white"
+            >
+              Annuler
+            </button>
+          </div>
+          <p className="mt-2 font-mono text-[10px] text-gray-600">
+            Optionnel — vous pouvez aussi laisser vide et renseigner l&apos;identité plus tard.
+          </p>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setCreating(true)}
+          disabled={busy || characters.length >= 5}
+          className="mt-4 flex items-center gap-2 rounded border border-metal px-4 py-2 font-mono text-xs text-gray-400 transition-colors hover:border-redlake hover:text-white disabled:opacity-50"
+        >
+          <UserPlus className="h-3.5 w-3.5" />
+          {characters.length >= 5 ? "Maximum atteint (5)" : "Créer un nouveau personnage"}
+        </button>
+      )}
       {error && <p className="mt-2 font-mono text-xs text-redlake-glow">{error}</p>}
       <p className="mt-3 font-mono text-[10px] text-gray-600">
         Activer un personnage change votre faction/grade partout sur le site
