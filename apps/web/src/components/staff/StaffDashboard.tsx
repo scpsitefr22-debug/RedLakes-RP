@@ -49,7 +49,7 @@ interface PersonnelReport {
   user: {
     minecraftUsername: string | null;
     discordUsername: string | null;
-    player?: { grade: string; rpFirstName?: string | null; rpLastName?: string | null };
+    activeCharacter?: { grade: string; rpFirstName?: string | null; rpLastName?: string | null };
   };
 }
 
@@ -328,7 +328,7 @@ export function StaffDashboard() {
         ) : (
           <div className="space-y-4">
             {reports.map((r) => {
-              const p = r.user.player;
+              const p = r.user.activeCharacter;
               const rpName = p
                 ? [p.rpFirstName, p.rpLastName].filter(Boolean).join(" ")
                 : null;

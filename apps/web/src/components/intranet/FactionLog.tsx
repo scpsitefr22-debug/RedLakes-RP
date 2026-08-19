@@ -13,7 +13,7 @@ interface FactionReport {
   createdAt: string;
   user: {
     minecraftUsername: string | null;
-    player: { rpFirstName: string | null; rpLastName: string | null; grade: string } | null;
+    activeCharacter: { rpFirstName: string | null; rpLastName: string | null; grade: string } | null;
   };
 }
 
@@ -71,8 +71,8 @@ export function FactionLog({
       ) : (
         <div className="space-y-3">
           {reports.map((r) => {
-            const rpName = r.user.player
-              ? [r.user.player.rpFirstName, r.user.player.rpLastName]
+            const rpName = r.user.activeCharacter
+              ? [r.user.activeCharacter.rpFirstName, r.user.activeCharacter.rpLastName]
                   .filter(Boolean)
                   .join(" ")
               : "";
@@ -95,7 +95,7 @@ export function FactionLog({
                 <p className="mt-1 line-clamp-2 text-xs text-gray-400">{r.content}</p>
                 <p className="mt-1 font-mono text-[10px] text-gray-600">
                   {displayName}
-                  {r.user.player?.grade ? ` — ${r.user.player.grade}` : ""}
+                  {r.user.activeCharacter?.grade ? ` — ${r.user.activeCharacter.grade}` : ""}
                 </p>
               </div>
             );
