@@ -27,7 +27,22 @@ import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
 import { EntityTimeline } from "@/components/platform/EntityTimeline";
 import { EntityComments } from "@/components/platform/EntityComments";
 import { StaffAuditFeed } from "@/components/staff/StaffAuditFeed";
+import { NavTile } from "@/components/staff/NavTile";
+import { MetricCard } from "@/components/ui/MetricCard";
 import { cn } from "@/lib/utils";
+
+const MANAGEMENT_LINKS = [
+  { icon: Shield, label: "Gestion des grades", caption: "Catalogue de grades", href: "/staff/grades" },
+  { icon: Landmark, label: "Gestion des factions", caption: "Catalogue de factions", href: "/staff/factions" },
+  { icon: Building2, label: "Gestion des départements", caption: "Catalogue de départements", href: "/staff/departements" },
+  { icon: Users, label: "Gestion des équipes", caption: "Équipes de terrain, FIM", href: "/staff/teams" },
+  { icon: UserCog, label: "Gestion des joueurs", caption: "Sanctions, affectations", href: "/staff/joueurs" },
+  { icon: FlaskConical, label: "Gestion du wiki SCP", caption: "Objets, classes, incidents", href: "/staff/scp" },
+  { icon: User, label: "Gestion des personnages", caption: "Fiches narratives", href: "/staff/personnages" },
+  { icon: Zap, label: "Gestion des événements", caption: "Brèches, invasions, crises", href: "/staff/evenements" },
+  { icon: Newspaper, label: "Gestion des actualités", caption: "Articles, mises à jour", href: "/staff/actualites" },
+  { icon: MapPin, label: "Gestion de la carte", caption: "Emplacements, coordonnées", href: "/staff/carte" },
+];
 
 interface Application {
   id: string;
@@ -173,93 +188,15 @@ export function StaffDashboard() {
         />
       </div>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-        <div className="hologram-border rounded-lg p-5">
-          <ClipboardList className="mb-2 h-5 w-5 text-redlake-glow" />
-          <p className="font-mono text-2xl font-bold text-white">{applications.length}</p>
-          <p className="text-xs text-gray-600">Candidatures en attente</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <FileText className="mb-2 h-5 w-5 text-redlake-glow" />
-          <p className="font-mono text-2xl font-bold text-white">{reports.length}</p>
-          <p className="text-xs text-gray-600">Rapports RP à traiter</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <Users className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/joueurs" className="font-mono text-sm text-redlake-glow hover:underline">
-            Registre personnel →
-          </Link>
-          <p className="text-xs text-gray-600">Base joueurs</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <Shield className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/grades" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion des grades →
-          </Link>
-          <p className="text-xs text-gray-600">Catalogue de grades</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <Landmark className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/factions" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion des factions →
-          </Link>
-          <p className="text-xs text-gray-600">Catalogue de factions</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <Building2 className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/departements" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion des départements →
-          </Link>
-          <p className="text-xs text-gray-600">Catalogue de départements</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <Users className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/teams" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion des équipes →
-          </Link>
-          <p className="text-xs text-gray-600">Équipes de terrain, FIM</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <UserCog className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/joueurs" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion des joueurs →
-          </Link>
-          <p className="text-xs text-gray-600">Sanctions, affectations</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <FlaskConical className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/scp" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion du wiki SCP →
-          </Link>
-          <p className="text-xs text-gray-600">Objets, classes, incidents</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <User className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/personnages" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion des personnages →
-          </Link>
-          <p className="text-xs text-gray-600">Fiches narratives</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <Zap className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/evenements" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion des événements →
-          </Link>
-          <p className="text-xs text-gray-600">Brèches, invasions, crises</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <Newspaper className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/actualites" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion des actualités →
-          </Link>
-          <p className="text-xs text-gray-600">Articles, mises à jour</p>
-        </div>
-        <div className="hologram-border rounded-lg p-5">
-          <MapPin className="mb-2 h-5 w-5 text-redlake-glow" />
-          <Link href="/staff/carte" className="font-mono text-sm text-redlake-glow hover:underline">
-            Gestion de la carte →
-          </Link>
-          <p className="text-xs text-gray-600">Emplacements, coordonnées</p>
-        </div>
+        <MetricCard icon={ClipboardList} value={applications.length} label="Candidatures en attente" />
+        <MetricCard icon={FileText} value={reports.length} label="Rapports RP à traiter" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+        <NavTile icon={Users} label="Registre personnel" caption="Base joueurs" href="/joueurs" />
+        {MANAGEMENT_LINKS.map((link) => (
+          <NavTile key={link.href} {...link} />
+        ))}
       </div>
 
       <section className="hologram-border rounded-lg p-6">
