@@ -48,8 +48,45 @@ export class CharactersService {
     });
   }
 
-  update(id: string, dto: UpdateCharacterDto) {
+  async update(
+    id: string,
+    dto: UpdateCharacterDto,
+    editorId?: string,
+    editorLabel?: string,
+  ) {
+    const before = await this.prisma.character.findUnique({ where: { id } });
+    if (!before) throw new NotFoundException('Personnage introuvable');
+
+    await this.prisma.characterRevision.create({
+      data: {
+        characterId: before.id,
+        name: before.name,
+        title: before.title,
+        faction: before.faction,
+        biography: before.biography,
+        quotes: before.quotes,
+        history: before.history,
+        portrait: before.portrait,
+        editedById: editorId,
+        editedByLabel: editorLabel,
+      },
+    });
+
     return this.prisma.character.update({ where: { id }, data: dto });
+  }
+
+  /** Historique des révisions d'un personnage — la plus récente d'abord */
+  async listRevisions(characterId: string) {
+    const character = await this.prisma.character.findUnique({
+      where: { id: characterId },
+      select: { id: true },
+    });
+    if (!character) throw new NotFoundException('Personnage introuvable');
+
+    return this.prisma.characterRevision.findMany({
+      where: { characterId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   remove(id: string) {

@@ -21,6 +21,9 @@ import { Roles } from '../auth/roles.decorator';
 import { PlayersService } from '../players/players.service';
 
 type OptionalAuthRequest = Request & { user?: { id: string } };
+type AuthedRequest = Request & {
+  user: { id: string; minecraftUsername?: string; discordUsername?: string };
+};
 
 @Controller('characters')
 export class CharactersController {
@@ -76,8 +79,20 @@ export class CharactersController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
-  update(@Param('id') id: string, @Body() dto: UpdateCharacterDto) {
-    return this.characters.update(id, dto);
+  update(
+    @Req() req: AuthedRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateCharacterDto,
+  ) {
+    const editorLabel = req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    return this.characters.update(id, dto, req.user.id, editorLabel);
+  }
+
+  @Get(':id/revisions')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  listRevisions(@Param('id') id: string) {
+    return this.characters.listRevisions(id);
   }
 
   @Delete(':id')

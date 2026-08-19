@@ -82,6 +82,7 @@ model User {
   sanctionsLifted  Sanction[]             @relation("SanctionLiftedBy")
   scpProposals     ScpObject[]
   scpRevisionsEdited ScpRevision[]
+  characterRevisionsEdited CharacterRevision[]
 }
 
 model Session {
@@ -645,6 +646,30 @@ model Character {
   restrictedDepartmentIds String[] @default([])
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
+  revisions               CharacterRevision[]
+}
+
+// Snapshot du contenu de Character juste AVANT chaque edition staff — meme
+// principe que ScpRevision.
+model CharacterRevision {
+  id            String    @id @default(cuid())
+  characterId   String
+  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  name          String
+  title         String
+  faction       String
+  biography     String
+  quotes        String[]
+  history       String[]
+  portrait      String?
+
+  editedById    String?
+  editedBy      User?     @relation(fields: [editedById], references: [id], onDelete: SetNull)
+  editedByLabel String?
+  createdAt     DateTime  @default(now())
+
+  @@index([characterId])
 }
 
 // ─── REDLAKES CORE — evenements narratifs (GameEvent) ───────────────────────

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { CharacterEditor } from "@/components/staff/CharacterEditor";
+import { CharacterRevisionHistory } from "@/components/staff/CharacterRevisionHistory";
 import { apiFetch } from "@/lib/api";
 
 interface ApiCharacterFull {
@@ -38,20 +39,25 @@ export default function EditCharacterPage() {
   }
 
   return (
-    <CharacterEditor
-      mode="edit"
-      characterId={id}
-      initial={{
-        slug: character.slug,
-        name: character.name,
-        title: character.title,
-        faction: character.faction,
-        biography: character.biography,
-        quotes: character.quotes.join("\n"),
-        history: character.history.join("\n"),
-        portrait: character.portrait ?? "",
-        restrictedDepartmentIds: character.restrictedDepartmentIds,
-      }}
-    />
+    <>
+      <CharacterEditor
+        mode="edit"
+        characterId={id}
+        initial={{
+          slug: character.slug,
+          name: character.name,
+          title: character.title,
+          faction: character.faction,
+          biography: character.biography,
+          quotes: character.quotes.join("\n"),
+          history: character.history.join("\n"),
+          portrait: character.portrait ?? "",
+          restrictedDepartmentIds: character.restrictedDepartmentIds,
+        }}
+      />
+      <div className="mx-auto max-w-3xl px-4 pb-12">
+        <CharacterRevisionHistory characterId={id} />
+      </div>
+    </>
   );
 }
