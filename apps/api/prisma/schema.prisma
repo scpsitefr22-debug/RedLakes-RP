@@ -83,6 +83,7 @@ model User {
   scpProposals     ScpObject[]
   scpRevisionsEdited ScpRevision[]
   characterRevisionsEdited CharacterRevision[]
+  gameEventRevisionsEdited GameEventRevision[]
 }
 
 model Session {
@@ -690,8 +691,33 @@ model GameEvent {
   restrictedDepartmentIds String[] @default([])
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
+  revisions               GameEventRevision[]
 
   @@index([type])
+}
+
+// Snapshot du contenu de GameEvent juste AVANT chaque edition staff — meme
+// principe que ScpRevision/CharacterRevision. Utile en particulier pour les
+// brèches/crises (voir memoire "RP breach rarity") : le recit officiel d'un
+// evenement rare doit pouvoir etre corrige sans perdre la version passee.
+model GameEventRevision {
+  id            String    @id @default(cuid())
+  gameEventId   String
+  gameEvent     GameEvent @relation(fields: [gameEventId], references: [id], onDelete: Cascade)
+
+  title         String
+  date          DateTime
+  type          String
+  description   String
+  casualties    String?
+  outcome       String
+
+  editedById    String?
+  editedBy      User?     @relation(fields: [editedById], references: [id], onDelete: SetNull)
+  editedByLabel String?
+  createdAt     DateTime  @default(now())
+
+  @@index([gameEventId])
 }
 
 // ─── REDLAKES CORE — actualites (NewsArticle) ───────────────────────────────

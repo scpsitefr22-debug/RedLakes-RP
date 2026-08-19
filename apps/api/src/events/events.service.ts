@@ -40,10 +40,46 @@ export class EventsService {
     });
   }
 
-  update(id: string, dto: UpdateGameEventDto) {
+  async update(
+    id: string,
+    dto: UpdateGameEventDto,
+    editorId?: string,
+    editorLabel?: string,
+  ) {
+    const before = await this.prisma.gameEvent.findUnique({ where: { id } });
+    if (!before) throw new NotFoundException('Événement introuvable');
+
+    await this.prisma.gameEventRevision.create({
+      data: {
+        gameEventId: before.id,
+        title: before.title,
+        date: before.date,
+        type: before.type,
+        description: before.description,
+        casualties: before.casualties,
+        outcome: before.outcome,
+        editedById: editorId,
+        editedByLabel: editorLabel,
+      },
+    });
+
     return this.prisma.gameEvent.update({
       where: { id },
       data: { ...dto, date: dto.date ? new Date(dto.date) : undefined },
+    });
+  }
+
+  /** Historique des révisions d'un évènement — le plus récent d'abord */
+  async listRevisions(gameEventId: string) {
+    const event = await this.prisma.gameEvent.findUnique({
+      where: { id: gameEventId },
+      select: { id: true },
+    });
+    if (!event) throw new NotFoundException('Événement introuvable');
+
+    return this.prisma.gameEventRevision.findMany({
+      where: { gameEventId },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

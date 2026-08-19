@@ -21,6 +21,9 @@ import { Roles } from '../auth/roles.decorator';
 import { PlayersService } from '../players/players.service';
 
 type OptionalAuthRequest = Request & { user?: { id: string } };
+type AuthedRequest = Request & {
+  user: { id: string; minecraftUsername?: string; discordUsername?: string };
+};
 
 @Controller('events')
 export class EventsController {
@@ -76,8 +79,20 @@ export class EventsController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
-  update(@Param('id') id: string, @Body() dto: UpdateGameEventDto) {
-    return this.events.update(id, dto);
+  update(
+    @Req() req: AuthedRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateGameEventDto,
+  ) {
+    const editorLabel = req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    return this.events.update(id, dto, req.user.id, editorLabel);
+  }
+
+  @Get(':id/revisions')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  listRevisions(@Param('id') id: string) {
+    return this.events.listRevisions(id);
   }
 
   @Delete(':id')

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { GameEventEditor } from "@/components/staff/GameEventEditor";
+import { GameEventRevisionHistory } from "@/components/staff/GameEventRevisionHistory";
 import { apiFetch } from "@/lib/api";
 
 interface ApiGameEventFull {
@@ -37,19 +38,24 @@ export default function EditGameEventPage() {
   }
 
   return (
-    <GameEventEditor
-      mode="edit"
-      eventId={id}
-      initial={{
-        slug: event.slug,
-        title: event.title,
-        date: event.date.slice(0, 10),
-        type: event.type,
-        description: event.description,
-        casualties: event.casualties ?? "",
-        outcome: event.outcome,
-        restrictedDepartmentIds: event.restrictedDepartmentIds,
-      }}
-    />
+    <>
+      <GameEventEditor
+        mode="edit"
+        eventId={id}
+        initial={{
+          slug: event.slug,
+          title: event.title,
+          date: event.date.slice(0, 10),
+          type: event.type,
+          description: event.description,
+          casualties: event.casualties ?? "",
+          outcome: event.outcome,
+          restrictedDepartmentIds: event.restrictedDepartmentIds,
+        }}
+      />
+      <div className="mx-auto max-w-3xl px-4 pb-12">
+        <GameEventRevisionHistory eventId={id} />
+      </div>
+    </>
   );
 }
