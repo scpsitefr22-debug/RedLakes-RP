@@ -81,6 +81,7 @@ model User {
   sanctionsIssued  Sanction[]             @relation("SanctionIssuedBy")
   sanctionsLifted  Sanction[]             @relation("SanctionLiftedBy")
   scpProposals     ScpObject[]
+  scpRevisionsEdited ScpRevision[]
 }
 
 model Session {
@@ -585,9 +586,44 @@ model ScpObject {
   reviewedAt              DateTime?
   createdAt               DateTime          @default(now())
   updatedAt               DateTime          @updatedAt
+  revisions               ScpRevision[]
 
   @@index([class])
   @@index([status])
+}
+
+// ─── REDLAKES CORE — historique des fiches SCP (ScpRevision) ───────────────
+// Snapshot du contenu de ScpObject juste AVANT chaque edition staff (voir
+// ScpService.update). Distinct de AuditLog (qui garde un resume + metadata,
+// pas le contenu complet) : ici on garde de quoi reconstituer/comparer une
+// version passee de la fiche, pas juste "quelque chose a change".
+
+model ScpRevision {
+  id                String    @id @default(cuid())
+  scpObjectId       String
+  scpObject         ScpObject @relation(fields: [scpObjectId], references: [id], onDelete: Cascade)
+
+  number            String
+  name              String
+  class             ScpClass
+  threatLevel       Int
+  containment       String
+  history           String
+  description       String
+  image             String?
+  incidents         Json
+  tests             Json
+  addendums         Json
+  containmentCost   String?
+  personnelAssigned Int?
+  breachCount       Int?
+
+  editedById        String?
+  editedBy          User?     @relation(fields: [editedById], references: [id], onDelete: SetNull)
+  editedByLabel     String?
+  createdAt         DateTime  @default(now())
+
+  @@index([scpObjectId])
 }
 
 // ─── REDLAKES CORE — personnages importants (Personnages) ──────────────────

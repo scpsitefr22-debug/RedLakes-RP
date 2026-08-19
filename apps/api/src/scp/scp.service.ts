@@ -69,7 +69,37 @@ export class ScpService {
     });
   }
 
-  update(id: string, dto: UpdateScpObjectDto) {
+  async update(
+    id: string,
+    dto: UpdateScpObjectDto,
+    editorId?: string,
+    editorLabel?: string,
+  ) {
+    const before = await this.prisma.scpObject.findUnique({ where: { id } });
+    if (!before) throw new NotFoundException('Objet SCP introuvable');
+
+    await this.prisma.scpRevision.create({
+      data: {
+        scpObjectId: before.id,
+        number: before.number,
+        name: before.name,
+        class: before.class,
+        threatLevel: before.threatLevel,
+        containment: before.containment,
+        history: before.history,
+        description: before.description,
+        image: before.image,
+        incidents: before.incidents as Prisma.InputJsonValue,
+        tests: before.tests as Prisma.InputJsonValue,
+        addendums: before.addendums as Prisma.InputJsonValue,
+        containmentCost: before.containmentCost,
+        personnelAssigned: before.personnelAssigned,
+        breachCount: before.breachCount,
+        editedById: editorId,
+        editedByLabel: editorLabel,
+      },
+    });
+
     return this.prisma.scpObject.update({
       where: { id },
       data: {
@@ -80,6 +110,20 @@ export class ScpService {
         addendums: dto.addendums as unknown as
           Prisma.InputJsonValue | undefined,
       },
+    });
+  }
+
+  /** Historique des révisions d'une fiche — la plus récente d'abord */
+  async listRevisions(scpObjectId: string) {
+    const scp = await this.prisma.scpObject.findUnique({
+      where: { id: scpObjectId },
+      select: { id: true },
+    });
+    if (!scp) throw new NotFoundException('Objet SCP introuvable');
+
+    return this.prisma.scpRevision.findMany({
+      where: { scpObjectId },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

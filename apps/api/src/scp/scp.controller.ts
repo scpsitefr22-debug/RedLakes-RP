@@ -97,8 +97,20 @@ export class ScpController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
-  update(@Param('id') id: string, @Body() dto: UpdateScpObjectDto) {
-    return this.scp.update(id, dto);
+  async update(
+    @Req() req: AuthedRequest & { user: { minecraftUsername?: string; discordUsername?: string } },
+    @Param('id') id: string,
+    @Body() dto: UpdateScpObjectDto,
+  ) {
+    const editorLabel = req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    return this.scp.update(id, dto, req.user.id, editorLabel);
+  }
+
+  @Get(':id/revisions')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  listRevisions(@Param('id') id: string) {
+    return this.scp.listRevisions(id);
   }
 
   @Delete(':id')

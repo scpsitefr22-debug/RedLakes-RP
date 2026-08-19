@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ScpEditor } from "@/components/staff/ScpEditor";
+import { ScpRevisionHistory } from "@/components/staff/ScpRevisionHistory";
 import { apiFetch } from "@/lib/api";
 
 interface ApiScpFull {
@@ -45,27 +46,32 @@ export default function EditScpPage() {
   }
 
   return (
-    <ScpEditor
-      mode="edit"
-      scpId={id}
-      initial={{
-        slug: scp.slug,
-        number: scp.number,
-        name: scp.name,
-        class: scp.class,
-        threatLevel: scp.threatLevel.toString(),
-        containment: scp.containment,
-        history: scp.history,
-        description: scp.description,
-        image: scp.image ?? "",
-        incidents: JSON.stringify(scp.incidents, null, 2),
-        tests: JSON.stringify(scp.tests, null, 2),
-        addendums: JSON.stringify(scp.addendums, null, 2),
-        containmentCost: scp.containmentCost ?? "",
-        personnelAssigned: scp.personnelAssigned?.toString() ?? "",
-        breachCount: scp.breachCount?.toString() ?? "",
-        restrictedDepartmentIds: scp.restrictedDepartmentIds,
-      }}
-    />
+    <>
+      <ScpEditor
+        mode="edit"
+        scpId={id}
+        initial={{
+          slug: scp.slug,
+          number: scp.number,
+          name: scp.name,
+          class: scp.class,
+          threatLevel: scp.threatLevel.toString(),
+          containment: scp.containment,
+          history: scp.history,
+          description: scp.description,
+          image: scp.image ?? "",
+          incidents: JSON.stringify(scp.incidents, null, 2),
+          tests: JSON.stringify(scp.tests, null, 2),
+          addendums: JSON.stringify(scp.addendums, null, 2),
+          containmentCost: scp.containmentCost ?? "",
+          personnelAssigned: scp.personnelAssigned?.toString() ?? "",
+          breachCount: scp.breachCount?.toString() ?? "",
+          restrictedDepartmentIds: scp.restrictedDepartmentIds,
+        }}
+      />
+      <div className="mx-auto max-w-3xl px-4 pb-12">
+        <ScpRevisionHistory scpId={id} />
+      </div>
+    </>
   );
 }
