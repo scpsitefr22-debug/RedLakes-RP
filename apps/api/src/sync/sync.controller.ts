@@ -14,6 +14,7 @@ import { SyncRoleDto } from './dto/sync-role.dto';
 import { DiscordLinkDto } from './dto/discord-link.dto';
 import { DiscordUnlinkDto } from './dto/discord-unlink.dto';
 import { SyncDiscordGradeDto } from './dto/sync-discord-grade.dto';
+import { SyncDiscordStaffDto } from './dto/sync-discord-staff.dto';
 import { DiscordEventDto } from './dto/discord-event.dto';
 import { UpdateDiscordIdentityDto } from './dto/update-discord-identity.dto';
 
@@ -50,6 +51,12 @@ export class SyncController {
   @Post('discord/grade')
   syncGradeFromDiscord(@Body() dto: SyncDiscordGradeDto) {
     return this.sync.syncGradeFromDiscord(dto);
+  }
+
+  /** Rôle STAFF depuis Discord (rôle @Staff détecté sur le serveur) */
+  @Post('discord/staff-role')
+  syncStaffRoleFromDiscord(@Body() dto: SyncDiscordStaffDto) {
+    return this.sync.syncStaffRoleFromDiscord(dto);
   }
 
   /** Identité RP depuis le bot (/identite) */

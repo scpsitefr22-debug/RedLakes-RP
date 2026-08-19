@@ -9,9 +9,16 @@ import { DiscordService } from './discord.service';
 import { SyncRoleDto } from './dto/sync-role.dto';
 import { DiscordLinkDto } from './dto/discord-link.dto';
 import { SyncDiscordGradeDto } from './dto/sync-discord-grade.dto';
-import { AssignmentEntityType, PersonnelReportStatus } from '@prisma/client';
+import { SyncDiscordStaffDto } from './dto/sync-discord-staff.dto';
+import {
+  AssignmentEntityType,
+  PersonnelReportStatus,
+  PlatformEntityType,
+  UserRole,
+} from '@prisma/client';
 import { GradesService } from '../grades/grades.service';
 import { FactionsService } from '../factions/factions.service';
+import { AuditService } from '../platform/audit.service';
 
 @Injectable()
 export class SyncService {
@@ -20,6 +27,7 @@ export class SyncService {
     private discord: DiscordService,
     private grades: GradesService,
     private factions: FactionsService,
+    private audit: AuditService,
   ) {}
 
   /** Resout le nom d'un grade en texte libre vers le catalogue Grade. */
@@ -365,6 +373,47 @@ export class SyncService {
       discordRoleName: dto.discordRoleName,
       minecraftUsername: user.minecraftUsername,
       roleUpdatedAt: player.roleUpdatedAt,
+    };
+  }
+
+  /**
+   * Rôle STAFF depuis Discord (rôle @Staff détecté sur le serveur) —
+   * promotion automatique uniquement (PLAYER -> STAFF). Ne redescend jamais
+   * automatiquement quelqu'un (perte du rôle Discord = pas de perte du
+   * site), et ne touche jamais ADMIN : ces deux cas restent décidés à la
+   * main sur le site (voir PlayersService.updateRole), pour garder un vrai
+   * contrôle et une trace claire sur les changements sensibles.
+   */
+  async syncStaffRoleFromDiscord(dto: SyncDiscordStaffDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { discordId: dto.discordId },
+    });
+    if (!user) throw new NotFoundException('Aucun compte lié à ce Discord');
+
+    if (!dto.hasStaffRole || user.role !== UserRole.PLAYER) {
+      return { success: true, unchanged: true, role: user.role };
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: user.id },
+      data: { role: UserRole.STAFF },
+    });
+
+    await this.audit.log({
+      entityType: PlatformEntityType.USER,
+      entityId: user.id,
+      action: 'ROLE_CHANGED',
+      actorLabel: 'Sync Discord (rôle Staff)',
+      summary: `Rôle de ${user.minecraftUsername ?? user.discordUsername ?? user.id} changé automatiquement : PLAYER → STAFF (rôle Discord Staff détecté)`,
+      metadata: { previousRole: 'PLAYER', newRole: 'STAFF', source: 'discord-role-sync' },
+    });
+
+    return {
+      success: true,
+      unchanged: false,
+      role: updated.role,
+      previousRole: UserRole.PLAYER,
+      minecraftUsername: user.minecraftUsername,
     };
   }
 
