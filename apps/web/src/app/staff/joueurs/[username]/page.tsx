@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import { ArrowLeft, ShieldAlert, History, Plus, X, Check } from "lucide-react";
+import { ArrowLeft, ShieldAlert, History, Plus, X, Check, KeyRound } from "lucide-react";
 
 interface PlayerProfile {
   grade: string;
@@ -13,8 +13,10 @@ interface PlayerProfile {
   rpFirstName: string | null;
   rpLastName: string | null;
   sanctions: number;
-  user: { minecraftUsername: string; avatarUrl: string | null };
+  user: { minecraftUsername: string; avatarUrl: string | null; role: string };
 }
+
+const ROLES = ["PLAYER", "STAFF", "ADMIN"];
 
 interface SanctionRow {
   id: string;
@@ -62,6 +64,11 @@ export default function StaffPlayerPage() {
   const [assignForm, setAssignForm] = useState({ entityType: "TEAM", entityId: "", role: "" });
   const [saving, setSaving] = useState(false);
 
+  const [viewerRole, setViewerRole] = useState<string | null>(null);
+  const [roleValue, setRoleValue] = useState("PLAYER");
+  const [roleSaving, setRoleSaving] = useState(false);
+  const [roleMessage, setRoleMessage] = useState("");
+
   const load = useCallback(async () => {
     try {
       const [prof, { id }] = await Promise.all([
@@ -70,6 +77,7 @@ export default function StaffPlayerPage() {
       ]);
       setProfile(prof);
       setPlayerId(id);
+      setRoleValue(prof.user.role);
       const [s, a] = await Promise.all([
         apiFetch<SanctionRow[]>(`/sanctions/player/${id}`),
         apiFetch<AssignmentRow[]>(`/assignments/player/${id}`),
@@ -90,7 +98,28 @@ export default function StaffPlayerPage() {
     apiFetch<EntityOption[]>("/factions").then(setFactions).catch(() => undefined);
     apiFetch<EntityOption[]>("/departments").then(setDepartments).catch(() => undefined);
     apiFetch<EntityOption[]>("/teams").then(setTeams).catch(() => undefined);
+    apiFetch<{ authenticated: boolean; user?: { role: string } }>("/auth/me")
+      .then((res) => setViewerRole(res.user?.role ?? null))
+      .catch(() => undefined);
   }, [load]);
+
+  const updateRole = async () => {
+    if (!profile || roleValue === profile.user.role) return;
+    setRoleSaving(true);
+    setRoleMessage("");
+    try {
+      await apiFetch(`/players/${username}/role`, {
+        method: "PATCH",
+        body: JSON.stringify({ role: roleValue }),
+      });
+      setRoleMessage(`Rôle mis à jour : ${roleValue}.`);
+      await load();
+    } catch (err) {
+      setRoleMessage(err instanceof Error ? err.message : "Échec de la mise à jour du rôle");
+    } finally {
+      setRoleSaving(false);
+    }
+  };
 
   const entityOptions = assignForm.entityType === "FACTION" ? factions
     : assignForm.entityType === "DEPARTMENT" ? departments
@@ -206,6 +235,31 @@ export default function StaffPlayerPage() {
 
       {error && (
         <div className="mb-6 rounded border border-red-400/30 bg-red-400/10 p-4 text-sm text-red-400">{error}</div>
+      )}
+
+      {/* Rôle du compte (ADMIN uniquement) */}
+      {viewerRole === "ADMIN" && (
+        <section className="mb-10 hologram-border rounded-lg p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
+            <KeyRound className="h-5 w-5 text-redlake-glow" /> Rôle du compte
+          </h2>
+          <p className="mb-4 text-sm text-gray-500">
+            Rôle actuel : <span className="font-mono text-white">{profile.user.role}</span>
+          </p>
+          <div className="grid grid-cols-[1fr_auto] gap-2">
+            <select className={inputClass} value={roleValue} onChange={(e) => setRoleValue(e.target.value)}>
+              {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+            <button
+              onClick={updateRole}
+              disabled={roleSaving || roleValue === profile.user.role}
+              className="flex items-center gap-1 rounded border border-redlake bg-redlake/20 px-3 text-sm text-white hover:bg-redlake/30 disabled:opacity-50"
+            >
+              <Check className="h-4 w-4" /> Confirmer
+            </button>
+          </div>
+          {roleMessage && <p className="mt-2 font-mono text-xs text-gray-500">{roleMessage}</p>}
+        </section>
       )}
 
       {/* Sanctions */}

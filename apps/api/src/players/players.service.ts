@@ -3,15 +3,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Grade, Faction, Team } from '@prisma/client';
+import { Grade, Faction, Team, UserRole, PlatformEntityType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../platform/audit.service';
 
 const MAX_CHARACTERS_PER_ACCOUNT = 5;
 
 @Injectable()
 export class PlayersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private audit: AuditService,
+  ) {}
 
   formatProfile(player: {
     grade: string;
@@ -392,5 +396,50 @@ export class PlayersService {
     });
 
     return this.getDashboard(userId);
+  }
+
+  /**
+   * Seul moyen de changer le role (PLAYER/STAFF/ADMIN) d'un compte —
+   * jusqu'ici il fallait modifier la base a la main, sans aucune trace.
+   * Reserve a l'ADMIN (voir @Roles sur le controller), journalise via
+   * AuditService pour laisser une trace de qui a promu/retrograde qui.
+   */
+  async updateRole(
+    username: string,
+    role: UserRole,
+    actorId: string,
+    actorLabel: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { minecraftUsername: username },
+    });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+
+    const previousRole = user.role;
+    if (previousRole === role) {
+      return { minecraftUsername: username, role, unchanged: true };
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: user.id },
+      data: { role },
+    });
+
+    await this.audit.log({
+      entityType: PlatformEntityType.USER,
+      entityId: user.id,
+      action: 'ROLE_CHANGED',
+      actorId,
+      actorLabel,
+      summary: `Rôle de ${username} changé : ${previousRole} → ${role}`,
+      metadata: { previousRole, newRole: role, targetUsername: username },
+    });
+
+    return {
+      minecraftUsername: username,
+      role: updated.role,
+      previousRole,
+      unchanged: false,
+    };
   }
 }
