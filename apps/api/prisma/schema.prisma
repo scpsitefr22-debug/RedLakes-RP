@@ -65,7 +65,9 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  player           Player?
+  activeCharacterId String? @unique
+  activeCharacter   Player? @relation("ActiveCharacter", fields: [activeCharacterId], references: [id], onDelete: SetNull)
+  players           Player[]               @relation("PlayerCharacters")
   applications     Application[]
   loreArticles     LoreArticle[]          @relation("AuthorArticles")
   sessions         Session[]
@@ -94,7 +96,8 @@ model Session {
 
 model Player {
   id              String             @id @default(cuid())
-  userId          String             @unique
+  userId          String
+  activeForUser   User?              @relation("ActiveCharacter")
   grade           String             @default("Civil")
   gradeId         String?
   gradeInfo       Grade?             @relation(fields: [gradeId], references: [id], onDelete: SetNull)
@@ -118,8 +121,9 @@ model Player {
   roleUpdatedAt   DateTime           @default(now())
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
-  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User               @relation("PlayerCharacters", fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@index([gradeId])
   @@index([factionId])
   @@index([teamId])

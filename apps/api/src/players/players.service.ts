@@ -105,6 +105,9 @@ export class PlayersService {
 
   async findAll() {
     const players = await this.prisma.player.findMany({
+      // Un compte peut avoir plusieurs personnages (Player) — le trombinoscope
+      // ne montre que le personnage actif de chacun, pas tous ses alts.
+      where: { activeForUser: { isNot: null } },
       include: {
         gradeInfo: { include: { departmentRef: true } },
 
@@ -157,26 +160,49 @@ export class PlayersService {
     }));
   }
 
-  /** Departement courant du joueur, derive de son grade actuel. */
+  /** Resout l'id du personnage actif d'un compte (User.activeCharacterId). */
+  private async resolveActiveCharacterId(userId: string): Promise<string> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { activeCharacterId: true },
+    });
+    if (!user?.activeCharacterId) {
+      throw new NotFoundException('Profil joueur introuvable');
+    }
+    return user.activeCharacterId;
+  }
+
+  /** Departement courant du joueur (personnage actif), derive de son grade. */
   async getDepartmentId(userId: string): Promise<string | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { activeCharacterId: true },
+    });
+    if (!user?.activeCharacterId) return null;
     const player = await this.prisma.player.findUnique({
-      where: { userId },
+      where: { id: user.activeCharacterId },
       select: { gradeInfo: { select: { departmentRefId: true } } },
     });
     return player?.gradeInfo?.departmentRefId ?? null;
   }
 
   async findIdByUsername(username: string) {
-    const player = await this.prisma.player.findFirst({
-      where: { user: { minecraftUsername: username } },
-      select: { id: true },
+    const user = await this.prisma.user.findUnique({
+      where: { minecraftUsername: username },
+      select: { activeCharacterId: true },
     });
-    return player?.id ?? null;
+    return user?.activeCharacterId ?? null;
   }
 
   async findByUsername(username: string) {
-    const player = await this.prisma.player.findFirst({
-      where: { user: { minecraftUsername: username } },
+    const user = await this.prisma.user.findUnique({
+      where: { minecraftUsername: username },
+      select: { activeCharacterId: true },
+    });
+    if (!user?.activeCharacterId) throw new NotFoundException('Joueur introuvable');
+
+    const player = await this.prisma.player.findUnique({
+      where: { id: user.activeCharacterId },
 
       include: {
         gradeInfo: { include: { departmentRef: true } },
@@ -211,8 +237,9 @@ export class PlayersService {
   }
 
   async getDashboard(userId: string) {
+    const activeCharacterId = await this.resolveActiveCharacterId(userId);
     const player = await this.prisma.player.findUnique({
-      where: { userId },
+      where: { id: activeCharacterId },
 
       include: {
         gradeInfo: { include: { departmentRef: true } },
@@ -253,11 +280,10 @@ export class PlayersService {
    * lieu du cuid brut de l'entite.
    */
   async getCareerHistory(userId: string) {
-    const player = await this.prisma.player.findUnique({ where: { userId } });
-    if (!player) throw new NotFoundException('Profil joueur introuvable');
+    const activeCharacterId = await this.resolveActiveCharacterId(userId);
 
     const assignments = await this.prisma.playerAssignment.findMany({
-      where: { playerId: player.id },
+      where: { playerId: activeCharacterId },
       orderBy: { startedAt: 'desc' },
     });
 

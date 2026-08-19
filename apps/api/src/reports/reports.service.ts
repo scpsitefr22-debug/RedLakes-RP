@@ -80,16 +80,16 @@ export class ReportsService {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
 
-      include: { player: true },
+      include: { activeCharacter: true },
     });
 
-    if (!user?.player) {
+    if (!user?.activeCharacter) {
       throw new ForbiddenException(
         'Profil joueur requis pour déposer un rapport',
       );
     }
 
-    const clearance = clearanceForGrade(user.player.grade);
+    const clearance = clearanceForGrade(user.activeCharacter.grade);
 
     const actorLabel =
       user.minecraftUsername ?? user.discordUsername ?? 'Agent';
@@ -106,7 +106,7 @@ export class ReportsService {
 
         clearance,
 
-        factionId: user.player.factionId,
+        factionId: user.activeCharacter.factionId,
       },
 
       include: {
@@ -114,7 +114,7 @@ export class ReportsService {
           select: {
             minecraftUsername: true,
 
-            player: {
+            activeCharacter: {
               select: { grade: true, rpFirstName: true, rpLastName: true },
             },
           },
@@ -152,7 +152,7 @@ export class ReportsService {
       entityId: report.id,
     });
 
-    const p = report.user.player;
+    const p = report.user.activeCharacter;
 
     const rpName = p
       ? [p.rpFirstName, p.rpLastName].filter(Boolean).join(' ')
@@ -210,9 +210,9 @@ export class ReportsService {
   async findByFaction(userId: string, query: ListReportsQueryDto) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { player: { select: { factionId: true } } },
+      include: { activeCharacter: { select: { factionId: true } } },
     });
-    const factionId = user?.player?.factionId;
+    const factionId = user?.activeCharacter?.factionId;
     if (!factionId) {
       return toPaginatedResult([], 0, 1, resolvePagination(query).limit);
     }
@@ -236,7 +236,7 @@ export class ReportsService {
           user: {
             select: {
               minecraftUsername: true,
-              player: { select: { rpFirstName: true, rpLastName: true, grade: true } },
+              activeCharacter: { select: { rpFirstName: true, rpLastName: true, grade: true } },
             },
           },
         },
@@ -258,7 +258,7 @@ export class ReportsService {
 
             discordUsername: true,
 
-            player: {
+            activeCharacter: {
               select: {
                 grade: true,
 
@@ -315,7 +315,7 @@ export class ReportsService {
 
               discordUsername: true,
 
-              player: {
+              activeCharacter: {
                 select: {
                   grade: true,
 

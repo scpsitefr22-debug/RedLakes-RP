@@ -10,7 +10,7 @@ import { User } from '@prisma/client';
 import { randomBytes } from 'crypto';
 
 export type AuthUser = User & {
-  player?: {
+  activeCharacter?: {
     grade: string;
     faction: string;
     teamName?: string | null;
@@ -33,7 +33,7 @@ export class AuthService {
   async validateSession(token: string): Promise<AuthUser | null> {
     const session = await this.prisma.session.findUnique({
       where: { token },
-      include: { user: { include: { player: true } } },
+      include: { user: { include: { activeCharacter: true } } },
     });
     if (!session || session.expiresAt < new Date()) return null;
     return session.user;
@@ -73,6 +73,32 @@ export class AuthService {
     const scope = encodeURIComponent('identify');
 
     return `https://discord.com/api/oauth2/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${scope}&prompt=consent`;
+  }
+
+  /**
+   * Garantit qu'un compte a un personnage actif — cree un personnage
+   * "Civil" par defaut et le pointe comme actif si aucun n'existe encore.
+   * Un compte peut avoir plusieurs personnages (Player) ; un seul est actif
+   * a la fois via User.activeCharacterId.
+   */
+  private async ensureActiveCharacter(userId: string) {
+    const character = await this.prisma.player.create({
+      data: { userId, grade: 'Civil', faction: 'Civil' },
+    });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { activeCharacterId: character.id },
+    });
+    return character;
+  }
+
+  private async withActiveCharacter(user: User & { activeCharacter: unknown }) {
+    if (user.activeCharacter) return user as AuthUser;
+    await this.ensureActiveCharacter(user.id);
+    return this.prisma.user.findUniqueOrThrow({
+      where: { id: user.id },
+      include: { activeCharacter: true },
+    });
   }
 
   async handleDiscordCallback(code: string): Promise<AuthUser> {
@@ -131,13 +157,13 @@ export class AuthService {
       discordAvatar,
     });
 
-    if (user.player) {
+    if (user.activeCharacter) {
       await this.discord.syncMemberProfile({
         discordId: profile.id,
         minecraftUsername: user.minecraftUsername ?? displayName,
-        grade: user.player.grade,
-        faction: user.player.faction,
-        teamName: user.player.teamName,
+        grade: user.activeCharacter.grade,
+        faction: user.activeCharacter.faction,
+        teamName: user.activeCharacter.teamName,
       });
     }
 
@@ -152,18 +178,19 @@ export class AuthService {
   }): Promise<AuthUser> {
     const existing = await this.prisma.user.findUnique({
       where: { discordId: params.discordId },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
 
     if (existing) {
-      return this.prisma.user.update({
+      const updated = await this.prisma.user.update({
         where: { id: existing.id },
         data: {
           discordUsername: params.displayName,
           avatarUrl: existing.avatarUrl ?? params.discordAvatar,
         },
-        include: { player: true },
+        include: { activeCharacter: true },
       });
+      return this.withActiveCharacter(updated);
     }
 
     const username = await this.uniqueAgentUsername(
@@ -171,21 +198,16 @@ export class AuthService {
       params.discordId,
     );
 
-    return this.prisma.user.create({
+    const created = await this.prisma.user.create({
       data: {
         discordId: params.discordId,
         discordUsername: params.displayName,
         minecraftUsername: username,
         avatarUrl: params.discordAvatar,
-        player: {
-          create: {
-            grade: 'Civil',
-            faction: 'Civil',
-          },
-        },
       },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
+    return this.withActiveCharacter(created);
   }
 
   private async uniqueAgentUsername(
@@ -340,16 +362,10 @@ export class AuthService {
         minecraftUuid: profile.uuid,
         minecraftUsername: profile.username,
         avatarUrl: profile.avatarUrl,
-        player: {
-          create: {
-            grade: 'Civil',
-            faction: 'Civil',
-          },
-        },
       },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
-    return user;
+    return this.withActiveCharacter(user);
   }
 
   async getMe(token: string): Promise<AuthUser | null> {

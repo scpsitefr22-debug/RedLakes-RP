@@ -125,7 +125,7 @@ export class AuthController {
         role: user.role,
         discordLinked: !!user.discordId,
         discordUsername: user.discordUsername,
-        player: user.player,
+        activeCharacter: user.activeCharacter,
       },
     };
   }

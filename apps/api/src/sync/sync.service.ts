@@ -82,17 +82,18 @@ export class SyncService {
     const resolved = await this.resolveGrade(dto.grade);
     const factionId = await this.resolveFactionId(dto.faction);
 
-    // Capture l'etat AVANT ecriture — l'upsert ci-dessous peut creer le
-    // joueur avec le grade/faction deja resolus, ce qui rendrait toute
+    // Capture l'etat AVANT ecriture — la creation ci-dessous peut creer le
+    // personnage avec le grade/faction deja resolus, ce qui rendrait toute
     // comparaison "avant/apres" faite apres coup invalide pour un nouveau
     // joueur (il n'y aurait alors jamais d'affectation initiale journalisee).
-    const existingPlayer = await this.prisma.user.findUnique({
+    const existingUser = await this.prisma.user.findUnique({
       where: { minecraftUuid: uuid },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
-    const previousFactionIdSnapshot = existingPlayer?.player?.factionId ?? null;
+    const previousFactionIdSnapshot =
+      existingUser?.activeCharacter?.factionId ?? null;
     const previousDepartmentRefIdSnapshot = await this.departmentRefIdForGrade(
-      existingPlayer?.player?.gradeId ?? null,
+      existingUser?.activeCharacter?.gradeId ?? null,
     );
 
     const user = await this.prisma.user.upsert({
@@ -102,24 +103,11 @@ export class SyncService {
         minecraftUuid: uuid,
         minecraftUsername: username,
         avatarUrl: `https://mc-heads.net/avatar/${encodeURIComponent(username)}/64`,
-        player: {
-          create: {
-            grade: dto.grade,
-            gradeId: resolved.gradeId,
-            faction: dto.faction ?? 'Civil',
-            factionId,
-            teamName: dto.teamName,
-            rpFirstName: dto.rpFirstName,
-            rpLastName: dto.rpLastName,
-            playtime: dto.playtime ?? 0,
-            roleUpdatedAt: new Date(),
-          },
-        },
       },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
 
-    let player = user.player;
+    let player = user.activeCharacter;
     const previousGrade = player?.grade;
 
     if (!player) {
@@ -134,7 +122,12 @@ export class SyncService {
           rpFirstName: dto.rpFirstName,
           rpLastName: dto.rpLastName,
           playtime: dto.playtime ?? 0,
+          roleUpdatedAt: new Date(),
         },
+      });
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { activeCharacterId: player.id },
       });
     } else {
       player = await this.prisma.player.update({
@@ -226,7 +219,7 @@ export class SyncService {
         discordId: dto.discordId,
         discordUsername: dto.discordUsername,
       },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
 
     await this.prisma.linkCode.update({
@@ -283,7 +276,7 @@ export class SyncService {
     const user = await this.prisma.user.findUnique({
       where: { discordId },
       include: {
-        player: {
+        activeCharacter: {
           include: {
             gradeInfo: { include: { departmentRef: true } },
             factionInfo: true,
@@ -291,7 +284,7 @@ export class SyncService {
         },
       },
     });
-    if (!user || !user.player) {
+    if (!user || !user.activeCharacter) {
       throw new NotFoundException('Aucun compte lié à ce Discord');
     }
 
@@ -299,19 +292,19 @@ export class SyncService {
       minecraftUsername: user.minecraftUsername,
       avatarUrl: user.avatarUrl,
       discordUsername: user.discordUsername,
-      grade: user.player.grade,
-      gradeInfo: user.player.gradeInfo,
-      faction: user.player.faction,
-      factionInfo: user.player.factionInfo,
-      teamName: user.player.teamName,
-      rpFirstName: user.player.rpFirstName,
-      rpLastName: user.player.rpLastName,
-      playtime: user.player.playtime,
-      reputation: user.player.reputation,
-      sanctions: user.player.sanctions,
-      medals: user.player.medals,
-      roleUpdatedAt: user.player.roleUpdatedAt,
-      seniority: user.player.seniority,
+      grade: user.activeCharacter.grade,
+      gradeInfo: user.activeCharacter.gradeInfo,
+      faction: user.activeCharacter.faction,
+      factionInfo: user.activeCharacter.factionInfo,
+      teamName: user.activeCharacter.teamName,
+      rpFirstName: user.activeCharacter.rpFirstName,
+      rpLastName: user.activeCharacter.rpLastName,
+      playtime: user.activeCharacter.playtime,
+      reputation: user.activeCharacter.reputation,
+      sanctions: user.activeCharacter.sanctions,
+      medals: user.activeCharacter.medals,
+      roleUpdatedAt: user.activeCharacter.roleUpdatedAt,
+      seniority: user.activeCharacter.seniority,
     };
   }
 
@@ -319,14 +312,14 @@ export class SyncService {
   async syncGradeFromDiscord(dto: SyncDiscordGradeDto) {
     const user = await this.prisma.user.findUnique({
       where: { discordId: dto.discordId },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
 
-    if (!user?.player) {
+    if (!user?.activeCharacter) {
       throw new NotFoundException('Aucun compte lie a ce Discord');
     }
 
-    const previousGrade = user.player.grade;
+    const previousGrade = user.activeCharacter.grade;
     if (previousGrade === dto.grade) {
       return {
         success: true,
@@ -338,11 +331,11 @@ export class SyncService {
     }
 
     const previousDepartmentRefId = await this.departmentRefIdForGrade(
-      user.player.gradeId,
+      user.activeCharacter.gradeId,
     );
     const resolved = await this.resolveGrade(dto.grade);
     const player = await this.prisma.player.update({
-      where: { id: user.player.id },
+      where: { id: user.activeCharacter.id },
       data: {
         grade: dto.grade,
         gradeId: resolved.gradeId,
@@ -390,14 +383,14 @@ export class SyncService {
     const { syncDiscord = true } = options;
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
-    if (!user?.player) {
+    if (!user?.activeCharacter) {
       throw new NotFoundException('Profil joueur introuvable');
     }
 
     const player = await this.prisma.player.update({
-      where: { id: user.player.id },
+      where: { id: user.activeCharacter.id },
       data: {
         ...(data.rpFirstName !== undefined && {
           rpFirstName: data.rpFirstName || null,
@@ -436,9 +429,9 @@ export class SyncService {
   ) {
     const user = await this.prisma.user.findUnique({
       where: { discordId },
-      include: { player: true },
+      include: { activeCharacter: true },
     });
-    if (!user?.player) {
+    if (!user?.activeCharacter) {
       throw new NotFoundException("Compte non lié — utilise /link d'abord");
     }
     // syncDiscord: false — le hub Discord (/identite) refait lui-même
@@ -455,7 +448,7 @@ export class SyncService {
         user: {
           select: {
             minecraftUsername: true,
-            player: {
+            activeCharacter: {
               select: { grade: true, rpFirstName: true, rpLastName: true },
             },
           },
