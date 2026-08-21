@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { MapPin, Bot, FileLock, Users, Image } from "lucide-react";
+import { MapPin, Skull, FileLock, Users, Image } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const quickLinks = [
@@ -13,10 +13,10 @@ const quickLinks = [
     href: "/carte",
   },
   {
-    icon: Bot,
-    title: "CASSIE IA",
-    description: "Assistant holographique pour le lore, les SCP et les grades.",
-    href: "/cassie",
+    icon: Skull,
+    title: "OPHIS",
+    description: "Entité anormale reliée au réseau CORE — répond aux questions, à contrecœur.",
+    href: "/ophis",
   },
   {
     icon: FileLock,

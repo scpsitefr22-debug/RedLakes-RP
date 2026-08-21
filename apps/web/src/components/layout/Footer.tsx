@@ -57,7 +57,7 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-gray-500">
               <li><Link href="/candidatures" className="hover:text-white">Candidatures</Link></li>
-              <li><Link href="/cassie" className="hover:text-white">CASSIE IA</Link></li>
+              <li><Link href="/ophis" className="hover:text-white">OPHIS</Link></li>
               <li><Link href="/dashboard" className="hover:text-white">Tableau de bord</Link></li>
               <li><Link href="/archives" className="hover:text-white">Archives classifiées</Link></li>
             </ul>

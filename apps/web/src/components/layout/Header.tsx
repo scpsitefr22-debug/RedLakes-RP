@@ -65,7 +65,7 @@ const navItems: NavItem[] = [
       { label: "Intranet Site-12", href: "/intranet" },
       { label: "Joueurs", href: "/joueurs" },
       { label: "Archives classifiées", href: "/archives" },
-      { label: "CASSIE IA", href: "/cassie" },
+      { label: "OPHIS", href: "/ophis" },
       { label: "CMS Lore (Staff)", href: "/lore/cms", staffOnly: true },
       { label: "Gestion Grades (Staff)", href: "/staff/grades", staffOnly: true },
       { label: "Gestion Factions (Staff)", href: "/staff/factions", staffOnly: true },
