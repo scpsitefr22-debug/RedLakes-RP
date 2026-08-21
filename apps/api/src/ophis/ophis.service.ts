@@ -98,12 +98,21 @@ export class OphisService {
       if (err instanceof Anthropic.AuthenticationError) {
         throw new BadRequestException('Clé ANTHROPIC_API_KEY invalide.');
       }
+      if (
+        err instanceof Anthropic.BadRequestError &&
+        /credit balance is too low/i.test(err.message)
+      ) {
+        throw new BadRequestException(
+          'Le compte Anthropic manque de crédit — ajoutez-en sur console.anthropic.com > Plans & Billing.',
+        );
+      }
       if (err instanceof Anthropic.RateLimitError) {
         throw new HttpException(
           'Le réseau CORE est saturé — OPHIS ne peut pas répondre pour le moment.',
           HttpStatus.TOO_MANY_REQUESTS,
         );
       }
+      console.error('[ophis] echec appel Anthropic :', err);
       throw new InternalServerErrorException('OPHIS ne répond pas.');
     }
   }
