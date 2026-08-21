@@ -96,6 +96,8 @@ model User {
   scpRevisionsEdited ScpRevision[]
   characterRevisionsEdited CharacterRevision[]
   gameEventRevisionsEdited GameEventRevision[]
+  missionsCreated  Mission[] @relation("MissionCreatedBy")
+  missionsResolved Mission[] @relation("MissionResolvedBy")
 }
 
 model Session {
@@ -124,6 +126,7 @@ model Player {
   teamInfo        Team?              @relation(fields: [teamId], references: [id], onDelete: SetNull)
   assignments     PlayerAssignment[]
   sanctionRecords Sanction[]
+  missions        Mission[]
   rpFirstName     String?
   rpLastName      String?
   playtime        Int                @default(0)
@@ -474,7 +477,8 @@ model Team {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  players Player[]
+  players  Player[]
+  missions Mission[]
 
   @@index([departmentId])
 }
@@ -551,6 +555,49 @@ model Sanction {
   updatedAt  DateTime       @updatedAt
 
   @@index([playerId])
+  @@index([status])
+}
+
+// ─── REDLAKES CORE — missions (LOT D) ───────────────────────────────────────
+// Objectif assigne par le staff a un joueur OU une equipe (jamais les deux —
+// verifie cote service, pas de contrainte DB pour un "au moins un des deux"
+// simple avec Prisma). "reward" reste une String libre plutot qu'un lien vers
+// un systeme d'inventaire/economie qui n'existe pas encore.
+
+enum MissionStatus {
+  ASSIGNED
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model Mission {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  reward      String?
+  status      MissionStatus @default(ASSIGNED)
+  dueAt       DateTime?
+
+  assignedPlayerId String?
+  assignedPlayer   Player? @relation(fields: [assignedPlayerId], references: [id], onDelete: Cascade)
+  assignedTeamId   String?
+  assignedTeam     Team?   @relation(fields: [assignedTeamId], references: [id], onDelete: Cascade)
+
+  createdById    String?
+  createdBy      User?    @relation("MissionCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdByLabel String?
+
+  resolvedAt      DateTime?
+  resolvedById    String?
+  resolvedBy      User?     @relation("MissionResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolvedByLabel String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([assignedPlayerId])
+  @@index([assignedTeamId])
   @@index([status])
 }
 

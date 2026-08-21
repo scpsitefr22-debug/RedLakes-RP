@@ -21,6 +21,7 @@ import {
   Zap,
   Newspaper,
   MapPin,
+  Target,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -37,6 +38,7 @@ const MANAGEMENT_LINKS = [
   { icon: Building2, label: "Gestion des départements", caption: "Catalogue de départements", href: "/staff/departements" },
   { icon: Users, label: "Gestion des équipes", caption: "Équipes de terrain, FIM", href: "/staff/teams" },
   { icon: UserCog, label: "Gestion des joueurs", caption: "Sanctions, affectations", href: "/staff/joueurs" },
+  { icon: Target, label: "Missions", caption: "Objectifs joueurs et équipes", href: "/staff/missions" },
   { icon: FlaskConical, label: "Gestion du wiki SCP", caption: "Objets, classes, incidents", href: "/staff/scp" },
   { icon: User, label: "Gestion des personnages", caption: "Fiches narratives", href: "/staff/personnages" },
   { icon: Zap, label: "Gestion des événements", caption: "Brèches, invasions, crises", href: "/staff/evenements" },
