@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { LoreEditor } from "@/components/lore/LoreEditor";
+import { LoreRevisionHistory } from "@/components/lore/LoreRevisionHistory";
 import { apiFetch } from "@/lib/api";
 
 export default function EditLorePage() {
@@ -38,22 +39,27 @@ export default function EditLorePage() {
   }
 
   return (
-    <LoreEditor
-      mode="edit"
-      articleId={id}
-      initial={{
-        slug: article.slug as string,
-        title: article.title as string,
-        excerpt: (article.excerpt as string) ?? "",
-        content: article.content as string,
-        category: article.category as string,
-        status: article.status as string,
-        restrictedDepartmentIds: Array.isArray(article.restrictedDepartmentIds)
-          ? (article.restrictedDepartmentIds as string[])
-          : [],
-        featured: article.featured as boolean,
-        tags: Array.isArray(article.tags) ? (article.tags as string[]).join(", ") : "",
-      }}
-    />
+    <>
+      <LoreEditor
+        mode="edit"
+        articleId={id}
+        initial={{
+          slug: article.slug as string,
+          title: article.title as string,
+          excerpt: (article.excerpt as string) ?? "",
+          content: article.content as string,
+          category: article.category as string,
+          status: article.status as string,
+          restrictedDepartmentIds: Array.isArray(article.restrictedDepartmentIds)
+            ? (article.restrictedDepartmentIds as string[])
+            : [],
+          featured: article.featured as boolean,
+          tags: Array.isArray(article.tags) ? (article.tags as string[]).join(", ") : "",
+        }}
+      />
+      <div className="mx-auto max-w-3xl px-4 pb-12">
+        <LoreRevisionHistory articleId={id} />
+      </div>
+    </>
   );
 }

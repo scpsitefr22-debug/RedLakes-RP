@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateMapLocationDto,
@@ -25,8 +25,46 @@ export class MapService {
     return this.prisma.mapLocation.create({ data: dto });
   }
 
-  update(id: string, dto: UpdateMapLocationDto) {
+  async update(
+    id: string,
+    dto: UpdateMapLocationDto,
+    editorId?: string,
+    editorLabel?: string,
+  ) {
+    const before = await this.prisma.mapLocation.findUnique({ where: { id } });
+    if (!before) throw new NotFoundException('Emplacement introuvable');
+
+    await this.prisma.mapLocationRevision.create({
+      data: {
+        mapLocationId: before.id,
+        name: before.name,
+        type: before.type,
+        x: before.x,
+        y: before.y,
+        description: before.description,
+        history: before.history,
+        danger: before.danger,
+        faction: before.faction,
+        editedById: editorId,
+        editedByLabel: editorLabel,
+      },
+    });
+
     return this.prisma.mapLocation.update({ where: { id }, data: dto });
+  }
+
+  /** Historique des révisions d'un emplacement — le plus récent d'abord */
+  async listRevisions(mapLocationId: string) {
+    const location = await this.prisma.mapLocation.findUnique({
+      where: { id: mapLocationId },
+      select: { id: true },
+    });
+    if (!location) throw new NotFoundException('Emplacement introuvable');
+
+    return this.prisma.mapLocationRevision.findMany({
+      where: { mapLocationId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   remove(id: string) {

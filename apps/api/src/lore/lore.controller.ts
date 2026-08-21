@@ -67,8 +67,20 @@ export class LoreController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
   @MinRank(StaffRank.COORDINATEUR_GENERAL)
-  update(@Param('id') id: string, @Body() dto: UpdateLoreDto) {
-    return this.lore.update(id, dto);
+  update(
+    @Req() req: Request & { user: { id: string; minecraftUsername?: string; discordUsername?: string } },
+    @Param('id') id: string,
+    @Body() dto: UpdateLoreDto,
+  ) {
+    const editorLabel = req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    return this.lore.update(id, dto, req.user.id, editorLabel);
+  }
+
+  @Get(':id/revisions')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  listRevisions(@Param('id') id: string) {
+    return this.lore.listRevisions(id);
   }
 
   @Delete(':id')

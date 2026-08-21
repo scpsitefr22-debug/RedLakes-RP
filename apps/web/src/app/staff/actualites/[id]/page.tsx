@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { NewsEditor } from "@/components/staff/NewsEditor";
+import { NewsRevisionHistory } from "@/components/staff/NewsRevisionHistory";
 import { apiFetch } from "@/lib/api";
 
 interface ApiNewsArticleFull {
@@ -36,18 +37,23 @@ export default function EditNewsArticlePage() {
   }
 
   return (
-    <NewsEditor
-      mode="edit"
-      articleId={id}
-      initial={{
-        slug: article.slug,
-        title: article.title,
-        excerpt: article.excerpt,
-        date: article.date.slice(0, 10),
-        category: article.category,
-        image: article.image ?? "",
-        featured: article.featured,
-      }}
-    />
+    <>
+      <NewsEditor
+        mode="edit"
+        articleId={id}
+        initial={{
+          slug: article.slug,
+          title: article.title,
+          excerpt: article.excerpt,
+          date: article.date.slice(0, 10),
+          category: article.category,
+          image: article.image ?? "",
+          featured: article.featured,
+        }}
+      />
+      <div className="mx-auto max-w-3xl px-4 pb-12">
+        <NewsRevisionHistory articleId={id} />
+      </div>
+    </>
   );
 }

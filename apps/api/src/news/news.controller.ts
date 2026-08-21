@@ -7,8 +7,10 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { StaffRank, UserRole } from '@prisma/client';
 import { NewsService } from './news.service';
 import {
@@ -57,8 +59,20 @@ export class NewsController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
   @MinRank(StaffRank.COORDINATEUR_GENERAL)
-  update(@Param('id') id: string, @Body() dto: UpdateNewsArticleDto) {
-    return this.news.update(id, dto);
+  update(
+    @Req() req: Request & { user: { id: string; minecraftUsername?: string; discordUsername?: string } },
+    @Param('id') id: string,
+    @Body() dto: UpdateNewsArticleDto,
+  ) {
+    const editorLabel = req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    return this.news.update(id, dto, req.user.id, editorLabel);
+  }
+
+  @Get(':id/revisions')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  listRevisions(@Param('id') id: string) {
+    return this.news.listRevisions(id);
   }
 
   @Delete(':id')

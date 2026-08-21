@@ -98,6 +98,9 @@ model User {
   gameEventRevisionsEdited GameEventRevision[]
   missionsCreated  Mission[] @relation("MissionCreatedBy")
   missionsResolved Mission[] @relation("MissionResolvedBy")
+  newsRevisionsEdited        NewsRevision[]
+  mapLocationRevisionsEdited MapLocationRevision[]
+  loreRevisionsEdited        LoreRevision[]
 }
 
 model Session {
@@ -182,9 +185,34 @@ model LoreArticle {
   createdAt               DateTime     @default(now())
   updatedAt               DateTime     @updatedAt
   author                  User?        @relation("AuthorArticles", fields: [authorId], references: [id], onDelete: SetNull)
+  revisions               LoreRevision[]
 
   @@index([status, category])
   @@index([publishedAt])
+}
+
+// Snapshot du contenu de LoreArticle juste AVANT chaque edition staff.
+model LoreRevision {
+  id            String      @id @default(cuid())
+  loreArticleId String
+  loreArticle   LoreArticle @relation(fields: [loreArticleId], references: [id], onDelete: Cascade)
+
+  title                   String
+  excerpt                 String?
+  content                 String
+  category                LoreCategory
+  status                  LoreStatus
+  restrictedDepartmentIds String[]
+  featured                Boolean
+  coverImage              String?
+  tags                    String[]
+
+  editedById    String?
+  editedBy      User?    @relation(fields: [editedById], references: [id], onDelete: SetNull)
+  editedByLabel String?
+  createdAt     DateTime @default(now())
+
+  @@index([loreArticleId])
 }
 
 model GalleryAsset {
@@ -798,9 +826,32 @@ model NewsArticle {
   featured  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  revisions NewsRevision[]
 
   @@index([category])
   @@index([date])
+}
+
+// Snapshot du contenu de NewsArticle juste AVANT chaque edition staff — meme
+// principe que ScpRevision/CharacterRevision/GameEventRevision (LOT F).
+model NewsRevision {
+  id            String      @id @default(cuid())
+  newsArticleId String
+  newsArticle   NewsArticle @relation(fields: [newsArticleId], references: [id], onDelete: Cascade)
+
+  title    String
+  excerpt  String
+  date     DateTime
+  category String
+  image    String?
+  featured Boolean
+
+  editedById    String?
+  editedBy      User?    @relation(fields: [editedById], references: [id], onDelete: SetNull)
+  editedByLabel String?
+  createdAt     DateTime @default(now())
+
+  @@index([newsArticleId])
 }
 
 // ─── REDLAKES CORE — carte interactive (MapLocation) ────────────────────────
@@ -856,6 +907,30 @@ model MapLocation {
   faction     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  revisions   MapLocationRevision[]
 
   @@index([type])
+}
+
+// Snapshot du contenu de MapLocation juste AVANT chaque edition staff.
+model MapLocationRevision {
+  id            String      @id @default(cuid())
+  mapLocationId String
+  mapLocation   MapLocation @relation(fields: [mapLocationId], references: [id], onDelete: Cascade)
+
+  name        String
+  type        String
+  x           Float
+  y           Float
+  description String
+  history     String
+  danger      Int
+  faction     String?
+
+  editedById    String?
+  editedBy      User?    @relation(fields: [editedById], references: [id], onDelete: SetNull)
+  editedByLabel String?
+  createdAt     DateTime @default(now())
+
+  @@index([mapLocationId])
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { MapLocationEditor } from "@/components/staff/MapLocationEditor";
+import { MapLocationRevisionHistory } from "@/components/staff/MapLocationRevisionHistory";
 import { apiFetch } from "@/lib/api";
 
 interface ApiMapLocationFull {
@@ -38,20 +39,25 @@ export default function EditMapLocationPage() {
   }
 
   return (
-    <MapLocationEditor
-      mode="edit"
-      locationId={id}
-      initial={{
-        slug: location.slug,
-        name: location.name,
-        type: location.type,
-        x: location.x.toString(),
-        y: location.y.toString(),
-        description: location.description,
-        history: location.history,
-        danger: location.danger.toString(),
-        faction: location.faction ?? "",
-      }}
-    />
+    <>
+      <MapLocationEditor
+        mode="edit"
+        locationId={id}
+        initial={{
+          slug: location.slug,
+          name: location.name,
+          type: location.type,
+          x: location.x.toString(),
+          y: location.y.toString(),
+          description: location.description,
+          history: location.history,
+          danger: location.danger.toString(),
+          faction: location.faction ?? "",
+        }}
+      />
+      <div className="mx-auto max-w-3xl px-4 pb-12">
+        <MapLocationRevisionHistory locationId={id} />
+      </div>
+    </>
   );
 }

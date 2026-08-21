@@ -7,8 +7,10 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { StaffRank, UserRole } from '@prisma/client';
 import { MapService } from './map.service';
 import {
@@ -57,8 +59,20 @@ export class MapController {
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
   @MinRank(StaffRank.COORDINATEUR_GENERAL)
-  update(@Param('id') id: string, @Body() dto: UpdateMapLocationDto) {
-    return this.map.update(id, dto);
+  update(
+    @Req() req: Request & { user: { id: string; minecraftUsername?: string; discordUsername?: string } },
+    @Param('id') id: string,
+    @Body() dto: UpdateMapLocationDto,
+  ) {
+    const editorLabel = req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    return this.map.update(id, dto, req.user.id, editorLabel);
+  }
+
+  @Get(':id/revisions')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  listRevisions(@Param('id') id: string) {
+    return this.map.listRevisions(id);
   }
 
   @Delete(':id')

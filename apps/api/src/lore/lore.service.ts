@@ -71,7 +71,32 @@ export class LoreService {
     return article;
   }
 
-  async update(id: string, dto: UpdateLoreDto) {
+  async update(
+    id: string,
+    dto: UpdateLoreDto,
+    editorId?: string,
+    editorLabel?: string,
+  ) {
+    const before = await this.prisma.loreArticle.findUnique({ where: { id } });
+    if (!before) throw new NotFoundException('Article introuvable');
+
+    await this.prisma.loreRevision.create({
+      data: {
+        loreArticleId: before.id,
+        title: before.title,
+        excerpt: before.excerpt,
+        content: before.content,
+        category: before.category,
+        status: before.status,
+        restrictedDepartmentIds: before.restrictedDepartmentIds,
+        featured: before.featured,
+        coverImage: before.coverImage,
+        tags: before.tags,
+        editedById: editorId,
+        editedByLabel: editorLabel,
+      },
+    });
+
     const article = await this.prisma.loreArticle.update({
       where: { id },
       data: {
@@ -86,6 +111,20 @@ export class LoreService {
       await this.search.removeLore(article.id);
     }
     return article;
+  }
+
+  /** Historique des révisions d'un article de lore — le plus récent d'abord */
+  async listRevisions(loreArticleId: string) {
+    const article = await this.prisma.loreArticle.findUnique({
+      where: { id: loreArticleId },
+      select: { id: true },
+    });
+    if (!article) throw new NotFoundException('Article introuvable');
+
+    return this.prisma.loreRevision.findMany({
+      where: { loreArticleId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async remove(id: string) {
