@@ -37,6 +37,7 @@ import {
   HUB_PREFIX,
   buildConfirmAllRow,
   buildConfirmDeleteRow,
+  buildConfirmTopHierarchyRow,
   buildFactionSelectMenu,
   buildGiveRemoveRow,
   buildGradeSelectMenu,
@@ -46,6 +47,11 @@ import {
   buildStatusEmbed,
   hubId,
 } from "./roles-hub-ui.js";
+import {
+  applyTopHierarchyPlan,
+  computeTopHierarchyPlan,
+  formatTopHierarchyPreview,
+} from "./top-hierarchy.js";
 import {
   formatImportPreview,
   formatImportProgress,
@@ -200,6 +206,29 @@ export async function handleRolesHubButton(
       if (btn === "organiser") {
         await runBatchAction(interaction, "Organiser", async () =>
           forceOrganize(guild),
+        );
+        return;
+      }
+      if (btn === "tophier") {
+        const plan = await computeTopHierarchyPlan(guild);
+        await interaction.reply({
+          content:
+            "🔝 **Rangement complet (bots + staff)**\n\n" +
+            formatTopHierarchyPreview(plan) +
+            "\n\nConfirmer ?",
+          components: [buildConfirmTopHierarchyRow()],
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+      if (btn === "confirm-tophier") {
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+        await interaction.editReply("⏳ Rangement en cours…");
+        const plan = await computeTopHierarchyPlan(guild);
+        await applyTopHierarchyPlan(guild, plan);
+        await forceOrganize(guild);
+        await interaction.editReply(
+          "✅ **Rangement complet terminé** — bots, staff, catégories et grades RP rangés.",
         );
         return;
       }

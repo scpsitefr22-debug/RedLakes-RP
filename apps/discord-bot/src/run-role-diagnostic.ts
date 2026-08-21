@@ -10,6 +10,7 @@ import { matchExistingRolesToGrades } from "./lib/role-matcher.js";
 import { isStaffOrBaseRole } from "./lib/rp-catalog.js";
 import { isLayoutSeparatorName } from "./lib/role-layout.js";
 import { organizeGuildRpRoles } from "./lib/organize-rp-roles.js";
+import { refreshGradeCatalog } from "./lib/grade-catalog.js";
 
 const token = process.env.DISCORD_BOT_TOKEN!;
 const guildId = process.env.DISCORD_GUILD_ID!;
@@ -17,6 +18,7 @@ const guildId = process.env.DISCORD_GUILD_ID!;
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once("ready", async () => {
+  await refreshGradeCatalog();
   const guild = await client.guilds.fetch(guildId);
   const full = await guild.fetch();
   await full.roles.fetch();

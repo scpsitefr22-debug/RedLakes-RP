@@ -22,9 +22,9 @@ import {
 
   normalizeRoleLabel,
 
-  RP_GRADE_NAMES,
-
 } from "./lib/rp-catalog.js";
+
+import { refreshGradeCatalog } from "./lib/grade-catalog.js";
 
 import {
 
@@ -230,13 +230,15 @@ async function verifyRoles(guild: Guild): Promise<number> {
 
 client.once("ready", async () => {
 
+  await refreshGradeCatalog();
+
   const guild = await client.guilds.fetch(config.guildId).then((g) => g.fetch());
 
 
 
   console.log("\n=== REBUILD ROLES RP REDLAKES ===\n");
 
-  console.log(`Catalogue : ${RP_GRADE_NAMES.length} grades\n`);
+  console.log(`Catalogue : ${getCanonicalGradeLabels().size} grades\n`);
 
 
 

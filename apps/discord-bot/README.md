@@ -66,21 +66,48 @@ Ou depuis la racine du projet : double-clic sur **`Lancer-Bot-Discord.bat`**
 (le script `scripts/start-bot.ps1` installe les dependances locales si besoin,
 puis verifie, deploie et lance le bot).
 
-## Commandes
+## Commande
 
-| Commande | Description |
-|----------|-------------|
-| `/link <code>` | Lie Discord a Minecraft (code genere sur le site) |
-| `/unlink` | Delie le compte |
-| `/profil [membre]` | Dossier personnel + sync roles RP (pour toi) |
-| `/sync-roles` | Force la sync de ton grade in-game vers Discord |
-| `/roles-scan` | [Staff] Re-scanne les roles RP et affiche le mapping |
-| `/serveur` | Statut Minecraft + IP |
-| `/grades [departement]` | Hierarchie Site-12 |
-| `/wiki [section]` | Liens encyclopedie |
-| `/candidature` | Postuler pour l'equipe |
-| `/aide` | Liste des commandes |
-| `/ping` | Etat bot + API |
+`/hub` est l'**unique commande slash** du bot — un panneau interactif (menus
+deroulants, boutons, formulaires) qui donne acces a tout le reste. Aucune
+autre commande n'existe : tout ce qui etait avant `/link`, `/profil`,
+`/grades`, `/serveur`, etc. est maintenant une section du hub.
+
+| Section (menu joueur) | Equivalent historique |
+|---|---|
+| Mon profil | `/profil` |
+| Mon identite RP | `/identite` |
+| Organisation (Ma faction / Mon departement / Ma team / Grades Site-12) | `/factions` / `/departements` (vue perso) / `/grades` |
+| Toutes les factions / Tous les departements | `/factions` / `/departements` (parcours libre) |
+| Statut serveur | `/serveur` |
+| Site & Wiki (11 pages : wiki, lore, factions, carte, chronologie, actualites, transmissions, archives...) | `/wiki` (etendu) |
+| Candidater | `/candidature` |
+| Lier / Delier mon compte | `/link` / `/unlink` |
+| Etat du bot | `/ping` + `/core-status` (fusionnes, visibles de tous) |
+| Mes candidatures / sanctions / missions / notifications | pas encore branche — voir `SOON_REASON` dans `lib/hub/constants.ts` |
+
+**Carte d'identité RP** (`lib/rp-card.ts`) : "Mon profil" genere une image PNG (via `sharp`)
+de la carte d'identite du joueur — couleur d'accent tiree de `factionInfo.color` (l'API),
+avatar Minecraft reel, sans niveau d'habilitation affiche.
+
+**Dossier personnel auto-synchronise** (`lib/dossier-channel.ts`) : a chaque affichage de
+"Mon profil" (et a chaque resync), le bot cree/retrouve un salon prive par joueur sous la
+categorie `📁 DOSSIERS PERSONNEL` (nom : `prenom-nom-rp-pseudodiscord`), visible du joueur et
+des roles staff, et y **edite** le meme message (carte + infos) — pas de spam. Le salon est
+retrouve sans base de donnees : l'ID Discord du joueur est stocke dans le topic du salon.
+
+| Section (Espace Staff, permission Discord Gerer les roles/le serveur) | Equivalent historique |
+|---|---|
+| Rapports RP | `/rapports` |
+| Rechercher un joueur | — (nouveau) |
+| Gestion des roles | `/hub-roles`, `/roles-admin`, `/roles-organize`, `/roles-import`, `/roles-check`, `/roles-scan` (panneau deja tout-en-un) |
+| Dernieres transmissions | — (nouveau) |
+| Candidatures / Notifications staff / Outils administratifs | pas encore branche |
+
+Architecture modulaire dans `lib/hub/` : `dispatch.ts` (routage), `navigation.ts`
+(primitives : boutons, back-targets), `constants.ts` (libelles, placeholders API GAP),
+`views/*.ts` (une page = une fonction `render*`). Reutilise le panneau roles existant (`lib/roles-hub-ui.ts` /
+`lib/roles-hub-handlers.ts`) plutot que de le dupliquer.
 
 ## Auto-setup : salons STAFF TECHNIQUE
 
@@ -132,17 +159,21 @@ roles techniques et boosts.
 le bot le **cree automatiquement** avec la couleur de sa branche (Securite = bleu,
 Scientifique = vert, Maintenance = orange, etc.).
 
-**Rangement propre** : separateurs par departement + hierarchie Site-12 :
-```
-━━━ CONSEIL OMEGA ━━━
-━━━ SECURITE ━━━
-━━━ SCIENTIFIQUE ━━━
-...
-```
-Les salons bot sont aussi ranges dans la categorie STAFF TECHNIQUE.
-Desactive avec `DISCORD_AUTO_ORGANIZE_ROLES=false`.
+**Rangement des roles (separateurs par departement + hierarchie Site-12)** :
+**desactive par defaut** (`DISCORD_AUTO_ORGANIZE_ROLES=false`) — un rangement automatique
+au demarrage a deja casse l'ordre des roles existants en prod. Le rangement reste
+disponible **a la demande** via le bouton "Organiser" / "Installation complete" du
+panneau `/hub` -> Espace Staff -> Gestion des roles (staffs uniquement, action volontaire).
+Les salons bot sont ranges dans la categorie STAFF TECHNIQUE (comportement separe, non concerne).
 
-Quand un grade change (plugin Minecraft -> API, `/link`, `/profil`, `/sync-roles`,
+**Rangement complet (bots + staff)** : bouton dedie dans le meme panneau — range
+les roles bot tout en haut (le role du bot en premier, "IA-Principal" juste apres si
+present), puis les roles staff, PUIS relance le rangement RP habituel dessous.
+Contrairement au rangement RP seul, celui-ci **affiche un apercu** (roles detectes
+dans chaque categorie) avant de demander confirmation, puisqu'il touche des roles
+normalement jamais deplaces par le bot. Implemente dans `lib/top-hierarchy.ts`.
+
+Quand un grade change (plugin Minecraft -> API, liaison/resync via `/hub`,
 connexion OAuth) :
 
 1. le **site** est mis a jour ;

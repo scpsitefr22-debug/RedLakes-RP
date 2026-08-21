@@ -24,6 +24,14 @@ function normalizeJsonEnv(raw: string): string {
   return trimmed;
 }
 
+/** IDs separes par virgule/point-virgule/espace -> tableau nettoye */
+function parseIdList(raw: string): string[] {
+  return raw
+    .split(/[,;\s]+/)
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
+
 function parseRoleMap(raw: string): Record<string, string> {
   if (!raw) return {};
   try {
@@ -98,11 +106,33 @@ export const config = {
 
   roleMap: parseRoleMap(optional("DISCORD_ROLE_MAP", "{}")),
   roleVerified: optional("ROLE_VERIFIED"),
+  /**
+   * IDs de roles Discord consideres "staff" en plus de la detection
+   * automatique par permission (voir lib/member-roles staff sync) — utile
+   * pour un role staff purement organisationnel sans vraie permission
+   * Discord. Plusieurs IDs possibles, separes par virgule/espace.
+   */
+  roleStaffIds: parseIdList(optional("ROLE_STAFF")),
+
+  /**
+   * IDs de roles Discord nommes correspondant a chaque rang staff — sert a
+   * detecter precisement le rang (au-dela du simple "a une permission
+   * staff", voir roleStaffIds). Le role Discord "Fondateur" est inclus ici
+   * mais ne fait jamais monter plus haut que Coordinateur Général cote site
+   * automatiquement — ADMIN reste toujours decide a la main.
+   */
+  roleRankIds: {
+    SURVEILLANT: parseIdList(optional("ROLE_RANK_SURVEILLANT")),
+    OFFICIER: parseIdList(optional("ROLE_RANK_OFFICIER")),
+    COORDINATEUR_GENERAL: parseIdList(optional("ROLE_RANK_COORDINATEUR_GENERAL")),
+    FONDATEUR: parseIdList(optional("ROLE_RANK_FONDATEUR")),
+  },
 
   /** Roles RP : scan, sync, creation et rangement auto */
   roles: {
     autoCreate: optional("DISCORD_AUTO_CREATE_ROLES", "false") === "true",
-    autoOrganize: optional("DISCORD_AUTO_ORGANIZE_ROLES", "true") !== "false",
+    /** Desactive par defaut — le rangement auto a deja casse l'ordre des roles en prod */
+    autoOrganize: optional("DISCORD_AUTO_ORGANIZE_ROLES", "false") === "true",
     /** Supprime les doublons vides crees par le bot en bas de liste */
     removeDuplicates: optional("DISCORD_REMOVE_DUPLICATE_ROLES", "true") !== "false",
   },

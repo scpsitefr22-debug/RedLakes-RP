@@ -16,7 +16,10 @@ function hasEmojiOrServerDecoration(name: string): boolean {
 }
 
 /**
- * Supprime les doublons vides crees par le bot (━━━ separateurs, noms canoniques en bas).
+ * Supprime les VRAIS doublons vides crees par le bot — deux roles separateurs
+ * avec exactement le meme nom (garde le plus haut place, supprime les autres).
+ * Un separateur unique n'est JAMAIS un doublon, meme vide : c'est son etat
+ * normal (role diviseur visuel, jamais assigne a personne).
  * Ne fetch pas tous les membres (gros serveurs) — supprime uniquement si role.members.size === 0.
  */
 export async function removeEmptyBotDuplicates(
@@ -35,6 +38,14 @@ export async function removeEmptyBotDuplicates(
     }
   }
 
+  const positionsByName = new Map<string, number[]>();
+  for (const role of guild.roles.cache.values()) {
+    if (role.managed || role.id === guild.id) continue;
+    const list = positionsByName.get(role.name) ?? [];
+    list.push(role.position);
+    positionsByName.set(role.name, list);
+  }
+
   const removed: string[] = [];
   const registry = getRoleRegistry();
 
@@ -42,7 +53,11 @@ export async function removeEmptyBotDuplicates(
     if (role.managed || role.id === guild.id) continue;
     if (isFactionRole(role.name) || isExistingBranchSeparator(role.name)) continue;
 
-    const isSep = isBotSeparatorDuplicate(role.name) || isLayoutSeparatorName(role.name);
+    const namesakePositions = positionsByName.get(role.name) ?? [];
+    const isSep =
+      (isBotSeparatorDuplicate(role.name) || isLayoutSeparatorName(role.name)) &&
+      namesakePositions.length > 1 &&
+      role.position !== Math.max(...namesakePositions);
     const isLowCanon =
       !hasEmojiOrServerDecoration(role.name) &&
       role.position < 100 &&

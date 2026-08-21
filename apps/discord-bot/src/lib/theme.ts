@@ -8,6 +8,7 @@ export const COLORS = {
   danger: 0xe74c3c,
   aegis: 0xc0c0c0,
   info: 0x3498db,
+  staff: 0x9b59b6,
 } as const;
 
 export const BRAND = {
@@ -23,4 +24,11 @@ export function mcAvatar(username: string): string {
 
 export function mcBody(username: string): string {
   return `https://mc-heads.net/body/${encodeURIComponent(username)}/right`;
+}
+
+/** Convertit une couleur hexadecimale CORE (#RRGGBB) en couleur d'embed, avec repli */
+export function parseHexColor(hex: string | null | undefined): number {
+  if (!hex) return COLORS.redlake;
+  const n = parseInt(hex.replace("#", ""), 16);
+  return Number.isNaN(n) ? COLORS.redlake : n;
 }

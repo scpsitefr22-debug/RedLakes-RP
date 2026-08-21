@@ -14,13 +14,19 @@ import {
   logRegistrySummary,
 } from "./lib/discord-role-registry.js";
 import { setupGuildChannels } from "./lib/guild-setup.js";
+import { refreshGradeCatalog } from "./lib/grade-catalog.js";
 import { handleMemberJoin } from "./events/welcome.js";
-import { handleMemberRoleChange } from "./events/member-roles.js";
+import { handleMemberRoleChange, backfillStaffRoles } from "./events/member-roles.js";
 import {
   handleMessageTransmission,
   handleMemberJoinTransmission,
   handleMemberLeaveTransmission,
 } from "./events/transmissions.js";
+import {
+  handleMainHubComponent,
+  handleMainHubModalSubmit,
+  isMainHubInteraction,
+} from "./lib/hub/dispatch.js";
 
 const intents = [
   GatewayIntentBits.Guilds,
@@ -40,6 +46,8 @@ const client = new Client({
 client.once(Events.ClientReady, async (c) => {
   console.log(`Bot connecte : ${c.user.tag}`);
 
+  await refreshGradeCatalog();
+
   const guild = await c.guilds.fetch(config.guildId).catch(() => null);
   if (guild) {
     try {
@@ -48,7 +56,7 @@ client.once(Events.ClientReady, async (c) => {
       console.warn("[setup] Echec auto-setup salons :", err);
     }
     try {
-      // Scan uniquement au démarrage — pas de création/rangement (évite conflit avec /roles-import)
+      // Scan uniquement au démarrage — pas de création/rangement (évite conflit avec le panneau import du hub)
       await refreshRoleRegistry(guild, {
         ensureMissing: false,
         organize: false,
@@ -56,6 +64,11 @@ client.once(Events.ClientReady, async (c) => {
       logRegistrySummary();
     } catch (err) {
       console.warn("[roles] Echec scan roles RP :", err);
+    }
+    try {
+      await backfillStaffRoles(guild);
+    } catch (err) {
+      console.warn("[sync] Echec backfill staff :", err);
     }
   } else {
     console.warn(
@@ -98,6 +111,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   try {
     if (interaction.isButton()) {
+      if (isMainHubInteraction(interaction.customId)) {
+        await handleMainHubComponent(interaction);
+        return;
+      }
       const { handleRolesHubButton, isRolesHubInteraction } = await import(
         "./lib/roles-hub-handlers.js"
       );
@@ -108,6 +125,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 
     if (interaction.isStringSelectMenu()) {
+      if (isMainHubInteraction(interaction.customId)) {
+        await handleMainHubComponent(interaction);
+        return;
+      }
       const { handleRolesHubSelect, isRolesHubInteraction } = await import(
         "./lib/roles-hub-handlers.js"
       );
@@ -136,6 +157,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 
     if (interaction.isModalSubmit()) {
+      if (isMainHubInteraction(interaction.customId)) {
+        await handleMainHubModalSubmit(interaction);
+        return;
+      }
       const { handleRolesHubModal, isRolesHubInteraction } = await import(
         "./lib/roles-hub-handlers.js"
       );

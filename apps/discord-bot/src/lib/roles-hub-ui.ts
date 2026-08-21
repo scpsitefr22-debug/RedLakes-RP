@@ -167,6 +167,14 @@ export function buildHubComponents() {
       .setEmoji("👥"),
   );
 
+  const row5 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(hubId("btn", "tophier"))
+      .setLabel("Rangement complet (bots + staff)")
+      .setStyle(ButtonStyle.Secondary)
+      .setEmoji("🔝"),
+  );
+
   const row4 = new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
     new UserSelectMenuBuilder()
       .setCustomId(hubId("user", "pick"))
@@ -175,7 +183,7 @@ export function buildHubComponents() {
       .setMaxValues(1),
   );
 
-  return [row1, row2, row3, row4];
+  return [row1, row2, row3, row5, row4];
 }
 
 export function buildGradeSelectMenu() {
@@ -213,6 +221,20 @@ export function buildConfirmAllRow() {
     new ButtonBuilder()
       .setCustomId(hubId("btn", "confirm-tout"))
       .setLabel("Oui, tout installer")
+      .setStyle(ButtonStyle.Danger)
+      .setEmoji("✅"),
+    new ButtonBuilder()
+      .setCustomId(hubId("btn", "cancel"))
+      .setLabel("Annuler")
+      .setStyle(ButtonStyle.Secondary),
+  );
+}
+
+export function buildConfirmTopHierarchyRow() {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(hubId("btn", "confirm-tophier"))
+      .setLabel("Oui, ranger bots + staff")
       .setStyle(ButtonStyle.Danger)
       .setEmoji("✅"),
     new ButtonBuilder()

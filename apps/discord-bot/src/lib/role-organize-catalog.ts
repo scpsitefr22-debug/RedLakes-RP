@@ -71,7 +71,6 @@ function branchForSeparator(separator: string): BranchId {
   const s = sanitizeDiscordRoleName(separator).toLowerCase();
   if (s.includes("omega")) return "omega";
   if (s.includes("direction")) return "direction";
-  if (s.includes("mtf")) return "securite";
   if (s.includes("securite") || s.includes("sécurité")) return "securite";
   if (s.includes("scientifique")) return "scientifique";
   if (s.includes("maintenance")) return "maintenance";
@@ -110,8 +109,6 @@ function separatorKeywords(catalogSeparator: string): string[] {
   if (s.includes("direction") || s.includes("site")) add("direction", "site");
   if (s.includes("securite") || s.includes("sécurité"))
     add("securite", "sécurité", "secur", "branche sécurité");
-  if (s.includes("mtf") || s.includes("mobiles"))
-    add("mtf", "mobiles", "forces");
   if (s.includes("scientifique") || s.includes("science"))
     add("scientifique", "science", "scp", "branche scientifique");
   if (s.includes("maintenance") || s.includes("maint"))

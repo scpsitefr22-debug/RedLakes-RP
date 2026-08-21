@@ -98,7 +98,7 @@ async function deploy(): Promise<void> {
     "Commandes enregistrees :",
     commands.map((c) => `/${c.data.name}`).join(", "),
   );
-  console.log("\nTeste sur Discord : /aide\n");
+  console.log("\nTeste sur Discord : /hub\n");
 }
 
 deploy().catch((err) => {

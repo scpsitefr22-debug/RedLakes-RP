@@ -3,7 +3,16 @@
  * Genere depuis : Branche Du Site 12 (4).xlsx
  * Staff, Membre, Joueur, Civil ne sont PAS geres par le bot.
  * Regenerer : python scripts/generate-rp-catalog.py
+ *
+ * Reste le filet de secours si l'API CORE est injoignable au demarrage —
+ * voir grade-catalog.ts. isRpGradeName / getCanonicalGradeLabels (et donc
+ * TOUT ce qui en depend : reconnaissance de role, ensure-rp-roles,
+ * organize-rp-roles, wipe-rp-roles, run-role-rebuild, run-role-diagnostic)
+ * preferent desormais le catalogue live charge depuis l'API des qu'il est
+ * disponible — refreshGradeCatalog() est appele au demarrage du bot
+ * (index.ts) et au demarrage de chaque script autonome qui en a besoin.
  */
+import { getLiveGradeNames } from "./grade-catalog.js";
 
 export const RP_GRADE_NAMES: readonly string[] = [
   "Adjoint-Directeur",
@@ -117,9 +126,14 @@ export function isStaffOrBaseRole(roleName: string): boolean {
   return STAFF_ROLE_PATTERNS.some((p) => p.test(roleName) || p.test(n));
 }
 
+function allKnownGradeNames(): readonly string[] {
+  const live = getLiveGradeNames();
+  return live.length > 0 ? live : RP_GRADE_NAMES;
+}
+
 export function isRpGradeName(name: string): boolean {
   const n = normalizeRoleLabel(name);
-  return RP_GRADE_NAMES.some((g) => normalizeRoleLabel(g) === n);
+  return allKnownGradeNames().some((g) => normalizeRoleLabel(g) === n);
 }
 
 function scoreDisplayName(name: string): number {
@@ -133,7 +147,7 @@ function scoreDisplayName(name: string): number {
 
 export function getCanonicalGradeLabels(): Map<string, string> {
   const map = new Map<string, string>();
-  for (const label of RP_GRADE_NAMES) {
+  for (const label of allKnownGradeNames()) {
     const key = normalizeRoleLabel(label);
     const prev = map.get(key);
     if (!prev || scoreDisplayName(label) > scoreDisplayName(prev)) {
