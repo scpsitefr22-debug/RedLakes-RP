@@ -106,21 +106,23 @@ export async function getMergedLoreArticles(): Promise<LoreArticleView[]> {
 export async function fetchLoreArticleBySlug(
   slug: string,
 ): Promise<LoreArticleView | null> {
-  const staticSection = loreSections.find((s) => s.id === slug);
-  if (staticSection) {
-    return staticToView(staticSection);
-  }
-
+  // Le CMS (base de données) est la source de vérité — un article statique
+  // avec le même slug ne sert que de contenu de secours pré-CMS, jamais
+  // prioritaire sur ce que le staff a réellement écrit/modifié.
   try {
     const res = await fetch(`${loreApiBase()}/lore/${encodeURIComponent(slug)}`, {
       ...(typeof window === "undefined" ? { cache: "no-store" } : {}),
       credentials: "include",
     });
-    if (!res.ok) return null;
-    return cmsToView((await res.json()) as CmsArticle);
+    if (res.ok) {
+      return cmsToView((await res.json()) as CmsArticle);
+    }
   } catch {
-    return null;
+    /* API indisponible — on retombe sur le contenu statique ci-dessous */
   }
+
+  const staticSection = loreSections.find((s) => s.id === slug);
+  return staticSection ? staticToView(staticSection) : null;
 }
 
 export async function getClassifiedArchives() {
