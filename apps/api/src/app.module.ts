@@ -18,7 +18,6 @@ import { TeamsModule } from './teams/teams.module';
 import { AssignmentsModule } from './assignments/assignments.module';
 import { SanctionsModule } from './sanctions/sanctions.module';
 import { MissionsModule } from './missions/missions.module';
-import { OphisModule } from './ophis/ophis.module';
 import { ScpModule } from './scp/scp.module';
 import { CharactersModule } from './characters/characters.module';
 import { EventsModule } from './events/events.module';
@@ -47,7 +46,6 @@ import { SystemModule } from './system/system.module';
     AssignmentsModule,
     SanctionsModule,
     MissionsModule,
-    OphisModule,
     ScpModule,
     CharactersModule,
     EventsModule,
