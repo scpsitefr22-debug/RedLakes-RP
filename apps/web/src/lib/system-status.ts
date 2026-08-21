@@ -15,6 +15,9 @@ export async function getSystemStatus(): Promise<SystemStatus> {
       serverOpen: siteConfig.serverOpen,
       recruitmentOpen: siteConfig.recruitmentOpen,
       maintenance: false,
+      alertLevel: "NORMAL",
+      alertNote: null,
+      alertUpdatedAt: null,
     };
   }
 }

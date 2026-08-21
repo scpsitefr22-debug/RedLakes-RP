@@ -1,4 +1,5 @@
-import { IsBoolean, IsOptional } from 'class-validator';
+import { AlertLevel } from '@prisma/client';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class UpdateSystemStateDto {
   @IsOptional()
@@ -12,4 +13,12 @@ export class UpdateSystemStateDto {
   @IsOptional()
   @IsBoolean()
   maintenance?: boolean;
+
+  @IsOptional()
+  @IsEnum(AlertLevel)
+  alertLevel?: AlertLevel;
+
+  @IsOptional()
+  @IsString()
+  alertNote?: string;
 }

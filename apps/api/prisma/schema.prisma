@@ -276,6 +276,7 @@ enum PlatformEntityType {
   PLAYER
   USER
   SCP_OBJECT
+  SYSTEM_STATE
 }
 
 enum AuditAction {
@@ -818,12 +819,28 @@ model NewsArticle {
 // Ligne unique (id fixe "singleton") plutôt qu'une table de config à clé/
 // valeur générique : seulement 3 booléens à ce stade, pas besoin de plus.
 
+// Niveau d'alerte RP affiché sur le site — distinct des flags ops
+// (serverOpen/recruitmentOpen/maintenance) ci-dessus. Change UNIQUEMENT via
+// une action staff explicite (voir SystemController, ADMIN uniquement) :
+// jamais de calcul automatique, de minuteur ou de tirage aleatoire — les
+// brèches et crises restent rares et decidees par le staff (voir memoire
+// "RP breach rarity").
+enum AlertLevel {
+  NORMAL
+  VIGILANCE
+  ALERTE
+  CRISE
+}
+
 model SystemState {
-  id              String   @id @default("singleton")
-  serverOpen      Boolean  @default(false)
-  recruitmentOpen Boolean  @default(true)
-  maintenance     Boolean  @default(false)
-  updatedAt       DateTime @updatedAt
+  id              String     @id @default("singleton")
+  serverOpen      Boolean    @default(false)
+  recruitmentOpen Boolean    @default(true)
+  maintenance     Boolean    @default(false)
+  alertLevel      AlertLevel @default(NORMAL)
+  alertNote       String?
+  alertUpdatedAt  DateTime?
+  updatedAt       DateTime   @updatedAt
 }
 
 model MapLocation {

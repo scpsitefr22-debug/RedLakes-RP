@@ -14,6 +14,7 @@ import {
 import { siteConfig } from "@/config/site";
 import { GlobalSearch } from "./GlobalSearch";
 import { HeaderAuth } from "./HeaderAuth";
+import { AlertLevelBadge } from "./AlertLevelBadge";
 import { usePlayerSession } from "@/hooks/usePlayerSession";
 
 const STAFF_ROLES = new Set(["STAFF", "ADMIN"]);
@@ -96,20 +97,23 @@ export function Header() {
     <>
       <header className="sticky top-0 z-50 border-b border-redlake/30 bg-black/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-          <Link href="/" className="group flex items-center gap-3">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded border border-redlake/50 bg-redlake/10">
-              <Shield className="h-5 w-5 text-redlake-glow" />
-              <div className="absolute inset-0 rounded bg-redlake/5 opacity-0 transition-opacity group-hover:opacity-100" />
-            </div>
-            <div className="hidden sm:block">
-              <p className="font-mono text-sm font-bold tracking-widest text-white">
-                REDLAKES RP
-              </p>
-              <p className="text-[10px] tracking-wider text-metal-light">
-                SITE-12 // CLASSIFIÉ
-              </p>
-            </div>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="group flex items-center gap-3">
+              <div className="relative flex h-10 w-10 items-center justify-center rounded border border-redlake/50 bg-redlake/10">
+                <Shield className="h-5 w-5 text-redlake-glow" />
+                <div className="absolute inset-0 rounded bg-redlake/5 opacity-0 transition-opacity group-hover:opacity-100" />
+              </div>
+              <div className="hidden sm:block">
+                <p className="font-mono text-sm font-bold tracking-widest text-white">
+                  REDLAKES RP
+                </p>
+                <p className="text-[10px] tracking-wider text-metal-light">
+                  SITE-12 // CLASSIFIÉ
+                </p>
+              </div>
+            </Link>
+            <AlertLevelBadge />
+          </div>
 
           <nav className="hidden items-center gap-1 lg:flex">
             {visibleNavItems.map((item) => (

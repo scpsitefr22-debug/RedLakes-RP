@@ -22,6 +22,7 @@ import {
   Newspaper,
   MapPin,
   Target,
+  Radio,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -44,6 +45,7 @@ const MANAGEMENT_LINKS = [
   { icon: Zap, label: "Gestion des événements", caption: "Brèches, invasions, crises", href: "/staff/evenements" },
   { icon: Newspaper, label: "Gestion des actualités", caption: "Articles, mises à jour", href: "/staff/actualites" },
   { icon: MapPin, label: "Gestion de la carte", caption: "Emplacements, coordonnées", href: "/staff/carte" },
+  { icon: Radio, label: "Système", caption: "Niveau d'alerte, statut (Fondateur)", href: "/staff/systeme" },
 ];
 
 interface Application {
