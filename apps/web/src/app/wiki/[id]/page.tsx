@@ -14,7 +14,7 @@ import { DeclassificationOverlay } from "@/components/wiki/DeclassificationOverl
 import { RecordScpView } from "@/components/wiki/RecordScpView";
 import { DangerComparison } from "@/components/wiki/DangerComparison";
 import { OfficialReportView } from "@/components/wiki/OfficialReportView";
-import { linkifyScpRefs } from "@/lib/scp-linkify";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -130,7 +130,11 @@ export default async function SCPDetailPage({ params }: Props) {
           </Badge>
         </div>
         <h1 className="mb-4 max-w-[80%] text-4xl font-bold text-white">{scp.name}</h1>
-        <p className="mb-4 text-gray-400">{linkifyScpRefs(scp.description, scp.number.toLowerCase())}</p>
+        <DiscordMarkdown
+          text={scp.description}
+          className="mb-4 text-gray-400"
+          scpRefsSlug={scp.number.toLowerCase()}
+        />
         <ThreatGauge level={scp.threatLevel} scpClass={scp.class} />
         {percentile !== null && (
           <DangerComparison percentile={percentile} level={scp.threatLevel} />
@@ -152,7 +156,7 @@ export default async function SCPDetailPage({ params }: Props) {
             <AlertTriangle className="h-5 w-5 text-redlake-glow" />
             Protocole de confinement
           </h2>
-          <p>{linkifyScpRefs(scp.containment)}</p>
+          <DiscordMarkdown text={scp.containment} scpRefsSlug={scp.number.toLowerCase()} />
           <div className="mt-4 grid grid-cols-3 gap-4 font-mono text-sm">
             <div>
               <p className="text-gray-600">Coût mensuel</p>
@@ -171,7 +175,7 @@ export default async function SCPDetailPage({ params }: Props) {
 
         <section className="hologram-border rounded-lg p-6">
           <h2 className="mb-4 text-xl font-bold text-white">Historique</h2>
-          <p>{linkifyScpRefs(scp.history)}</p>
+          <DiscordMarkdown text={scp.history} scpRefsSlug={scp.number.toLowerCase()} />
         </section>
 
         {scp.incidents.length > 0 && (
@@ -186,7 +190,7 @@ export default async function SCPDetailPage({ params }: Props) {
                   <p className="font-mono text-xs text-redlake-glow">
                     {formatDate(inc.date)}
                   </p>
-                  <p className="text-gray-400">{linkifyScpRefs(inc.summary)}</p>
+                  <DiscordMarkdown text={inc.summary} className="text-gray-400" scpRefsSlug={scp.number.toLowerCase()} />
                 </div>
               ))}
             </div>
@@ -205,7 +209,7 @@ export default async function SCPDetailPage({ params }: Props) {
                   <p className="font-mono text-xs text-gray-600">
                     {formatDate(test.date)} — {test.researcher}
                   </p>
-                  <p className="text-gray-400">{linkifyScpRefs(test.result)}</p>
+                  <DiscordMarkdown text={test.result} className="text-gray-400" scpRefsSlug={scp.number.toLowerCase()} />
                 </div>
               ))}
             </div>
@@ -221,7 +225,7 @@ export default async function SCPDetailPage({ params }: Props) {
                 {add.redacted ? (
                   <ClassifiedPlaceholder />
                 ) : (
-                  <p className="text-gray-400">{linkifyScpRefs(add.content!)}</p>
+                  <DiscordMarkdown text={add.content!} className="text-gray-400" scpRefsSlug={scp.number.toLowerCase()} />
                 )}
               </div>
             ))}

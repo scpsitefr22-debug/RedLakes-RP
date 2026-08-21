@@ -1,28 +1,88 @@
-import { Fragment, type ReactNode } from "react";
+"use client";
+
+import { Fragment, useState, type ReactNode } from "react";
+import Link from "next/link";
 
 /**
  * Rendu léger du sous-ensemble de markdown utilisé sur Discord (gras,
- * italique, souligné, barré, code, citations, titres, listes) — beaucoup de
- * contenu RP est rédigé sur Discord avant d'être collé dans une fiche du
- * site, et affichait jusqu'ici les symboles bruts (**texte**) au lieu du
- * formatage. Pas de lib externe : le sous-ensemble Discord est petit et
- * bien défini, pas besoin d'un parseur CommonMark complet.
+ * italique, souligné, barré, code, citations, titres, listes, spoilers) —
+ * beaucoup de contenu RP est rédigé sur Discord avant d'être collé dans une
+ * fiche du site, et affichait jusqu'ici les symboles bruts (**texte**) au
+ * lieu du formatage. Pas de lib externe : le sous-ensemble Discord est petit
+ * et bien défini, pas besoin d'un parseur CommonMark complet.
+ *
+ * `scpRefsSlug` active le linking des mentions "SCP-XXX" (ex. sur les fiches
+ * du wiki) — un flag serialisable plutot qu'une fonction callback, ce
+ * composant etant un Client Component : React interdit de passer une
+ * fonction en prop depuis un Server Component (voir wiki/[id]/page.tsx, qui
+ * est un Server Component).
  */
 
-const INLINE_PATTERN =
-  /(\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|__(.+?)__|~~(.+?)~~|`([^`]+?)`|\*(.+?)\*|_(.+?)_)/g;
+function Spoiler({ children }: { children: ReactNode }) {
+  const [revealed, setRevealed] = useState(false);
+  return (
+    <span
+      onClick={() => setRevealed(true)}
+      title={revealed ? undefined : "Cliquer pour révéler"}
+      className={
+        revealed
+          ? "rounded bg-metal/30 px-1"
+          : "cursor-pointer rounded bg-white px-1 text-white hover:bg-gray-300"
+      }
+    >
+      <span className={revealed ? "" : "invisible"}>{children}</span>
+    </span>
+  );
+}
 
-function renderInline(text: string): ReactNode[] {
+const INLINE_PATTERN =
+  /(\|\|(.+?)\|\||\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|__(.+?)__|~~(.+?)~~|`([^`]+?)`|\*(.+?)\*|_(.+?)_)/g;
+
+const SCP_REF_PATTERN = /\b(SCP-\d{3,4})\b/g;
+
+/** Transforme les mentions "SCP-XXX" en liens vers /wiki/scp-xxx (sauf la fiche courante) */
+function linkifyScpRefsSegment(segment: string, currentSlug: string, keyPrefix: string): ReactNode {
+  const parts = segment.split(SCP_REF_PATTERN);
+  if (parts.length === 1) return segment;
+  return parts.map((part, i) => {
+    const match = /^SCP-(\d{3,4})$/.exec(part);
+    if (!match) return <Fragment key={`${keyPrefix}-${i}`}>{part}</Fragment>;
+    const slug = `scp-${match[1]}`;
+    if (slug === currentSlug) return <Fragment key={`${keyPrefix}-${i}`}>{part}</Fragment>;
+    return (
+      <Link
+        key={`${keyPrefix}-${i}`}
+        href={`/wiki/${slug}`}
+        className="text-redlake-glow underline decoration-dotted underline-offset-2 hover:text-white"
+      >
+        {part}
+      </Link>
+    );
+  });
+}
+
+function renderInline(text: string, scpRefsSlug?: string): ReactNode[] {
   const nodes: ReactNode[] = [];
   let lastIndex = 0;
   let key = 0;
 
+  const pushPlain = (segment: string) => {
+    if (!segment) return;
+    nodes.push(
+      scpRefsSlug !== undefined
+        ? <Fragment key={key++}>{linkifyScpRefsSegment(segment, scpRefsSlug, `sr${key}`)}</Fragment>
+        : segment,
+    );
+  };
+
   for (const match of text.matchAll(INLINE_PATTERN)) {
     const index = match.index ?? 0;
-    if (index > lastIndex) nodes.push(text.slice(lastIndex, index));
+    if (index > lastIndex) pushPlain(text.slice(lastIndex, index));
 
-    const [, , boldItalic, bold, underline, strike, code, italicStar, italicUnderscore] = match;
-    if (boldItalic !== undefined) {
+    const [, , spoiler, boldItalic, bold, underline, strike, code, italicStar, italicUnderscore] = match;
+    if (spoiler !== undefined) {
+      nodes.push(<Spoiler key={key++}>{spoiler}</Spoiler>);
+    } else if (boldItalic !== undefined) {
       nodes.push(
         <strong key={key++}>
           <em>{boldItalic}</em>
@@ -46,7 +106,7 @@ function renderInline(text: string): ReactNode[] {
     lastIndex = index + match[0].length;
   }
 
-  if (lastIndex < text.length) nodes.push(text.slice(lastIndex));
+  if (lastIndex < text.length) pushPlain(text.slice(lastIndex));
   return nodes;
 }
 
@@ -108,7 +168,14 @@ const HEADING_CLASSES: Record<number, string> = {
   3: "text-sm font-bold text-white mt-2",
 };
 
-export function DiscordMarkdown({ text, className }: { text: string; className?: string }) {
+interface DiscordMarkdownProps {
+  text: string;
+  className?: string;
+  /** Fiche SCP courante (ex. "scp-002") — active le linking des mentions SCP-XXX, en excluant l'auto-référence */
+  scpRefsSlug?: string;
+}
+
+export function DiscordMarkdown({ text, className, scpRefsSlug }: DiscordMarkdownProps) {
   if (!text) return null;
   const blocks = parseBlocks(text);
 
@@ -121,7 +188,7 @@ export function DiscordMarkdown({ text, className }: { text: string; className?:
     elements.push(
       <ul key={key++} className="ml-4 list-disc space-y-0.5">
         {listBuffer.map((item, i) => (
-          <li key={i}>{renderInline(item)}</li>
+          <li key={i}>{renderInline(item, scpRefsSlug)}</li>
         ))}
       </ul>,
     );
@@ -144,19 +211,19 @@ export function DiscordMarkdown({ text, className }: { text: string; className?:
     } else if (block.type === "quote") {
       elements.push(
         <p key={key++} className="border-l-2 border-redlake/40 pl-3 italic text-gray-400">
-          {renderInline(block.content)}
+          {renderInline(block.content, scpRefsSlug)}
         </p>,
       );
     } else if (block.type === "heading") {
       elements.push(
         <p key={key++} className={HEADING_CLASSES[block.level ?? 3]}>
-          {renderInline(block.content)}
+          {renderInline(block.content, scpRefsSlug)}
         </p>,
       );
     } else if (block.type === "blank") {
       elements.push(<Fragment key={key++} />);
     } else {
-      elements.push(<Fragment key={key++}>{renderInline(block.content)}{"\n"}</Fragment>);
+      elements.push(<Fragment key={key++}>{renderInline(block.content, scpRefsSlug)}{"\n"}</Fragment>);
     }
   }
   flushList();
