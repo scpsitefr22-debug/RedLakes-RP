@@ -13,10 +13,21 @@ interface PlayerProfile {
   rpFirstName: string | null;
   rpLastName: string | null;
   sanctions: number;
-  user: { minecraftUsername: string; avatarUrl: string | null; role: string };
+  user: {
+    minecraftUsername: string;
+    avatarUrl: string | null;
+    role: string;
+    staffRank: string | null;
+  };
 }
 
 const ROLES = ["PLAYER", "STAFF", "ADMIN"];
+const STAFF_RANKS = ["SURVEILLANT", "OFFICIER", "COORDINATEUR_GENERAL"];
+const STAFF_RANK_LABELS: Record<string, string> = {
+  SURVEILLANT: "Surveillant",
+  OFFICIER: "Officier",
+  COORDINATEUR_GENERAL: "Coordinateur Général",
+};
 
 interface SanctionRow {
   id: string;
@@ -66,6 +77,7 @@ export default function StaffPlayerPage() {
 
   const [viewerRole, setViewerRole] = useState<string | null>(null);
   const [roleValue, setRoleValue] = useState("PLAYER");
+  const [rankValue, setRankValue] = useState("SURVEILLANT");
   const [roleSaving, setRoleSaving] = useState(false);
   const [roleMessage, setRoleMessage] = useState("");
 
@@ -78,6 +90,7 @@ export default function StaffPlayerPage() {
       setProfile(prof);
       setPlayerId(id);
       setRoleValue(prof.user.role);
+      setRankValue(prof.user.staffRank ?? "SURVEILLANT");
       const [s, a] = await Promise.all([
         apiFetch<SanctionRow[]>(`/sanctions/player/${id}`),
         apiFetch<AssignmentRow[]>(`/assignments/player/${id}`),
@@ -103,16 +116,26 @@ export default function StaffPlayerPage() {
       .catch(() => undefined);
   }, [load]);
 
+  const roleUnchanged =
+    !!profile &&
+    roleValue === profile.user.role &&
+    (roleValue !== "STAFF" || rankValue === (profile.user.staffRank ?? "SURVEILLANT"));
+
   const updateRole = async () => {
-    if (!profile || roleValue === profile.user.role) return;
+    if (!profile || roleUnchanged) return;
     setRoleSaving(true);
     setRoleMessage("");
     try {
       await apiFetch(`/players/${username}/role`, {
         method: "PATCH",
-        body: JSON.stringify({ role: roleValue }),
+        body: JSON.stringify({
+          role: roleValue,
+          staffRank: roleValue === "STAFF" ? rankValue : undefined,
+        }),
       });
-      setRoleMessage(`Rôle mis à jour : ${roleValue}.`);
+      setRoleMessage(
+        `Rôle mis à jour : ${roleValue}${roleValue === "STAFF" ? ` (${STAFF_RANK_LABELS[rankValue]})` : ""}.`,
+      );
       await load();
     } catch (err) {
       setRoleMessage(err instanceof Error ? err.message : "Échec de la mise à jour du rôle");
@@ -245,19 +268,32 @@ export default function StaffPlayerPage() {
           </h2>
           <p className="mb-4 text-sm text-gray-500">
             Rôle actuel : <span className="font-mono text-white">{profile.user.role}</span>
+            {profile.user.staffRank && (
+              <> — <span className="font-mono text-white">{STAFF_RANK_LABELS[profile.user.staffRank]}</span></>
+            )}
           </p>
-          <div className="grid grid-cols-[1fr_auto] gap-2">
+          <div className={roleValue === "STAFF" ? "grid grid-cols-[1fr_1fr_auto] gap-2" : "grid grid-cols-[1fr_auto] gap-2"}>
             <select className={inputClass} value={roleValue} onChange={(e) => setRoleValue(e.target.value)}>
               {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
             </select>
+            {roleValue === "STAFF" && (
+              <select className={inputClass} value={rankValue} onChange={(e) => setRankValue(e.target.value)}>
+                {STAFF_RANKS.map((r) => <option key={r} value={r}>{STAFF_RANK_LABELS[r]}</option>)}
+              </select>
+            )}
             <button
               onClick={updateRole}
-              disabled={roleSaving || roleValue === profile.user.role}
+              disabled={roleSaving || roleUnchanged}
               className="flex items-center gap-1 rounded border border-redlake bg-redlake/20 px-3 text-sm text-white hover:bg-redlake/30 disabled:opacity-50"
             >
               <Check className="h-4 w-4" /> Confirmer
             </button>
           </div>
+          {roleValue === "STAFF" && (
+            <p className="mt-2 font-mono text-xs text-gray-600">
+              Surveillant : candidatures/rapports. Officier : + sanctions/affectations. Coordinateur Général : + gestion du contenu (wiki, personnages, événements, actualités, carte, catalogues).
+            </p>
+          )}
           {roleMessage && <p className="mt-2 font-mono text-xs text-gray-500">{roleMessage}</p>}
         </section>
       )}

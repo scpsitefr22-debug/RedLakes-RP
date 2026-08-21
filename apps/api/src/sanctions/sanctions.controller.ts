@@ -11,12 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { UserRole } from '@prisma/client';
+import { StaffRank, UserRole } from '@prisma/client';
 import { SanctionsService } from './sanctions.service';
 import { CreateSanctionDto, UpdateSanctionDto } from './dto/sanction.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 
 @Controller('sanctions')
 @UseGuards(AuthGuard, RolesGuard)
@@ -37,6 +38,7 @@ export class SanctionsController {
   }
 
   @Post()
+  @MinRank(StaffRank.OFFICIER)
   create(
     @Body() dto: CreateSanctionDto,
     @Req() req: Request & { user: { id: string } },
@@ -45,6 +47,7 @@ export class SanctionsController {
   }
 
   @Patch(':id')
+  @MinRank(StaffRank.OFFICIER)
   update(
     @Param('id') id: string,
     @Body() dto: UpdateSanctionDto,

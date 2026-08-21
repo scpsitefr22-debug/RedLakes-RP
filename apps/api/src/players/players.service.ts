@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Grade, Faction, Team, UserRole, PlatformEntityType } from '@prisma/client';
+import { Grade, Faction, Team, UserRole, StaffRank, PlatformEntityType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../platform/audit.service';
@@ -57,6 +57,8 @@ export class PlayersService {
 
       role: string;
 
+      staffRank: StaffRank | null;
+
       discordId: string | null;
 
       discordUsername: string | null;
@@ -103,6 +105,8 @@ export class PlayersService {
         avatarUrl: player.user.avatarUrl,
 
         role: player.user.role,
+
+        staffRank: player.user.staffRank,
 
         discordLinked: !!player.user.discordId,
 
@@ -236,6 +240,8 @@ export class PlayersService {
             createdAt: true,
 
             role: true,
+
+            staffRank: true,
           },
         },
       },
@@ -267,6 +273,8 @@ export class PlayersService {
             avatarUrl: true,
 
             role: true,
+
+            staffRank: true,
 
             discordId: true,
 
@@ -399,14 +407,18 @@ export class PlayersService {
   }
 
   /**
-   * Seul moyen de changer le role (PLAYER/STAFF/ADMIN) d'un compte —
-   * jusqu'ici il fallait modifier la base a la main, sans aucune trace.
-   * Reserve a l'ADMIN (voir @Roles sur le controller), journalise via
-   * AuditService pour laisser une trace de qui a promu/retrograde qui.
+   * Seul moyen de changer le role (PLAYER/STAFF/ADMIN) et le rang staff
+   * (Surveillant/Officier/Coordinateur Général) d'un compte — jusqu'ici il
+   * fallait modifier la base a la main, sans aucune trace. Reserve a
+   * l'ADMIN (voir @Roles sur le controller), journalise via AuditService
+   * pour laisser une trace de qui a promu/retrograde qui. Le rang n'a de
+   * sens que pour STAFF — il est efface des qu'on quitte STAFF (ADMIN =
+   * Fondateur, acces total ; PLAYER n'en a pas besoin).
    */
   async updateRole(
     username: string,
     role: UserRole,
+    staffRank: StaffRank | undefined,
     actorId: string,
     actorLabel: string,
   ) {
@@ -416,14 +428,25 @@ export class PlayersService {
     if (!user) throw new NotFoundException('Utilisateur introuvable');
 
     const previousRole = user.role;
-    if (previousRole === role) {
-      return { minecraftUsername: username, role, unchanged: true };
+    const previousRank = user.staffRank;
+    const nextRank = role === UserRole.STAFF ? (staffRank ?? previousRank) : null;
+
+    if (previousRole === role && previousRank === nextRank) {
+      return {
+        minecraftUsername: username,
+        role,
+        staffRank: nextRank,
+        unchanged: true,
+      };
     }
 
     const updated = await this.prisma.user.update({
       where: { id: user.id },
-      data: { role },
+      data: { role, staffRank: nextRank },
     });
+
+    const roleLabel = (r: UserRole, rank: StaffRank | null) =>
+      rank ? `${r} (${rank})` : r;
 
     await this.audit.log({
       entityType: PlatformEntityType.USER,
@@ -431,14 +454,22 @@ export class PlayersService {
       action: 'ROLE_CHANGED',
       actorId,
       actorLabel,
-      summary: `Rôle de ${username} changé : ${previousRole} → ${role}`,
-      metadata: { previousRole, newRole: role, targetUsername: username },
+      summary: `Rôle de ${username} changé : ${roleLabel(previousRole, previousRank)} → ${roleLabel(role, nextRank)}`,
+      metadata: {
+        previousRole,
+        newRole: role,
+        previousRank,
+        newRank: nextRank,
+        targetUsername: username,
+      },
     });
 
     return {
       minecraftUsername: username,
       role: updated.role,
+      staffRank: updated.staffRank,
       previousRole,
+      previousRank,
       unchanged: false,
     };
   }

@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { StaffRank, UserRole } from '@prisma/client';
 import { MapService } from './map.service';
 import {
   CreateMapLocationDto,
@@ -18,6 +18,7 @@ import {
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 
 @Controller('map')
 export class MapController {
@@ -47,6 +48,7 @@ export class MapController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   create(@Body() dto: CreateMapLocationDto) {
     return this.map.create(dto);
   }
@@ -54,6 +56,7 @@ export class MapController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   update(@Param('id') id: string, @Body() dto: UpdateMapLocationDto) {
     return this.map.update(id, dto);
   }

@@ -11,13 +11,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { UserRole } from '@prisma/client';
+import { StaffRank, UserRole } from '@prisma/client';
 import { EventsService } from './events.service';
 import { CreateGameEventDto, UpdateGameEventDto } from './dto/game-event.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 import { PlayersService } from '../players/players.service';
 
 type OptionalAuthRequest = Request & { user?: { id: string } };
@@ -72,6 +73,7 @@ export class EventsController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   create(@Body() dto: CreateGameEventDto) {
     return this.events.create(dto);
   }
@@ -79,6 +81,7 @@ export class EventsController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   update(
     @Req() req: AuthedRequest,
     @Param('id') id: string,

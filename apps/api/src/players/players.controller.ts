@@ -101,6 +101,12 @@ export class PlayersController {
   ) {
     const actorLabel =
       req.user.discordUsername ?? req.user.minecraftUsername ?? 'Admin';
-    return this.players.updateRole(username, dto.role, req.user.id, actorLabel);
+    return this.players.updateRole(
+      username,
+      dto.role,
+      dto.staffRank,
+      req.user.id,
+      actorLabel,
+    );
   }
 }

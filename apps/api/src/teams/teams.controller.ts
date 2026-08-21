@@ -10,12 +10,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { StaffRank, UserRole } from '@prisma/client';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto, UpdateTeamDto } from './dto/team.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 
 @Controller('teams')
 export class TeamsController {
@@ -45,6 +46,7 @@ export class TeamsController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   create(@Body() dto: CreateTeamDto) {
     return this.teams.create(dto);
   }
@@ -52,6 +54,7 @@ export class TeamsController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   update(@Param('id') id: string, @Body() dto: UpdateTeamDto) {
     return this.teams.update(id, dto);
   }

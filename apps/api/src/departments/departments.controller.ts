@@ -10,12 +10,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { StaffRank, UserRole } from '@prisma/client';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto, UpdateDepartmentDto } from './dto/department.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 
 @Controller('departments')
 export class DepartmentsController {
@@ -45,6 +46,7 @@ export class DepartmentsController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   create(@Body() dto: CreateDepartmentDto) {
     return this.departments.create(dto);
   }
@@ -52,6 +54,7 @@ export class DepartmentsController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   update(@Param('id') id: string, @Body() dto: UpdateDepartmentDto) {
     return this.departments.update(id, dto);
   }

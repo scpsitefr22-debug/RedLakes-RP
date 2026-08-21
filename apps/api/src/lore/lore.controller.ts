@@ -10,13 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { UserRole } from '@prisma/client';
+import { StaffRank, UserRole } from '@prisma/client';
 import { LoreService } from './lore.service';
 import { CreateLoreDto, UpdateLoreDto } from './dto/lore.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 import { PlayersService } from '../players/players.service';
 
 type OptionalAuthRequest = Request & { user?: { id: string } };
@@ -54,6 +55,7 @@ export class LoreController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   create(
     @Req() req: Request & { user: { id: string } },
     @Body() dto: CreateLoreDto,
@@ -64,6 +66,7 @@ export class LoreController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   update(@Param('id') id: string, @Body() dto: UpdateLoreDto) {
     return this.lore.update(id, dto);
   }

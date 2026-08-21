@@ -9,12 +9,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AssignmentEntityType, UserRole } from '@prisma/client';
+import { AssignmentEntityType, StaffRank, UserRole } from '@prisma/client';
 import { AssignmentsService } from './assignments.service';
 import { CreateAssignmentDto, UpdateAssignmentDto } from './dto/assignment.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 
 @Controller('assignments')
 @UseGuards(AuthGuard, RolesGuard)
@@ -36,11 +37,13 @@ export class AssignmentsController {
   }
 
   @Post()
+  @MinRank(StaffRank.OFFICIER)
   create(@Body() dto: CreateAssignmentDto) {
     return this.assignments.create(dto);
   }
 
   @Patch(':id')
+  @MinRank(StaffRank.OFFICIER)
   update(@Param('id') id: string, @Body() dto: UpdateAssignmentDto) {
     return this.assignments.update(id, dto);
   }

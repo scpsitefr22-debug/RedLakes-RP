@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { ScpClass, ScpProposalStatus, UserRole } from '@prisma/client';
+import { ScpClass, ScpProposalStatus, StaffRank, UserRole } from '@prisma/client';
 import { ScpService } from './scp.service';
 import { CreateScpObjectDto, UpdateScpObjectDto } from './dto/scp-object.dto';
 import { ProposeScpDto } from './dto/propose-scp.dto';
@@ -21,6 +21,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 import { PlayersService } from '../players/players.service';
 
 type OptionalAuthRequest = Request & { user?: { id: string } };
@@ -79,6 +80,7 @@ export class ScpController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   create(@Body() dto: CreateScpObjectDto) {
     return this.scp.create(dto);
   }
@@ -86,6 +88,7 @@ export class ScpController {
   @Patch(':id/review')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   review(
     @Req() req: AuthedRequest,
     @Param('id') id: string,
@@ -97,6 +100,7 @@ export class ScpController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   async update(
     @Req() req: AuthedRequest & { user: { minecraftUsername?: string; discordUsername?: string } },
     @Param('id') id: string,

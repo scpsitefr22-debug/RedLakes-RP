@@ -9,12 +9,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { StaffRank, UserRole } from '@prisma/client';
 import { FactionsService } from './factions.service';
 import { CreateFactionDto, UpdateFactionDto } from './dto/faction.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { MinRank } from '../auth/rank.decorator';
 
 @Controller('factions')
 export class FactionsController {
@@ -44,6 +45,7 @@ export class FactionsController {
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   create(@Body() dto: CreateFactionDto) {
     return this.factions.create(dto);
   }
@@ -51,6 +53,7 @@ export class FactionsController {
   @Patch(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
   update(@Param('id') id: string, @Body() dto: UpdateFactionDto) {
     return this.factions.update(id, dto);
   }

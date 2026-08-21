@@ -13,6 +13,17 @@ enum UserRole {
   ADMIN
 }
 
+// Rang au sein du STAFF (PLAYER n'en a pas, ADMIN n'en a pas besoin — ADMIN
+// = Fondateur, acces total par definition). Sert a distinguer ce que peuvent
+// faire les differents membres du staff sans toucher au systeme PLAYER/
+// STAFF/ADMIN existant : STAFF reste le portail d'entree ("est staff ou
+// pas"), StaffRank affine ensuite ce qu'un compte STAFF a le droit de faire.
+enum StaffRank {
+  SURVEILLANT
+  OFFICIER
+  COORDINATEUR_GENERAL
+}
+
 enum ApplicationType {
   STAFF
   RECHERCHE
@@ -62,6 +73,7 @@ model User {
   discordId         String?  @unique
   discordUsername   String?
   role              UserRole @default(PLAYER)
+  staffRank         StaffRank?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
