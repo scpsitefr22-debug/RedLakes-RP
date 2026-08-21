@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Shield,
-  Fingerprint,
   MessageCircle,
   ServerOff,
   Lock,
@@ -156,7 +155,7 @@ export function RpLoginTerminal() {
 
       <div className="hologram-border space-y-4 rounded-lg p-6">
         <p className="font-mono text-[10px] tracking-widest text-gray-600">
-          METHODE PRIMAIRE — IDENTITE DISCORD
+          IDENTITE DISCORD REQUISE
         </p>
 
         {apiOnline && siteConfig.discordOAuthEnabled ? (
@@ -177,21 +176,6 @@ export function RpLoginTerminal() {
         <p className="text-center text-xs text-gray-600">
           Connexion directe via votre identite Discord du serveur REDLAKES.
         </p>
-
-        {apiOnline && siteConfig.microsoftOAuthEnabled && (
-          <>
-            <div className="relative py-1 text-center">
-              <span className="font-mono text-[10px] text-gray-700">OU</span>
-            </div>
-            <a
-              href="/api/auth/minecraft"
-              className="block w-full rounded border border-redlake/40 bg-redlake/10 py-3 text-center font-mono text-xs uppercase tracking-wider text-white hover:bg-redlake/20"
-            >
-              <Fingerprint className="mr-2 inline h-4 w-4" />
-              Connexion Minecraft / Microsoft
-            </a>
-          </>
-        )}
       </div>
 
       {siteConfig.devLoginEnabled && (

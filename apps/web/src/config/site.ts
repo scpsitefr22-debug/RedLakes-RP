@@ -6,9 +6,7 @@ export const siteConfig = {
   discordInvite: "https://discord.gg/d5DqcZEJkn",
   discordLabel: "Discord REDLAKES",
   recruitmentOpen: true,
-  /** OAuth Microsoft — activer quand Azure AD est configuré ET l'API tourne */
-  microsoftOAuthEnabled: false,
-  /** Connexion principale via Discord OAuth (compte lie au serveur) */
+  /** Connexion principale via Discord OAuth (compte lie au serveur) — seule methode de connexion */
   discordOAuthEnabled: true,
   /** Acces technique dev-login (pre-ouverture / tests locaux) */
   devLoginEnabled: true,

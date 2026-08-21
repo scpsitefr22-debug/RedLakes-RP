@@ -29,10 +29,6 @@ export const authErrorMessages: Record<string, { title: string; body: string }> 
     body:
       "La liaison avec Discord a echoue. Reessayez ou contactez le personnel technique.",
   },
-  oauth_not_configured: {
-    title: "Microsoft OAuth inactif",
-    body: "La connexion Minecraft n'est pas encore configuree sur ce terminal.",
-  },
 };
 
 export function isDiscordLoginEnabled(): boolean {

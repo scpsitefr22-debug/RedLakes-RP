@@ -24,17 +24,6 @@ export class AuthController {
     private sync: SyncService,
   ) {}
 
-  @Get('minecraft')
-  minecraftLogin(@Res() res: Response) {
-    const clientId = this.config.get('MICROSOFT_CLIENT_ID');
-    if (!clientId) {
-      return res.redirect(
-        `${this.config.get('WEB_URL')}/connexion?error=oauth_not_configured`,
-      );
-    }
-    return res.redirect(this.auth.getMicrosoftAuthUrl());
-  }
-
   @Get('discord')
   discordLogin(@Res() res: Response) {
     const clientId = this.config.get('DISCORD_CLIENT_ID');
@@ -83,15 +72,6 @@ export class AuthController {
 
       return res.redirect(`${webUrl}/connexion?error=${code}`);
     }
-  }
-
-  @Get('microsoft/callback')
-  async microsoftCallback(@Query('code') code: string, @Res() res: Response) {
-    const webUrl = this.config.get('WEB_URL') ?? 'http://localhost:3000';
-    const user = await this.auth.handleMicrosoftCallback(code);
-    const token = await this.auth.createSession(user.id);
-    this.setSessionCookie(res, token);
-    return res.redirect(`${webUrl}/dashboard`);
   }
 
   @Post('dev-login')
