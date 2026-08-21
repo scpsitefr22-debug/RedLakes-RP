@@ -6,7 +6,7 @@ import type { SystemStatus } from "@/hooks/useSystemStatus";
 export async function getSystemStatus(): Promise<SystemStatus> {
   try {
     const res = await fetch(`${API_URL}/system/status`, {
-      next: { revalidate: 30 },
+      cache: "no-store",
     });
     if (!res.ok) throw new Error();
     return await res.json();

@@ -30,6 +30,7 @@ import { EntityTimeline } from "@/components/platform/EntityTimeline";
 import { EntityComments } from "@/components/platform/EntityComments";
 import { StaffAuditFeed } from "@/components/staff/StaffAuditFeed";
 import { NavTile } from "@/components/staff/NavTile";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { cn } from "@/lib/utils";
 
@@ -308,7 +309,7 @@ export function StaffDashboard() {
                     </button>
                   </div>
                   <p className="font-medium text-white">{r.subject}</p>
-                  <p className="mt-1 text-sm text-gray-500">{r.content}</p>
+                  <DiscordMarkdown text={r.content} className="mt-1 text-sm text-gray-500" />
                   {expanded && (
                     <>
                       <EntityTimeline

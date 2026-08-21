@@ -18,7 +18,7 @@ async function getPlayer(username: string) {
   try {
     const res = await fetch(
       `${API_URL}/players/${encodeURIComponent(username)}`,
-      { next: { revalidate: 60 } },
+      { cache: "no-store" },
     );
     if (res.status === 404) return null;
     if (!res.ok) return null;

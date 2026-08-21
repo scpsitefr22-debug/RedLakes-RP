@@ -6,7 +6,7 @@ export const metadata = { title: "Catalogue des grades — Site-12" };
 
 async function getGrades(): Promise<ApiGrade[]> {
   try {
-    const res = await fetch(`${API_URL}/grades`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/grades`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

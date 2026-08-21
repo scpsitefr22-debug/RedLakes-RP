@@ -34,7 +34,7 @@ export interface ApiFaction {
 /** Pattern de fetch établi (server component + revalidate ISR) — voir src/app/grades/page.tsx */
 export async function getFactions(): Promise<ApiFaction[]> {
   try {
-    const res = await fetch(`${API_URL}/factions`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/factions`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {
@@ -45,7 +45,7 @@ export async function getFactions(): Promise<ApiFaction[]> {
 export async function getFaction(slug: string): Promise<ApiFaction | null> {
   try {
     const res = await fetch(`${API_URL}/factions/${slug}`, {
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     return res.json();

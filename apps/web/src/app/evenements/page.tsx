@@ -24,7 +24,7 @@ interface ApiGameEvent {
 
 async function getGameEvents(): Promise<ApiGameEvent[]> {
   try {
-    const res = await fetch(`${API_URL}/events`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/events`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

@@ -35,7 +35,7 @@ export const TRANSMISSION_TYPE_LABELS: Record<TransmissionType, string> = {
 export async function getTransmissions(limit = 60): Promise<Transmission[]> {
   try {
     const res = await fetch(`${API_URL}/transmissions?limit=${limit}`, {
-      next: { revalidate: 30 },
+      cache: "no-store",
     });
     if (!res.ok) return [];
     return (await res.json()) as Transmission[];

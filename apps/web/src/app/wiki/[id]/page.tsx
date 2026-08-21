@@ -44,7 +44,7 @@ type ScpFetchResult =
 
 async function getThreatPercentile(currentSlug: string, currentLevel: number): Promise<number | null> {
   try {
-    const res = await fetch(`${API_URL}/scp`, { next: { revalidate: 300 } });
+    const res = await fetch(`${API_URL}/scp`, { cache: "no-store" });
     if (!res.ok) return null;
     const list: { slug: string; threatLevel: number }[] = await res.json();
     const others = list.filter((s) => s.slug !== currentSlug);

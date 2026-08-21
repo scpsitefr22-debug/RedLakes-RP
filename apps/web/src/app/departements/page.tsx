@@ -16,7 +16,7 @@ interface ApiDepartment {
 
 async function getDepartments(): Promise<ApiDepartment[]> {
   try {
-    const res = await fetch(`${API_URL}/departments`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/departments`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

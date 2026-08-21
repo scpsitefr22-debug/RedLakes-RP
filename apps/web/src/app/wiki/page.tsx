@@ -22,7 +22,7 @@ interface ApiScpObject {
 
 async function getScpObjects(): Promise<ApiScpObject[]> {
   try {
-    const res = await fetch(`${API_URL}/scp`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/scp`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

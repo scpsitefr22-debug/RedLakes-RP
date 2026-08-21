@@ -8,6 +8,7 @@ import { Pagination } from "@/components/platform/Pagination";
 import { DataTable, type DataTableColumn } from "@/components/platform/DataTable";
 import { EntityTimeline } from "@/components/platform/EntityTimeline";
 import { EntityComments } from "@/components/platform/EntityComments";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 import {
   type PaginatedResult,
   buildQueryString,
@@ -222,9 +223,7 @@ export function MyReportsPanel({ refreshKey = 0 }: MyReportsPanelProps) {
               Fermer
             </button>
           </div>
-          <p className="whitespace-pre-wrap text-sm text-gray-400">
-            {selected.content}
-          </p>
+          <DiscordMarkdown text={selected.content} className="text-sm text-gray-400" />
           {selected.staffNote && (
             <p
               className={cn(

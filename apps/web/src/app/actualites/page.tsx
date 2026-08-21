@@ -17,7 +17,7 @@ interface ApiNewsArticle {
 
 async function getNewsArticles(): Promise<ApiNewsArticle[]> {
   try {
-    const res = await fetch(`${API_URL}/news`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/news`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

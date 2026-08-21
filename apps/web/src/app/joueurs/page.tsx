@@ -7,7 +7,7 @@ export const metadata = { title: "Base de données joueurs" };
 
 async function getPlayers() {
   try {
-    const res = await fetch(`${API_URL}/players`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/players`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Lock, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { fetchLoreArticleBySlug, type LoreArticleView } from "@/lib/lore-feed";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 
 export function LoreArticleReader({ slug }: { slug: string }) {
   const [article, setArticle] = useState<LoreArticleView | null | undefined>(
@@ -64,9 +65,7 @@ export function LoreArticleReader({ slug }: { slug: string }) {
 
       <div className="prose-redlake hologram-border space-y-6 rounded-lg p-8">
         {paragraphs.map((p, i) => (
-          <p key={i} className="whitespace-pre-line text-gray-300 leading-relaxed">
-            {p}
-          </p>
+          <DiscordMarkdown key={i} text={p} className="text-gray-300 leading-relaxed" />
         ))}
       </div>
     </>

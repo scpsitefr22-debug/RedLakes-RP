@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Target } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 
 interface Mission {
   id: string;
@@ -56,7 +57,7 @@ export function MissionsWidget() {
                 {STATUS_LABELS[m.status]}
               </span>
             </div>
-            <p className="mt-1 text-xs text-gray-400">{m.description}</p>
+            <DiscordMarkdown text={m.description} className="mt-1 text-xs text-gray-400" />
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] text-gray-600">
               {m.assignedTeam && <span>Équipe : {m.assignedTeam.name}</span>}
               {m.reward && <span>Récompense : {m.reward}</span>}

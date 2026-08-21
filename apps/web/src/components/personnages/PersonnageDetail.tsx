@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { Quote, ArrowLeft } from "lucide-react";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 
 interface ApiCharacter {
   name: string;
@@ -54,7 +55,7 @@ export function PersonnageDetail({ id }: { id: string }) {
       <div className="space-y-6">
         <section className="hologram-border rounded-lg p-6">
           <h2 className="mb-4 text-xl font-bold text-white">Biographie</h2>
-          <p className="text-gray-400">{character.biography}</p>
+          <DiscordMarkdown text={character.biography} className="text-gray-400" />
         </section>
 
         {character.quotes.length > 0 && (

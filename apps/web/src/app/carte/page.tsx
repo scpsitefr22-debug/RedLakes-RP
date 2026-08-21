@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { MapPin, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiFetch } from "@/lib/api";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 
 interface ApiMapLocation {
   id: string;
@@ -112,10 +113,10 @@ export default function CartePage() {
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <p className="mb-4 text-sm text-gray-400">{location.description}</p>
+              <DiscordMarkdown text={location.description} className="mb-4 text-sm text-gray-400" />
               <div className="mb-4">
                 <p className="mb-1 font-mono text-xs text-redlake-glow">HISTORIQUE</p>
-                <p className="text-sm text-gray-500">{location.history}</p>
+                <DiscordMarkdown text={location.history} className="text-sm text-gray-500" />
               </div>
               <div className="flex gap-4 font-mono text-xs">
                 <span className="text-gray-600">

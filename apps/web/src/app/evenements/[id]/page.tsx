@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -16,7 +17,7 @@ interface ApiGameEventDetail {
 
 async function getGameEvent(slug: string): Promise<ApiGameEventDetail | null> {
   try {
-    const res = await fetch(`${API_URL}/events/${slug}`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/events/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -38,17 +39,17 @@ export default async function EvenementDetailPage({ params }: Props) {
 
       <div className="space-y-6">
         <section className="hologram-border rounded-lg p-6">
-          <p className="text-gray-400">{event.description}</p>
+          <DiscordMarkdown text={event.description} className="text-gray-400" />
         </section>
         {event.casualties && (
           <section className="hologram-border rounded-lg p-6">
             <h2 className="mb-2 font-bold text-white">Victimes</h2>
-            <p className="text-gray-500">{event.casualties}</p>
+            <DiscordMarkdown text={event.casualties} className="text-gray-500" />
           </section>
         )}
         <section className="hologram-border rounded-lg p-6">
           <h2 className="mb-2 font-bold text-white">Issue</h2>
-          <p className="text-gray-500">{event.outcome}</p>
+          <DiscordMarkdown text={event.outcome} className="text-gray-500" />
         </section>
       </div>
     </div>

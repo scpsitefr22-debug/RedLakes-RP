@@ -11,7 +11,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 async function getOmegaCouncil(): Promise<ApiGrade[]> {
   try {
     const res = await fetch(`${API_URL}/grades?branch=omega`, {
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) return [];
     const grades: ApiGrade[] = await res.json();

@@ -33,7 +33,7 @@ interface ApiDepartment {
 
 async function getDepartment(slug: string): Promise<ApiDepartment | null> {
   try {
-    const res = await fetch(`${API_URL}/departments/${slug}`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/departments/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

@@ -19,7 +19,7 @@ interface Props {
 async function getGrade(slug: string): Promise<ApiGrade | null> {
   try {
     const res = await fetch(`${API_URL}/grades/${slug}`, {
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     return res.json();

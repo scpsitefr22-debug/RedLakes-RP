@@ -78,7 +78,7 @@ function cmsToView(a: CmsArticle): LoreArticleView {
 export async function fetchCmsLore(): Promise<LoreArticleView[]> {
   try {
     const res = await fetch(`${loreApiBase()}/lore`, {
-      ...(typeof window === "undefined" ? { next: { revalidate: 60 } } : {}),
+      ...(typeof window === "undefined" ? { cache: "no-store" } : {}),
       credentials: "include",
     });
     if (!res.ok) return [];
@@ -113,7 +113,7 @@ export async function fetchLoreArticleBySlug(
 
   try {
     const res = await fetch(`${loreApiBase()}/lore/${encodeURIComponent(slug)}`, {
-      ...(typeof window === "undefined" ? { next: { revalidate: 60 } } : {}),
+      ...(typeof window === "undefined" ? { cache: "no-store" } : {}),
       credentials: "include",
     });
     if (!res.ok) return null;

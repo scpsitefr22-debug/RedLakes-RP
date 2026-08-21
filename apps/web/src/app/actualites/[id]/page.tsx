@@ -3,6 +3,7 @@ import { categoryLabels } from "@/data/news";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -17,7 +18,7 @@ interface ApiNewsArticleDetail {
 
 async function getNewsArticle(slug: string): Promise<ApiNewsArticleDetail | null> {
   try {
-    const res = await fetch(`${API_URL}/news/${slug}`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/news/${slug}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -40,7 +41,7 @@ export default async function ActualiteDetailPage({ params }: Props) {
       </p>
       <h1 className="mb-8 text-4xl font-bold text-white">{article.title}</h1>
       <div className="prose-redlake hologram-border rounded-lg p-8">
-        <p className="text-lg">{article.excerpt}</p>
+        <DiscordMarkdown text={article.excerpt} className="text-lg" />
         <p className="mt-4 text-gray-500">
           Article complet à rédiger par l&apos;équipe lore. Cette section sera
           connectée au CMS NestJS pour permettre aux rédacteurs de publier du

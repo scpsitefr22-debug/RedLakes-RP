@@ -40,13 +40,13 @@ interface ApiDepartmentListItem {
 
 async function getDepartments(): Promise<ApiDepartmentFull[]> {
   try {
-    const listRes = await fetch(`${API_URL}/departments`, { next: { revalidate: 60 } });
+    const listRes = await fetch(`${API_URL}/departments`, { cache: "no-store" });
     if (!listRes.ok) return [];
     const list: ApiDepartmentListItem[] = await listRes.json();
 
     const full = await Promise.all(
       list.map(async (d) => {
-        const res = await fetch(`${API_URL}/departments/${d.slug}`, { next: { revalidate: 60 } });
+        const res = await fetch(`${API_URL}/departments/${d.slug}`, { cache: "no-store" });
         if (!res.ok) return null;
         return res.json() as Promise<ApiDepartmentFull>;
       }),
@@ -59,7 +59,7 @@ async function getDepartments(): Promise<ApiDepartmentFull[]> {
 
 async function getOmegaCouncil(): Promise<ApiGrade[]> {
   try {
-    const res = await fetch(`${API_URL}/grades?branch=omega`, { next: { revalidate: 60 } });
+    const res = await fetch(`${API_URL}/grades?branch=omega`, { cache: "no-store" });
     if (!res.ok) return [];
     const grades: ApiGrade[] = await res.json();
     return grades.sort((a, b) => (b.pay ?? 0) - (a.pay ?? 0));
