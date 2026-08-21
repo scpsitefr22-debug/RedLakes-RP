@@ -14,11 +14,13 @@ import {
   AssignmentEntityType,
   PersonnelReportStatus,
   PlatformEntityType,
+  StaffRank,
   UserRole,
 } from '@prisma/client';
 import { GradesService } from '../grades/grades.service';
 import { FactionsService } from '../factions/factions.service';
 import { AuditService } from '../platform/audit.service';
+import { STAFF_RANK_ORDER } from '../auth/staff-rank-order';
 
 @Injectable()
 export class SyncService {
@@ -377,12 +379,15 @@ export class SyncService {
   }
 
   /**
-   * Rôle STAFF depuis Discord (rôle @Staff détecté sur le serveur) —
-   * promotion automatique uniquement (PLAYER -> STAFF). Ne redescend jamais
-   * automatiquement quelqu'un (perte du rôle Discord = pas de perte du
-   * site), et ne touche jamais ADMIN : ces deux cas restent décidés à la
-   * main sur le site (voir PlayersService.updateRole), pour garder un vrai
-   * contrôle et une trace claire sur les changements sensibles.
+   * Rôle STAFF + rang depuis Discord (rôles Staff/Surveillant/Officier/
+   * Coordinateur Général/Fondateur détectés sur le serveur) — promotion
+   * automatique uniquement : fait passer PLAYER -> STAFF, et fait monter le
+   * rang staff (jamais redescendre). Ne redescend jamais automatiquement
+   * quelqu'un (perte du rôle Discord = pas de perte du site), et ne touche
+   * jamais ADMIN — même le rôle Discord "Fondateur" ne fait que monter
+   * jusqu'à Coordinateur Général ici. ADMIN reste décidé à la main sur le
+   * site (voir PlayersService.updateRole), pour garder un vrai contrôle et
+   * une trace claire sur les changements sensibles.
    */
   async syncStaffRoleFromDiscord(dto: SyncDiscordStaffDto) {
     const user = await this.prisma.user.findUnique({
@@ -390,29 +395,70 @@ export class SyncService {
     });
     if (!user) throw new NotFoundException('Aucun compte lié à ce Discord');
 
-    if (!dto.hasStaffRole || user.role !== UserRole.PLAYER) {
-      return { success: true, unchanged: true, role: user.role };
+    // Fondateur = ADMIN, toujours décidé à la main — jamais touché ici.
+    if (user.role === UserRole.ADMIN) {
+      return {
+        success: true,
+        unchanged: true,
+        role: user.role,
+        staffRank: user.staffRank,
+      };
     }
+
+    const becomesStaff = dto.hasStaffRole && user.role === UserRole.PLAYER;
+    const currentRankLevel = user.staffRank ? STAFF_RANK_ORDER[user.staffRank] : 0;
+    const requestedRankLevel = dto.staffRank ? STAFF_RANK_ORDER[dto.staffRank] : 0;
+    const upgradesRank =
+      user.role === UserRole.STAFF &&
+      !!dto.staffRank &&
+      requestedRankLevel > currentRankLevel;
+
+    if (!becomesStaff && !upgradesRank) {
+      return {
+        success: true,
+        unchanged: true,
+        role: user.role,
+        staffRank: user.staffRank,
+      };
+    }
+
+    const previousRole = user.role;
+    const previousRank = user.staffRank;
+    const nextRole = becomesStaff ? UserRole.STAFF : user.role;
+    const nextRank = becomesStaff
+      ? (dto.staffRank ?? StaffRank.SURVEILLANT)
+      : (dto.staffRank as StaffRank);
 
     const updated = await this.prisma.user.update({
       where: { id: user.id },
-      data: { role: UserRole.STAFF },
+      data: { role: nextRole, staffRank: nextRank },
     });
+
+    const label = (role: UserRole, rank: StaffRank | null) =>
+      rank ? `${role} (${rank})` : role;
 
     await this.audit.log({
       entityType: PlatformEntityType.USER,
       entityId: user.id,
       action: 'ROLE_CHANGED',
       actorLabel: 'Sync Discord (rôle Staff)',
-      summary: `Rôle de ${user.minecraftUsername ?? user.discordUsername ?? user.id} changé automatiquement : PLAYER → STAFF (rôle Discord Staff détecté)`,
-      metadata: { previousRole: 'PLAYER', newRole: 'STAFF', source: 'discord-role-sync' },
+      summary: `Rôle de ${user.minecraftUsername ?? user.discordUsername ?? user.id} changé automatiquement : ${label(previousRole, previousRank)} → ${label(nextRole, nextRank)} (synchronisation Discord)`,
+      metadata: {
+        previousRole,
+        newRole: nextRole,
+        previousRank,
+        newRank: nextRank,
+        source: 'discord-role-sync',
+      },
     });
 
     return {
       success: true,
       unchanged: false,
       role: updated.role,
-      previousRole: UserRole.PLAYER,
+      staffRank: updated.staffRank,
+      previousRole,
+      previousRank,
       minecraftUsername: user.minecraftUsername,
     };
   }

@@ -8,13 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { StaffRank, UserRole } from '@prisma/client';
 import { ROLES_KEY } from './roles.decorator';
 import { MIN_RANK_KEY } from './rank.decorator';
-
-/** Ordre croissant — un rang plus haut couvre tout ce qu'un rang plus bas couvre */
-const RANK_ORDER: Record<StaffRank, number> = {
-  [StaffRank.SURVEILLANT]: 1,
-  [StaffRank.OFFICIER]: 2,
-  [StaffRank.COORDINATEUR_GENERAL]: 3,
-};
+import { STAFF_RANK_ORDER } from './staff-rank-order';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -41,8 +35,8 @@ export class RolesGuard implements CanActivate {
     // ADMIN (Fondateur) passe toujours — un rang staff n'a de sens que
     // pour un compte STAFF, ADMIN a deja l'acces total par definition.
     if (minRank && user?.role !== UserRole.ADMIN) {
-      const currentRank = user?.staffRank ? RANK_ORDER[user.staffRank] : 0;
-      if (currentRank < RANK_ORDER[minRank]) {
+      const currentRank = user?.staffRank ? STAFF_RANK_ORDER[user.staffRank] : 0;
+      if (currentRank < STAFF_RANK_ORDER[minRank]) {
         throw new ForbiddenException('Rang staff insuffisant');
       }
     }
