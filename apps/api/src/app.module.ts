@@ -24,6 +24,7 @@ import { EventsModule } from './events/events.module';
 import { NewsModule } from './news/news.module';
 import { MapModule } from './map/map.module';
 import { SystemModule } from './system/system.module';
+import { CoreMessagesModule } from './core-messages/core-messages.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { SystemModule } from './system/system.module';
     NewsModule,
     MapModule,
     SystemModule,
+    CoreMessagesModule,
   ],
 })
 export class AppModule {}

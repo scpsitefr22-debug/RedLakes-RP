@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Award, Banknote, MapPin, ShieldCheck, Users } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
 import {
   BRANCH_LABELS,
@@ -28,6 +29,17 @@ async function getGrade(slug: string): Promise<ApiGrade | null> {
   }
 }
 
+async function getDepartmentGrades(departmentSlug: string, excludeSlug: string): Promise<ApiGrade[]> {
+  try {
+    const res = await fetch(`${API_URL}/grades`, { cache: "no-store" });
+    if (!res.ok) return [];
+    const all: ApiGrade[] = await res.json();
+    return all.filter((g) => g.departmentRef?.slug === departmentSlug && g.slug !== excludeSlug);
+  } catch {
+    return [];
+  }
+}
+
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const grade = await getGrade(slug);
@@ -38,6 +50,10 @@ export default async function GradeDetailPage({ params }: Props) {
   const { slug } = await params;
   const grade = await getGrade(slug);
   if (!grade) notFound();
+
+  const siblingGrades = grade.departmentRef
+    ? await getDepartmentGrades(grade.departmentRef.slug, grade.slug)
+    : [];
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
@@ -89,7 +105,7 @@ export default async function GradeDetailPage({ params }: Props) {
       {grade.description && (
         <section className="mt-6 hologram-border rounded-lg p-6">
           <h2 className="mb-3 text-xl font-bold text-white">Description</h2>
-          <p className="text-gray-400">{grade.description}</p>
+          <DiscordMarkdown text={grade.description} className="text-gray-400" />
         </section>
       )}
 
@@ -154,6 +170,25 @@ export default async function GradeDetailPage({ params }: Props) {
           <div className="flex flex-wrap gap-2">
             {grade.siteSections.map((s) => (
               <Badge key={s}>{SITE_SECTION_LABELS[s as SiteSection] ?? s}</Badge>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {siblingGrades.length > 0 && grade.departmentRef && (
+        <section className="mt-6 hologram-border rounded-lg p-6">
+          <h2 className="mb-4 text-xl font-bold text-white">
+            Autres grades — {grade.departmentRef.name}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {siblingGrades.map((g) => (
+              <Link
+                key={g.id}
+                href={`/grades/${g.slug}`}
+                className="rounded border border-metal/50 px-3 py-1.5 text-sm text-gray-400 transition-colors hover:border-redlake hover:text-white"
+              >
+                {g.name}
+              </Link>
             ))}
           </div>
         </section>

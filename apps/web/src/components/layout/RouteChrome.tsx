@@ -7,12 +7,16 @@ import { Footer } from "./Footer";
 export function RouteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isConsole = pathname?.startsWith("/console");
+  // REDLAKES CORE se présente comme un vrai OS plein écran une fois connecté
+  // — pas une page dans le chrome habituel du site (même logique que /console).
+  const isCore = pathname?.startsWith("/core");
+  const hideChrome = isConsole || isCore;
 
   return (
     <>
-      {!isConsole && <Header />}
-      <main className={isConsole ? "" : "flex-1"}>{children}</main>
-      {!isConsole && <Footer />}
+      {!hideChrome && <Header />}
+      <main className={hideChrome ? "" : "flex-1"}>{children}</main>
+      {!hideChrome && <Footer />}
     </>
   );
 }

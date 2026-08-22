@@ -1,8 +1,5 @@
-import Link from "next/link";
-import { categoryLabels } from "@/data/news";
-import { Badge } from "@/components/ui/Badge";
-import { formatDate } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
+import { ActualitesCatalog } from "@/components/actualites/ActualitesCatalog";
 
 export const metadata = { title: "Actualités" };
 
@@ -37,34 +34,7 @@ export default async function ActualitesPage() {
         </p>
       </div>
 
-      {newsArticles.length === 0 ? (
-        <div className="hologram-border rounded-lg p-8 text-center text-gray-500">
-          Aucun article disponible pour le moment.
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {newsArticles.map((article) => (
-            <Link
-              key={article.id}
-              href={`/actualites/${article.slug}`}
-              className="group block hologram-border rounded-lg p-6 transition-all hover:border-redlake/40"
-            >
-              <div className="mb-3 flex items-center gap-3">
-                <Badge variant="classified">
-                  {categoryLabels[article.category as keyof typeof categoryLabels] ?? article.category}
-                </Badge>
-                <span className="font-mono text-xs text-gray-600">
-                  {formatDate(article.date)}
-                </span>
-              </div>
-              <h2 className="mb-2 text-xl font-bold text-white group-hover:text-redlake-glow">
-                {article.title}
-              </h2>
-              <p className="text-gray-500">{article.excerpt}</p>
-            </Link>
-          ))}
-        </div>
-      )}
+      <ActualitesCatalog newsArticles={newsArticles} />
     </div>
   );
 }

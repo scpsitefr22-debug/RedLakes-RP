@@ -19,6 +19,23 @@ export type AuthUser = User & {
     sanctions: number;
     medals: string[];
     achievements: unknown;
+    /**
+     * Relations reelles (factionInfo/gradeInfo/teamInfo) — seulement
+     * chargees par validateSession() pour /auth/me (utilise par REDLAKES
+     * CORE pour theme/permissions en un seul appel). Les autres chemins
+     * (callback Discord, dev login) ne les chargent pas : `faction`/`grade`
+     * (strings libres) leur suffisent pour la sync Discord.
+     */
+    factionInfo?: {
+      slug: string;
+      name: string;
+    } | null;
+    gradeInfo?: {
+      branch: string;
+      tier: string;
+      departmentRef?: { id: string; slug: string; name: string } | null;
+    } | null;
+    teamInfo?: { slug: string; name: string } | null;
   } | null;
 };
 
@@ -33,7 +50,25 @@ export class AuthService {
   async validateSession(token: string): Promise<AuthUser | null> {
     const session = await this.prisma.session.findUnique({
       where: { token },
-      include: { user: { include: { activeCharacter: true } } },
+      include: {
+        user: {
+          include: {
+            activeCharacter: {
+              include: {
+                factionInfo: { select: { slug: true, name: true } },
+                gradeInfo: {
+                  select: {
+                    branch: true,
+                    tier: true,
+                    departmentRef: { select: { id: true, slug: true, name: true } },
+                  },
+                },
+                teamInfo: { select: { slug: true, name: true } },
+              },
+            },
+          },
+        },
+      },
     });
     if (!session || session.expiresAt < new Date()) return null;
     return session.user;

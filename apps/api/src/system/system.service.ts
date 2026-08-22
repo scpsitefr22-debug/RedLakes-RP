@@ -1,16 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { PlatformEntityType } from '@prisma/client';
+import { AlertLevel, PlatformEntityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateSystemStateDto } from './dto/update-system-state.dto';
 import { AuditService } from '../platform/audit.service';
+import { NotificationsService } from '../platform/notifications.service';
 
 const SINGLETON_ID = 'singleton';
+
+const ALERT_LABELS: Record<AlertLevel, string> = {
+  NORMAL: 'Normal',
+  VIGILANCE: 'Vigilance',
+  ALERTE: 'Alerte',
+  CRISE: 'Crise',
+};
 
 @Injectable()
 export class SystemService {
   constructor(
     private prisma: PrismaService,
     private audit: AuditService,
+    private notifications: NotificationsService,
   ) {}
 
   /** Source unique de l'état serveur — remplace siteConfig.ts (web) et SERVER_OPEN (bot). */
@@ -64,6 +73,19 @@ export class SystemService {
           newAlertLevel: updated.alertLevel,
           note: dto.alertNote,
         },
+      });
+
+      // Diffusion à tout le réseau — le bureau REDLAKES CORE d'un joueur
+      // connecté doit refléter un vrai changement d'état décidé par le
+      // staff, jamais un évènement simulé (voir memoire "RP breach rarity").
+      const userIds = await this.notifications.findAllUserIds();
+      await this.notifications.notifyMany(userIds, {
+        title: `Niveau d'alerte : ${ALERT_LABELS[updated.alertLevel]}`,
+        body:
+          dto.alertNote ??
+          `Le niveau d'alerte de Site-12 est passé à ${ALERT_LABELS[updated.alertLevel]}.`,
+        entityType: PlatformEntityType.SYSTEM_STATE,
+        entityId: SINGLETON_ID,
       });
     }
 

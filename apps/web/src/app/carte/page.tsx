@@ -7,6 +7,7 @@ import { MapPin, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiFetch } from "@/lib/api";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
+import { SiteMapBackground } from "@/components/carte/SiteMapBackground";
 
 interface ApiMapLocation {
   id: string;
@@ -60,16 +61,7 @@ export default function CartePage() {
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="relative lg:col-span-2">
           <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-redlake/30 bg-black">
-            <div
-              className="absolute inset-0 opacity-30"
-              style={{
-                backgroundImage: `
-                  linear-gradient(rgba(139,10,10,0.1) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(139,10,10,0.1) 1px, transparent 1px)
-                `,
-                backgroundSize: "40px 40px",
-              }}
-            />
+            <SiteMapBackground />
             {locations.map((loc) => (
               <button
                 key={loc.id}

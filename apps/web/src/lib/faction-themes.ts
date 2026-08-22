@@ -278,6 +278,32 @@ export const FACTION_THEMES: Record<string, FactionTheme> = {
     icon: Zap,
     kicker: "RÉSEAU CLANDESTIN — AUCUNE AFFILIATION OFFICIELLE",
   },
+  /**
+   * Pas une des 9 factions jouables avec fiche publique (pas d'entrée dans
+   * data/factions.ts) — mais "Civil" est la valeur par defaut reelle de
+   * Player.faction (voir schema.prisma), donc REDLAKES CORE a besoin d'une
+   * identite visuelle neutre dediee plutot que de retomber silencieusement
+   * sur le rouge "classifie" de la Fondation via getFactionTheme().
+   */
+  civil: {
+    slug: "civil",
+    colors: {
+      primary: "#5c5c5c",
+      secondary: "#3a3a3a",
+      accent: "#9ca3af",
+      glow: "#d1d5db",
+    },
+    rgba: {
+      surface: "rgba(92, 92, 92, 0.1)",
+      border: "rgba(92, 92, 92, 0.35)",
+    },
+    fontVariable: "",
+    headingFont: "var(--font-sans)",
+    motif: "letterhead",
+    motion: "formal",
+    icon: Landmark,
+    kicker: "ACCÈS CIVIL — RÉSEAU PUBLIC DE REDLAKES",
+  },
 };
 
 export function getFactionTheme(slug: string): FactionTheme {

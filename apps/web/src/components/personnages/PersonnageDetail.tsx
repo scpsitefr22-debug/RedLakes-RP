@@ -13,6 +13,7 @@ interface ApiCharacter {
   biography: string;
   quotes: string[];
   history: string[];
+  portrait: string | null;
 }
 
 export function PersonnageDetail({ id }: { id: string }) {
@@ -42,9 +43,18 @@ export function PersonnageDetail({ id }: { id: string }) {
         <ArrowLeft className="h-3 w-3" /> Personnages
       </Link>
       <div className="mb-8 flex gap-6">
-        <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-redlake/30 bg-redlake/10">
-          <span className="font-mono text-2xl text-redlake-glow">██</span>
-        </div>
+        {character.portrait ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={character.portrait}
+            alt={character.name}
+            className="h-24 w-24 shrink-0 rounded-full border border-redlake/30 object-cover"
+          />
+        ) : (
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border border-redlake/30 bg-redlake/10">
+            <span className="font-mono text-2xl text-redlake-glow">██</span>
+          </div>
+        )}
         <div>
           <h1 className="text-3xl font-bold text-white">{character.name}</h1>
           <p className="text-gray-500">{character.title}</p>
@@ -77,9 +87,12 @@ export function PersonnageDetail({ id }: { id: string }) {
 
         <section className="hologram-border rounded-lg p-6">
           <h2 className="mb-4 text-xl font-bold text-white">Historique</h2>
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {character.history.map((h) => (
-              <li key={h} className="text-gray-400">▸ {h}</li>
+              <li key={h} className="flex gap-2 text-gray-400">
+                <span className="shrink-0 text-redlake-glow">▸</span>
+                <DiscordMarkdown text={h} />
+              </li>
             ))}
           </ul>
         </section>

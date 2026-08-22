@@ -103,6 +103,7 @@ export class AuthController {
         uuid: user.minecraftUuid,
         avatarUrl: user.avatarUrl,
         role: user.role,
+        staffRank: user.staffRank,
         discordLinked: !!user.discordId,
         discordUsername: user.discordUsername,
         activeCharacter: user.activeCharacter,

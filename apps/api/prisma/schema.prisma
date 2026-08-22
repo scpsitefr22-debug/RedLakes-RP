@@ -101,6 +101,7 @@ model User {
   newsRevisionsEdited        NewsRevision[]
   mapLocationRevisionsEdited MapLocationRevision[]
   loreRevisionsEdited        LoreRevision[]
+  coreMessages               CoreMessage[]
 }
 
 model Session {
@@ -268,6 +269,24 @@ model PersonnelReport {
   @@index([userId])
   @@index([createdAt])
   @@index([factionId])
+}
+
+/// Canal de communication REDLAKES CORE, scope par faction (meme principe que
+/// PersonnelReport.factionId) — factionId null = canal public/Civil, partage
+/// par tout personnage sans faction assignee. Pas de messagerie privee/DM en
+/// v1 : un fil par faction, tout le monde dans la faction le voit.
+model CoreMessage {
+  id          String   @id @default(cuid())
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorLabel String
+  factionId   String?
+  faction     Faction? @relation(fields: [factionId], references: [id], onDelete: Cascade)
+  content     String
+  createdAt   DateTime @default(now())
+
+  @@index([factionId])
+  @@index([createdAt])
 }
 
 /// Évènements Discord relayés par le bot, transformés en "transmissions" RP (thème SCP).
@@ -453,6 +472,7 @@ model Faction {
   departments Department[]
   players     Player[]
   reports     PersonnelReport[]
+  coreMessages CoreMessage[]
 
   @@index([playable])
 }

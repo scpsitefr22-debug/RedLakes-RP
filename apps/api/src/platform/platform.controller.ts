@@ -20,6 +20,7 @@ import { AuditService } from './audit.service';
 import { CommentsService } from './comments.service';
 import { NotificationsService } from './notifications.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { NotificationsQueryDto } from './dto/notifications-query.dto';
 
 @Controller('platform')
 export class PlatformController {
@@ -93,7 +94,7 @@ export class PlatformController {
   @UseGuards(AuthGuard)
   myNotifications(
     @Req() req: Request & { user: { id: string } },
-    @Query() query: PaginationQueryDto & { unreadOnly?: string },
+    @Query() query: NotificationsQueryDto,
   ) {
     return this.notifications.findMine(req.user.id, {
       ...query,

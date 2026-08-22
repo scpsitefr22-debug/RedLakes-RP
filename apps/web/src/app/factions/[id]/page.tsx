@@ -6,6 +6,7 @@ import { FactionThemeScope } from "@/components/factions/FactionThemeScope";
 import { FactionHero } from "@/components/factions/FactionHero";
 import { FactionDepartmentsGrid } from "@/components/factions/FactionDepartmentsGrid";
 import { FactionRoleCategoriesPanel } from "@/components/factions/FactionRoleCategoriesPanel";
+import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 import { Building2, Target, Users } from "lucide-react";
 
 interface Props {
@@ -42,14 +43,14 @@ export default async function FactionDetailPage({ params }: Props) {
         {faction.description && (
           <section className="faction-card p-6">
             <h2 className="faction-heading mb-4 text-xl font-bold text-white">Description</h2>
-            <p>{faction.description}</p>
+            <DiscordMarkdown text={faction.description} />
           </section>
         )}
 
         {faction.history && (
           <section className="faction-card p-6">
             <h2 className="faction-heading mb-4 text-xl font-bold text-white">Historique</h2>
-            <p>{faction.history}</p>
+            <DiscordMarkdown text={faction.history} />
           </section>
         )}
 

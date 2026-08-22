@@ -103,4 +103,10 @@ export class NotificationsService {
     });
     return users.map((u) => u.id);
   }
+
+  /** Tous les comptes — pour un évènement qui concerne l'ensemble du réseau (ex: alerte Site-12). */
+  async findAllUserIds(): Promise<string[]> {
+    const users = await this.prisma.user.findMany({ select: { id: true } });
+    return users.map((u) => u.id);
+  }
 }
