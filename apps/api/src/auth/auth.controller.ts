@@ -107,8 +107,15 @@ export class AuthController {
         discordLinked: !!user.discordId,
         discordUsername: user.discordUsername,
         activeCharacter: user.activeCharacter,
+        onboarded: !!user.onboardedAt,
       },
     };
+  }
+
+  @Post('onboarding/complete')
+  @UseGuards(AuthGuard)
+  async completeOnboarding(@Req() req: Request & { user: { id: string } }) {
+    return this.auth.completeOnboarding(req.user.id);
   }
 
   @Post('discord/code')

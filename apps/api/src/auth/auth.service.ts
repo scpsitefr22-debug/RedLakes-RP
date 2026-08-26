@@ -90,6 +90,15 @@ export class AuthService {
     await this.prisma.session.deleteMany({ where: { token } });
   }
 
+  /** Marque la creation de compte REDLAKES comme terminee (nom RP renseigne). */
+  async completeOnboarding(userId: string) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { onboardedAt: new Date() },
+    });
+    return { success: true };
+  }
+
   getDiscordAuthUrl(): string {
     const clientId = this.config.get('DISCORD_CLIENT_ID');
     const redirectUri = encodeURIComponent(

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import { Save, ArrowLeft, Trash2 } from "lucide-react";
+import { Save, ArrowLeft, Trash2, MapPin } from "lucide-react";
 
-const LOCATION_TYPES = ["site", "surface", "ville", "egouts", "criminel", "labo", "scp", "portail", "ennemi"];
+const LOCATION_TYPES = ["site", "surface", "ville", "egouts", "criminel", "labo", "scp", "portail", "ennemi", "village", "nature", "incident", "ferme"];
 
 export interface MapLocationFormData {
   slug: string;
@@ -41,6 +41,16 @@ export function MapLocationEditor({ initial, locationId, mode }: MapLocationEdit
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  const placeOnMap = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = mapRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.min(100, Math.max(0, ((e.clientY - rect.top) / rect.height) * 100));
+    update("x", x.toFixed(1));
+    update("y", y.toFixed(1));
+  };
 
   const update = (key: keyof MapLocationFormData, value: string) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -147,6 +157,24 @@ export function MapLocationEditor({ initial, locationId, mode }: MapLocationEdit
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Danger (1-5)</label>
             <input type="number" min={1} max={5} className={inputClass} value={form.danger} onChange={(e) => update("danger", e.target.value)} />
+          </div>
+        </div>
+        <div>
+          <label className="mb-1 block font-mono text-xs text-gray-500">
+            Position — cliquez sur la carte pour placer le point
+          </label>
+          <div
+            ref={mapRef}
+            onClick={placeOnMap}
+            className="relative aspect-[1126/923] w-full cursor-crosshair overflow-hidden rounded border border-metal bg-black bg-cover bg-center"
+            style={{ backgroundImage: "url(/carte/redlakes-map.png)" }}
+          >
+            <div
+              className="pointer-events-none absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-redlake-glow bg-redlake/30"
+              style={{ left: `${Number(form.x) || 0}%`, top: `${Number(form.y) || 0}%` }}
+            >
+              <MapPin className="h-4 w-4 text-white drop-shadow-[0_0_4px_rgba(0,0,0,0.9)]" />
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">

@@ -1,7 +1,7 @@
 export interface MapLocation {
   id: string;
   name: string;
-  type: "site" | "surface" | "ville" | "egouts" | "criminel" | "labo" | "scp" | "portail" | "ennemi";
+  type: "site" | "surface" | "ville" | "egouts" | "criminel" | "labo" | "scp" | "portail" | "ennemi" | "village" | "nature" | "incident" | "ferme";
   x: number;
   y: number;
   description: string;
@@ -129,4 +129,8 @@ export const locationTypeLabels: Record<MapLocation["type"], string> = {
   scp: "Secteur SCP",
   portail: "Portail",
   ennemi: "Base ennemie",
+  village: "Village",
+  nature: "Zone naturelle",
+  incident: "Zone d'incident",
+  ferme: "Terres agricoles",
 };

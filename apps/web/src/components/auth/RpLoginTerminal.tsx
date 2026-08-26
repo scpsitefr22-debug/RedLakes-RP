@@ -19,7 +19,7 @@ export function RpLoginTerminal() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorCode = searchParams.get("error");
-  const redirectTo = searchParams.get("redirect") ?? "/dashboard";
+  const redirectTo = searchParams.get("redirect") ?? "/bienvenue";
 
   const [apiOnline, setApiOnline] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -90,7 +90,8 @@ export function RpLoginTerminal() {
           Terminal d&apos;habilitation
         </h1>
         <p className="mt-3 text-sm text-gray-500">
-          Authentifiez-vous pour acceder a votre dossier personnel de la Fondation.
+          Liez votre Discord pour créer votre compte REDLAKES et accéder à votre
+          dossier personnel.
         </p>
       </div>
 
@@ -155,7 +156,7 @@ export function RpLoginTerminal() {
 
       <div className="hologram-border space-y-4 rounded-lg p-6">
         <p className="font-mono text-[10px] tracking-widest text-gray-600">
-          IDENTITE DISCORD REQUISE
+          ÉTAPE 1 — LIAISON DISCORD OBLIGATOIRE
         </p>
 
         {apiOnline && siteConfig.discordOAuthEnabled ? (
@@ -164,17 +165,19 @@ export function RpLoginTerminal() {
             className="flex w-full items-center justify-center gap-3 rounded border border-[#5865F2]/50 bg-[#5865F2]/15 py-4 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-[#5865F2]/25"
           >
             <MessageCircle className="h-5 w-5 text-[#aab1ff]" />
-            Connexion avec Discord
+            Lier mon compte Discord
             <ChevronRight className="h-4 w-4 text-gray-500" />
           </a>
         ) : (
           <p className="text-center font-mono text-xs text-gray-600">
-            Connexion Discord indisponible
+            Liaison Discord indisponible
           </p>
         )}
 
         <p className="text-center text-xs text-gray-600">
-          Connexion directe via votre identite Discord du serveur REDLAKES.
+          Votre compte REDLAKES est créé à partir de votre identité Discord du
+          serveur REDLAKES — l&apos;étape suivante vous permet de créer votre
+          personnage.
         </p>
       </div>
 

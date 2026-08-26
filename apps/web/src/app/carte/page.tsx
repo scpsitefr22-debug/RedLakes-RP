@@ -32,6 +32,10 @@ const typeColors: Record<string, string> = {
   scp: "bg-red-400/10 border-red-400/30",
   portail: "bg-pink-400/10 border-pink-400/30",
   ennemi: "bg-gray-400/10 border-gray-400/30",
+  village: "bg-lime-400/10 border-lime-400/30",
+  nature: "bg-emerald-400/10 border-emerald-400/30",
+  incident: "bg-red-500/10 border-red-500/30",
+  ferme: "bg-yellow-600/10 border-yellow-600/30",
 };
 
 export default function CartePage() {
@@ -60,7 +64,7 @@ export default function CartePage() {
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="relative lg:col-span-2">
-          <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-redlake/30 bg-black">
+          <div className="relative aspect-[1126/923] overflow-hidden rounded-lg border border-redlake/30 bg-black">
             <SiteMapBackground />
             {locations.map((loc) => (
               <button
@@ -83,9 +87,9 @@ export default function CartePage() {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {Object.entries(locationTypeLabels).map(([type, label]) => (
+            {Array.from(new Set(locations.map((l) => l.type))).map((type) => (
               <Badge key={type} className={cn("border", typeColors[type])}>
-                {label}
+                {locationTypeLabels[type as keyof typeof locationTypeLabels] ?? type}
               </Badge>
             ))}
           </div>

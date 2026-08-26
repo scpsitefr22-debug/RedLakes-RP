@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { LucideIcon } from "lucide-react";
-import { UserSquare2, Bell, FileText, Map, Target, Users, Lock, MessageSquare, Skull } from "lucide-react";
+import { UserSquare2, Bell, FileText, Map, Target, Users, Lock, MessageSquare, Skull, Mail } from "lucide-react";
 import { ProfileApp } from "@/components/core/apps/ProfileApp";
 import { NotificationsApp } from "@/components/core/apps/NotificationsApp";
 import { ReportsApp } from "@/components/core/apps/ReportsApp";
@@ -11,6 +11,7 @@ import { EquipesApp } from "@/components/core/apps/EquipesApp";
 import { DocumentsApp } from "@/components/core/apps/DocumentsApp";
 import { CommunicationsApp } from "@/components/core/apps/CommunicationsApp";
 import { OphisApp } from "@/components/core/apps/OphisApp";
+import { MessagerieApp } from "@/components/core/apps/MessagerieApp";
 
 export interface CoreAppDef {
   id: string;
@@ -29,6 +30,7 @@ type AppId =
   | "equipes"
   | "documents"
   | "communications"
+  | "messagerie"
   | "ophis";
 
 const BASE_APPS: Record<AppId, Omit<CoreAppDef, "label">> = {
@@ -41,6 +43,7 @@ const BASE_APPS: Record<AppId, Omit<CoreAppDef, "label">> = {
   equipes: { id: "equipes", icon: Users, component: EquipesApp },
   documents: { id: "documents", icon: Lock, component: DocumentsApp },
   communications: { id: "communications", icon: MessageSquare, component: CommunicationsApp },
+  messagerie: { id: "messagerie", icon: Mail, component: MessagerieApp },
   ophis: { id: "ophis", icon: Skull, component: OphisApp },
 };
 
@@ -54,6 +57,7 @@ const DEFAULT_LABELS: Record<AppId, string> = {
   equipes: "Équipes",
   documents: "Documents",
   communications: "Communications",
+  messagerie: "Messagerie",
   ophis: "OPHIS",
 };
 
@@ -82,6 +86,7 @@ const FACTION_LABEL_OVERRIDES: Partial<Record<string, Partial<Record<AppId, stri
     missions: "Mandats",
     equipes: "Unités",
     communications: "Réseau AEGIS",
+    messagerie: "Correspondance",
   },
   gouvernement: {
     rapports: "Signalements",
@@ -90,13 +95,15 @@ const FACTION_LABEL_OVERRIDES: Partial<Record<string, Partial<Record<AppId, stri
     personnel: "Services",
     equipes: "Départements",
     communications: "Communiqués",
+    messagerie: "Courrier",
   },
   crime: {
     documents: "Informations",
     missions: "Opérations",
     personnel: "Contacts",
     equipes: "Réseau",
-    communications: "Messages",
+    communications: "Canal",
+    messagerie: "Messages",
   },
   chaos: {
     rapports: "Rapports d'opération",
@@ -105,6 +112,7 @@ const FACTION_LABEL_OVERRIDES: Partial<Record<string, Partial<Record<AppId, stri
     personnel: "Membres",
     equipes: "Cellules",
     communications: "Transmissions",
+    messagerie: "Contact",
   },
   "main-serpent": {
     rapports: "Présages",
@@ -112,6 +120,7 @@ const FACTION_LABEL_OVERRIDES: Partial<Record<string, Partial<Record<AppId, stri
     personnel: "Membres",
     equipes: "Cercles",
     communications: "Signal libre",
+    messagerie: "Missives",
   },
   goc: {
     rapports: "Rapports d'anomalie",
@@ -119,6 +128,7 @@ const FACTION_LABEL_OVERRIDES: Partial<Record<string, Partial<Record<AppId, stri
     missions: "Opérations",
     equipes: "Unités",
     communications: "GOC Network",
+    messagerie: "Correspondance",
   },
   civil: {
     rapports: "Signalements",

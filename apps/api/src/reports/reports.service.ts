@@ -140,7 +140,9 @@ export class ReportsService {
       clearance: report.clearance,
     });
 
-    const staffIds = await this.notifications.findStaffUserIds();
+    const staffIds = await this.notifications.findStaffUserIdsForFaction(
+      report.factionId,
+    );
 
     await this.notifications.notifyMany(staffIds, {
       title: 'Nouveau rapport personnel',

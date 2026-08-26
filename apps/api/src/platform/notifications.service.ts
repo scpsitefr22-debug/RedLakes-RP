@@ -104,6 +104,28 @@ export class NotificationsService {
     return users.map((u) => u.id);
   }
 
+  /**
+   * Staff de la faction concernee (via son personnage actif) — pour router
+   * un evenement propre a une faction (ex: rapport personnel) vers sa
+   * Direction plutot que vers tout le staff du serveur. Sans faction
+   * (factionId null, ex: Civil) ou si aucun staff n'a cette faction comme
+   * personnage actif, on retombe sur tout le staff pour ne jamais laisser
+   * un evenement sans destinataire.
+   */
+  async findStaffUserIdsForFaction(factionId: string | null): Promise<string[]> {
+    if (!factionId) return this.findStaffUserIds();
+
+    const users = await this.prisma.user.findMany({
+      where: {
+        role: { in: ['STAFF', 'ADMIN'] },
+        activeCharacter: { factionId },
+      },
+      select: { id: true },
+    });
+    if (users.length === 0) return this.findStaffUserIds();
+    return users.map((u) => u.id);
+  }
+
   /** Tous les comptes — pour un évènement qui concerne l'ensemble du réseau (ex: alerte Site-12). */
   async findAllUserIds(): Promise<string[]> {
     const users = await this.prisma.user.findMany({ select: { id: true } });

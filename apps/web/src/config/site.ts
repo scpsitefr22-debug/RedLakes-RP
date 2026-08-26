@@ -6,7 +6,7 @@ export const siteConfig = {
   discordInvite: "https://discord.gg/d5DqcZEJkn",
   discordLabel: "Discord REDLAKES",
   recruitmentOpen: true,
-  /** Connexion principale via Discord OAuth (compte lie au serveur) — seule methode de connexion */
+  /** Liaison Discord (mecanisme technique de connexion) — creation du compte REDLAKES et vecu joueur presentes comme "lier Discord d'abord", cf. /connexion et /bienvenue */
   discordOAuthEnabled: true,
   /** Acces technique dev-login (pre-ouverture / tests locaux) */
   devLoginEnabled: true,

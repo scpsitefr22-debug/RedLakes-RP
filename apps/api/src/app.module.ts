@@ -25,6 +25,7 @@ import { NewsModule } from './news/news.module';
 import { MapModule } from './map/map.module';
 import { SystemModule } from './system/system.module';
 import { CoreMessagesModule } from './core-messages/core-messages.module';
+import { CoreDmModule } from './core-dm/core-dm.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { CoreMessagesModule } from './core-messages/core-messages.module';
     MapModule,
     SystemModule,
     CoreMessagesModule,
+    CoreDmModule,
   ],
 })
 export class AppModule {}

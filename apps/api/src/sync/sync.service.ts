@@ -47,6 +47,24 @@ export class SyncService {
     return faction?.id ?? null;
   }
 
+  /**
+   * Faction impliquee par le departement d'un grade (ex: un grade du
+   * departement "Direction du Site" implique la faction Fondation SCP).
+   * Utilise par syncGradeFromDiscord, qui ne recoit qu'un grade — sans ca,
+   * un joueur promu dans une faction via un role Discord "grade uniquement"
+   * garde indefiniment sa faction precedente (souvent "Civil" par defaut).
+   */
+  private async factionForDepartment(
+    departmentRefId: string | null,
+  ): Promise<{ id: string; name: string } | null> {
+    if (!departmentRefId) return null;
+    const department = await this.prisma.department.findUnique({
+      where: { id: departmentRefId },
+      select: { faction: { select: { id: true, name: true } } },
+    });
+    return department?.faction ?? null;
+  }
+
   private async departmentRefIdForGrade(
     gradeId: string | null,
   ): Promise<string | null> {
@@ -343,13 +361,23 @@ export class SyncService {
     const previousDepartmentRefId = await this.departmentRefIdForGrade(
       user.activeCharacter.gradeId,
     );
+    const previousFactionId = user.activeCharacter.factionId;
     const resolved = await this.resolveGrade(dto.grade);
+    const impliedFaction = await this.factionForDepartment(resolved.departmentRefId);
+
     const player = await this.prisma.player.update({
       where: { id: user.activeCharacter.id },
       data: {
         grade: dto.grade,
         gradeId: resolved.gradeId,
         roleUpdatedAt: new Date(),
+        // Un grade lie a un departement implique sa faction — sans ca, une
+        // promotion "grade uniquement" via Discord laisserait la faction
+        // bloquee sur son ancienne valeur (souvent "Civil" par defaut).
+        ...(impliedFaction && {
+          factionId: impliedFaction.id,
+          faction: impliedFaction.name,
+        }),
       },
     });
 
@@ -359,6 +387,14 @@ export class SyncService {
       previousDepartmentRefId,
       resolved.departmentRefId,
     );
+    if (impliedFaction) {
+      await this.recordAssignmentChange(
+        player.id,
+        AssignmentEntityType.FACTION,
+        previousFactionId,
+        impliedFaction.id,
+      );
+    }
 
     await this.discord.notifyRoleChange({
       minecraftUsername: user.minecraftUsername ?? 'Joueur',

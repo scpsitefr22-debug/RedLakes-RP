@@ -22,6 +22,7 @@ import { siteConfig } from "@/config/site";
 import { findGradeMeta } from "@/data/rp-grades";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
 import { MetricCard } from "@/components/ui/MetricCard";
+import { JargonTooltip } from "@/components/ui/JargonTooltip";
 import { CareerTimeline } from "@/components/dashboard/CareerTimeline";
 import { MissionsWidget } from "@/components/dashboard/MissionsWidget";
 import { CharacterSwitcher } from "@/components/dashboard/CharacterSwitcher";
@@ -263,17 +264,22 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               <span className="rounded border border-redlake/30 bg-redlake/10 px-2.5 py-1 font-mono text-xs text-redlake-glow">
                 {player.grade}
               </span>
+              <JargonTooltip term="grade" />
               <span className="rounded border border-metal/50 px-2.5 py-1 font-mono text-xs text-gray-400">
                 {player.faction}
               </span>
+              <JargonTooltip term="faction" />
               {player.teamName && (
-                <span className="rounded border border-metal/50 px-2.5 py-1 font-mono text-xs text-gray-400">
-                  {player.teamName}
-                </span>
+                <>
+                  <span className="rounded border border-metal/50 px-2.5 py-1 font-mono text-xs text-gray-400">
+                    {player.teamName}
+                  </span>
+                  <JargonTooltip term="equipe" />
+                </>
               )}
             </div>
 
@@ -452,8 +458,8 @@ export default function DashboardPage() {
         <MetricCard icon={Clock} label="Temps de service" value={formatPlaytime(player.playtime)} />
         <MetricCard icon={CalendarDays} label="Ancienneté" value={formatSeniority(player.seniority)} />
         <MetricCard icon={User} label="Statut" value={player.grade} />
-        <MetricCard icon={Award} label="Réputation" value={`${player.reputation}/100`} />
-        <MetricCard icon={AlertTriangle} label="Sanctions" value={player.sanctions} />
+        <MetricCard icon={Award} label="Réputation" value={`${player.reputation}/100`} tooltip="reputation" />
+        <MetricCard icon={AlertTriangle} label="Sanctions" value={player.sanctions} tooltip="sanction" />
       </div>
 
       <MissionsWidget />

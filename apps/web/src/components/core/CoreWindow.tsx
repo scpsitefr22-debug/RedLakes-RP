@@ -83,7 +83,14 @@ export function CoreWindow({
       style={
         win.maximized
           ? { position: "absolute", inset: "0.5rem", zIndex }
-          : { position: "absolute", left: win.x, top: win.y, width: WINDOW_WIDTH, zIndex }
+          : {
+              position: "absolute",
+              left: win.x,
+              top: win.y,
+              width: WINDOW_WIDTH,
+              maxWidth: "calc(100vw - 2rem)",
+              zIndex,
+            }
       }
       onPointerDown={() => focusApp(win.appId)}
     >

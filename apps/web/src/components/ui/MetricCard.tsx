@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { JargonTooltip } from "@/components/ui/JargonTooltip";
+import type { GlossaryTerm } from "@/lib/glossary";
 
 interface MetricCardProps {
   icon: LucideIcon;
@@ -9,9 +11,10 @@ interface MetricCardProps {
   href?: string;
   live?: boolean;
   className?: string;
+  tooltip?: GlossaryTerm;
 }
 
-export function MetricCard({ icon: Icon, value, label, href, live, className }: MetricCardProps) {
+export function MetricCard({ icon: Icon, value, label, href, live, className, tooltip }: MetricCardProps) {
   const content = (
     <>
       <div className="mb-2 flex items-center justify-between">
@@ -24,7 +27,10 @@ export function MetricCard({ icon: Icon, value, label, href, live, className }: 
         )}
       </div>
       <p className="font-mono text-2xl font-bold text-white">{value}</p>
-      <p className="text-xs text-gray-600">{label}</p>
+      <p className="text-xs text-gray-600">
+        {label}
+        {tooltip && <JargonTooltip term={tooltip} />}
+      </p>
     </>
   );
 
