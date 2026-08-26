@@ -202,13 +202,14 @@ export function IntegrationDossier() {
             </p>
             <p className="mt-2 text-sm text-gray-300">
               Accréditation Chercheur stagiaire accordée. Envie de voir votre
-              dossier personnel et le réseau interne ? Connectez-vous avec le
-              compte qu&apos;on vous a donné, dans l&apos;encart « Accès technique »
-              de la page{" "}
+              dossier personnel et le réseau interne ? Rendez-vous sur{" "}
               <Link href="/connexion" className="text-redlake-glow hover:underline">
                 Connexion
-              </Link>
-              .
+              </Link>{" "}
+              et liez votre compte Discord — ça crée votre personnage et vous
+              donne accès à votre espace joueur. Il faut être membre du
+              serveur Discord REDLAKES (un lien pour le rejoindre s&apos;affiche
+              automatiquement si besoin).
             </p>
           </div>
         )}
