@@ -17,7 +17,8 @@
     "roles:resume": "tsx src/run-role-resume.ts",
     "roles:import": "tsx src/run-role-import.ts",
     "roles:check": "tsx src/run-role-check.ts",
-    "roles:separators": "tsx src/run-role-separators.ts"
+    "roles:separators": "tsx src/run-role-separators.ts",
+    "nicknames:sweep": "tsx src/run-nickname-sweep.ts"
   },
   "dependencies": {
     "discord.js": "^14.16.3",

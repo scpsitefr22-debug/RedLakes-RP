@@ -17,6 +17,13 @@ export type ApplyMemberRolesResult = {
   nicknameError?: string;
 };
 
+/** Le rôle "Assistant IA" est exempte du pseudo RP force (voir formatRpNickname) */
+const NICKNAME_EXEMPT_ROLE_NAME = "Assistant IA";
+
+function isExemptFromForcedNickname(member: GuildMember): boolean {
+  return member.roles.cache.some((r) => r.name.includes(NICKNAME_EXEMPT_ROLE_NAME));
+}
+
 /** Applique pseudo + role RP (grade in-game) sans toucher staff / joueur de base */
 export async function applyMemberRoles(
   member: GuildMember,
@@ -73,16 +80,18 @@ export async function applyMemberRoles(
         : "Permissions insuffisantes ou rôle plus haut que le bot.";
   }
 
-  const nick = formatRpNickname({
-    ...profile,
-    grade: gradeForRoles,
-  });
+  if (!isExemptFromForcedNickname(member)) {
+    const nick = formatRpNickname({
+      ...profile,
+      grade: gradeForRoles,
+    });
 
-  try {
-    await member.setNickname(nick, "Sync grade RP REDLAKES");
-  } catch (err) {
-    result.nicknameError =
-      err instanceof Error ? err.message : "Impossible de changer le pseudo.";
+    try {
+      await member.setNickname(nick, "Sync grade RP REDLAKES");
+    } catch (err) {
+      result.nicknameError =
+        err instanceof Error ? err.message : "Impossible de changer le pseudo.";
+    }
   }
 
   return result;
