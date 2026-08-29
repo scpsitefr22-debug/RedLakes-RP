@@ -53,7 +53,11 @@ export function collectProtectedRoles(guild: Guild): Role[] {
 
 /** Plafond hiérarchique RP : juste sous le rôle staff le plus bas. */
 export function findRpBlockCeiling(guild: Guild): number {
-  const protectedRoles = collectProtectedRoles(guild);
+  // @everyone est toujours protégé (position 0) mais ne doit jamais compter
+  // comme "plancher staff" — sinon le plafond retombe systématiquement à 1.
+  const protectedRoles = collectProtectedRoles(guild).filter(
+    (r) => r.id !== guild.id,
+  );
   if (!protectedRoles.length) {
     const botTop = guild.members.me?.roles.highest.position ?? 1;
     return Math.max(botTop - 1, 1);
