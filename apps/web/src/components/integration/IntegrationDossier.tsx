@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ClipboardList, CheckCircle2, ExternalLink } from "lucide-react";
+
+const ANSWERS_KEY = "redlakes_integration_answers";
+const ACTIVE_KEY = "redlakes_integration_active";
 
 interface Blank {
   id: string;
@@ -122,11 +125,44 @@ const BLANKS: Blank[] = [
 export function IntegrationDossier() {
   const [values, setValues] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  // Charge les reponses deja saisies (onglet ferme/rafraichi entre-temps) et
+  // marque le dossier comme "en cours" pour que le bandeau de retour
+  // s'affiche sur les autres pages tant qu'il n'est pas termine.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(ANSWERS_KEY);
+      if (saved) setValues(JSON.parse(saved));
+      localStorage.setItem(ACTIVE_KEY, "1");
+    } catch {
+      /* stockage indisponible — le dossier marche quand meme, juste sans sauvegarde */
+    }
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(ANSWERS_KEY, JSON.stringify(values));
+    } catch {
+      /* ignore */
+    }
+  }, [values, loaded]);
 
   const results = Object.fromEntries(
     BLANKS.map((b) => [b.id, BLANKS.find((x) => x.id === b.id)!.accepted.includes(normalize(values[b.id] ?? ""))]),
   );
   const allCorrect = checked && BLANKS.every((b) => results[b.id]);
+
+  useEffect(() => {
+    if (!allCorrect) return;
+    try {
+      localStorage.removeItem(ACTIVE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, [allCorrect]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
