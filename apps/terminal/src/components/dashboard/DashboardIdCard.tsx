@@ -30,7 +30,7 @@ export function DashboardIdCard({
   const authRows = buildAuthRows(gns, clearance);
 
   return (
-    <DashboardWidget title="Carte d'identité" bodyClassName="p-3">
+    <DashboardWidget title="Carte d'identité" className="shrink-0" bodyClassName="p-3">
       <div className="flex gap-3">
         <div className="flex h-20 w-16 shrink-0 flex-col items-center justify-end border border-dashboard-border bg-[#0a1018]">
           <div className="mb-2 h-10 w-8 rounded-t-full bg-gradient-to-b from-metal/50 to-metal/20" />

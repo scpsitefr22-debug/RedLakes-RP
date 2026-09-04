@@ -26,7 +26,7 @@ export function DashboardBottomWidgets({ gns }: DashboardBottomWidgetsProps) {
     gns.world.siteStatus === "breach" || gns.world.siteStatus === "lockdown";
 
   return (
-    <div className="grid min-h-0 grid-cols-1 gap-2 lg:grid-cols-3">
+    <div className="grid shrink-0 grid-cols-1 gap-2 lg:grid-cols-3">
       <DashboardWidget title="Journal des incidents" bodyClassName="overflow-y-auto p-2">
         {incidents.length === 0 ? (
           <p className="text-[10px] text-metal/60">Aucun incident enregistré.</p>

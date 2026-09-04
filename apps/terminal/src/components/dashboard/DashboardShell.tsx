@@ -80,7 +80,7 @@ export function DashboardShell({
         />
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2 overflow-y-auto p-2">
-          <div className="grid min-h-0 grid-cols-1 gap-2 lg:grid-cols-12">
+          <div className="grid shrink-0 grid-cols-1 gap-2 lg:grid-cols-12">
             <div className="flex h-[420px] min-h-0 flex-col lg:col-span-7 lg:h-auto">
               <DashboardWidget title={mainTitle} className="h-full min-h-[280px]" bodyClassName="min-h-0">
                 {renderApp(activeApp)}
