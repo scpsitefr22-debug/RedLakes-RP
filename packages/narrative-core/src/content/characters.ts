@@ -145,6 +145,18 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     secrets: ["knows_redacted_entries"],
     availableFromChapter: 1,
   },
+  "agent-parker": {
+    id: "agent-parker",
+    name: "Agent Parker",
+    title: "Liaison terrain — hors site",
+    faction: "Fondation SCP — Sécurité",
+    avatarColor: "#0891b2",
+    personality: ["terse", "professional", "wary"],
+    goals: ["gather_field_intel", "avoid_exposure"],
+    fears: ["blown_cover"],
+    secrets: ["has_own_contacts_in_redlakes"],
+    availableFromChapter: 3,
+  },
   "commandant-nu7": {
     id: "commandant-nu7",
     name: "Commandant Vance",

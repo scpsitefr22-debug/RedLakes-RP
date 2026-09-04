@@ -25,14 +25,18 @@ export function PersonnelApp() {
 
   const renderChar = (char: (typeof roster)[0], dimmed = false) => {
     const mem = gns.characterMemory[char.id];
-    const title = gns.world.promotedCharacters[char.id] ?? char.title;
+    const title =
+      char.id === "dr-chen" && gns.flags.ch3_chen_promoted
+        ? "Directrice adjointe — Recherche"
+        : (gns.world.promotedCharacters[char.id] ?? char.title);
     const dead = gns.world.deadCharacters.includes(char.id);
+    const vanished = char.id === "chercheur-junior-euclid" && Boolean(gns.flags.ch6_amir_vanished);
 
     return (
       <div
         key={char.id}
         className={`flex items-center gap-3 border-b border-panel-border/50 px-4 py-3 ${
-          dead || dimmed ? "opacity-45" : ""
+          dead || dimmed || vanished ? "opacity-45" : ""
         }`}
       >
         <div
@@ -45,8 +49,8 @@ export function PersonnelApp() {
           <div className="text-xs text-foreground">
             {char.name} {dead && "†"}
           </div>
-          <div className="text-[10px] text-metal">{title}</div>
-          {mem?.met && <div className="text-[9px] text-terminal">Contact établi</div>}
+          <div className="text-[10px] text-metal">{vanished ? "Statut : disparu des effectifs" : title}</div>
+          {mem?.met && !vanished && <div className="text-[9px] text-terminal">Contact établi</div>}
           {dimmed && <div className="text-[9px] text-metal/60">Non rencontré</div>}
         </div>
       </div>

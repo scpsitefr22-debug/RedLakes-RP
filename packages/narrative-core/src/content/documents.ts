@@ -213,6 +213,82 @@ Objet : protocole de remontée d'incident.
 
 Présence obligatoire. Contact : messagerie Sécurité.`,
   },
+  "doc-protocole-confinement-euclid": {
+    id: "doc-protocole-confinement-euclid",
+    title: "PROTO_CONFINEMENT_EUCLID.pdf",
+    clearance: 1,
+    category: "protocole",
+    unlockRequires: { flag: "ch2_protocol_anomaly_found" },
+    content: `PROTOCOLE DE CONFINEMENT — SECTEUR EUCLID
+Site-12 — Révision courante
+
+Seuils d'alerte fixés par le Comité scientifique. Toute modification manuelle doit être
+co-signée par deux membres du personnel clearance 3+ et journalisée automatiquement.
+
+HISTORIQUE DES MODIFICATIONS (dernières 72h) :
+- Modification non co-signée détectée — origine : terminal Class-D.
+- Aucune fiche d'incident associée déposée par l'auteur.
+
+Toute anomalie de ce type doit être remontée à la Sécurité ou à la FIM Nu-7 avant tout
+exercice de confinement programmé.
+
+— Comité scientifique, Site-12`,
+  },
+  "doc-rapport-garrison": {
+    id: "doc-rapport-garrison",
+    title: "RAPPORT_ACCES_GARRISON.pdf",
+    clearance: 2,
+    category: "rapport",
+    unlockRequires: { flag: "ch2_garrison_implicated" },
+    content: `RAPPORT D'ACCÈS — CONFIDENTIEL
+Objet : modification non autorisée, seuils Euclid-7
+
+Terminal source : poste Class-D, Lt. Garrison (superviseur).
+Horodatage : 04h48, veille de l'exercice Nu-7.
+Aucune co-signature clearance 3+ enregistrée.
+
+Motif déclaré par l'intéressé : « Test de routine non documenté. »
+Le Comité scientifique juge cette explication insuffisante.
+
+Suite donnée : transmission au Commandant Vance (FIM Nu-7) pour décision opérationnelle.
+
+— Département Sécurité, Site-12`,
+  },
+  "doc-schema-egouts": {
+    id: "doc-schema-egouts",
+    title: "SCHEMA_EGOUTS_partiel.pdf",
+    clearance: 1,
+    category: "note",
+    content: `SCHÉMA PARTIEL — RÉSEAU D'ÉGOUTS MUNICIPAL
+REDLAKES — secteur sous Site-12
+
+Balisage jaune : zones cartographiées et sécurisées.
+Au-delà : réseau non répertorié, origine antérieure à la ville actuelle.
+
+Incident précédent (juin 2026) : cérémonie interceptée, artefact non récupéré.
+Accès réservé au personnel accompagné.
+
+— Service maintenance, Site-12`,
+  },
+  "doc-aegis-dossier-site12": {
+    id: "doc-aegis-dossier-site12",
+    title: "AEGIS_DOSSIER_SITE-12.pdf",
+    clearance: 2,
+    category: "rapport",
+    unlockRequires: { flag: "ch5_database_unlocked" },
+    content: `DOSSIER D'AUDIT A.E.G.I.S. — SITE-12
+Accès temporaire — durée de l'audit uniquement
+
+Incidents recensés (12 derniers mois) :
+- Anomalie Euclid-7 non déclarée à temps.
+- Altération de seuils de confinement (exercice Nu-7).
+- Brèche partielle Keter-02.
+
+Conclusion préliminaire : défaillances procédurales répétées, absence de sanction disciplinaire
+proportionnée. Surveillance renforcée recommandée.
+
+— A.E.G.I.S., dossier temporaire`,
+  },
   "doc-protocole-class-d": {
     id: "doc-protocole-class-d",
     title: "PROTO_CLASS-D_visite.pdf",
@@ -265,6 +341,15 @@ export const SCP_ENTRIES: ScpEntry[] = [
     summary: "Brèche partielle documentée le 15 juin 2026.",
     detail: "Durée de brèche : 47 minutes. Pertes Class-D documentées. Audit AEGIS en cours.",
     unlockRequires: { flag: "cassie_queried_incidents" },
+  },
+  {
+    id: "scp-artefact-serpent",
+    class: "Euclid",
+    title: "SCP-████ — Artefact pré-fondation (Main du Serpent)",
+    clearance: 2,
+    summary: "Objet rituel récupéré ou laissé en place dans le réseau d'égouts de REDLAKES.",
+    detail: "Origine antérieure à la fondation du Site-12. Surveillé historiquement par la Main du Serpent.",
+    unlockRequires: { flag: "ch4_report_done" },
   },
 ];
 
@@ -360,6 +445,22 @@ export const INCIDENT_ENTRIES: IncidentEntry[] = [
     status: "En cours",
     detail: "Écarts protocolaires signalés. Enquête interne non officielle.",
     unlockRequires: { document: "doc-euclid7-logs" },
+  },
+  {
+    id: "inc-ch2-exercice",
+    date: "2026-06-23",
+    title: "Exercice Nu-7 — pic de confinement réel",
+    status: "Contenu",
+    detail: "Seuils Euclid-7 falsifiés avant un exercice programmé. Pic de 30 secondes, aucun blessé.",
+    unlockRequires: { flag: "ch2_nu7_exercise_done" },
+  },
+  {
+    id: "inc-ch7-keter02-breach",
+    date: "2026-07-14",
+    title: "Brèche réelle — Secteur Keter-02",
+    status: "Contenu",
+    detail: "FIM Nu-7 déployée. Deux pertes Class-D. Confinement rétabli après intervention.",
+    unlockRequires: { flag: "ch7_containment_resolved" },
   },
 ];
 

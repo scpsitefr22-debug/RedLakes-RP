@@ -1,4 +1,14 @@
-import { CHAPTER_MANIFESTS, clearAllGNSSaves, getChapterEntryWarning, getPlayerDisplayName, hasChapterProgress, hasPriorSagaProgress, resetChapterForReplay } from "@redlakes/narrative-core";
+import { useState } from "react";
+import {
+  CHAPTER_MANIFESTS,
+  clearAllGNSSaves,
+  getChapterEntryWarning,
+  getPlayerDisplayName,
+  hasChapterProgress,
+  hasPriorSagaProgress,
+  resetChapterForReplay,
+  type ChapterId,
+} from "@redlakes/narrative-core";
 import { Lock, Play, AlertTriangle, RotateCcw, Users } from "lucide-react";
 import { useGNSRequired } from "../context/GNSContext";
 
@@ -10,16 +20,19 @@ interface ChapterSelectProps {
 export function ChapterSelect({ onSelect, onChangeProfile }: ChapterSelectProps) {
   const { gns, updateGNS, saveNow, offlineEventsTriggered } = useGNSRequired();
   const completed = gns.session.chaptersCompleted;
-  const ch1HasProgress = hasChapterProgress(gns, 1);
+  const [replayTarget, setReplayTarget] = useState<ChapterId | null>(null);
 
-  const handleReplayChapter1 = async () => {
+  const chaptersWithProgress = CHAPTER_MANIFESTS.filter((ch) => hasChapterProgress(gns, ch.id));
+
+  const handleReplay = async (chapterId: ChapterId) => {
     const confirmed = confirm(
-      "Recommencer le Chapitre I ?\n\nVos conversations et choix de ce chapitre seront effacés. Votre profil recrue et la sauvegarde globale (hors Ch. I) seront conservés."
+      `Recommencer le ${chapterId === 1 ? "Chapitre I" : `Chapitre ${chapterId}`} ?\n\nVos conversations et choix de ce chapitre seront effacés. Le reste de votre saga sera conservé.`
     );
     if (!confirmed) return;
-    updateGNS((prev) => resetChapterForReplay(prev, 1));
+    setReplayTarget(chapterId);
+    updateGNS((prev) => resetChapterForReplay(prev, chapterId));
     await saveNow();
-    onSelect(1);
+    onSelect(chapterId);
   };
 
   return (
@@ -70,10 +83,7 @@ export function ChapterSelect({ onSelect, onChangeProfile }: ChapterSelectProps)
         <div className="grid max-w-3xl gap-3">
           {CHAPTER_MANIFESTS.map((ch) => {
             const warning = getChapterEntryWarning(ch.id, completed);
-            const ch1Done = completed.includes(1);
-            const isPlayable = ch.id === 1;
-            const isLocked = ch.id > 1 && !ch1Done;
-            const isComingSoon = ch.id > 1 && ch1Done;
+            const isPlayable = warning?.level !== "hard";
             const isDone = completed.includes(ch.id);
 
             return (
@@ -97,10 +107,7 @@ export function ChapterSelect({ onSelect, onChangeProfile }: ChapterSelectProps)
                     {isDone && (
                       <span className="text-[10px] uppercase tracking-wider text-terminal">Terminé</span>
                     )}
-                    {isLocked && <Lock className="h-3 w-3 text-metal" />}
-                    {isComingSoon && (
-                      <span className="text-[10px] uppercase tracking-wider text-metal">Bientôt</span>
-                    )}
+                    {!isPlayable && <Lock className="h-3 w-3 text-metal" />}
                   </div>
                   <p className="text-xs text-redlake/80">{ch.subtitle}</p>
                   <p className="mt-1 line-clamp-2 text-xs text-metal">{ch.description}</p>
@@ -123,21 +130,26 @@ export function ChapterSelect({ onSelect, onChangeProfile }: ChapterSelectProps)
           })}
         </div>
 
-        <p className="mt-8 text-[10px] text-metal/60">
-          {completed.includes(1)
-            ? "Chapitre I terminé — Chapitres II–IX en développement."
-            : "Terminez le Chapitre I pour débloquer la suite de la saga."}
-        </p>
-
-        {ch1HasProgress && (
-          <button
-            type="button"
-            onClick={() => void handleReplayChapter1()}
-            className="mt-4 flex items-center gap-2 border border-panel-border bg-panel px-4 py-2.5 text-xs text-foreground transition-colors hover:border-redlake/40 hover:bg-classified"
-          >
-            <RotateCcw className="h-3.5 w-3.5 text-metal" />
-            Recommencer le Chapitre I (ce personnage)
-          </button>
+        {chaptersWithProgress.length > 0 && (
+          <div className="mt-8 space-y-2">
+            <p className="text-[10px] uppercase tracking-wider text-metal">
+              Recommencer un chapitre (ce personnage)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {chaptersWithProgress.map((ch) => (
+                <button
+                  key={ch.id}
+                  type="button"
+                  disabled={replayTarget === ch.id}
+                  onClick={() => void handleReplay(ch.id)}
+                  className="flex items-center gap-2 border border-panel-border bg-panel px-3 py-2 text-xs text-foreground transition-colors hover:border-redlake/40 hover:bg-classified disabled:opacity-50"
+                >
+                  <RotateCcw className="h-3.5 w-3.5 text-metal" />
+                  Chapitre {ch.id}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
       </main>
 

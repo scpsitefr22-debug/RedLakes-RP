@@ -18,6 +18,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "start:dev", "--prefix", "apps/api"],
       "port": 3001
+    },
+    {
+      "name": "terminal",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "apps/terminal"],
+      "port": 3020
     }
   ]
 }

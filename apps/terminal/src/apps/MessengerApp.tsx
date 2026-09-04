@@ -160,8 +160,14 @@ export function MessengerApp({
           const node = thread.nodes[entryId];
           if (!node) return prev;
 
-          onNewContact?.(CHARACTERS[thread.characterId]?.name ?? thread.label);
-          playNotifyRef.current();
+          // Effets de bord différés hors du updater : setThreadStates doit rester pur
+          // (React StrictMode invoque les updaters deux fois pour détecter les impuretés,
+          // et appeler ici un setState du parent déclenchait "update pendant le rendu").
+          const contactLabel = CHARACTERS[thread.characterId]?.name ?? thread.label;
+          window.setTimeout(() => {
+            onNewContact?.(contactLabel);
+            playNotifyRef.current();
+          }, 0);
 
           return {
             ...prev,

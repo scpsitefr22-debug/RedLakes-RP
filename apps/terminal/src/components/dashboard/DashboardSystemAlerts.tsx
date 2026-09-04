@@ -45,6 +45,24 @@ function buildSystemAlerts(gns: GlobalNarrativeSave, chapterId: ChapterId): Syst
     });
   }
 
+  if (gns.flags.ch7_breach_active) {
+    alerts.push({
+      id: "ch7-breach",
+      level: "critical",
+      title: "BRÈCHE KETER-02 EN COURS",
+      body: "FIM Nu-7 déployée — suivre les instructions du canal #alertes-site12.",
+    });
+  }
+
+  if (gns.flags.ch5_aegis_arrived && !gns.flags.ch5_report_filed) {
+    alerts.push({
+      id: "aegis-audit",
+      level: "critical",
+      title: "AUDIT A.E.G.I.S. EN COURS",
+      body: "Inspection externe active sur le Site-12 — coopération requise.",
+    });
+  }
+
   if (gns.flags.ch1_security_review) {
     alerts.push({
       id: "security",

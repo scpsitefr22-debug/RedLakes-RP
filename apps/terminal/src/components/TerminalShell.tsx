@@ -30,7 +30,7 @@ import { ToastStack, type ToastItem } from "./ToastStack";
 
 import { DashboardShell } from "./dashboard/DashboardShell";
 
-import { resolveNavAppId, type DashboardNavId } from "./dashboard/dashboard-nav";
+import { getDashboardNav, resolveNavAppId, type DashboardNavId } from "./dashboard/dashboard-nav";
 
 import { useWorldEventTicker } from "../hooks/useWorldEventTicker";
 
@@ -44,13 +44,37 @@ import { ScpDatabaseApp } from "../apps/ScpDatabaseApp";
 
 import { PersonnelApp } from "../apps/PersonnelApp";
 
+import { CamerasApp } from "../apps/CamerasApp";
+
 import { CassieApp } from "../apps/CassieApp";
+
+import { ArchivesApp } from "../apps/ArchivesApp";
+
+import { SitePlansApp } from "../apps/SitePlansApp";
 
 import { IncidentLogApp } from "../apps/IncidentLogApp";
 
 import { CalendarApp } from "../apps/CalendarApp";
 
 import { SettingsApp } from "../apps/SettingsApp";
+
+import { ProtocolsApp } from "../apps/ProtocolsApp";
+
+import { CityMapApp } from "../apps/CityMapApp";
+
+import { SewerSchematicsApp } from "../apps/SewerSchematicsApp";
+
+import { AegisDatabaseApp } from "../apps/AegisDatabaseApp";
+
+import { DeletedFilesApp } from "../apps/DeletedFilesApp";
+
+import { ControlRoomApp } from "../apps/ControlRoomApp";
+
+import { CorruptedServerApp } from "../apps/CorruptedServerApp";
+
+import { AdminConsoleApp } from "../apps/AdminConsoleApp";
+
+import { LegacyArchiveApp } from "../apps/LegacyArchiveApp";
 
 interface TerminalShellProps {
   chapterId: ChapterId;
@@ -119,11 +143,11 @@ export function TerminalShell({ chapterId, onExit }: TerminalShellProps) {
 
   const handleSelectNav = useCallback(
     (navId: DashboardNavId) => {
-      const appId = resolveNavAppId(navId);
+      const appId = resolveNavAppId(getDashboardNav(chapterId), navId);
       if (!appId || !unlockedApps.includes(appId)) return;
       setActiveApp(appId);
     },
-    [unlockedApps]
+    [unlockedApps, chapterId]
   );
 
   const handleOpenDocument = useCallback(
@@ -156,14 +180,38 @@ export function TerminalShell({ chapterId, onExit }: TerminalShellProps) {
         return <ScpDatabaseApp onOpenDocument={setOpenDocumentId} />;
       case "personnel":
         return <PersonnelApp />;
+      case "cameras":
+        return <CamerasApp />;
       case "cassie":
         return <CassieApp />;
+      case "archives":
+        return <ArchivesApp />;
+      case "site-plans":
+        return <SitePlansApp />;
       case "incident-log":
         return <IncidentLogApp />;
       case "calendar":
         return <CalendarApp />;
       case "settings":
         return <SettingsApp />;
+      case "protocols":
+        return <ProtocolsApp onOpenDocument={setOpenDocumentId} />;
+      case "city-map":
+        return <CityMapApp />;
+      case "sewer-schematics":
+        return <SewerSchematicsApp />;
+      case "aegis-database":
+        return <AegisDatabaseApp onOpenDocument={setOpenDocumentId} />;
+      case "deleted-files":
+        return <DeletedFilesApp />;
+      case "control-room":
+        return <ControlRoomApp />;
+      case "corrupted-server":
+        return <CorruptedServerApp />;
+      case "admin-console":
+        return <AdminConsoleApp />;
+      case "legacy-archive":
+        return <LegacyArchiveApp />;
       default:
         return (
           <div className="flex h-full items-center justify-center p-6 text-center text-[11px] text-metal">

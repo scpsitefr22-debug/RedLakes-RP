@@ -1,7 +1,8 @@
-import { DASHBOARD_NAV, type DashboardNavId } from "./dashboard-nav";
+import type { DashboardNavId, DashboardNavItem } from "./dashboard-nav";
 import type { AppId } from "../../lib/workstation";
 
 interface DashboardSidebarProps {
+  nav: DashboardNavItem[];
   activeApp: AppId;
   unlockedApps: AppId[];
   onSelectNav: (navId: DashboardNavId) => void;
@@ -9,12 +10,13 @@ interface DashboardSidebarProps {
   onOpenDirectorOffice?: () => void;
 }
 
-function isNavActive(navId: DashboardNavId, activeApp: AppId): boolean {
-  const item = DASHBOARD_NAV.find((n) => n.id === navId);
+function isNavActive(nav: DashboardNavItem[], navId: DashboardNavId, activeApp: AppId): boolean {
+  const item = nav.find((n) => n.id === navId);
   return item?.appId === activeApp;
 }
 
 export function DashboardSidebar({
+  nav,
   activeApp,
   unlockedApps,
   onSelectNav,
@@ -35,10 +37,10 @@ export function DashboardSidebar({
           </button>
         )}
 
-        {DASHBOARD_NAV.map(({ id, label, icon: Icon, appId }) => {
+        {nav.map(({ id, label, icon: Icon, appId }) => {
           const locked = appId !== null && !unlockedApps.includes(appId);
           const disabled = appId === null || locked;
-          const active = isNavActive(id, activeApp);
+          const active = isNavActive(nav, id, activeApp);
 
           return (
             <button
