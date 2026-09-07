@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client } from '@elastic/elasticsearch';
 import { PrismaService } from '../prisma/prisma.service';
-import { LoreArticle } from '@prisma/client';
+import { LoreArticle, ScpProposalStatus } from '@prisma/client';
 import { filterByDepartment } from '../common/department-visibility';
 
 export interface SearchHit {
@@ -59,6 +59,7 @@ export class SearchService implements OnModuleInit {
             content: { type: 'text', analyzer: 'french' },
             href: { type: 'keyword' },
             tags: { type: 'keyword' },
+            restrictedDepartmentIds: { type: 'keyword' },
           },
         },
       });
@@ -77,6 +78,7 @@ export class SearchService implements OnModuleInit {
         content: article.content,
         href: `/lore/${article.slug}`,
         tags: article.tags,
+        restrictedDepartmentIds: article.restrictedDepartmentIds,
       },
     });
   }
@@ -102,10 +104,9 @@ export class SearchService implements OnModuleInit {
 
   /**
    * departmentId : departement du demandeur (null = anonyme/public
-   * uniquement). Applique au chemin SQL, le seul reellement actif tant
-   * qu'Elasticsearch n'est pas configure ici. Le chemin ES n'indexe pas
-   * encore restrictedDepartmentIds (seul LoreArticle y est indexe, sans ce
-   * champ) — non filtre pour l'instant, a traiter si ES est active un jour.
+   * uniquement). Applique aux deux chemins — ES et SQL — pour ne jamais
+   * faire remonter dans les resultats un contenu restreint que l'endpoint
+   * dedie (/lore/:id, /scp/:slug, etc.) refuserait de servir.
    */
   async search(
     query: string,
@@ -118,6 +119,8 @@ export class SearchService implements OnModuleInit {
       try {
         const result = await this.client.search({
           index: this.index,
+          // On sur-demande (limit * 3) car le filtre par departement
+          // s'applique apres coup — voir fallbackSearch, meme principe.
           query: {
             multi_match: {
               query,
@@ -125,19 +128,23 @@ export class SearchService implements OnModuleInit {
               fuzziness: 'AUTO',
             },
           },
-          size: limit,
+          size: limit * 3,
         });
-        return result.hits.hits.map((hit) => {
-          const src = hit._source as Record<string, string>;
+        const hits = result.hits.hits.map((hit) => {
+          const src = hit._source as Record<string, unknown>;
           return {
             id: hit._id ?? '',
-            type: src.type,
-            title: src.title,
-            excerpt: src.excerpt,
-            href: src.href,
+            type: src.type as string,
+            title: src.title as string,
+            excerpt: src.excerpt as string,
+            href: src.href as string,
             score: hit._score ?? 0,
+            restrictedDepartmentIds: (src.restrictedDepartmentIds as string[]) ?? [],
           };
         });
+        return filterByDepartment(hits, departmentId)
+          .slice(0, limit)
+          .map(({ restrictedDepartmentIds: _omit, ...hit }) => hit);
       } catch {
         this.logger.warn('Recherche ES échouée, fallback SQL');
       }
@@ -186,6 +193,10 @@ export class SearchService implements OnModuleInit {
       }),
       this.prisma.scpObject.findMany({
         where: {
+          // Meme filtre que ScpService.findAll — sans ca, les propositions
+          // PENDING/REJECTED (censees rester staff-only, voir /scp/cms)
+          // remontaient dans la recherche publique.
+          status: ScpProposalStatus.APPROVED,
           OR: [
             { number: insensitive },
             { name: insensitive },

@@ -9,15 +9,27 @@ import { CreateFactionDto, UpdateFactionDto } from './dto/faction.dto';
 export class FactionsService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.faction.findMany({
+  async findAll(authenticated = false) {
+    const factions = await this.prisma.faction.findMany({
       where: { playable: true },
       include: { departments: true },
       orderBy: { name: 'asc' },
     });
+    if (authenticated) return factions;
+    return factions.map((f) => ({
+      ...f,
+      departments: f.departments.map(
+        ({ leadership: _l, chefId: _c, deputyIds: _d, budget: _b, ...pub }) => pub,
+      ),
+    }));
   }
 
-  async findOne(slug: string) {
+  /**
+   * authenticated=false (visiteur non connecte) : masque direction/budget
+   * des departements (leadership, chefId, deputyIds, budget) — infos
+   * internes, pas la simple existence/description publique de la faction.
+   */
+  async findOne(slug: string, authenticated = false) {
     const faction = await this.prisma.faction.findUnique({
       where: { slug },
       include: { departments: true },
@@ -35,7 +47,13 @@ export class FactionsService {
       }),
     ]);
 
-    return { ...faction, memberCount, topGrade };
+    const departments = authenticated
+      ? faction.departments
+      : faction.departments.map(
+          ({ leadership: _l, chefId: _c, deputyIds: _d, budget: _b, ...pub }) => pub,
+        );
+
+    return { ...faction, departments, memberCount, topGrade };
   }
 
   /** Personnages actifs affilies a cette faction — pour la vitrine publique. */

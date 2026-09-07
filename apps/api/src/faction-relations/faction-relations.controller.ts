@@ -24,11 +24,13 @@ export class FactionRelationsController {
   constructor(private relations: FactionRelationsService) {}
 
   @Get()
+  @UseGuards(AuthGuard)
   findAll() {
     return this.relations.findAll();
   }
 
   @Get('faction/:factionId')
+  @UseGuards(AuthGuard)
   findForFaction(@Param('factionId') factionId: string) {
     return this.relations.findForFaction(factionId);
   }

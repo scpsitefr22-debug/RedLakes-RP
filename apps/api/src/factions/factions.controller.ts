@@ -31,8 +31,9 @@ export class FactionsController {
   }
 
   @Get()
-  findAll() {
-    return this.factions.findAll();
+  @UseGuards(OptionalAuthGuard)
+  findAll(@Req() req: OptionalAuthRequest) {
+    return this.factions.findAll(!!req.user);
   }
 
   @Get('by-id/:id')
@@ -45,13 +46,15 @@ export class FactionsController {
   }
 
   @Get(':slug')
-  async findOne(@Param('slug') slug: string) {
-    const faction = await this.factions.findOne(slug);
+  @UseGuards(OptionalAuthGuard)
+  async findOne(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
+    const faction = await this.factions.findOne(slug, !!req.user);
     if (!faction) throw new NotFoundException('Faction introuvable');
     return faction;
   }
 
   @Get(':slug/members')
+  @UseGuards(AuthGuard)
   async listMembers(@Param('slug') slug: string) {
     const faction = await this.factions.findOne(slug);
     if (!faction) throw new NotFoundException('Faction introuvable');

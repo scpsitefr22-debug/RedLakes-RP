@@ -1,4 +1,16 @@
+import { cookies } from "next/headers";
 import { API_URL } from "@/lib/api";
+
+/**
+ * Ces endpoints distinguent visiteur anonyme / connecte (departements
+ * internes, membres, relations reservees aux comptes connectes depuis
+ * l'audit RP/HRP) — sans transmettre le cookie de session ici, un fetch
+ * server-side traiterait TOUT visiteur comme anonyme, meme connecte.
+ */
+async function authHeaders(): Promise<HeadersInit | undefined> {
+  const token = (await cookies()).get("redlakes_token")?.value;
+  return token ? { Cookie: `redlakes_token=${token}` } : undefined;
+}
 
 export interface ApiDepartment {
   id: string;
@@ -45,6 +57,7 @@ export async function getFactionMembers(slug: string): Promise<FactionMember[]> 
   try {
     const res = await fetch(`${API_URL}/factions/${slug}/members`, {
       cache: "no-store",
+      headers: await authHeaders(),
     });
     if (!res.ok) return [];
     return res.json();
@@ -65,7 +78,10 @@ export interface FactionEvent {
 /** Pattern de fetch établi (server component + revalidate ISR) — voir src/app/grades/page.tsx */
 export async function getFactions(): Promise<ApiFaction[]> {
   try {
-    const res = await fetch(`${API_URL}/factions`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/factions`, {
+      cache: "no-store",
+      headers: await authHeaders(),
+    });
     if (!res.ok) return [];
     return res.json();
   } catch {
@@ -77,6 +93,7 @@ export async function getFaction(slug: string): Promise<ApiFaction | null> {
   try {
     const res = await fetch(`${API_URL}/factions/${slug}`, {
       cache: "no-store",
+      headers: await authHeaders(),
     });
     if (!res.ok) return null;
     return res.json();
@@ -114,6 +131,7 @@ export async function getFactionRelations(
   try {
     const res = await fetch(`${API_URL}/faction-relations/faction/${factionId}`, {
       cache: "no-store",
+      headers: await authHeaders(),
     });
     if (!res.ok) return [];
     return res.json();

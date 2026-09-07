@@ -268,7 +268,15 @@ export class PlayersService {
 
     if (!player) throw new NotFoundException('Joueur introuvable');
 
-    return this.formatProfile(player);
+    // Dossier PUBLIC (aucune auth requise) — contrairement a getDashboard
+    // (qui reutilise le meme formatProfile pour le proprietaire du compte),
+    // on retire ici tout ce qui est un detail de compte HRP plutot qu'une
+    // info de personnage RP : identifiant Discord, UUID Minecraft, si un
+    // mot de passe est defini, date de creation du compte.
+    const profile = this.formatProfile(player);
+    const { discordUsername, minecraftUuid, hasPassword, createdAt, ...publicUser } =
+      profile.user;
+    return { ...profile, user: publicUser };
   }
 
   async getDashboard(userId: string) {
