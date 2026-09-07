@@ -15,6 +15,8 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { clearanceForGrade } from '../players/grade-clearance';
 
+import { GradesService } from '../grades/grades.service';
+
 import { CreatePersonnelReportDto } from './dto/create-personnel-report.dto';
 
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
@@ -40,6 +42,8 @@ export class ReportsService {
     private audit: AuditService,
 
     private notifications: NotificationsService,
+
+    private grades: GradesService,
   ) {}
 
   private buildWhere(
@@ -80,7 +84,7 @@ export class ReportsService {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
 
-      include: { activeCharacter: true },
+      include: { activeCharacter: { include: { gradeInfo: true } } },
     });
 
     if (!user?.activeCharacter) {
@@ -89,7 +93,15 @@ export class ReportsService {
       );
     }
 
-    const clearance = clearanceForGrade(user.activeCharacter.grade);
+    // Habilitation reelle du catalogue Grade en priorite (lie via gradeId,
+    // ou retrouve par nom pour les personnages pas encore relies) — le
+    // regex `clearanceForGrade` ne sert plus que de filet de securite pour
+    // un grade totalement hors catalogue.
+    const clearance =
+      user.activeCharacter.gradeInfo?.clearanceLevel ??
+      (await this.grades.findByName(user.activeCharacter.grade))
+        ?.clearanceLevel ??
+      clearanceForGrade(user.activeCharacter.grade);
 
     const actorLabel =
       user.minecraftUsername ?? user.discordUsername ?? 'Agent';

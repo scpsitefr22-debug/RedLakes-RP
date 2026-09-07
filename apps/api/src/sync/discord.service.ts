@@ -224,6 +224,105 @@ export class DiscordService {
   }
 
   /**
+   * Poste un message dans le salon "contenu" via le token du bot — pas de
+   * webhook a creer, le bot est deja invite sur le serveur avec les droits
+   * d'ecriture necessaires (il poste deja des messages ailleurs, voir
+   * apps/discord-bot). Meme convention que syncMemberProfile/isGuildMember
+   * ci-dessous : desactive tant que DISCORD_BOT_TOKEN n'est pas configure,
+   * jamais d'exception remontee a l'appelant.
+   */
+  private async postToContentChannel(body: Record<string, unknown>): Promise<void> {
+    const token = this.config.get<string>('DISCORD_BOT_TOKEN');
+    const channelId = this.config.get<string>('DISCORD_CHANNEL_CONTENT');
+    if (!token || !channelId) return;
+
+    try {
+      const res = await fetch(
+        `https://discord.com/api/v10/channels/${channelId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bot ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        },
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        this.logger.warn(`Message Discord échoué (${res.status}): ${text}`);
+      }
+    } catch (err) {
+      this.logger.warn(`Message Discord échoué: ${err}`);
+    }
+  }
+
+  /** Nouveau document classifié publié (statut PUBLISHED, pas restreint à un département) */
+  async notifyDocumentPublished(params: {
+    title: string;
+    excerpt?: string | null;
+    slug: string;
+  }): Promise<void> {
+    const webUrl = this.config.get<string>('WEB_URL') ?? 'http://localhost:3000';
+
+    await this.postToContentChannel({
+      embeds: [
+        {
+          title: `📄 Document déclassifié — ${params.title}`,
+          url: `${webUrl}/documents/${params.slug}`,
+          color: 0x8b0a0a,
+          description: params.excerpt ?? undefined,
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    });
+  }
+
+  /** Nouvel événement RP publié sur le site (brèche, guerre, incident...) */
+  async notifyEventPublished(params: {
+    title: string;
+    type: string;
+    slug: string;
+  }): Promise<void> {
+    const webUrl = this.config.get<string>('WEB_URL') ?? 'http://localhost:3000';
+
+    await this.postToContentChannel({
+      embeds: [
+        {
+          title: `⚠️ Nouvel événement — ${params.title}`,
+          url: `${webUrl}/evenements/${params.slug}`,
+          color: 0xf59e0b,
+          fields: [{ name: 'Type', value: params.type, inline: true }],
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    });
+  }
+
+  /** Nouvelle actualité publiée sur le site */
+  async notifyNewsPublished(params: {
+    title: string;
+    excerpt: string;
+    category: string;
+    slug: string;
+  }): Promise<void> {
+    const webUrl = this.config.get<string>('WEB_URL') ?? 'http://localhost:3000';
+
+    await this.postToContentChannel({
+      embeds: [
+        {
+          title: `📰 ${params.title}`,
+          url: `${webUrl}/actualites/${params.slug}`,
+          color: 0x3b82f6,
+          description: params.excerpt,
+          fields: [{ name: 'Catégorie', value: params.category, inline: true }],
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    });
+  }
+
+  /**
    * Verifie que le compte Discord est membre du serveur REDLAKES au moment
    * de la connexion (pas seulement au moment de la creation du compte).
    * Retourne true si DISCORD_BOT_TOKEN/DISCORD_GUILD_ID ne sont pas

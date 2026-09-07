@@ -4,7 +4,7 @@ import Link from "next/link";
 import { classColors, SCPClass } from "@/data/scp";
 import { Badge } from "@/components/ui/Badge";
 import { cn, formatDate } from "@/lib/utils";
-import { AlertTriangle, FlaskConical, FileText, ChevronRight } from "lucide-react";
+import { AlertTriangle, FlaskConical, FileText, ChevronRight, FileLock2 } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { ThreatGauge } from "@/components/wiki/ThreatGauge";
 import { ClassificationStamp } from "@/components/wiki/ClassificationStamp";
@@ -15,12 +15,14 @@ import { RecordScpView } from "@/components/wiki/RecordScpView";
 import { DangerComparison } from "@/components/wiki/DangerComparison";
 import { OfficialReportView } from "@/components/wiki/OfficialReportView";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
+import { EditableText } from "@/components/staff/EditableText";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 interface ApiScpDetail {
+  id: string;
   number: string;
   name: string;
   class: SCPClass;
@@ -35,6 +37,7 @@ interface ApiScpDetail {
   personnelAssigned: number | null;
   breachCount: number | null;
   restrictedDepartmentIds: string[];
+  linkedDocuments: { id: string; slug: string; title: string; excerpt: string | null }[];
 }
 
 type ScpFetchResult =
@@ -129,9 +132,19 @@ export default async function SCPDetailPage({ params }: Props) {
             {scp.class}
           </Badge>
         </div>
-        <h1 className="mb-4 max-w-[80%] text-4xl font-bold text-white">{scp.name}</h1>
-        <DiscordMarkdown
-          text={scp.description}
+        <EditableText
+          as="h1"
+          className="mb-4 max-w-[80%] text-4xl font-bold text-white"
+          value={scp.name}
+          endpoint={`/scp/${scp.id}`}
+          field="name"
+        />
+        <EditableText
+          value={scp.description}
+          endpoint={`/scp/${scp.id}`}
+          field="description"
+          multiline
+          markdown
           className="mb-4 text-gray-400"
           scpRefsSlug={scp.number.toLowerCase()}
         />
@@ -156,8 +169,15 @@ export default async function SCPDetailPage({ params }: Props) {
             <AlertTriangle className="h-5 w-5 text-redlake-glow" />
             Protocole de confinement
           </h2>
-          <DiscordMarkdown text={scp.containment} scpRefsSlug={scp.number.toLowerCase()} />
-          <div className="mt-4 grid grid-cols-3 gap-4 font-mono text-sm">
+          <EditableText
+            value={scp.containment}
+            endpoint={`/scp/${scp.id}`}
+            field="containment"
+            multiline
+            markdown
+            scpRefsSlug={scp.number.toLowerCase()}
+          />
+          <div className="mt-4 grid grid-cols-1 gap-4 font-mono text-sm sm:grid-cols-3">
             <div>
               <p className="text-gray-600">Coût mensuel</p>
               <p className="text-white">{scp.containmentCost ?? "—"}</p>
@@ -175,7 +195,14 @@ export default async function SCPDetailPage({ params }: Props) {
 
         <section className="hologram-border rounded-lg p-6">
           <h2 className="mb-4 text-xl font-bold text-white">Historique</h2>
-          <DiscordMarkdown text={scp.history} scpRefsSlug={scp.number.toLowerCase()} />
+          <EditableText
+            value={scp.history}
+            endpoint={`/scp/${scp.id}`}
+            field="history"
+            multiline
+            markdown
+            scpRefsSlug={scp.number.toLowerCase()}
+          />
         </section>
 
         {scp.incidents.length > 0 && (
@@ -229,6 +256,27 @@ export default async function SCPDetailPage({ params }: Props) {
                 )}
               </div>
             ))}
+          </section>
+        )}
+
+        {scp.linkedDocuments.length > 0 && (
+          <section className="hologram-border rounded-lg p-6">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
+              <FileLock2 className="h-5 w-5 text-redlake-glow" />
+              Documents classifiés liés
+            </h2>
+            <div className="space-y-2">
+              {scp.linkedDocuments.map((doc) => (
+                <Link
+                  key={doc.id}
+                  href={`/documents/${doc.slug}`}
+                  className="block rounded border border-metal/40 p-3 transition-colors hover:border-redlake/30"
+                >
+                  <p className="text-sm font-bold text-white">{doc.title}</p>
+                  {doc.excerpt && <p className="line-clamp-1 text-xs text-gray-500">{doc.excerpt}</p>}
+                </Link>
+              ))}
+            </div>
           </section>
         )}
       </div>

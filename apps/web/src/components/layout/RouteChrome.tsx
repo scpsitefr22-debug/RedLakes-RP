@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { IntegrationReturnBanner } from "@/components/integration/IntegrationReturnBanner";
+import { EditModeProvider } from "@/components/staff/EditModeProvider";
+import { EditModeToggle } from "@/components/staff/EditModeToggle";
 
 export function RouteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -14,11 +16,12 @@ export function RouteChrome({ children }: { children: React.ReactNode }) {
   const hideChrome = isConsole || isCore;
 
   return (
-    <>
+    <EditModeProvider>
       {!hideChrome && <Header />}
       <main className={hideChrome ? "" : "flex-1"}>{children}</main>
       {!hideChrome && <Footer />}
       <IntegrationReturnBanner />
-    </>
+      {!hideChrome && <EditModeToggle />}
+    </EditModeProvider>
   );
 }

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import { ArrowLeft, ShieldAlert, History, Plus, X, Check, KeyRound } from "lucide-react";
+import { ArrowLeft, ShieldAlert, History, Plus, X, Check, KeyRound, UserX } from "lucide-react";
 
 interface PlayerProfile {
   grade: string;
@@ -39,6 +39,16 @@ interface SanctionRow {
   liftedAt: string | null;
 }
 
+interface CharacterRow {
+  id: string;
+  grade: string;
+  faction: string;
+  rpFirstName: string | null;
+  rpLastName: string | null;
+  createdAt: string;
+  active: boolean;
+}
+
 interface AssignmentRow {
   id: string;
   entityType: string;
@@ -64,6 +74,7 @@ export default function StaffPlayerPage() {
 
   const [profile, setProfile] = useState<PlayerProfile | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
+  const [characters, setCharacters] = useState<CharacterRow[]>([]);
   const [sanctions, setSanctions] = useState<SanctionRow[]>([]);
   const [assignments, setAssignments] = useState<AssignmentRow[]>([]);
   const [factions, setFactions] = useState<EntityOption[]>([]);
@@ -91,12 +102,14 @@ export default function StaffPlayerPage() {
       setPlayerId(id);
       setRoleValue(prof.user.role);
       setRankValue(prof.user.staffRank ?? "SURVEILLANT");
-      const [s, a] = await Promise.all([
+      const [s, a, c] = await Promise.all([
         apiFetch<SanctionRow[]>(`/sanctions/player/${id}`),
         apiFetch<AssignmentRow[]>(`/assignments/player/${id}`),
+        apiFetch<CharacterRow[]>(`/players/${username}/characters`),
       ]);
       setSanctions(s);
       setAssignments(a);
+      setCharacters(c);
     } catch (err) {
       setError(
         err instanceof Error
@@ -191,6 +204,22 @@ export default function StaffPlayerPage() {
     }
   };
 
+  const deleteCharacter = async (id: string, label: string) => {
+    if (!confirm(`Supprimer définitivement le personnage RP "${label}" ? Cette action est irréversible.`)) return;
+    setSaving(true);
+    setError("");
+    try {
+      const updated = await apiFetch<CharacterRow[]>(`/players/${username}/characters/${id}`, {
+        method: "DELETE",
+      });
+      setCharacters(updated);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const createAssignment = async () => {
     if (!playerId || !assignForm.entityId) return;
     setSaving(true);
@@ -272,7 +301,7 @@ export default function StaffPlayerPage() {
               <> — <span className="font-mono text-white">{STAFF_RANK_LABELS[profile.user.staffRank]}</span></>
             )}
           </p>
-          <div className={roleValue === "STAFF" ? "grid grid-cols-[1fr_1fr_auto] gap-2" : "grid grid-cols-[1fr_auto] gap-2"}>
+          <div className={roleValue === "STAFF" ? "grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]" : "grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]"}>
             <select className={inputClass} value={roleValue} onChange={(e) => setRoleValue(e.target.value)}>
               {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
             </select>
@@ -298,6 +327,37 @@ export default function StaffPlayerPage() {
         </section>
       )}
 
+      {/* Personnages RP (suppression reservee au staff) */}
+      <section className="mb-10 hologram-border rounded-lg p-6">
+        <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
+          <UserX className="h-5 w-5 text-redlake-glow" /> Personnages RP ({characters.length})
+        </h2>
+        <div className="space-y-2">
+          {characters.length === 0 && <p className="text-sm text-gray-600">Aucun personnage.</p>}
+          {characters.map((c) => (
+            <div key={c.id} className="flex items-center justify-between gap-3 rounded border border-metal p-3 text-sm">
+              <div className="min-w-0">
+                <p className="text-white">
+                  {[c.rpFirstName, c.rpLastName].filter(Boolean).join(" ") || "Sans nom"}
+                  {c.active && <span className="ml-2 rounded border border-redlake/40 bg-redlake/10 px-1.5 py-0.5 font-mono text-[10px] text-redlake-glow">ACTIF</span>}
+                </p>
+                <p className="font-mono text-xs text-gray-600">
+                  {c.grade} — {c.faction} — créé le {new Date(c.createdAt).toLocaleDateString("fr-FR")}
+                </p>
+              </div>
+              <button
+                onClick={() => deleteCharacter(c.id, [c.rpFirstName, c.rpLastName].filter(Boolean).join(" ") || "Sans nom")}
+                disabled={saving}
+                className="rounded border border-red-400/40 p-1.5 text-red-400 hover:bg-red-400/10 disabled:opacity-50"
+                title="Supprimer ce personnage"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Sanctions */}
       <section className="mb-10 hologram-border rounded-lg p-6">
         <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
@@ -307,8 +367,8 @@ export default function StaffPlayerPage() {
         <div className="mb-4 space-y-2">
           {sanctions.length === 0 && <p className="text-sm text-gray-600">Aucune sanction enregistrée.</p>}
           {sanctions.map((s) => (
-            <div key={s.id} className="flex items-center justify-between rounded border border-metal p-3 text-sm">
-              <div>
+            <div key={s.id} className="flex items-center justify-between gap-3 rounded border border-metal p-3 text-sm">
+              <div className="min-w-0">
                 <p className="text-white">{s.type} — {s.reason}</p>
                 <p className="font-mono text-xs text-gray-600">
                   {new Date(s.issuedAt).toLocaleDateString("fr-FR")} — {s.status}
@@ -329,7 +389,7 @@ export default function StaffPlayerPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-[1fr_2fr_auto] gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_2fr_auto]">
           <select className={inputClass} value={sanctionForm.type} onChange={(e) => setSanctionForm((f) => ({ ...f, type: e.target.value }))}>
             {SANCTION_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
@@ -349,8 +409,8 @@ export default function StaffPlayerPage() {
         <div className="mb-4 space-y-2">
           {assignments.length === 0 && <p className="text-sm text-gray-600">Aucune affectation enregistrée.</p>}
           {assignments.map((a) => (
-            <div key={a.id} className="flex items-center justify-between rounded border border-metal p-3 text-sm">
-              <div>
+            <div key={a.id} className="flex items-center justify-between gap-3 rounded border border-metal p-3 text-sm">
+              <div className="min-w-0">
                 <p className="text-white">
                   {a.entityType} — {labelFor(a.entityType, a.entityId)}{a.role ? ` (${a.role})` : ""}
                 </p>
@@ -368,7 +428,7 @@ export default function StaffPlayerPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-[1fr_2fr_1fr_auto] gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_2fr_1fr_auto]">
           <select
             className={inputClass}
             value={assignForm.entityType}

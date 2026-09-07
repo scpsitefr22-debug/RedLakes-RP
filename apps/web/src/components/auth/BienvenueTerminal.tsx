@@ -2,17 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserPlus } from "lucide-react";
+import { UserPlus, MessageCircle, ChevronRight } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
 interface MeResponse {
   authenticated: boolean;
-  user?: { onboarded: boolean };
+  user?: { onboarded: boolean; discordLinked: boolean };
 }
 
 export function BienvenueTerminal() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
+  const [needsDiscord, setNeedsDiscord] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -30,6 +31,10 @@ export function BienvenueTerminal() {
           router.replace("/dashboard");
           return;
         }
+        // Discord recommandé mais optionnel — un compte créé par
+        // pseudo/mot de passe n'a jamais de Discord lié au départ,
+        // et peut choisir de continuer sans (ex. comptes de test).
+        setNeedsDiscord(!me.user?.discordLinked);
       } catch {
         router.replace("/connexion");
         return;
@@ -65,6 +70,48 @@ export function BienvenueTerminal() {
     );
   }
 
+  if (needsDiscord) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-12">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded border border-redlake/50 bg-redlake/10">
+            <MessageCircle className="h-8 w-8 text-redlake-glow" />
+          </div>
+          <p className="font-mono text-xs tracking-[0.3em] text-redlake-glow">
+            COMPTE REDLAKES // LIAISON DISCORD
+          </p>
+          <h1 className="mt-2 text-3xl font-bold text-white">
+            Liez votre compte Discord
+          </h1>
+          <p className="mt-3 text-sm text-gray-500">
+            Recommandé — nécessaire pour la synchronisation avec le bot
+            (grades, notifications) et pour confirmer votre appartenance à
+            la communauté REDLAKES. Vous pouvez aussi continuer sans, et
+            lier votre compte plus tard depuis votre dossier.
+          </p>
+        </div>
+
+        <div className="hologram-border space-y-4 rounded-lg p-6">
+          <a
+            href="/api/auth/discord"
+            className="flex w-full items-center justify-center gap-3 rounded border border-[#5865F2]/50 bg-[#5865F2]/15 py-4 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-[#5865F2]/25"
+          >
+            <MessageCircle className="h-5 w-5 text-[#aab1ff]" />
+            Lier mon compte Discord
+            <ChevronRight className="h-4 w-4 text-gray-500" />
+          </a>
+          <button
+            type="button"
+            onClick={() => setNeedsDiscord(false)}
+            className="w-full text-center font-mono text-[10px] uppercase tracking-widest text-gray-600 transition-colors hover:text-gray-400"
+          >
+            Continuer sans Discord pour l&apos;instant
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-lg px-4 py-12">
       <div className="mb-8 text-center">
@@ -78,8 +125,8 @@ export function BienvenueTerminal() {
           Bienvenue sur REDLAKES
         </h1>
         <p className="mt-3 text-sm text-gray-500">
-          Votre Discord est lié. Il ne reste plus qu&apos;à créer votre personnage
-          pour accéder à votre dossier.
+          Il ne reste plus qu&apos;à créer votre personnage pour accéder à
+          votre dossier.
         </p>
       </div>
 

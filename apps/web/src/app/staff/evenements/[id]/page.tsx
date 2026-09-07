@@ -15,6 +15,7 @@ interface ApiGameEventFull {
   casualties: string | null;
   outcome: string;
   restrictedDepartmentIds: string[];
+  factionId: string | null;
 }
 
 export default function EditGameEventPage() {
@@ -51,6 +52,7 @@ export default function EditGameEventPage() {
           casualties: event.casualties ?? "",
           outcome: event.outcome,
           restrictedDepartmentIds: event.restrictedDepartmentIds,
+          factionId: event.factionId ?? "",
         }}
       />
       <div className="mx-auto max-w-3xl px-4 pb-12">

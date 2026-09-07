@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ScpEditor } from "@/components/staff/ScpEditor";
+import { ScpEditor, type IncidentItem, type TestItem, type AddendumItem } from "@/components/staff/ScpEditor";
 import { ScpRevisionHistory } from "@/components/staff/ScpRevisionHistory";
 import { apiFetch } from "@/lib/api";
 
@@ -16,9 +16,9 @@ interface ApiScpFull {
   history: string;
   description: string;
   image: string | null;
-  incidents: unknown;
-  tests: unknown;
-  addendums: unknown;
+  incidents: IncidentItem[];
+  tests: TestItem[];
+  addendums: AddendumItem[];
   containmentCost: string | null;
   personnelAssigned: number | null;
   breachCount: number | null;
@@ -60,9 +60,9 @@ export default function EditScpPage() {
           history: scp.history,
           description: scp.description,
           image: scp.image ?? "",
-          incidents: JSON.stringify(scp.incidents, null, 2),
-          tests: JSON.stringify(scp.tests, null, 2),
-          addendums: JSON.stringify(scp.addendums, null, 2),
+          incidents: scp.incidents,
+          tests: scp.tests,
+          addendums: scp.addendums,
           containmentCost: scp.containmentCost ?? "",
           personnelAssigned: scp.personnelAssigned?.toString() ?? "",
           breachCount: scp.breachCount?.toString() ?? "",

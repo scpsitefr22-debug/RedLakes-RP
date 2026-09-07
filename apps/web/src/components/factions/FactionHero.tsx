@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import type { FactionTheme } from "@/lib/faction-themes";
 import type { ApiFaction } from "@/lib/faction-api";
 import { cn } from "@/lib/utils";
+import { EditableText } from "@/components/staff/EditableText";
 
 const HERO_VARIANTS: Record<FactionTheme["motion"], Variants> = {
   reveal: {
@@ -81,8 +82,21 @@ export function FactionHero({ faction, theme, icon, totalRoles, roleCategoryCoun
           {icon}
         </span>
         <div>
-          <h1 className="faction-heading text-4xl font-bold text-white">{faction.name}</h1>
-          {faction.tagline && <p className="italic text-gray-400">{faction.tagline}</p>}
+          <EditableText
+            as="h1"
+            className="faction-heading text-4xl font-bold text-white"
+            value={faction.name}
+            endpoint={`/factions/${faction.id}`}
+            field="name"
+          />
+          <EditableText
+            as="p"
+            className="italic text-gray-400"
+            value={faction.tagline}
+            endpoint={`/factions/${faction.id}`}
+            field="tagline"
+            placeholder="Cliquer pour ajouter un slogan…"
+          />
         </div>
       </div>
 

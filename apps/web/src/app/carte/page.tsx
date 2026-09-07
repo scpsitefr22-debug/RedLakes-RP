@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/Badge";
 import { MapPin, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiFetch } from "@/lib/api";
-import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 import { SiteMapBackground } from "@/components/carte/SiteMapBackground";
+import { EditableText } from "@/components/staff/EditableText";
 
 interface ApiMapLocation {
   id: string;
@@ -103,16 +103,36 @@ export default function CartePage() {
                   <Badge className={cn("mb-2 border", typeColors[location.type])}>
                     {locationTypeLabels[location.type as keyof typeof locationTypeLabels] ?? location.type}
                   </Badge>
-                  <h2 className="text-xl font-bold text-white">{location.name}</h2>
+                  <EditableText
+                    as="h2"
+                    className="text-xl font-bold text-white"
+                    value={location.name}
+                    endpoint={`/map/${location.id}`}
+                    field="name"
+                  />
                 </div>
                 <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-white">
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <DiscordMarkdown text={location.description} className="mb-4 text-sm text-gray-400" />
+              <EditableText
+                value={location.description}
+                endpoint={`/map/${location.id}`}
+                field="description"
+                multiline
+                markdown
+                className="mb-4 text-sm text-gray-400"
+              />
               <div className="mb-4">
                 <p className="mb-1 font-mono text-xs text-redlake-glow">HISTORIQUE</p>
-                <DiscordMarkdown text={location.history} className="text-sm text-gray-500" />
+                <EditableText
+                  value={location.history}
+                  endpoint={`/map/${location.id}`}
+                  field="history"
+                  multiline
+                  markdown
+                  className="text-sm text-gray-500"
+                />
               </div>
               <div className="flex gap-4 font-mono text-xs">
                 <span className="text-gray-600">

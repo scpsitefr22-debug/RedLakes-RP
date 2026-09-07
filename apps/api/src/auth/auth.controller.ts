@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Patch,
   Post,
   Query,
   Res,
@@ -11,10 +12,14 @@ import {
 } from '@nestjs/common';
 import type { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { SyncService } from '../sync/sync.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { SetPasswordDto } from './dto/set-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -40,6 +45,7 @@ export class AuthController {
   async discordCallback(
     @Query('code') code: string,
     @Query('error') oauthError: string,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
     const webUrl = this.config.get('WEB_URL') ?? 'http://localhost:3000';
@@ -48,7 +54,22 @@ export class AuthController {
       return res.redirect(`${webUrl}/connexion?error=discord_oauth_denied`);
     }
 
+    // Chemin normal : un compte pseudo/mot de passe est deja connecte, on
+    // lie Discord a CE compte plutot que d'en (re)creer/retrouver un autre.
+    const existingToken = req.cookies?.['redlakes_token'];
+    const existingUser = existingToken
+      ? await this.auth.getMe(existingToken)
+      : null;
+
     try {
+      if (existingUser) {
+        await this.auth.linkDiscordAccount(existingUser.id, code);
+        const dest = existingUser.onboardedAt ? '/dashboard' : '/bienvenue';
+        return res.redirect(`${webUrl}${dest}`);
+      }
+
+      // Repli : aucune session en cours — ancien chemin login-par-Discord,
+      // pour ne pas verrouiller un lien Discord ouvert hors contexte.
       const user = await this.auth.handleDiscordCallback(code);
       const token = await this.auth.createSession(user.id);
       this.setSessionCookie(res, token);
@@ -60,15 +81,17 @@ export class AuthController {
           ? err.message
           : 'DISCORD_OAUTH_FAILED';
 
-      const code = msg.includes('DISCORD_NOT_GUILD_MEMBER')
-        ? 'discord_not_member'
-        : msg.includes('DISCORD_NOT_LINKED')
-          ? 'discord_not_linked'
-          : msg.includes('DISCORD_NOT_CONFIGURED')
-            ? 'discord_not_configured'
-            : msg.includes('DISCORD_OAUTH_FAILED')
-              ? 'discord_oauth_failed'
-              : 'discord_oauth_failed';
+      const code = msg.includes('DISCORD_ALREADY_LINKED')
+        ? 'discord_already_linked'
+        : msg.includes('DISCORD_NOT_GUILD_MEMBER')
+          ? 'discord_not_member'
+          : msg.includes('DISCORD_NOT_LINKED')
+            ? 'discord_not_linked'
+            : msg.includes('DISCORD_NOT_CONFIGURED')
+              ? 'discord_not_configured'
+              : msg.includes('DISCORD_OAUTH_FAILED')
+                ? 'discord_oauth_failed'
+                : 'discord_oauth_failed';
 
       return res.redirect(`${webUrl}/connexion?error=${code}`);
     }
@@ -88,6 +111,45 @@ export class AuthController {
     return { success: true, user: { username: user.minecraftUsername } };
   }
 
+  @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  async register(
+    @Body() dto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const user = await this.auth.register(dto.username, dto.password);
+    const token = await this.auth.createSession(user.id);
+    this.setSessionCookie(res, token);
+    return { success: true, user: { username: user.username } };
+  }
+
+  @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const user = await this.auth.login(dto.username, dto.password);
+    const token = await this.auth.createSession(user.id);
+    this.setSessionCookie(res, token);
+    return { success: true, user: { username: user.username } };
+  }
+
+  @Patch('set-password')
+  @UseGuards(AuthGuard)
+  async setPassword(
+    @Req() req: Request & { user: { id: string } },
+    @Body() dto: SetPasswordDto,
+  ) {
+    await this.auth.setPassword(
+      req.user.id,
+      dto.password,
+      dto.username,
+      dto.currentPassword,
+    );
+    return { success: true };
+  }
+
   @Get('me')
   async me(@Req() req: Request) {
     const token = req.cookies?.['redlakes_token'];
@@ -99,13 +161,15 @@ export class AuthController {
       user: {
         id: user.id,
         username: user.minecraftUsername,
-        displayName: user.discordUsername ?? user.minecraftUsername,
+        redlakesUsername: user.username,
+        displayName: user.discordUsername ?? user.minecraftUsername ?? user.username,
         uuid: user.minecraftUuid,
         avatarUrl: user.avatarUrl,
         role: user.role,
         staffRank: user.staffRank,
         discordLinked: !!user.discordId,
         discordUsername: user.discordUsername,
+        hasPassword: !!user.passwordHash,
         activeCharacter: user.activeCharacter,
         onboarded: !!user.onboardedAt,
       },

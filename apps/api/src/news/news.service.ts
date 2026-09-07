@@ -4,10 +4,14 @@ import {
   CreateNewsArticleDto,
   UpdateNewsArticleDto,
 } from './dto/news-article.dto';
+import { DiscordService } from '../sync/discord.service';
 
 @Injectable()
 export class NewsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private discord: DiscordService,
+  ) {}
 
   findAll() {
     return this.prisma.newsArticle.findMany({ orderBy: { date: 'desc' } });
@@ -21,10 +25,19 @@ export class NewsService {
     return this.prisma.newsArticle.findUnique({ where: { id } });
   }
 
-  create(dto: CreateNewsArticleDto) {
-    return this.prisma.newsArticle.create({
+  async create(dto: CreateNewsArticleDto) {
+    const article = await this.prisma.newsArticle.create({
       data: { ...dto, date: new Date(dto.date) },
     });
+
+    void this.discord.notifyNewsPublished({
+      title: article.title,
+      excerpt: article.excerpt,
+      category: article.category,
+      slug: article.slug,
+    });
+
+    return article;
   }
 
   async update(

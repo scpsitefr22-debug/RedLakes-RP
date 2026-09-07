@@ -149,11 +149,11 @@ export class SearchService implements OnModuleInit {
   /**
    * SQL de repli — le seul chemin reellement actif tant qu'Elasticsearch
    * n'est pas configure dans cet environnement (voir onModuleInit). Couvre
-   * les 8 types deja references par lib/search.ts cote web (autrefois des
-   * tableaux statiques figes) : lore, scp, faction, departement, personnage,
-   * evenement, actualite, lieu — chacun desormais un modele Prisma reel.
-   * Indexation Elasticsearch volontairement non etendue a ces 7 types tant
-   * qu'ES n'est pas actif ici pour verifier le comportement.
+   * 9 types, chacun un modele Prisma reel : lore, scp, faction, departement,
+   * personnage, evenement, actualite, lieu, document classifie (ce dernier
+   * ajoute apres coup — absent du lot initial de migration, voir Lot 29 du
+   * spec CORE). Indexation Elasticsearch volontairement non etendue a ces
+   * types tant qu'ES n'est pas actif ici pour verifier le comportement.
    */
   private async fallbackSearch(
     query: string,
@@ -171,6 +171,7 @@ export class SearchService implements OnModuleInit {
       locations,
       factions,
       departments,
+      documentsRaw,
     ] = await Promise.all([
       this.prisma.loreArticle.findMany({
         where: {
@@ -223,12 +224,24 @@ export class SearchService implements OnModuleInit {
         where: { name: insensitive },
         take: limit,
       }),
+      this.prisma.classifiedDocument.findMany({
+        where: {
+          status: 'PUBLISHED',
+          OR: [
+            { title: insensitive },
+            { excerpt: insensitive },
+            { content: insensitive },
+          ],
+        },
+        take: limit,
+      }),
     ]);
 
     const articles = filterByDepartment(articlesRaw, departmentId);
     const scpObjects = filterByDepartment(scpObjectsRaw, departmentId);
     const characters = filterByDepartment(charactersRaw, departmentId);
     const events = filterByDepartment(eventsRaw, departmentId);
+    const documents = filterByDepartment(documentsRaw, departmentId);
 
     const hits: SearchHit[] = [
       ...articles.map((a) => ({
@@ -293,6 +306,14 @@ export class SearchService implements OnModuleInit {
         title: d.name,
         excerpt: d.utilities.slice(0, 3).join(', '),
         href: `/departements/${d.slug}`,
+        score: 1,
+      })),
+      ...documents.map((doc) => ({
+        id: doc.id,
+        type: 'document',
+        title: doc.title,
+        excerpt: doc.excerpt ?? doc.content.slice(0, 120),
+        href: `/documents/${doc.slug}`,
         score: 1,
       })),
     ];

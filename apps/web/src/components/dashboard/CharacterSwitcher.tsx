@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserPlus, Users } from "lucide-react";
+import { Trash2, UserPlus, Users } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { getFactionTheme } from "@/lib/faction-theme";
 
@@ -16,7 +16,13 @@ interface Character {
   isActive: boolean;
 }
 
-export function CharacterSwitcher({ onSwitched }: { onSwitched?: () => void }) {
+export function CharacterSwitcher({
+  onSwitched,
+  canDelete = false,
+}: {
+  onSwitched?: () => void;
+  canDelete?: boolean;
+}) {
   const [characters, setCharacters] = useState<Character[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +47,21 @@ export function CharacterSwitcher({ onSwitched }: { onSwitched?: () => void }) {
       onSwitched?.();
     } catch {
       setError("Impossible de changer de personnage.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteCharacter = async (id: string, name: string) => {
+    if (!confirm(`Supprimer définitivement le personnage "${name}" ? Cette action est irréversible.`)) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await apiFetch(`/players/me/characters/${id}`, { method: "DELETE" });
+      load();
+      onSwitched?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible de supprimer ce personnage.");
     } finally {
       setBusy(false);
     }
@@ -82,18 +103,24 @@ export function CharacterSwitcher({ onSwitched }: { onSwitched?: () => void }) {
           const name =
             [c.rpFirstName, c.rpLastName].filter(Boolean).join(" ") || "Sans identité RP";
           return (
-            <button
+            <div
               key={c.id}
-              type="button"
+              role="button"
+              tabIndex={0}
               onClick={() => !c.isActive && activate(c.id)}
-              disabled={busy || c.isActive}
-              className="rounded-lg border p-4 text-left transition-colors disabled:cursor-default"
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" || e.key === " ") && !c.isActive) activate(c.id);
+              }}
+              aria-disabled={busy || c.isActive}
+              className={`relative rounded-lg border p-4 text-left transition-colors ${
+                busy || c.isActive ? "cursor-default" : "cursor-pointer"
+              }`}
               style={{
                 borderColor: c.isActive ? theme.color : "var(--metal)",
                 background: c.isActive ? `${theme.color}14` : "transparent",
               }}
             >
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-2 pr-5">
                 <p className="text-sm font-bold text-white">{name}</p>
                 {c.isActive && (
                   <span
@@ -112,7 +139,21 @@ export function CharacterSwitcher({ onSwitched }: { onSwitched?: () => void }) {
                   Cliquer pour activer
                 </p>
               )}
-            </button>
+              {canDelete && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteCharacter(c.id, name);
+                  }}
+                  disabled={busy}
+                  title="Supprimer ce personnage (staff)"
+                  className="absolute right-2 top-2 rounded border border-transparent p-1 text-gray-600 transition-colors hover:border-red-400/40 hover:text-red-400 disabled:opacity-50"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           );
         })}
       </div>

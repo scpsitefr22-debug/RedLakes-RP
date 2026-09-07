@@ -35,6 +35,10 @@ export class CreateGameEventDto {
   @IsArray()
   @IsString({ each: true })
   restrictedDepartmentIds?: string[];
+
+  @IsOptional()
+  @IsString()
+  factionId?: string;
 }
 
 export class UpdateGameEventDto {
@@ -66,4 +70,8 @@ export class UpdateGameEventDto {
   @IsArray()
   @IsString({ each: true })
   restrictedDepartmentIds?: string[];
+
+  @IsOptional()
+  @IsString()
+  factionId?: string;
 }

@@ -5,8 +5,10 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { Quote, ArrowLeft } from "lucide-react";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
+import { EditableText } from "@/components/staff/EditableText";
 
 interface ApiCharacter {
+  id: string;
   name: string;
   title: string;
   faction: string;
@@ -56,8 +58,21 @@ export function PersonnageDetail({ id }: { id: string }) {
           </div>
         )}
         <div>
-          <h1 className="text-3xl font-bold text-white">{character.name}</h1>
-          <p className="text-gray-500">{character.title}</p>
+          <EditableText
+            as="h1"
+            className="text-3xl font-bold text-white"
+            value={character.name}
+            endpoint={`/characters/${character.id}`}
+            field="name"
+          />
+          <EditableText
+            as="p"
+            className="text-gray-500"
+            value={character.title}
+            endpoint={`/characters/${character.id}`}
+            field="title"
+            placeholder="Cliquer pour ajouter un titre…"
+          />
           <p className="mt-1 text-sm text-gray-600">{character.faction}</p>
         </div>
       </div>
@@ -65,7 +80,14 @@ export function PersonnageDetail({ id }: { id: string }) {
       <div className="space-y-6">
         <section className="hologram-border rounded-lg p-6">
           <h2 className="mb-4 text-xl font-bold text-white">Biographie</h2>
-          <DiscordMarkdown text={character.biography} className="text-gray-400" />
+          <EditableText
+            value={character.biography}
+            endpoint={`/characters/${character.id}`}
+            field="biography"
+            multiline
+            markdown
+            className="text-gray-400"
+          />
         </section>
 
         {character.quotes.length > 0 && (

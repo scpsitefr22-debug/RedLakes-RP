@@ -43,6 +43,7 @@ export default function EditGradePage() {
         name: grade.name,
         branch: grade.branch,
         tier: grade.tier,
+        clearanceLevel: grade.clearanceLevel.toString(),
         departmentId: grade.departmentId ?? "",
         departmentRefId: grade.departmentRef?.id ?? "",
         pay: grade.pay?.toString() ?? "",

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
   --background: #050505;
   --foreground: #e8e8e8;
   --redlake-red: #8b0a0a;
@@ -30,6 +31,18 @@
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--redlake-red) var(--classified);
+}
+
+/*
+ * Liste deroulante native des <select> : certains moteurs ignorent la
+ * couleur heritee du parent pour le popup d'options et retombent sur un
+ * theme clair par defaut malgre color-scheme: dark — texte illisible sur
+ * fond blanc. Couleurs explicites, opaques (pas de rgba : le popup n'est
+ * de toute facon jamais composite sur le fond de la page).
+ */
+select option {
+  background-color: #0a0a0a;
+  color: var(--foreground);
 }
 
 body {
@@ -95,6 +108,17 @@ body {
 .map-radar-ring {
   animation: map-radar-ping 4s ease-out infinite;
   transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-glow {
+    animation: none;
+    box-shadow: 0 0 20px rgba(139, 10, 10, 0.3);
+  }
+
+  .map-radar-ring {
+    animation: none;
+  }
 }
 
 @keyframes core-boot-line {

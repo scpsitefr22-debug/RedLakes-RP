@@ -99,7 +99,11 @@ export default function LoreCmsPage() {
                 </div>
               </div>
               <span className={`font-mono text-xs ${
-                article.status === "PUBLISHED" ? "text-green-400" : "text-yellow-400"
+                article.status === "PUBLISHED"
+                  ? "text-green-400"
+                  : article.status === "ARCHIVED"
+                    ? "text-gray-500"
+                    : "text-yellow-400"
               }`}>
                 {article.status}
               </span>

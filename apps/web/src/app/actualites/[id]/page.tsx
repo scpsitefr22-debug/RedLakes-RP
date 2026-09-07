@@ -3,13 +3,14 @@ import { categoryLabels } from "@/data/news";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
-import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
+import { EditableText } from "@/components/staff/EditableText";
 
 interface Props {
   params: Promise<{ id: string }>;
 }
 
 interface ApiNewsArticleDetail {
+  id: string;
   title: string;
   excerpt: string;
   date: string;
@@ -39,9 +40,22 @@ export default async function ActualiteDetailPage({ params }: Props) {
       <p className="mb-2 font-mono text-sm text-gray-600">
         {formatDate(article.date)}
       </p>
-      <h1 className="mb-8 text-4xl font-bold text-white">{article.title}</h1>
+      <EditableText
+        as="h1"
+        className="mb-8 text-4xl font-bold text-white"
+        value={article.title}
+        endpoint={`/news/${article.id}`}
+        field="title"
+      />
       <div className="prose-redlake hologram-border rounded-lg p-8">
-        <DiscordMarkdown text={article.excerpt} className="text-lg" />
+        <EditableText
+          value={article.excerpt}
+          endpoint={`/news/${article.id}`}
+          field="excerpt"
+          multiline
+          markdown
+          className="text-lg"
+        />
         <p className="mt-4 text-gray-500">
           Article complet à rédiger par l&apos;équipe lore. Cette section sera
           connectée au CMS NestJS pour permettre aux rédacteurs de publier du

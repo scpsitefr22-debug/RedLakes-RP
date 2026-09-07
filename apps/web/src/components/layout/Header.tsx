@@ -65,6 +65,7 @@ const navItems: NavItem[] = [
       { label: "Intranet Site-12", href: "/intranet" },
       { label: "Joueurs", href: "/joueurs" },
       { label: "Archives classifiées", href: "/archives" },
+      { label: "Documents classifiés", href: "/documents" },
       { label: "OPHIS", href: "/ophis" },
       { label: "CMS Lore (Staff)", href: "/lore/cms", staffOnly: true },
       { label: "Gestion Grades (Staff)", href: "/staff/grades", staffOnly: true },
@@ -77,6 +78,7 @@ const navItems: NavItem[] = [
       { label: "Gestion Événements (Staff)", href: "/staff/evenements", staffOnly: true },
       { label: "Gestion Actualités (Staff)", href: "/staff/actualites", staffOnly: true },
       { label: "Gestion Carte (Staff)", href: "/staff/carte", staffOnly: true },
+      { label: "Gestion Documents (Staff)", href: "/staff/documents", staffOnly: true },
     ],
   },
 ];
@@ -122,10 +124,21 @@ export function Header() {
                 className="relative"
                 onMouseEnter={() => item.children && setOpenDropdown(item.label)}
                 onMouseLeave={() => setOpenDropdown(null)}
+                onFocus={() => item.children && setOpenDropdown(item.label)}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                    setOpenDropdown(null);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") setOpenDropdown(null);
+                }}
               >
                 <Link
                   href={item.href}
-                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-300 transition-colors hover:text-redlake-glow"
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-300 transition-colors hover:text-redlake-glow focus-visible:text-redlake-glow"
+                  aria-haspopup={item.children ? true : undefined}
+                  aria-expanded={item.children ? openDropdown === item.label : undefined}
                 >
                   {item.label}
                   {item.children && <ChevronDown className="h-3 w-3" />}

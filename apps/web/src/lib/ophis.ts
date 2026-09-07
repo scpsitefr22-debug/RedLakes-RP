@@ -42,16 +42,19 @@ export const OPHIS_SUGGESTIONS = [
 
 async function searchCore(query: string): Promise<{ title: string; href: string }[]> {
   // Le réseau CORE (base de données live) fait foi — le catalogue statique
-  // ne sert que de repli si l'API est indisponible, jamais de source
-  // prioritaire (même bug que lore-feed.ts : ne jamais laisser du contenu
-  // figé masquer ce que le staff a réellement écrit).
+  // ne sert que de repli si l'API est reellement indisponible (catch),
+  // jamais quand elle répond avec 0 résultat : le catalogue statique n'a
+  // aucune notion de restriction par département, contrairement à /search
+  // côté API — le laisser combler un 0 résultat pourrait faire fuiter le
+  // titre d'un contenu classifié à un visiteur non autorisé (même bug que
+  // GlobalSearch.tsx avant correction, et que lore-feed.ts : ne jamais
+  // laisser du contenu figé masquer ou compléter ce que le staff a
+  // réellement écrit/restreint).
   try {
-    const hits = await apiFetch<ApiSearchHit[]>(`/search?q=${encodeURIComponent(query)}&limit=5`);
-    if (hits.length > 0) return hits;
+    return await apiFetch<ApiSearchHit[]>(`/search?q=${encodeURIComponent(query)}&limit=5`);
   } catch {
-    /* API indisponible — repli sur le catalogue statique */
+    return searchAll(query);
   }
-  return searchAll(query);
 }
 
 function getOphisKeywordResponse(input: string): string | null {

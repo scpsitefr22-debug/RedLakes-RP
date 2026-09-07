@@ -29,6 +29,12 @@ export const authErrorMessages: Record<string, { title: string; body: string }> 
     body:
       "La liaison avec Discord a echoue. Reessayez ou contactez le personnel technique.",
   },
+  discord_already_linked: {
+    title: "Discord deja lie a un autre compte",
+    body:
+      "Cette identite Discord est deja liee a un autre compte REDLAKES. " +
+      "Connectez-vous avec ce compte-la, ou delie Discord depuis son tableau de bord d'abord.",
+  },
 };
 
 export function isDiscordLoginEnabled(): boolean {

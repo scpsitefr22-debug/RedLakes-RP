@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { FactionEditor } from "@/components/staff/FactionEditor";
+import { FactionRelationsPanel } from "@/components/staff/FactionRelationsPanel";
 import { apiFetch } from "@/lib/api";
 
 interface ApiFactionFull {
@@ -24,11 +25,15 @@ export default function EditFactionPage() {
   const id = params.id as string;
   const [faction, setFaction] = useState<ApiFactionFull | null>(null);
   const [error, setError] = useState("");
+  const [viewerRole, setViewerRole] = useState<string | null>(null);
 
   useEffect(() => {
     apiFetch<ApiFactionFull>(`/factions/by-id/${id}`)
       .then(setFaction)
       .catch(() => setError("Faction introuvable ou API indisponible — connectez-vous en staff."));
+    apiFetch<{ authenticated: boolean; user?: { role: string } }>("/auth/me")
+      .then((res) => setViewerRole(res.user?.role ?? null))
+      .catch(() => undefined);
   }, [id]);
 
   if (error) {
@@ -48,22 +53,25 @@ export default function EditFactionPage() {
   }
 
   return (
-    <FactionEditor
-      mode="edit"
-      factionId={id}
-      initial={{
-        slug: faction.slug,
-        name: faction.name,
-        tagline: faction.tagline ?? "",
-        description: faction.description ?? "",
-        history: faction.history ?? "",
-        color: faction.color ?? "",
-        playable: faction.playable,
-        objectives: faction.objectives.join(", "),
-        chefId: faction.chefId ?? "",
-        deputyIds: faction.deputyIds.join(", "),
-        budget: faction.budget.toString(),
-      }}
-    />
+    <>
+      <FactionEditor
+        mode="edit"
+        factionId={id}
+        initial={{
+          slug: faction.slug,
+          name: faction.name,
+          tagline: faction.tagline ?? "",
+          description: faction.description ?? "",
+          history: faction.history ?? "",
+          color: faction.color ?? "",
+          playable: faction.playable,
+          objectives: faction.objectives.join(", "),
+          chefId: faction.chefId ?? "",
+          deputyIds: faction.deputyIds.join(", "),
+          budget: faction.budget.toString(),
+        }}
+      />
+      <FactionRelationsPanel factionId={id} canDelete={viewerRole === "ADMIN"} />
+    </>
   );
 }

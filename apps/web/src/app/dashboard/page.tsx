@@ -15,6 +15,7 @@ import {
   MessageCircle,
   Terminal,
   CalendarDays,
+  Lock,
 } from "lucide-react";
 import { apiFetch, checkApiAvailable } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -49,6 +50,8 @@ interface PlayerData {
     role: string;
     discordLinked?: boolean;
     discordUsername?: string | null;
+    redlakesUsername?: string | null;
+    hasPassword?: boolean;
     createdAt: string;
   };
 }
@@ -91,6 +94,11 @@ export default function DashboardPage() {
   const [rpLastName, setRpLastName] = useState("");
   const [savingIdentity, setSavingIdentity] = useState(false);
   const [identityMsg, setIdentityMsg] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [newUsername, setNewUsername] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [settingPassword, setSettingPassword] = useState(false);
+  const [passwordMsg, setPasswordMsg] = useState<string | null>(null);
   const [myApplications, setMyApplications] = useState<
     { id: string; type: string; status: string; createdAt: string }[]
   >([]);
@@ -190,6 +198,46 @@ export default function DashboardPage() {
       setIdentityMsg("Impossible de délier Discord.");
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const setPassword = async () => {
+    if (newPassword.length < 8) {
+      setPasswordMsg("8 caractères minimum.");
+      return;
+    }
+    if (!player?.user.redlakesUsername && !newUsername.trim()) {
+      setPasswordMsg("Choisissez un pseudo de connexion.");
+      return;
+    }
+    if (player?.user.hasPassword && !currentPassword) {
+      setPasswordMsg("Renseignez votre mot de passe actuel.");
+      return;
+    }
+    setSettingPassword(true);
+    setPasswordMsg(null);
+    try {
+      await apiFetch("/auth/set-password", {
+        method: "PATCH",
+        body: JSON.stringify({
+          password: newPassword,
+          ...(newUsername.trim() && { username: newUsername.trim() }),
+          ...(currentPassword && { currentPassword }),
+        }),
+      });
+      setNewPassword("");
+      setNewUsername("");
+      setCurrentPassword("");
+      setPasswordMsg(
+        player?.user.hasPassword
+          ? "Mot de passe modifié."
+          : "Mot de passe défini — utilisable dès la prochaine connexion.",
+      );
+      await refreshProfile();
+    } catch (err) {
+      setPasswordMsg(err instanceof Error ? err.message : "Échec de l'enregistrement.");
+    } finally {
+      setSettingPassword(false);
     }
   };
 
@@ -316,7 +364,10 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <CharacterSwitcher onSwitched={refreshProfile} />
+      <CharacterSwitcher
+        onSwitched={refreshProfile}
+        canDelete={player.user.role === "STAFF" || player.user.role === "ADMIN"}
+      />
 
       {(() => {
         const meta = findGradeMeta(player.grade);
@@ -452,6 +503,57 @@ export default function DashboardPage() {
           <RefreshCw className="h-3 w-3" />
           Synchroniser le dossier
         </button>
+      </section>
+
+      <section className="mb-8 panel-flat rounded-lg p-6">
+        <h3 className="mb-2 flex items-center gap-2 font-bold text-white">
+          <Lock className="h-5 w-5 text-redlake-glow" />
+          {player.user.hasPassword ? "Changer mon mot de passe" : "Définir mon mot de passe"}
+        </h3>
+        <p className="mb-3 text-sm text-gray-500">
+          {player.user.hasPassword
+            ? "Modifiable à tout moment — renseignez votre mot de passe actuel pour confirmer."
+            : "Votre compte n'a pas encore de mot de passe — vous vous êtes connecté via Discord. Définissez-en un pour pouvoir vous reconnecter directement avec votre pseudo."}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {!player.user.redlakesUsername && (
+            <input
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              placeholder="Pseudo de connexion"
+              autoComplete="username"
+              className="min-w-[180px] flex-1 rounded border border-metal bg-black px-4 py-2 font-mono text-sm text-white outline-none focus:border-redlake"
+            />
+          )}
+          {player.user.hasPassword && (
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Mot de passe actuel"
+              autoComplete="current-password"
+              className="min-w-[180px] flex-1 rounded border border-metal bg-black px-4 py-2 font-mono text-sm text-white outline-none focus:border-redlake"
+            />
+          )}
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="Nouveau mot de passe (8 caractères min.)"
+            autoComplete="new-password"
+            className="min-w-[240px] flex-1 rounded border border-metal bg-black px-4 py-2 font-mono text-sm text-white outline-none focus:border-redlake"
+          />
+          <button
+            onClick={setPassword}
+            disabled={settingPassword}
+            className="rounded border border-redlake/40 bg-redlake/10 px-4 py-2 font-mono text-xs text-redlake-glow hover:text-white disabled:opacity-50"
+          >
+            {settingPassword ? "Enregistrement..." : player.user.hasPassword ? "Changer" : "Définir"}
+          </button>
+        </div>
+        {passwordMsg && (
+          <p className="mt-2 font-mono text-xs text-gray-400">{passwordMsg}</p>
+        )}
       </section>
 
       <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-5">

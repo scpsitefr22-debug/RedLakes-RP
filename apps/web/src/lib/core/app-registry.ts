@@ -62,7 +62,7 @@ const DEFAULT_LABELS: Record<AppId, string> = {
 };
 
 /**
- * Vocabulaire par faction — même moteur, même 9 apps partout (pas d'app
+ * Vocabulaire par faction — même moteur, mêmes 11 apps partout (pas d'app
  * ajoutée/retirée), seul le libellé change pour coller à l'identité de
  * chaque faction. S'appuie sur les mêmes flavor déjà établis ailleurs
  * (lib/faction-theme.ts::reportLabels, ops boards de l'Intranet) plutôt que

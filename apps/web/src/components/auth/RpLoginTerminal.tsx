@@ -10,6 +10,8 @@ import {
   Lock,
   ChevronRight,
   AlertTriangle,
+  UserPlus,
+  LogIn,
 } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { authErrorMessages } from "@/lib/auth-messages";
@@ -28,11 +30,22 @@ export function RpLoginTerminal() {
   const [devError, setDevError] = useState("");
   const [devLoading, setDevLoading] = useState(false);
 
+  // Compte REDLAKES par pseudo + mot de passe — moteur de connexion
+  // principal. Discord (plus bas) ne sert plus qu'à la liaison bot.
+  const [mode, setMode] = useState<"login" | "register">("login");
+  const [rlUsername, setRlUsername] = useState("");
+  const [rlPassword, setRlPassword] = useState("");
+  const [rlError, setRlError] = useState("");
+  const [rlLoading, setRlLoading] = useState(false);
+
   useEffect(() => {
     (async () => {
       const online = await checkApiAvailable();
       setApiOnline(online);
-      if (online) {
+      // Si une erreur accompagne l'arrivee (ex. liaison Discord echouee pour
+      // un compte deja connecte), on reste sur la page pour l'afficher —
+      // sinon la redirection automatique ci-dessous l'escamote aussitot.
+      if (online && !errorCode) {
         try {
           const me = await apiFetch<{ authenticated: boolean }>("/auth/me");
           if (me.authenticated) {
@@ -45,7 +58,32 @@ export function RpLoginTerminal() {
       }
       setChecking(false);
     })();
-  }, [router, redirectTo]);
+  }, [router, redirectTo, errorCode]);
+
+  const submitAccount = async () => {
+    if (!rlUsername.trim() || !rlPassword) {
+      setRlError("Pseudo et mot de passe requis");
+      return;
+    }
+    setRlLoading(true);
+    setRlError("");
+    try {
+      await apiFetch(`/auth/${mode}`, {
+        method: "POST",
+        body: JSON.stringify({
+          username: rlUsername.trim(),
+          password: rlPassword,
+        }),
+      });
+      router.push(redirectTo.startsWith("/") ? redirectTo : "/dashboard");
+    } catch (err) {
+      setRlError(
+        err instanceof Error ? err.message : "Une erreur est survenue",
+      );
+    } finally {
+      setRlLoading(false);
+    }
+  };
 
   const devLogin = async () => {
     if (!username.trim()) {
@@ -90,7 +128,7 @@ export function RpLoginTerminal() {
           Terminal d&apos;habilitation
         </h1>
         <p className="mt-3 text-sm text-gray-500">
-          Liez votre Discord pour créer votre compte REDLAKES et accéder à votre
+          Créez votre compte REDLAKES ou connectez-vous pour accéder à votre
           dossier personnel.
         </p>
       </div>
@@ -155,31 +193,77 @@ export function RpLoginTerminal() {
       )}
 
       <div className="hologram-border space-y-4 rounded-lg p-6">
-        <p className="font-mono text-[10px] tracking-widest text-gray-600">
-          ÉTAPE 1 — LIAISON DISCORD OBLIGATOIRE
-        </p>
-
-        {apiOnline && siteConfig.discordOAuthEnabled ? (
-          <a
-            href="/api/auth/discord"
-            className="flex w-full items-center justify-center gap-3 rounded border border-[#5865F2]/50 bg-[#5865F2]/15 py-4 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-[#5865F2]/25"
+        <div className="flex rounded border border-metal/50 p-1 font-mono text-xs">
+          <button
+            type="button"
+            onClick={() => {
+              setMode("login");
+              setRlError("");
+            }}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded py-2 uppercase tracking-wider transition-colors ${
+              mode === "login"
+                ? "bg-redlake/20 text-redlake-glow"
+                : "text-gray-500 hover:text-white"
+            }`}
           >
-            <MessageCircle className="h-5 w-5 text-[#aab1ff]" />
-            Lier mon compte Discord
-            <ChevronRight className="h-4 w-4 text-gray-500" />
-          </a>
-        ) : (
-          <p className="text-center font-mono text-xs text-gray-600">
-            Liaison Discord indisponible
-          </p>
-        )}
+            <LogIn className="h-3.5 w-3.5" />
+            Se connecter
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMode("register");
+              setRlError("");
+            }}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded py-2 uppercase tracking-wider transition-colors ${
+              mode === "register"
+                ? "bg-redlake/20 text-redlake-glow"
+                : "text-gray-500 hover:text-white"
+            }`}
+          >
+            <UserPlus className="h-3.5 w-3.5" />
+            Créer un compte
+          </button>
+        </div>
 
-        <p className="text-center text-xs text-gray-600">
-          Votre compte REDLAKES est créé à partir de votre identité Discord du
-          serveur REDLAKES — l&apos;étape suivante vous permet de créer votre
-          personnage.
-        </p>
+        <input
+          value={rlUsername}
+          onChange={(e) => setRlUsername(e.target.value)}
+          placeholder="Pseudo"
+          autoComplete="username"
+          className="w-full rounded border border-metal bg-black px-4 py-2 font-mono text-sm text-white outline-none focus:border-redlake"
+        />
+        <input
+          type="password"
+          value={rlPassword}
+          onChange={(e) => setRlPassword(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submitAccount()}
+          placeholder="Mot de passe"
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
+          className="w-full rounded border border-metal bg-black px-4 py-2 font-mono text-sm text-white outline-none focus:border-redlake"
+        />
+        {rlError && (
+          <p className="font-mono text-xs text-redlake-glow">{rlError}</p>
+        )}
+        <button
+          type="button"
+          onClick={submitAccount}
+          disabled={rlLoading || !apiOnline}
+          className="w-full rounded border border-redlake bg-redlake/20 py-3 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-redlake/30 disabled:opacity-50"
+        >
+          {rlLoading
+            ? "Vérification..."
+            : mode === "login"
+              ? "Se connecter"
+              : "Créer mon compte"}
+        </button>
       </div>
+
+      <p className="mt-6 text-center text-xs text-gray-600">
+        La liaison Discord (obligatoire) se fait juste après la création de
+        votre compte — synchronisation avec le bot (grades, notifications) et
+        confirmation de votre appartenance à la communauté REDLAKES.
+      </p>
 
       {siteConfig.devLoginEnabled && (
         <div className="mt-6">

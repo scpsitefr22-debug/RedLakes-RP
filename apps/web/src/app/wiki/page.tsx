@@ -20,18 +20,23 @@ interface ApiScpObject {
   personnelAssigned: number | null;
 }
 
-async function getScpObjects(): Promise<ApiScpObject[]> {
+type ScpListResult =
+  | { status: "ok"; objects: ApiScpObject[] }
+  | { status: "error" };
+
+async function getScpObjects(): Promise<ScpListResult> {
   try {
     const res = await fetch(`${API_URL}/scp`, { cache: "no-store" });
-    if (!res.ok) return [];
-    return res.json();
+    if (!res.ok) return { status: "error" };
+    return { status: "ok", objects: await res.json() };
   } catch {
-    return [];
+    return { status: "error" };
   }
 }
 
 export default async function WikiPage() {
-  const scpObjects = await getScpObjects();
+  const result = await getScpObjects();
+  const scpObjects = result.status === "ok" ? result.objects : [];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12">
@@ -44,7 +49,12 @@ export default async function WikiPage() {
       <TerminalSearch />
       <RecentlyViewed />
 
-      {scpObjects.length === 0 ? (
+      {result.status === "error" ? (
+        <div className="hologram-border rounded-lg p-8 text-center text-red-400">
+          Le service est momentanément indisponible (il peut mettre jusqu&apos;à une minute à se
+          réveiller après une période d&apos;inactivité). Rechargez la page dans quelques instants.
+        </div>
+      ) : scpObjects.length === 0 ? (
         <div className="hologram-border rounded-lg p-8 text-center text-gray-500">
           Aucun objet disponible pour le moment.
         </div>

@@ -3,6 +3,8 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  Max,
+  Min,
   MinLength,
 } from 'class-validator';
 
@@ -20,6 +22,12 @@ export class CreateGradeDto {
 
   @IsString()
   tier!: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  clearanceLevel?: number;
 
   @IsOptional()
   @IsString()
@@ -74,6 +82,12 @@ export class UpdateGradeDto {
   @IsOptional()
   @IsString()
   tier?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  clearanceLevel?: number;
 
   @IsOptional()
   @IsString()

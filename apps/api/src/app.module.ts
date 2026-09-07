@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { PlayersModule } from './players/players.module';
@@ -13,6 +15,8 @@ import { PlatformModule } from './platform/platform.module';
 import { HealthModule } from './health/health.module';
 import { GradesModule } from './grades/grades.module';
 import { FactionsModule } from './factions/factions.module';
+import { FactionRelationsModule } from './faction-relations/faction-relations.module';
+import { ClassifiedDocumentsModule } from './classified-documents/classified-documents.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { TeamsModule } from './teams/teams.module';
 import { AssignmentsModule } from './assignments/assignments.module';
@@ -30,6 +34,9 @@ import { CoreDmModule } from './core-dm/core-dm.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // Plafond global leger (protection generale) — les routes sensibles
+    // (login/register) ont leur propre plafond plus strict via @Throttle().
+    ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 120 }]),
     PrismaModule,
     PlatformModule,
     HealthModule,
@@ -43,6 +50,8 @@ import { CoreDmModule } from './core-dm/core-dm.module';
     ReportsModule,
     GradesModule,
     FactionsModule,
+    FactionRelationsModule,
+    ClassifiedDocumentsModule,
     DepartmentsModule,
     TeamsModule,
     AssignmentsModule,
@@ -57,5 +66,6 @@ import { CoreDmModule } from './core-dm/core-dm.module';
     CoreMessagesModule,
     CoreDmModule,
   ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

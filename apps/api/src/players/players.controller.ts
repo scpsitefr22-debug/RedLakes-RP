@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -67,6 +68,25 @@ export class PlayersController {
     return this.players.activateCharacter(req.user.id, id);
   }
 
+  @Delete('me/characters/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  async deleteMyCharacter(
+    @Req() req: Request & { user: { id: string; minecraftUsername?: string; discordUsername?: string } },
+    @Param('id') id: string,
+  ) {
+    const actorLabel =
+      req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    await this.players.deleteCharacterForUser(
+      req.user.id,
+      id,
+      req.user.id,
+      actorLabel,
+      req.user.minecraftUsername,
+    );
+    return this.players.listCharacters(req.user.id);
+  }
+
   @Patch('me')
   @UseGuards(AuthGuard)
   async updateMe(
@@ -84,6 +104,26 @@ export class PlayersController {
     const id = await this.players.findIdByUsername(username);
     if (!id) throw new NotFoundException('Joueur introuvable');
     return { id };
+  }
+
+  @Get(':username/characters')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  listCharacters(@Param('username') username: string) {
+    return this.players.listCharactersByUsername(username);
+  }
+
+  @Delete(':username/characters/:id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  deleteCharacter(
+    @Req() req: Request & { user: { id: string; minecraftUsername?: string; discordUsername?: string } },
+    @Param('username') username: string,
+    @Param('id') id: string,
+  ) {
+    const actorLabel =
+      req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    return this.players.deleteCharacter(username, id, req.user.id, actorLabel);
   }
 
   @Get(':username')

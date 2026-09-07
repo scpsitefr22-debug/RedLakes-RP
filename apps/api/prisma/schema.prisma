@@ -72,6 +72,8 @@ model User {
   avatarUrl         String?
   discordId         String?  @unique
   discordUsername   String?
+  username          String?  @unique
+  passwordHash      String?
   role              UserRole @default(PLAYER)
   staffRank         StaffRank?
   onboardedAt       DateTime?
@@ -102,6 +104,8 @@ model User {
   newsRevisionsEdited        NewsRevision[]
   mapLocationRevisionsEdited MapLocationRevision[]
   loreRevisionsEdited        LoreRevision[]
+  classifiedDocuments               ClassifiedDocument[]         @relation("AuthorClassifiedDocuments")
+  classifiedDocumentRevisionsEdited ClassifiedDocumentRevision[]
   coreMessages               CoreMessage[]
   coreDmSent                 CoreDirectMessage[] @relation("CoreDmSent")
   coreDmReceived             CoreDirectMessage[] @relation("CoreDmReceived")
@@ -217,6 +221,68 @@ model LoreRevision {
   createdAt     DateTime @default(now())
 
   @@index([loreArticleId])
+}
+
+enum ClassifiedDocumentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Documents classifies — meme patron que LoreArticle (auteur, statut,
+/// restriction par departement, tags, historique de revisions), scope
+/// volontairement proportionne pour un premier passage : les liens vers
+/// SCP/evenements/missions/autres documents decrits dans le spec CORE ne
+/// sont pas encore modelises en relations (pas de Mission construite,
+/// et une jointure many-to-many par type de lien aurait demultiplie la
+/// portee sans besoin exprime) — attachments reste une liste d'URLs.
+model ClassifiedDocument {
+  id                      String                   @id @default(cuid())
+  slug                    String                   @unique
+  title                   String
+  excerpt                 String?
+  content                 String
+  status                  ClassifiedDocumentStatus @default(DRAFT)
+  restrictedDepartmentIds String[]                 @default([])
+  factionId               String?
+  faction                 Faction?                 @relation(fields: [factionId], references: [id], onDelete: SetNull)
+  tags                    String[]                 @default([])
+  attachments             String[]                 @default([])
+  authorId                String?
+  author                  User?                    @relation("AuthorClassifiedDocuments", fields: [authorId], references: [id], onDelete: SetNull)
+  publishedAt             DateTime?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+
+  revisions ClassifiedDocumentRevision[]
+  linkedEvents     GameEvent[] @relation("DocumentEvents")
+  linkedScpObjects ScpObject[] @relation("DocumentScpObjects")
+
+  @@index([status])
+  @@index([factionId])
+}
+
+// Snapshot du contenu de ClassifiedDocument juste AVANT chaque edition staff.
+model ClassifiedDocumentRevision {
+  id         String             @id @default(cuid())
+  documentId String
+  document   ClassifiedDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  title                   String
+  excerpt                 String?
+  content                 String
+  status                  ClassifiedDocumentStatus
+  restrictedDepartmentIds String[]
+  factionId               String?
+  tags                    String[]
+  attachments             String[]
+
+  editedById    String?
+  editedBy      User?    @relation(fields: [editedById], references: [id], onDelete: SetNull)
+  editedByLabel String?
+  createdAt     DateTime @default(now())
+
+  @@index([documentId])
 }
 
 model GalleryAsset {
@@ -448,6 +514,10 @@ model Grade {
   name            String
   branch          String
   tier            String
+  /// Niveau d'habilitation reel (1 = public, 5 = Conseil O5) — remplace le
+  /// devinage par regex sur le nom (voir grade-clearance.ts, garde comme
+  /// filet de securite pour les grades hors catalogue).
+  clearanceLevel  Int         @default(1)
   departmentId    String?
   departmentRefId String?
   departmentRef   Department? @relation(fields: [departmentRefId], references: [id], onDelete: SetNull)
@@ -496,8 +566,39 @@ model Faction {
   players     Player[]
   reports     PersonnelReport[]
   coreMessages CoreMessage[]
+  relationsAsA FactionRelation[] @relation("FactionRelationA")
+  relationsAsB FactionRelation[] @relation("FactionRelationB")
+  classifiedDocuments ClassifiedDocument[]
+  gameEvents  GameEvent[]
 
   @@index([playable])
+}
+
+enum FactionRelationStatus {
+  ALLIE
+  NEUTRE
+  TENSION
+  HOSTILE
+}
+
+/// Relation diplomatique entre deux factions (alliance/neutralite/tension/
+/// guerre) — non dirigee : stockee une seule fois par paire, factionAId et
+/// factionBId ordonnes par id (voir canonicalPair cote service) pour eviter
+/// les doublons A-B / B-A.
+model FactionRelation {
+  id         String                @id @default(cuid())
+  factionAId String
+  factionA   Faction               @relation("FactionRelationA", fields: [factionAId], references: [id], onDelete: Cascade)
+  factionBId String
+  factionB   Faction               @relation("FactionRelationB", fields: [factionBId], references: [id], onDelete: Cascade)
+  status     FactionRelationStatus @default(NEUTRE)
+  note       String?
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
+
+  @@unique([factionAId, factionBId])
+  @@index([factionAId])
+  @@index([factionBId])
 }
 
 model Department {
@@ -720,6 +821,7 @@ model ScpObject {
   createdAt               DateTime          @default(now())
   updatedAt               DateTime          @updatedAt
   revisions               ScpRevision[]
+  linkedDocuments         ClassifiedDocument[] @relation("DocumentScpObjects")
 
   @@index([class])
   @@index([status])
@@ -820,11 +922,15 @@ model GameEvent {
   casualties              String?
   outcome                 String
   restrictedDepartmentIds String[] @default([])
+  factionId               String?
+  faction                 Faction? @relation(fields: [factionId], references: [id], onDelete: SetNull)
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   revisions               GameEventRevision[]
+  linkedDocuments         ClassifiedDocument[] @relation("DocumentEvents")
 
   @@index([type])
+  @@index([factionId])
 }
 
 // Snapshot du contenu de GameEvent juste AVANT chaque edition staff — meme

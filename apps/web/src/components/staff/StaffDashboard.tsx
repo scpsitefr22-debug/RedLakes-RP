@@ -23,6 +23,7 @@ import {
   MapPin,
   Target,
   Radio,
+  FileLock2,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -45,6 +46,7 @@ const MANAGEMENT_LINKS = [
   { icon: User, label: "Gestion des personnages", caption: "Fiches narratives", href: "/staff/personnages" },
   { icon: Zap, label: "Gestion des événements", caption: "Brèches, invasions, crises", href: "/staff/evenements" },
   { icon: Newspaper, label: "Gestion des actualités", caption: "Articles, mises à jour", href: "/staff/actualites" },
+  { icon: FileLock2, label: "Documents classifiés", caption: "Dossiers restreints par département", href: "/staff/documents" },
   { icon: MapPin, label: "Gestion de la carte", caption: "Emplacements, coordonnées", href: "/staff/carte" },
   { icon: Radio, label: "Système", caption: "Niveau d'alerte, statut (Fondateur)", href: "/staff/systeme" },
 ];

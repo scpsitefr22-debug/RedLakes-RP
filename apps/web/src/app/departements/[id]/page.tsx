@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { API_URL } from "@/lib/api";
 import { site12Departments } from "@/data/site12";
+import { EditableText } from "@/components/staff/EditableText";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -53,7 +54,13 @@ export default async function DepartmentDetailPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <p className="mb-2 font-mono text-xs text-gray-600">Oméga {dept.omegaTier ?? "—"}</p>
-      <h1 className="mb-2 text-4xl font-bold text-white">{dept.name}</h1>
+      <EditableText
+        as="h1"
+        className="mb-2 text-4xl font-bold text-white"
+        value={dept.name}
+        endpoint={`/departments/${dept.id}`}
+        field="name"
+      />
       <p className="mb-8 text-gray-500">Directeur : {dept.directorGradeName ?? "Non assigné"}</p>
 
       <div className="space-y-6">

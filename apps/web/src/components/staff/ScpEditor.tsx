@@ -4,10 +4,27 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import { Save, ArrowLeft, Trash2 } from "lucide-react";
+import { Save, ArrowLeft, Trash2, Plus, X } from "lucide-react";
 import { DepartmentMultiSelect } from "@/components/staff/DepartmentMultiSelect";
 
 const SCP_CLASSES = ["Safe", "Euclid", "Keter", "Thaumiel", "Apollyon"];
+
+export interface IncidentItem {
+  date: string;
+  summary: string;
+}
+
+export interface TestItem {
+  date: string;
+  researcher: string;
+  result: string;
+}
+
+export interface AddendumItem {
+  author: string;
+  content: string;
+  restrictedDepartmentIds?: string[];
+}
 
 export interface ScpFormData {
   slug: string;
@@ -19,9 +36,9 @@ export interface ScpFormData {
   history: string;
   description: string;
   image: string;
-  incidents: string;
-  tests: string;
-  addendums: string;
+  incidents: IncidentItem[];
+  tests: TestItem[];
+  addendums: AddendumItem[];
   containmentCost: string;
   personnelAssigned: string;
   breachCount: string;
@@ -34,7 +51,9 @@ interface ScpEditorProps {
   mode: "create" | "edit";
 }
 
-const EMPTY_JSON = "[]";
+function updateAt<T>(list: T[], index: number, patch: Partial<T>): T[] {
+  return list.map((item, i) => (i === index ? { ...item, ...patch } : item));
+}
 
 export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
   const router = useRouter();
@@ -48,9 +67,9 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
     history: initial?.history ?? "",
     description: initial?.description ?? "",
     image: initial?.image ?? "",
-    incidents: initial?.incidents ?? EMPTY_JSON,
-    tests: initial?.tests ?? EMPTY_JSON,
-    addendums: initial?.addendums ?? EMPTY_JSON,
+    incidents: initial?.incidents ?? [],
+    tests: initial?.tests ?? [],
+    addendums: initial?.addendums ?? [],
     containmentCost: initial?.containmentCost ?? "",
     personnelAssigned: initial?.personnelAssigned ?? "",
     breachCount: initial?.breachCount ?? "",
@@ -70,15 +89,23 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
     }
   };
 
-  const parseJsonField = (label: string, value: string): unknown[] => {
-    try {
-      const parsed = JSON.parse(value || "[]");
-      if (!Array.isArray(parsed)) throw new Error();
-      return parsed;
-    } catch {
-      throw new Error(`${label} : JSON invalide (doit être un tableau)`);
-    }
-  };
+  const addIncident = () => setForm((f) => ({ ...f, incidents: [...f.incidents, { date: "", summary: "" }] }));
+  const updateIncident = (i: number, patch: Partial<IncidentItem>) =>
+    setForm((f) => ({ ...f, incidents: updateAt(f.incidents, i, patch) }));
+  const removeIncident = (i: number) =>
+    setForm((f) => ({ ...f, incidents: f.incidents.filter((_, idx) => idx !== i) }));
+
+  const addTest = () => setForm((f) => ({ ...f, tests: [...f.tests, { date: "", researcher: "", result: "" }] }));
+  const updateTest = (i: number, patch: Partial<TestItem>) =>
+    setForm((f) => ({ ...f, tests: updateAt(f.tests, i, patch) }));
+  const removeTest = (i: number) =>
+    setForm((f) => ({ ...f, tests: f.tests.filter((_, idx) => idx !== i) }));
+
+  const addAddendum = () => setForm((f) => ({ ...f, addendums: [...f.addendums, { author: "", content: "" }] }));
+  const updateAddendum = (i: number, patch: Partial<AddendumItem>) =>
+    setForm((f) => ({ ...f, addendums: updateAt(f.addendums, i, patch) }));
+  const removeAddendum = (i: number) =>
+    setForm((f) => ({ ...f, addendums: f.addendums.filter((_, idx) => idx !== i) }));
 
   const save = async () => {
     setSaving(true);
@@ -94,9 +121,9 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
         history: form.history,
         description: form.description,
         image: form.image || undefined,
-        incidents: parseJsonField("Incidents", form.incidents),
-        tests: parseJsonField("Tests", form.tests),
-        addendums: parseJsonField("Addendums", form.addendums),
+        incidents: form.incidents.filter((i) => i.date.trim() || i.summary.trim()),
+        tests: form.tests.filter((t) => t.date.trim() || t.researcher.trim() || t.result.trim()),
+        addendums: form.addendums.filter((a) => a.author.trim() || a.content.trim()),
         containmentCost: form.containmentCost || undefined,
         personnelAssigned: form.personnelAssigned === "" ? undefined : Number(form.personnelAssigned),
         breachCount: form.breachCount === "" ? undefined : Number(form.breachCount),
@@ -114,7 +141,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
     } catch (err) {
       setError(
         err instanceof Error
-          ? `${err.message}${err.message.includes("JSON") ? "" : " — connectez-vous en staff pour éditer."}`
+          ? `${err.message} — connectez-vous en staff pour éditer.`
           : "Erreur de sauvegarde",
       );
     } finally {
@@ -138,7 +165,6 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
 
   const inputClass =
     "w-full rounded border border-metal bg-black px-4 py-2 text-white outline-none focus:border-redlake";
-  const monoClass = inputClass + " font-mono text-xs";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
@@ -160,7 +186,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
       )}
 
       <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Numéro</label>
             <input className={inputClass} value={form.number} onChange={(e) => update("number", e.target.value)} placeholder="SCP-173" />
@@ -176,7 +202,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
           <label className="mb-1 block font-mono text-xs text-gray-500">Nom</label>
           <input className={inputClass} value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="La Sculpture" />
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Classe</label>
             <select className={inputClass} value={form.class} onChange={(e) => update("class", e.target.value)}>
@@ -209,7 +235,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
           <input className={inputClass} value={form.image} onChange={(e) => update("image", e.target.value)} />
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <label className="mb-1 block font-mono text-xs text-gray-500">Coût de confinement</label>
             <input className={inputClass} value={form.containmentCost} onChange={(e) => update("containmentCost", e.target.value)} placeholder="12 000$/mois" />
@@ -225,22 +251,120 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
         </div>
 
         <div>
-          <label className="mb-1 block font-mono text-xs text-gray-500">
-            {'Incidents (JSON — [{"date","summary"}])'}
-          </label>
-          <textarea rows={3} className={monoClass} value={form.incidents} onChange={(e) => update("incidents", e.target.value)} />
+          <div className="mb-1 flex items-center justify-between">
+            <label className="block font-mono text-xs text-gray-500">Journal des incidents ({form.incidents.length})</label>
+            <button type="button" onClick={addIncident} className="flex items-center gap-1 font-mono text-xs text-redlake-glow hover:text-white">
+              <Plus className="h-3 w-3" /> Ajouter
+            </button>
+          </div>
+          <div className="space-y-2">
+            {form.incidents.length === 0 && (
+              <p className="rounded border border-dashed border-metal p-3 text-center text-xs text-gray-600">Aucun incident enregistré.</p>
+            )}
+            {form.incidents.map((inc, i) => (
+              <div key={i} className="flex flex-col gap-2 rounded border border-metal p-3 sm:flex-row">
+                <input
+                  type="date"
+                  className={inputClass + " sm:w-44"}
+                  value={inc.date}
+                  onChange={(e) => updateIncident(i, { date: e.target.value })}
+                />
+                <textarea
+                  rows={2}
+                  className={inputClass + " flex-1"}
+                  placeholder="Résumé de l'incident"
+                  value={inc.summary}
+                  onChange={(e) => updateIncident(i, { summary: e.target.value })}
+                />
+                <button type="button" onClick={() => removeIncident(i)} className="self-start rounded border border-red-400/40 p-1.5 text-red-400 hover:bg-red-400/10" title="Retirer">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
+
         <div>
-          <label className="mb-1 block font-mono text-xs text-gray-500">
-            {'Tests (JSON — [{"date","researcher","result"}])'}
-          </label>
-          <textarea rows={3} className={monoClass} value={form.tests} onChange={(e) => update("tests", e.target.value)} />
+          <div className="mb-1 flex items-center justify-between">
+            <label className="block font-mono text-xs text-gray-500">Journal des tests ({form.tests.length})</label>
+            <button type="button" onClick={addTest} className="flex items-center gap-1 font-mono text-xs text-redlake-glow hover:text-white">
+              <Plus className="h-3 w-3" /> Ajouter
+            </button>
+          </div>
+          <div className="space-y-2">
+            {form.tests.length === 0 && (
+              <p className="rounded border border-dashed border-metal p-3 text-center text-xs text-gray-600">Aucun test enregistré.</p>
+            )}
+            {form.tests.map((test, i) => (
+              <div key={i} className="space-y-2 rounded border border-metal p-3">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    type="date"
+                    className={inputClass + " sm:w-44"}
+                    value={test.date}
+                    onChange={(e) => updateTest(i, { date: e.target.value })}
+                  />
+                  <input
+                    className={inputClass + " flex-1"}
+                    placeholder="Chercheur responsable"
+                    value={test.researcher}
+                    onChange={(e) => updateTest(i, { researcher: e.target.value })}
+                  />
+                  <button type="button" onClick={() => removeTest(i)} className="self-start rounded border border-red-400/40 p-1.5 text-red-400 hover:bg-red-400/10" title="Retirer">
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <textarea
+                  rows={2}
+                  className={inputClass}
+                  placeholder="Résultat du test"
+                  value={test.result}
+                  onChange={(e) => updateTest(i, { result: e.target.value })}
+                />
+              </div>
+            ))}
+          </div>
         </div>
+
         <div>
-          <label className="mb-1 block font-mono text-xs text-gray-500">
-            {'Addendums (JSON — [{"author","content"}])'}
-          </label>
-          <textarea rows={3} className={monoClass} value={form.addendums} onChange={(e) => update("addendums", e.target.value)} />
+          <div className="mb-1 flex items-center justify-between">
+            <label className="block font-mono text-xs text-gray-500">Addendums ({form.addendums.length})</label>
+            <button type="button" onClick={addAddendum} className="flex items-center gap-1 font-mono text-xs text-redlake-glow hover:text-white">
+              <Plus className="h-3 w-3" /> Ajouter
+            </button>
+          </div>
+          <div className="space-y-2">
+            {form.addendums.length === 0 && (
+              <p className="rounded border border-dashed border-metal p-3 text-center text-xs text-gray-600">Aucun addendum.</p>
+            )}
+            {form.addendums.map((add, i) => (
+              <div key={i} className="space-y-2 rounded border border-metal p-3">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    className={inputClass + " flex-1"}
+                    placeholder="Auteur (ex: Dr. Kovacs)"
+                    value={add.author}
+                    onChange={(e) => updateAddendum(i, { author: e.target.value })}
+                  />
+                  <button type="button" onClick={() => removeAddendum(i)} className="self-start rounded border border-red-400/40 p-1.5 text-red-400 hover:bg-red-400/10" title="Retirer">
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <textarea
+                  rows={2}
+                  className={inputClass}
+                  placeholder="Contenu de l'addendum"
+                  value={add.content}
+                  onChange={(e) => updateAddendum(i, { content: e.target.value })}
+                />
+                {(add.restrictedDepartmentIds?.length ?? 0) > 0 && (
+                  <p className="font-mono text-[10px] text-gray-600">
+                    Restreint à {add.restrictedDepartmentIds!.length} département(s) — modifiable via le champ de restriction global si besoin.
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         <button

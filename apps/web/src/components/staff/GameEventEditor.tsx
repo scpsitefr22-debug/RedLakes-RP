@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
@@ -8,6 +8,12 @@ import { Save, ArrowLeft, Trash2 } from "lucide-react";
 import { DepartmentMultiSelect } from "@/components/staff/DepartmentMultiSelect";
 
 const EVENT_TYPES = ["breach", "invasion", "guerre", "crise-xk", "experience"];
+
+interface FactionOption {
+  id: string;
+  slug: string;
+  name: string;
+}
 
 export interface GameEventFormData {
   slug: string;
@@ -18,6 +24,7 @@ export interface GameEventFormData {
   casualties: string;
   outcome: string;
   restrictedDepartmentIds: string[];
+  factionId: string;
 }
 
 interface GameEventEditorProps {
@@ -37,9 +44,15 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
     casualties: initial?.casualties ?? "",
     outcome: initial?.outcome ?? "",
     restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
+    factionId: initial?.factionId ?? "",
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [factions, setFactions] = useState<FactionOption[]>([]);
+
+  useEffect(() => {
+    apiFetch<FactionOption[]>("/factions").then(setFactions).catch(() => undefined);
+  }, []);
 
   const update = (key: keyof GameEventFormData, value: string) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -67,6 +80,7 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
         casualties: form.casualties || undefined,
         outcome: form.outcome,
         restrictedDepartmentIds: form.restrictedDepartmentIds,
+        factionId: form.factionId || undefined,
       };
 
       if (mode === "create") {
@@ -151,6 +165,17 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
           value={form.restrictedDepartmentIds}
           onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
         />
+        <div>
+          <label className="mb-1 block font-mono text-xs text-gray-500">
+            Faction liée (optionnel — affiché sur la fiche de la faction)
+          </label>
+          <select className={inputClass} value={form.factionId} onChange={(e) => update("factionId", e.target.value)}>
+            <option value="">— Aucune —</option>
+            {factions.map((f) => (
+              <option key={f.id} value={f.id}>{f.name}</option>
+            ))}
+          </select>
+        </div>
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">Description</label>
           <textarea rows={3} className={inputClass} value={form.description} onChange={(e) => update("description", e.target.value)} />

@@ -1,0 +1,26 @@
+name: Keep Render services awake
+
+# Le plan gratuit Render met les services en veille apres ~15 min sans
+# requete — la premiere visite qui suit met jusqu'a une minute a repondre
+# (voir docs/REDLAKES-CORE-SPEC.md). Ce ping toutes les 10 min maintient
+# l'API et le site eveilles pour de vrai — ce n'est pas un correctif cote
+# code, juste un contournement gratuit de la limite du plan gratuit.
+#
+# Limite connue : GitHub desactive automatiquement les workflows planifies
+# d'un depot sans aucune activite (commit/push) depuis 60 jours — il faudra
+# le reactiver manuellement (onglet Actions -> ce workflow -> Enable) si ca
+# arrive.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API
+        run: curl -fsS --max-time 90 https://redlakes-api.onrender.com/api/health || true
+      - name: Ping site
+        run: curl -fsS --max-time 90 https://redlakes-web.onrender.com/ || true

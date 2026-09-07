@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Search, X, FileText, Users, MapPin, BookOpen, Shield } from "lucide-react";
+import { Search, X, FileText, Users, MapPin, BookOpen, Shield, FileLock2 } from "lucide-react";
 import Link from "next/link";
-import { searchAll, type SearchResult } from "@/lib/search";
 import { apiFetch } from "@/lib/api";
 
 const typeIcons: Record<string, React.ReactNode> = {
@@ -15,7 +14,7 @@ const typeIcons: Record<string, React.ReactNode> = {
   location: <MapPin className="h-4 w-4 text-green-400" />,
   character: <Users className="h-4 w-4 text-purple-400" />,
   department: <Shield className="h-4 w-4 text-gray-400" />,
-  mtf: <Shield className="h-4 w-4 text-red-400" />,
+  document: <FileLock2 className="h-4 w-4 text-red-400" />,
 };
 
 interface GlobalSearchProps {
@@ -23,7 +22,7 @@ interface GlobalSearchProps {
   onClose: () => void;
 }
 
-interface ApiSearchHit {
+interface SearchResult {
   id: string;
   type: string;
   title: string;
@@ -34,32 +33,29 @@ interface ApiSearchHit {
 export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [error, setError] = useState(false);
 
   const handleSearch = useCallback(async (q: string) => {
     setQuery(q);
     if (!q.trim()) {
       setResults([]);
+      setError(false);
       return;
     }
 
-    const local = searchAll(q);
     try {
-      const apiResults = await apiFetch<ApiSearchHit[]>(`/search?q=${encodeURIComponent(q)}`);
-      const merged = [
-        ...apiResults.map((r) => ({
-          id: r.id,
-          title: r.title,
-          type: r.type as SearchResult["type"],
-          href: r.href,
-          excerpt: r.excerpt,
-        })),
-        ...local.filter(
-          (l) => !apiResults.some((a) => a.href === l.href)
-        ),
-      ];
-      setResults(merged.slice(0, 20));
+      // Recherche live cote API (filtree par habilitation departement du
+      // demandeur cote serveur) — plus de repli sur un index statique
+      // fige : ce repli ne reflétait jamais les modifications faites via
+      // le CMS et, plus grave, n'avait aucune notion de restriction par
+      // departement (un contenu classifie pouvait fuiter dans les
+      // resultats de recherche d'un visiteur non autorise).
+      const apiResults = await apiFetch<SearchResult[]>(`/search?q=${encodeURIComponent(q)}`);
+      setResults(apiResults.slice(0, 20));
+      setError(false);
     } catch {
-      setResults(local);
+      setResults([]);
+      setError(true);
     }
   }, []);
 
@@ -67,6 +63,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
     if (!open) {
       setQuery("");
       setResults([]);
+      setError(false);
     }
   }, [open]);
 
@@ -99,7 +96,12 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
             </button>
           </div>
           <div className="max-h-[50vh] overflow-y-auto p-2">
-            {query && results.length === 0 && (
+            {error && (
+              <p className="px-4 py-8 text-center font-mono text-sm text-red-400">
+                Recherche indisponible — API hors ligne.
+              </p>
+            )}
+            {!error && query && results.length === 0 && (
               <p className="px-4 py-8 text-center font-mono text-sm text-gray-500">
                 Aucun résultat pour &quot;{query}&quot;
               </p>
@@ -120,7 +122,7 @@ export function GlobalSearch({ open, onClose }: GlobalSearchProps) {
             ))}
             {!query && (
               <p className="px-4 py-8 text-center font-mono text-xs text-gray-600">
-                SCP • Factions • Lore • Événements • Elasticsearch
+                SCP • Factions • Lore • Personnages • Événements • Documents classifiés
               </p>
             )}
           </div>

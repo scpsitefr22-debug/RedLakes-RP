@@ -7,6 +7,7 @@ import { Grade, Faction, Team, UserRole, StaffRank, PlatformEntityType } from '@
 
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../platform/audit.service';
+import { clearanceForGrade } from './grade-clearance';
 
 const MAX_CHARACTERS_PER_ACCOUNT = 5;
 
@@ -63,6 +64,10 @@ export class PlayersService {
 
       discordUsername: string | null;
 
+      username: string | null;
+
+      passwordHash: string | null;
+
       createdAt: Date;
     };
   }) {
@@ -70,6 +75,12 @@ export class PlayersService {
       grade: player.grade,
 
       gradeInfo: player.gradeInfo,
+
+      // Habilitation reelle du catalogue en priorite, regex en filet de
+      // securite pour un grade texte libre hors catalogue (voir aussi
+      // reports.service.ts, meme principe) — jamais recalculee/simulee
+      // cote client (regle du spec CORE : clearance verifiee cote API).
+      clearanceLevel: player.gradeInfo?.clearanceLevel ?? clearanceForGrade(player.grade),
 
       faction: player.faction,
 
@@ -111,6 +122,10 @@ export class PlayersService {
         discordLinked: !!player.user.discordId,
 
         discordUsername: player.user.discordUsername,
+
+        redlakesUsername: player.user.username,
+
+        hasPassword: !!player.user.passwordHash,
 
         createdAt: player.user.createdAt,
       },
@@ -237,6 +252,10 @@ export class PlayersService {
 
             discordUsername: true,
 
+            username: true,
+
+            passwordHash: true,
+
             createdAt: true,
 
             role: true,
@@ -279,6 +298,10 @@ export class PlayersService {
             discordId: true,
 
             discordUsername: true,
+
+            username: true,
+
+            passwordHash: true,
 
             createdAt: true,
           },
@@ -404,6 +427,114 @@ export class PlayersService {
     });
 
     return this.getDashboard(userId);
+  }
+
+  /** Personnages RP d'un compte, vus par le staff via son pseudo Minecraft. */
+  async listCharactersByUsername(username: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { minecraftUsername: username },
+      select: { id: true, activeCharacterId: true },
+    });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+
+    const characters = await this.prisma.player.findMany({
+      where: { userId: user.id },
+      include: { factionInfo: true, gradeInfo: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return characters.map((c) => ({
+      id: c.id,
+      grade: c.grade,
+      gradeInfo: c.gradeInfo,
+      faction: c.faction,
+      factionInfo: c.factionInfo,
+      rpFirstName: c.rpFirstName,
+      rpLastName: c.rpLastName,
+      createdAt: c.createdAt,
+      active: c.id === user.activeCharacterId,
+    }));
+  }
+
+  /**
+   * Suppression d'un personnage RP — reservee au STAFF/ADMIN (voir @Roles
+   * sur le controller), jamais en self-service pour un PLAYER : un joueur
+   * simple ne doit pas pouvoir effacer son propre historique RP (sanctions,
+   * affectations) sans validation. Si le personnage supprime etait le
+   * personnage actif du compte, on bascule automatiquement sur un autre
+   * personnage restant (sinon le compte se retrouve onboarded mais sans
+   * personnage actif).
+   */
+  async deleteCharacter(
+    username: string,
+    characterId: string,
+    actorId: string,
+    actorLabel: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { minecraftUsername: username },
+      select: { id: true, activeCharacterId: true },
+    });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+
+    await this.deleteCharacterForUser(user.id, characterId, actorId, actorLabel, username);
+
+    return this.listCharactersByUsername(username);
+  }
+
+  /**
+   * Meme suppression que `deleteCharacter`, mais adressee par userId plutot
+   * que par pseudo Minecraft — utilisee par le raccourci self-service
+   * `DELETE /players/me/characters/:id` (toujours reserve STAFF/ADMIN via
+   * @Roles sur le controller) pour qu'un membre du staff puisse nettoyer
+   * ses PROPRES personnages de test directement depuis son tableau de bord,
+   * sans passer par la fiche joueur d'un pseudo.
+   */
+  async deleteCharacterForUser(
+    userId: string,
+    characterId: string,
+    actorId: string,
+    actorLabel: string,
+    actorUsername?: string,
+  ) {
+    const character = await this.prisma.player.findUnique({
+      where: { id: characterId },
+    });
+    if (!character || character.userId !== userId) {
+      throw new NotFoundException('Personnage introuvable');
+    }
+
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { activeCharacterId: true },
+    });
+
+    if (character.id === user.activeCharacterId) {
+      const fallback = await this.prisma.player.findFirst({
+        where: { userId, id: { not: characterId } },
+        orderBy: { createdAt: 'asc' },
+      });
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { activeCharacterId: fallback?.id ?? null },
+      });
+    }
+
+    await this.prisma.player.delete({ where: { id: characterId } });
+
+    await this.audit.log({
+      entityType: PlatformEntityType.PLAYER,
+      entityId: characterId,
+      action: 'DELETED',
+      actorId,
+      actorLabel,
+      summary: `Personnage RP supprimé : ${[character.rpFirstName, character.rpLastName].filter(Boolean).join(' ') || characterId}${actorUsername ? ` (${actorUsername})` : ''}`,
+      metadata: {
+        targetUserId: userId,
+        grade: character.grade,
+        faction: character.faction,
+      },
+    });
   }
 
   /**

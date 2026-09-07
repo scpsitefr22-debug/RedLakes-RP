@@ -6,6 +6,7 @@ export interface ApiGrade {
   name: string;
   branch: string;
   tier: string;
+  clearanceLevel: number;
   departmentId: string | null;
   pay: number | null;
   quota: number | null;

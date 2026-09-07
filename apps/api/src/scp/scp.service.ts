@@ -1,5 +1,11 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PlatformEntityType, Prisma, ScpClass, ScpProposalStatus } from '@prisma/client';
+import {
+  ClassifiedDocumentStatus,
+  PlatformEntityType,
+  Prisma,
+  ScpClass,
+  ScpProposalStatus,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateScpObjectDto, UpdateScpObjectDto } from './dto/scp-object.dto';
 import { ProposeScpDto } from './dto/propose-scp.dto';
@@ -45,12 +51,23 @@ export class ScpService {
   }
 
   async findOne(slug: string, departmentId: string | null = null) {
-    const scp = await this.prisma.scpObject.findUnique({ where: { slug } });
+    const scp = await this.prisma.scpObject.findUnique({
+      where: { slug },
+      include: {
+        linkedDocuments: {
+          where: { status: ClassifiedDocumentStatus.PUBLISHED },
+          select: { id: true, slug: true, title: true, excerpt: true, restrictedDepartmentIds: true },
+        },
+      },
+    });
     if (!scp || scp.status !== ScpProposalStatus.APPROVED) return null;
     if (!isVisibleToDepartment(scp.restrictedDepartmentIds, departmentId)) {
       throw new NotFoundException('Accès restreint à un autre département');
     }
-    return redactAddendums(scp, departmentId);
+    return {
+      ...redactAddendums(scp, departmentId),
+      linkedDocuments: filterByDepartment(scp.linkedDocuments, departmentId),
+    };
   }
 
   findById(id: string) {

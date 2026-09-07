@@ -7,7 +7,9 @@ import { type ClearanceLevel } from "@/lib/clearance";
 import { type Transmission } from "@/lib/transmissions";
 import { TransmissionsFeed } from "./TransmissionsFeed";
 
-const FULL_CLEARANCE = 5 as ClearanceLevel;
+function clampClearance(n: number): ClearanceLevel {
+  return Math.min(Math.max(Math.round(n), 1), 5) as ClearanceLevel;
+}
 
 export function TransmissionsFeedConnected({
   transmissions,
@@ -15,12 +17,20 @@ export function TransmissionsFeedConnected({
   transmissions: Transmission[];
 }) {
   const [authenticated, setAuthenticated] = useState(false);
+  const [clearance, setClearance] = useState<ClearanceLevel>(1);
 
   useEffect(() => {
     (async () => {
       try {
         const auth = await apiFetch<{ authenticated: boolean }>("/auth/me");
         setAuthenticated(auth.authenticated);
+        if (auth.authenticated) {
+          // Habilitation reelle du personnage actif (resolue cote API), pas
+          // une valeur simulee — voir la regle "clearance toujours verifiee
+          // cote API" du spec CORE.
+          const player = await apiFetch<{ clearanceLevel: number }>("/players/me");
+          setClearance(clampClearance(player.clearanceLevel));
+        }
       } catch {
         setAuthenticated(false);
       }
@@ -42,7 +52,7 @@ export function TransmissionsFeedConnected({
       )}
       <TransmissionsFeed
         transmissions={transmissions}
-        playerClearance={authenticated ? FULL_CLEARANCE : undefined}
+        playerClearance={authenticated ? clearance : undefined}
         authenticated={authenticated}
       />
     </div>

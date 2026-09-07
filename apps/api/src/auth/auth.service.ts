@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { DiscordService } from '../sync/discord.service';
 import { User } from '@prisma/client';
 import { randomBytes } from 'crypto';
+import * as bcrypt from 'bcryptjs';
 
 export type AuthUser = User & {
   activeCharacter?: {
@@ -135,7 +136,17 @@ export class AuthService {
     });
   }
 
-  async handleDiscordCallback(code: string): Promise<AuthUser> {
+  /**
+   * Echange le code OAuth Discord contre le profil Discord verifie (token +
+   * appartenance au serveur). Partage par les deux usages du callback :
+   * lier un compte deja connecte (chemin normal desormais) et l'ancien
+   * chemin login-par-Discord (repli, voir handleDiscordCallback).
+   */
+  private async exchangeDiscordCode(code: string): Promise<{
+    discordId: string;
+    displayName: string;
+    discordAvatar: string;
+  }> {
     const clientId = this.config.get('DISCORD_CLIENT_ID');
     const clientSecret = this.config.get('DISCORD_CLIENT_SECRET');
     const redirectUri = this.config.get('DISCORD_OAUTH_REDIRECT_URI');
@@ -185,15 +196,68 @@ export class AuthService {
       ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png?size=128`
       : `https://cdn.discordapp.com/embed/avatars/${Number(profile.id) % 5}.png`;
 
+    return { discordId: profile.id, displayName, discordAvatar };
+  }
+
+  /**
+   * Chemin normal desormais : lie Discord au compte DEJA connecte (cree par
+   * pseudo/mot de passe), plutot que de creer/retrouver un compte distinct
+   * par discordId. Sans ca, cliquer "Lier mon compte Discord" en etant deja
+   * connecte remplacait silencieusement la session par un AUTRE compte —
+   * exactement le bug signale (deux comptes "Adams Wolf" separes).
+   */
+  async linkDiscordAccount(userId: string, code: string): Promise<AuthUser> {
+    const { discordId, displayName } = await this.exchangeDiscordCode(code);
+
+    const conflictingUser = await this.prisma.user.findUnique({
+      where: { discordId },
+    });
+    if (conflictingUser && conflictingUser.id !== userId) {
+      throw new BadRequestException('DISCORD_ALREADY_LINKED');
+    }
+
+    // avatarUrl volontairement absent du data — ne jamais ecraser un avatar deja choisi.
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        discordId,
+        discordUsername: displayName,
+      },
+      include: { activeCharacter: true },
+    });
+
+    if (user.activeCharacter) {
+      await this.discord.syncMemberProfile({
+        discordId,
+        minecraftUsername: user.minecraftUsername ?? displayName,
+        grade: user.activeCharacter.grade,
+        faction: user.activeCharacter.faction,
+        teamName: user.activeCharacter.teamName,
+      });
+    }
+
+    return user;
+  }
+
+  /**
+   * Repli : connexion directe par Discord pour un visiteur SANS session en
+   * cours (retrouve ou cree un compte par discordId). Le controleur ne
+   * l'utilise que si aucun cookie de session n'est present — le chemin
+   * normal est desormais linkDiscordAccount ci-dessus.
+   */
+  async handleDiscordCallback(code: string): Promise<AuthUser> {
+    const { discordId, displayName, discordAvatar } =
+      await this.exchangeDiscordCode(code);
+
     const user = await this.findOrCreateDiscordUser({
-      discordId: profile.id,
+      discordId,
       displayName,
       discordAvatar,
     });
 
     if (user.activeCharacter) {
       await this.discord.syncMemberProfile({
-        discordId: profile.id,
+        discordId,
         minecraftUsername: user.minecraftUsername ?? displayName,
         grade: user.activeCharacter.grade,
         faction: user.activeCharacter.faction,
@@ -296,6 +360,113 @@ export class AuthService {
       include: { activeCharacter: true },
     });
     return this.withActiveCharacter(user);
+  }
+
+  /**
+   * Creation d'un compte REDLAKES par pseudo + mot de passe — chemin de
+   * connexion principal desormais, Discord ne servant plus qu'a la liaison
+   * (voir linkDiscord/createDiscordLinkCode dans SyncService). Reutilise
+   * withActiveCharacter comme tous les autres chemins de creation de compte
+   * (Discord, dev-login) pour que l'onboarding (/bienvenue) se declenche
+   * pareil quelle que soit la methode d'inscription.
+   */
+  async register(username: string, password: string): Promise<AuthUser> {
+    const normalized = username.toLowerCase();
+    const existing = await this.prisma.user.findUnique({
+      where: { username: normalized },
+    });
+    if (existing) {
+      throw new BadRequestException('Ce pseudo est deja pris');
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = await this.prisma.user.create({
+      data: {
+        username: normalized,
+        passwordHash,
+        avatarUrl: `https://mc-heads.net/avatar/${encodeURIComponent(normalized)}/64`,
+      },
+      include: { activeCharacter: true },
+    });
+    return this.withActiveCharacter(user);
+  }
+
+  /**
+   * Connexion par mot de passe. Message d'erreur volontairement identique
+   * (pseudo inconnu ou mot de passe incorrect) pour ne jamais reveler si un
+   * pseudo existe deja — enumeration classique a eviter.
+   */
+  async login(username: string, password: string): Promise<AuthUser> {
+    const user = await this.prisma.user.findUnique({
+      where: { username: username.toLowerCase() },
+      include: { activeCharacter: true },
+    });
+    if (!user?.passwordHash) {
+      throw new UnauthorizedException('Identifiants invalides');
+    }
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) {
+      throw new UnauthorizedException('Identifiants invalides');
+    }
+    return this.withActiveCharacter(user);
+  }
+
+  /**
+   * Permet a un compte deja connecte (typiquement via Discord/dev-login,
+   * sans mot de passe) d'en definir un — chemin de migration pour les
+   * comptes existants sans verrouiller personne dehors. Ces comptes n'ont
+   * jamais eu de `username` (pseudo de connexion) non plus — sans lui,
+   * POST /auth/login ne pourrait jamais les retrouver — donc le pseudo est
+   * exige ici tant que le compte n'en a pas deja un.
+   */
+  async setPassword(
+    userId: string,
+    password: string,
+    username?: string,
+    currentPassword?: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { username: true, passwordHash: true },
+    });
+
+    // Changement (pas premiere definition) — exige et verifie l'ancien mot
+    // de passe, pour qu'une session volee ne suffise pas a en verrouiller
+    // le veritable proprietaire dehors.
+    if (user.passwordHash) {
+      if (!currentPassword) {
+        throw new BadRequestException('Mot de passe actuel requis');
+      }
+      const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!valid) {
+        throw new UnauthorizedException('Mot de passe actuel incorrect');
+      }
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    if (!user.username) {
+      if (!username) {
+        throw new BadRequestException('Pseudo de connexion requis');
+      }
+      const normalized = username.toLowerCase();
+      const existing = await this.prisma.user.findUnique({
+        where: { username: normalized },
+      });
+      if (existing) {
+        throw new BadRequestException('Ce pseudo est deja pris');
+      }
+      await this.prisma.user.update({
+        where: { id: userId },
+        data: { passwordHash, username: normalized },
+      });
+      return;
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
   }
 
   async getMe(token: string): Promise<AuthUser | null> {

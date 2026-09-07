@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
+import { CLEARANCE_LABELS } from "@/lib/clearance";
 import { Save, ArrowLeft, Trash2 } from "lucide-react";
 
 const BRANCHES = [
@@ -27,6 +28,7 @@ export interface GradeFormData {
   name: string;
   branch: string;
   tier: string;
+  clearanceLevel: string;
   departmentId: string;
   departmentRefId: string;
   pay: string;
@@ -52,6 +54,7 @@ export function GradeEditor({ initial, gradeId, mode }: GradeEditorProps) {
     name: initial?.name ?? "",
     branch: initial?.branch ?? "securite",
     tier: initial?.tier ?? "",
+    clearanceLevel: initial?.clearanceLevel ?? "1",
     departmentId: initial?.departmentId ?? "",
     departmentRefId: initial?.departmentRefId ?? "",
     pay: initial?.pay ?? "",
@@ -96,6 +99,7 @@ export function GradeEditor({ initial, gradeId, mode }: GradeEditorProps) {
         name: form.name,
         branch: form.branch,
         tier: form.tier,
+        clearanceLevel: Number(form.clearanceLevel),
         departmentId: form.departmentId || undefined,
         departmentRefId: form.departmentRefId || undefined,
         pay: form.pay === "" ? undefined : Number(form.pay),
@@ -197,6 +201,17 @@ export function GradeEditor({ initial, gradeId, mode }: GradeEditorProps) {
             <label className="mb-1 block font-mono text-xs text-gray-500">Tier</label>
             <input className={inputClass} value={form.tier} onChange={(e) => update("tier", e.target.value)} placeholder="officier, troupe, admin..." />
           </div>
+        </div>
+        <div>
+          <label className="mb-1 block font-mono text-xs text-gray-500">Niveau d&apos;habilitation</label>
+          <select className={inputClass} value={form.clearanceLevel} onChange={(e) => update("clearanceLevel", e.target.value)}>
+            {Object.entries(CLEARANCE_LABELS).map(([level, label]) => (
+              <option key={level} value={level}>{label}</option>
+            ))}
+          </select>
+          <p className="mt-1 font-mono text-[10px] text-gray-600">
+            Détermine l&apos;accès aux rapports/documents classifiés — pas seulement décoratif.
+          </p>
         </div>
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">Département</label>

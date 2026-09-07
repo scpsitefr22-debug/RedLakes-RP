@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Award, Banknote, MapPin, ShieldCheck, Users } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { Badge } from "@/components/ui/Badge";
-import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
+import { EditableText } from "@/components/staff/EditableText";
+import { OptionalSection } from "@/components/staff/OptionalSection";
 import {
   BRANCH_LABELS,
   TIER_LABELS,
@@ -61,7 +62,13 @@ export default async function GradeDetailPage({ params }: Props) {
         <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
           {BRANCH_LABELS[grade.branch] ?? grade.branch}
         </p>
-        <h1 className="text-4xl font-bold text-white">{grade.name}</h1>
+        <EditableText
+          as="h1"
+          className="text-4xl font-bold text-white"
+          value={grade.name}
+          endpoint={`/grades/${grade.id}`}
+          field="name"
+        />
         {grade.departmentRef && (
           <p className="mt-2 text-gray-500">
             Département :{" "}
@@ -102,12 +109,20 @@ export default async function GradeDetailPage({ params }: Props) {
         </section>
       </div>
 
-      {grade.description && (
+      <OptionalSection show={!!grade.description}>
         <section className="mt-6 hologram-border rounded-lg p-6">
           <h2 className="mb-3 text-xl font-bold text-white">Description</h2>
-          <DiscordMarkdown text={grade.description} className="text-gray-400" />
+          <EditableText
+            value={grade.description}
+            endpoint={`/grades/${grade.id}`}
+            field="description"
+            multiline
+            markdown
+            className="text-gray-400"
+            placeholder="Cliquer pour ajouter une description…"
+          />
         </section>
-      )}
+      </OptionalSection>
 
       {grade.objectives.length > 0 && (
         <section className="mt-6 hologram-border rounded-lg p-6">
