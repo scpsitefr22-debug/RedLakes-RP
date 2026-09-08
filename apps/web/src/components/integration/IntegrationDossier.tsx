@@ -183,6 +183,11 @@ export function IntegrationDossier() {
         </p>
       </div>
 
+      <p className="mb-6 rounded border border-metal/40 bg-black/30 px-4 py-2 text-center font-mono text-[10px] uppercase tracking-widest text-gray-600">
+        Hors RP — ce mémo est un tutoriel qui vous fait découvrir le site, pas un
+        événement de l&apos;histoire
+      </p>
+
       <div className="hologram-border space-y-5 rounded-lg p-6">
         {BLANKS.map((b, i) => (
           <div key={b.id} className="border-b border-metal/30 pb-5 last:border-0 last:pb-0">

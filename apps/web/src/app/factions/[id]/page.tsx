@@ -131,6 +131,9 @@ export default async function FactionDetailPage({ params }: Props) {
       <div className="prose-redlake space-y-8">
         {roleCategories.length > 0 && (
           <section className="faction-card p-6">
+            <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-gray-600">
+              Guide pratique — hors RP
+            </p>
             <h2 className="faction-heading mb-2 flex items-center gap-2 text-xl font-bold text-white">
               <Users className="h-5 w-5 faction-accent" />
               Ce que tu fais dans cette faction
