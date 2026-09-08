@@ -7,7 +7,10 @@ import { apiFetch } from "@/lib/api";
 
 interface MeResponse {
   authenticated: boolean;
-  user?: { rpFirstName?: string | null; username?: string | null };
+  user?: {
+    redlakesUsername?: string | null;
+    activeCharacter?: { rpFirstName?: string | null } | null;
+  };
 }
 
 const BOOT_LINES = [
@@ -59,7 +62,7 @@ export function SiteIntro({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  const name = me.user?.rpFirstName || me.user?.username;
+  const name = me.user?.activeCharacter?.rpFirstName || me.user?.redlakesUsername;
 
   return (
     <div className="scanlines crt-noise flex min-h-[85vh] items-center justify-center px-4 py-16">
