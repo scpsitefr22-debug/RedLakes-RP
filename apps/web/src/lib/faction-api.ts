@@ -1,5 +1,19 @@
 import { cookies } from "next/headers";
 import { API_URL } from "@/lib/api";
+import type { ApiFaction, ApiFactionRelation, FactionMember } from "@/lib/faction-types";
+
+export type {
+  ApiDepartment,
+  ApiFaction,
+  ApiFactionRelation,
+  FactionEvent,
+  FactionMember,
+} from "@/lib/faction-types";
+export {
+  FACTION_RELATION_COLORS,
+  FACTION_RELATION_LABELS,
+} from "@/lib/faction-types";
+export type { FactionRelationStatus } from "@/lib/faction-types";
 
 /**
  * Ces endpoints distinguent visiteur anonyme / connecte (departements
@@ -10,47 +24,6 @@ import { API_URL } from "@/lib/api";
 async function authHeaders(): Promise<HeadersInit | undefined> {
   const token = (await cookies()).get("redlakes_token")?.value;
   return token ? { Cookie: `redlakes_token=${token}` } : undefined;
-}
-
-export interface ApiDepartment {
-  id: string;
-  slug: string;
-  name: string;
-  factionId: string;
-  omegaTier: string | null;
-  directorGradeName: string | null;
-  color: string | null;
-  utilities: string[];
-  objectives: string[];
-  chefId: string | null;
-  deputyIds: string[];
-  budget: number;
-}
-
-export interface ApiFaction {
-  id: string;
-  slug: string;
-  name: string;
-  tagline: string | null;
-  description: string | null;
-  history: string | null;
-  color: string | null;
-  playable: boolean;
-  objectives: string[];
-  chefId: string | null;
-  deputyIds: string[];
-  budget: number;
-  departments: ApiDepartment[];
-  memberCount: number;
-  topGrade: { name: string; pay: number } | null;
-}
-
-export interface FactionMember {
-  rpFirstName: string | null;
-  rpLastName: string | null;
-  grade: string;
-  minecraftUsername: string | null;
-  avatarUrl: string | null;
 }
 
 export async function getFactionMembers(slug: string): Promise<FactionMember[]> {
@@ -64,15 +37,6 @@ export async function getFactionMembers(slug: string): Promise<FactionMember[]> 
   } catch {
     return [];
   }
-}
-
-export interface FactionEvent {
-  id: string;
-  slug: string;
-  title: string;
-  date: string;
-  type: string;
-  outcome: string;
 }
 
 /** Pattern de fetch établi (server component + revalidate ISR) — voir src/app/grades/page.tsx */
@@ -100,29 +64,6 @@ export async function getFaction(slug: string): Promise<ApiFaction | null> {
   } catch {
     return null;
   }
-}
-
-export type FactionRelationStatus = "ALLIE" | "NEUTRE" | "TENSION" | "HOSTILE";
-
-export const FACTION_RELATION_LABELS: Record<FactionRelationStatus, string> = {
-  ALLIE: "Alliée",
-  NEUTRE: "Neutre",
-  TENSION: "Tensions",
-  HOSTILE: "Hostile / En guerre",
-};
-
-export const FACTION_RELATION_COLORS: Record<FactionRelationStatus, string> = {
-  ALLIE: "border-green-400/40 text-green-400",
-  NEUTRE: "border-metal text-gray-400",
-  TENSION: "border-yellow-400/40 text-yellow-400",
-  HOSTILE: "border-red-400/40 text-red-400",
-};
-
-export interface ApiFactionRelation {
-  id: string;
-  status: FactionRelationStatus;
-  note: string | null;
-  faction: { id: string; slug: string; name: string; color: string | null };
 }
 
 export async function getFactionRelations(

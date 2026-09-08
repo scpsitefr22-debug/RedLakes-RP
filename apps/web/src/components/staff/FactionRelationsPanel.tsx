@@ -6,7 +6,7 @@ import {
   FACTION_RELATION_LABELS,
   type ApiFactionRelation,
   type FactionRelationStatus,
-} from "@/lib/faction-api";
+} from "@/lib/faction-types";
 import { Handshake, Plus, X } from "lucide-react";
 
 interface FactionOption {
