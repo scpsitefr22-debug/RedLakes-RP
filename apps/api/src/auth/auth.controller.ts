@@ -20,6 +20,8 @@ import { SyncService } from '../sync/sync.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { SetPasswordDto } from './dto/set-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -133,6 +135,25 @@ export class AuthController {
     const token = await this.auth.createSession(user.id);
     this.setSessionCookie(res, token);
     return { success: true, user: { username: user.username } };
+  }
+
+  @Post('forgot-password')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.auth.forgotPassword(dto.username);
+    return { success: true };
+  }
+
+  @Post('reset-password')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  async resetPassword(
+    @Body() dto: ResetPasswordDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const userId = await this.auth.resetPassword(dto.token, dto.password);
+    const token = await this.auth.createSession(userId);
+    this.setSessionCookie(res, token);
+    return { success: true };
   }
 
   @Patch('set-password')

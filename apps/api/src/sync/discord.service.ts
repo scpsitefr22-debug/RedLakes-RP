@@ -257,6 +257,55 @@ export class DiscordService {
     }
   }
 
+  /**
+   * DM direct a un utilisateur (ex. code de reinitialisation de mot de
+   * passe) — pas de webhook possible pour un DM, il faut le token du bot.
+   * Deux appels REST Discord : ouvrir/recuperer le canal DM, puis y poster
+   * le message. Meme convention que postToContentChannel : jamais
+   * d'exception remontee a l'appelant, juste un booleen + log en cas
+   * d'echec (pas de notification bloquante pour l'appelant).
+   */
+  async sendDirectMessage(discordId: string, content: string): Promise<boolean> {
+    const token = this.config.get<string>('DISCORD_BOT_TOKEN');
+    if (!token) return false;
+
+    try {
+      const channelRes = await fetch('https://discord.com/api/v10/users/@me/channels', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bot ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ recipient_id: discordId }),
+      });
+      if (!channelRes.ok) {
+        this.logger.warn(`Ouverture DM Discord échouée (${channelRes.status}): ${await channelRes.text()}`);
+        return false;
+      }
+      const { id: channelId } = (await channelRes.json()) as { id: string };
+
+      const messageRes = await fetch(
+        `https://discord.com/api/v10/channels/${channelId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bot ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content }),
+        },
+      );
+      if (!messageRes.ok) {
+        this.logger.warn(`Envoi DM Discord échoué (${messageRes.status}): ${await messageRes.text()}`);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      this.logger.warn(`DM Discord échoué: ${err}`);
+      return false;
+    }
+  }
+
   /** Nouveau document classifié publié (statut PUBLISHED, pas restreint à un département) */
   async notifyDocumentPublished(params: {
     title: string;

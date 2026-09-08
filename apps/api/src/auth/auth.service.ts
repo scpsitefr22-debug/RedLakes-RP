@@ -472,4 +472,50 @@ export class AuthService {
   async getMe(token: string): Promise<AuthUser | null> {
     return this.validateSession(token);
   }
+
+  /**
+   * Reponse volontairement identique que le compte existe ou non, et qu'il
+   * ait Discord lie ou non — meme principe anti-enumeration que login().
+   * Sans Discord lie, il n'existe aucun canal verifie pour envoyer le code
+   * (pas d'email sur le site) : le compte reste silencieusement ignore.
+   */
+  async forgotPassword(username: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { username: username.toLowerCase() },
+    });
+    if (!user?.discordId) return;
+
+    const token = randomBytes(4).toString('hex').toUpperCase();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    await this.prisma.passwordResetToken.create({
+      data: { token, userId: user.id, expiresAt },
+    });
+
+    await this.discord.sendDirectMessage(
+      user.discordId,
+      `🔑 **Réinitialisation de mot de passe REDLAKES**\n\nCode : \`${token}\`\nValable 15 minutes.\n\nSi tu n'es pas à l'origine de cette demande, ignore ce message.`,
+    );
+  }
+
+  async resetPassword(token: string, password: string): Promise<string> {
+    const reset = await this.prisma.passwordResetToken.findUnique({
+      where: { token: token.toUpperCase() },
+    });
+    if (!reset || reset.used || reset.expiresAt < new Date()) {
+      throw new BadRequestException('Code invalide ou expiré');
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: reset.userId },
+        data: { passwordHash },
+      }),
+      this.prisma.passwordResetToken.update({
+        where: { id: reset.id },
+        data: { used: true },
+      }),
+    ]);
+    return reset.userId;
+  }
 }

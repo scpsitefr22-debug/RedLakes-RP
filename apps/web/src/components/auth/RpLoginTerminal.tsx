@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   UserPlus,
   LogIn,
+  KeyRound,
 } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { authErrorMessages } from "@/lib/auth-messages";
@@ -32,11 +33,21 @@ export function RpLoginTerminal() {
 
   // Compte REDLAKES par pseudo + mot de passe — moteur de connexion
   // principal. Discord (plus bas) ne sert plus qu'à la liaison bot.
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [rlUsername, setRlUsername] = useState("");
   const [rlPassword, setRlPassword] = useState("");
   const [rlError, setRlError] = useState("");
   const [rlLoading, setRlLoading] = useState(false);
+
+  // Mot de passe oublié — code envoyé par DM Discord (pas d'email sur le
+  // site) ; reponse serveur volontairement identique que le compte existe
+  // ou non, donc on affiche toujours l'etape 2 apres l'envoi.
+  const [fpStep, setFpStep] = useState<"request" | "reset">("request");
+  const [fpUsername, setFpUsername] = useState("");
+  const [fpCode, setFpCode] = useState("");
+  const [fpNewPassword, setFpNewPassword] = useState("");
+  const [fpError, setFpError] = useState("");
+  const [fpLoading, setFpLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -82,6 +93,49 @@ export function RpLoginTerminal() {
       );
     } finally {
       setRlLoading(false);
+    }
+  };
+
+  const requestReset = async () => {
+    if (!fpUsername.trim()) {
+      setFpError("Pseudo requis");
+      return;
+    }
+    setFpLoading(true);
+    setFpError("");
+    try {
+      await apiFetch("/auth/forgot-password", {
+        method: "POST",
+        body: JSON.stringify({ username: fpUsername.trim() }),
+      });
+      setFpStep("reset");
+    } catch (err) {
+      setFpError(err instanceof Error ? err.message : "Une erreur est survenue");
+    } finally {
+      setFpLoading(false);
+    }
+  };
+
+  const submitReset = async () => {
+    if (!fpCode.trim() || !fpNewPassword) {
+      setFpError("Code et nouveau mot de passe requis");
+      return;
+    }
+    setFpLoading(true);
+    setFpError("");
+    try {
+      await apiFetch("/auth/reset-password", {
+        method: "POST",
+        body: JSON.stringify({
+          token: fpCode.trim().toUpperCase(),
+          password: fpNewPassword,
+        }),
+      });
+      router.push(redirectTo.startsWith("/") ? redirectTo : "/dashboard");
+    } catch (err) {
+      setFpError(err instanceof Error ? err.message : "Une erreur est survenue");
+    } finally {
+      setFpLoading(false);
     }
   };
 
@@ -192,6 +246,94 @@ export function RpLoginTerminal() {
         </div>
       )}
 
+      {mode === "forgot" ? (
+        <div className="hologram-border space-y-4 rounded-lg p-6">
+          <button
+            type="button"
+            onClick={() => {
+              setMode("login");
+              setFpError("");
+            }}
+            className="flex items-center gap-1 font-mono text-xs text-gray-500 hover:text-white"
+          >
+            ← Retour à la connexion
+          </button>
+
+          {fpStep === "request" ? (
+            <>
+              <p className="text-sm text-gray-500">
+                Entrez votre pseudo — si le compte existe et a un compte
+                Discord lié, un code de vérification vous sera envoyé par
+                message privé sur Discord.
+              </p>
+              <input
+                value={fpUsername}
+                onChange={(e) => setFpUsername(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && requestReset()}
+                placeholder="Pseudo"
+                autoComplete="username"
+                className="w-full rounded border border-metal bg-black px-4 py-2 font-mono text-sm text-white outline-none focus:border-redlake"
+              />
+              {fpError && (
+                <p className="font-mono text-xs text-redlake-glow">{fpError}</p>
+              )}
+              <button
+                type="button"
+                onClick={requestReset}
+                disabled={fpLoading || !apiOnline}
+                className="flex w-full items-center justify-center gap-2 rounded border border-redlake bg-redlake/20 py-3 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-redlake/30 disabled:opacity-50"
+              >
+                <KeyRound className="h-4 w-4" />
+                {fpLoading ? "Envoi..." : "Envoyer le code"}
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-gray-500">
+                Si un code a pu être envoyé, vérifiez vos messages privés
+                Discord. Entrez-le ci-dessous avec votre nouveau mot de
+                passe.
+              </p>
+              <input
+                value={fpCode}
+                onChange={(e) => setFpCode(e.target.value)}
+                placeholder="Code (8 caractères)"
+                className="w-full rounded border border-metal bg-black px-4 py-2 font-mono text-sm uppercase tracking-widest text-white outline-none focus:border-redlake"
+              />
+              <input
+                type="password"
+                value={fpNewPassword}
+                onChange={(e) => setFpNewPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submitReset()}
+                placeholder="Nouveau mot de passe"
+                autoComplete="new-password"
+                className="w-full rounded border border-metal bg-black px-4 py-2 font-mono text-sm text-white outline-none focus:border-redlake"
+              />
+              {fpError && (
+                <p className="font-mono text-xs text-redlake-glow">{fpError}</p>
+              )}
+              <button
+                type="button"
+                onClick={submitReset}
+                disabled={fpLoading || !apiOnline}
+                className="w-full rounded border border-redlake bg-redlake/20 py-3 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-redlake/30 disabled:opacity-50"
+              >
+                {fpLoading ? "Vérification..." : "Réinitialiser le mot de passe"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setFpStep("request");
+                  setFpError("");
+                }}
+                className="block w-full text-center font-mono text-xs text-gray-600 hover:text-redlake-glow"
+              >
+                Renvoyer un code
+              </button>
+            </>
+          )}
+        </div>
+      ) : (
       <div className="hologram-border space-y-4 rounded-lg p-6">
         <div className="flex rounded border border-metal/50 p-1 font-mono text-xs">
           <button
@@ -257,7 +399,22 @@ export function RpLoginTerminal() {
               ? "Se connecter"
               : "Créer mon compte"}
         </button>
+        {mode === "login" && (
+          <button
+            type="button"
+            onClick={() => {
+              setMode("forgot");
+              setFpStep("request");
+              setFpUsername(rlUsername);
+              setFpError("");
+            }}
+            className="block w-full text-center font-mono text-xs text-gray-600 hover:text-redlake-glow"
+          >
+            Mot de passe oublié ?
+          </button>
+        )}
       </div>
+      )}
 
       <p className="mt-6 text-center text-xs text-gray-600">
         La liaison Discord (obligatoire) se fait juste après la création de
