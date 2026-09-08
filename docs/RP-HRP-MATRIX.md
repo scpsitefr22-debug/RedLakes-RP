@@ -47,7 +47,7 @@ initiale de la Master Directive)
 | Route | Type | Contexte | Risque | Action | Priorité |
 |---|---|---|---|---|---|
 | `/factions` | RP | Catalogue — existence des factions | Aucun — l'existence d'une faction peut être publique (directive §10) | Aucune | — |
-| `/factions/[id]` | HYBRIDE | Organigramme complet, effectifs, relations, départements, docs liés | **Fort** — directive §10/§13 : un civil ne doit pas voir organigramme, effectifs, salaires, opérations, membres, relations secrètes | Server-side : séparer public (nom, description générale) de ce qui nécessite appartenance/clearance (roster, relations, docs liés) | **P0** |
+| `/factions/[id]` | HYBRIDE | Organigramme complet, effectifs, relations, départements, docs liés | Directive §10/§13 : un civil ne doit pas voir effectifs, relations secrètes | ✅ Connexion requise pour roster/relations/budgets ; nom/description restent publics ; section "rôles" étiquetée guide pratique | Fait |
 | `/departements`, `/departements/[id]`, `/departements/site-12` | HYBRIDE | Organigramme + pay/quota réels | Modéré — pay/quota = mécanique de jeu utile à connaître, mais l'organigramme complet Site-12 en un coup d'œil casse la découverte | Garder public l'existence des départements ; restreindre organigramme/staffing complet à l'appartenance faction | P1 |
 | `/grades`, `/grades/[slug]` | HYBRIDE | Référence de progression (pay, quota, accès) | Faible-modéré — les joueurs ont besoin de connaître leur voie de progression | Probablement OK de garder en référence publique | P2 |
 | `/intranet` | RP immersif | Espace interne par faction | **Fort — metagame et fuite inter-faction** si le contenu n'est pas réellement isolé par faction/département (directive §13, §16) | Confirmer que l'API restreint par appartenance réelle, pas juste par affichage conditionnel | **P0** |
@@ -57,9 +57,9 @@ initiale de la Master Directive)
 | Route | Type | Contexte | Risque | Action | Priorité |
 |---|---|---|---|---|---|
 | `/connexion`, `/bienvenue` | HRP | Auth réelle (déjà auditée cette session) | Aucun | Aucune | — |
-| `/integration` | HYBRIDE | Quiz d'onboarding déguisé en mémo IC | Confusion joueur/personnage — trop bien caché | Bandeau explicite "ceci est un tutoriel" en haut | P2 |
-| `/dashboard` | HYBRIDE | Fiche perso + vrais réglages de compte | Déjà séparé en sections d'après les tests de cette session, mais à confirmer qu'aucune donnée de compte (mdp, sessions) ne fuite dans une vue "personnage" publique | Confirmer la séparation stricte identité RP / activité RP / compte (directive §15) | P1 |
-| `/actualites`, `/actualites/[id]` | HYBRIDE | Mélange patch notes réels et actus RP dans un flux non différencié | Confusion UX, pas sécurité | Séparer par tag/onglet (directive §20) | P1 |
+| `/integration` | HYBRIDE | Quiz d'onboarding déguisé en mémo IC | Confusion joueur/personnage | ✅ Bandeau "hors RP" ajouté | Fait |
+| `/dashboard` | HYBRIDE | Fiche perso + vrais réglages de compte | Déjà séparé en sections, confirmé lors des tests de cette session | — | Fait |
+| `/actualites`, `/actualites/[id]` | HYBRIDE | Mélangeait patch notes réels et actus RP | Confusion UX | ✅ Onglets "Actualités RP" / "Annonces du site" | Fait |
 
 ## CORE — le plus gros chantier
 
@@ -72,25 +72,27 @@ initiale de la Master Directive)
 | Route | Type | Contexte | Risque | Action | Priorité |
 |---|---|---|---|---|---|
 | `/staff/*` (30+ pages CRUD) | HRP | Déjà protégé par rôle (STAFF/ADMIN) | Aucun niveau RP ; risque sécurité classique si les guards ne sont pas réellement server-side | Alléger l'habillage RP (proposé précédemment) ; vérifier les guards | P1 (UX) / **P0** si les guards ne sont pas vraiment server-side — à vérifier |
-| `/lore/cms`, `/lore/cms/[id]`, `/lore/cms/nouveau` | HRP | Hors `/staff/`, **pas de garde client** | Réel si l'API ne protège pas non plus | Vérifier le guard API ; déplacer sous `/staff/` pour cohérence | **P0** si le garde API est absent, P2 sinon (cosmétique) |
+| `/lore/cms`, `/lore/cms/[id]`, `/lore/cms/nouveau` | HRP | Hors `/staff/`, n'avait pas de garde client (API déjà protégée) | UX seulement — l'API refusait déjà les mutations non-staff | ✅ `layout.tsx` ajouté, même garde que `/staff/*` | Fait |
 
 ## Transversal (pas une route unique)
 
 | Zone | Type | Contexte | Risque | Action | Priorité |
 |---|---|---|---|---|---|
-| Recherche globale + autocomplete | — | Interroge tout le contenu | **Critique** (directive §24) — une recherche interdite ne doit jamais retourner l'information | Auditer si la recherche respecte déjà les permissions ou retourne tout sans filtre | **P0** |
-| Sanctions | — | Historique RP (rétrogradation) et HRP (ban/mute Discord) potentiellement dans un seul modèle/affichage | Mélange joueur/personnage si affiché comme un seul historique de personnage | Vérifier le modèle `Sanction` actuel : distingue-t-il déjà type RP vs HRP ? | P1 |
+| Recherche globale + autocomplete | — | Interroge tout le contenu | Fallback SQL laissait passer les SCP non approuvés ; chemin Elasticsearch n'appliquait aucun filtre de département | ✅ Filtre de statut + de département appliqué aux deux chemins | Fait |
+| Sanctions | — | Modèle `Sanction` entièrement lié au personnage (`playerId`) — 5 types tous implicitement RP | Aucun système de sanction HRP (mute/kick/ban compte) n'existe, distinct de Discord | **À trancher avec l'utilisateur** — nouvelle fonctionnalité à construire ou modération HRP volontairement laissée à Discord ? | En attente |
 
-## Prochaine étape suggérée
+## État au 8 septembre 2026
 
-Les lignes **P0** ci-dessus sont des hypothèses de risque, pas des fuites confirmées — chacune dit "à vérifier". La suite logique (Phase 4 de la Master Directive, "Audit des fuites API") serait de vérifier ces 6 points un par un :
+**Audit P0 terminé** (Phase 4 de la Master Directive). Résultat réel, pas hypothétique :
+- Wiki, Documents classifiés, Intranet, CORE (Rapports/Messagerie/Communications/Documents/Missions), Staff (`/staff/*`) : déjà correctement filtrés/gardés server-side, rien à corriger.
+- `GET /players` et `/players/:username` : fuite confirmée (roster complet + `discordUsername`/`minecraftUuid`/`hasPassword` publics) — **corrigé**.
+- `/factions/:slug`, `/factions/:slug/members`, `/faction-relations/*` : aucune garde — **corrigé** (connexion requise pour roster/relations/budgets départements).
+- Recherche (SQL + Elasticsearch) : fuitait les SCP en attente de validation, ES n'appliquait aucun filtre de département — **corrigé**.
+- `/lore/cms` : API déjà protégée, juste pas de garde visuel — **corrigé** (layout ajouté).
 
-1. Wiki — clearance sur les dossiers SCP classifiés
-2. Documents classifiés — filtrage server-side réel
-3. Factions/[id] — fuite d'organigramme/effectifs aux non-membres
-4. Intranet — cloisonnement réel par faction/département
-5. CORE — cloisonnement par app
-6. Recherche globale — respect des permissions
-7. Guards staff (`/staff/*` et `/lore/cms`) — réellement server-side
+**P1 fermés** : séparation `/actualites` RP/HRP (onglets), bandeau HRP sur `/integration`, étiquette "Guide pratique" sur la section rôles de faction, verrou de connexion sur l'ensemble du site + intro d'accueil.
 
-Le reste (P1/P2) est plus structurel/UX, pas des trous de sécurité.
+**P1 restant, hors périmètre technique pur** :
+- **Sanctions** : le modèle `Sanction` actuel est entièrement lié au personnage (`playerId`) — les 5 types (avertissement, blâme, mise à pied, rétrogradation, bannissement) sont tous implicitement RP. Il n'existe aucun système de sanction HRP (mute/kick/ban compte, séparé de Discord) dans REDLAKES. Construire ça serait une vraie nouvelle fonctionnalité, pas une réorganisation — **à trancher avec l'utilisateur** : le veut-il, ou la modération HRP reste-t-elle uniquement l'affaire de Discord ?
+
+**Phase 3 (Matrice de connaissance) — non commencée.** Qui a le droit de savoir quoi par faction/département/grade/clearance est du canon RP, pas une décision technique — nécessite l'utilisateur, voir directive §33 ("Ne pas inventer les règles").
