@@ -15,19 +15,33 @@ interface ApiNewsArticle {
   category: string;
 }
 
+/**
+ * "mise-a-jour" = vraie annonce site/serveur (HRP) ; scp/evenement/lore =
+ * actu in-universe (RP) — voir docs/RP-HRP-MATRIX.md. Categorie inconnue
+ * (pas dans categoryLabels) traitee par defaut comme RP, la plupart du
+ * contenu du site l'etant.
+ */
+const HRP_CATEGORIES = new Set(["mise-a-jour"]);
+
 export function ActualitesCatalog({ newsArticles }: { newsArticles: ApiNewsArticle[] }) {
+  const [scope, setScope] = useState<"rp" | "hrp" | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [query, setQuery] = useState("");
 
+  const byScope = useMemo(
+    () => newsArticles.filter((a) => !scope || (HRP_CATEGORIES.has(a.category) ? "hrp" : "rp") === scope),
+    [newsArticles, scope],
+  );
+
   const counts = useMemo(() => {
     const map = new Map<string, number>();
-    for (const a of newsArticles) map.set(a.category, (map.get(a.category) ?? 0) + 1);
+    for (const a of byScope) map.set(a.category, (map.get(a.category) ?? 0) + 1);
     return map;
-  }, [newsArticles]);
+  }, [byScope]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return newsArticles
+    return byScope
       .filter((a) => (activeCategory ? a.category === activeCategory : true))
       .filter(
         (a) =>
@@ -36,12 +50,40 @@ export function ActualitesCatalog({ newsArticles }: { newsArticles: ApiNewsArtic
           a.excerpt.toLowerCase().includes(q),
       )
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [newsArticles, activeCategory, query]);
+  }, [byScope, activeCategory, query]);
 
   const categories = [...counts.keys()];
+  const rpCount = newsArticles.filter((a) => !HRP_CATEGORIES.has(a.category)).length;
+  const hrpCount = newsArticles.length - rpCount;
 
   return (
     <>
+      <div className="mb-6 flex flex-wrap gap-2">
+        {(
+          [
+            { key: null, label: `Tout (${newsArticles.length})` },
+            { key: "rp" as const, label: `Actualités RP (${rpCount})` },
+            { key: "hrp" as const, label: `Annonces du site (${hrpCount})` },
+          ]
+        ).map((opt) => (
+          <button
+            key={opt.label}
+            type="button"
+            onClick={() => {
+              setScope(opt.key);
+              setActiveCategory(null);
+            }}
+            className={`rounded border px-4 py-2 font-mono text-sm uppercase tracking-wider transition-colors ${
+              scope === opt.key
+                ? "border-redlake-glow bg-redlake-glow/20 text-white"
+                : "border-metal text-gray-400 hover:border-redlake-glow/50"
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
       <div className="mb-4">
         <input
           value={query}
@@ -61,7 +103,7 @@ export function ActualitesCatalog({ newsArticles }: { newsArticles: ApiNewsArtic
               : "border-metal/50 text-gray-500 hover:border-metal"
           }`}
         >
-          Toutes ({newsArticles.length})
+          Toutes ({byScope.length})
         </button>
         {categories.map((c) => (
           <button
