@@ -1,3 +1,4 @@
+import { SiteIntro } from "@/components/home/SiteIntro";
 import { HeroBanner } from "@/components/home/HeroBanner";
 import { ComingSoonSection } from "@/components/home/ComingSoonSection";
 import { ConceptSection } from "@/components/home/ConceptSection";
@@ -12,7 +13,7 @@ import { RecrutementSection } from "@/components/home/RecrutementSection";
 
 export default function HomePage() {
   return (
-    <>
+    <SiteIntro>
       <HeroBanner />
       <div id="ouverture">
         <ComingSoonSection />
@@ -26,6 +27,6 @@ export default function HomePage() {
       <GradesPreview />
       <RecrutementSection />
       <QuickAccess />
-    </>
+    </SiteIntro>
   );
 }
