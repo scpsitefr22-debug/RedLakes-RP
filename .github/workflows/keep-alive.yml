@@ -2,9 +2,15 @@ name: Keep Render services awake
 
 # Le plan gratuit Render met les services en veille apres ~15 min sans
 # requete — la premiere visite qui suit met jusqu'a une minute a repondre
-# (voir docs/REDLAKES-CORE-SPEC.md). Ce ping toutes les 10 min maintient
-# l'API et le site eveilles pour de vrai — ce n'est pas un correctif cote
-# code, juste un contournement gratuit de la limite du plan gratuit.
+# (voir docs/REDLAKES-CORE-SPEC.md). Ce ping toutes les 5 min (le minimum
+# autorise par GitHub) maintient l'API et le site eveilles pour de vrai —
+# ce n'est pas un correctif cote code, juste un contournement gratuit de
+# la limite du plan gratuit.
+#
+# 5 min plutot que 10 : les declenchements planifies GitHub Actions ne
+# sont pas parfaitement ponctuels (retard possible en cas de charge cote
+# GitHub) — un intervalle plus court laisse plus de marge avant le seuil
+# de mise en veille de Render.
 #
 # Limite connue : GitHub desactive automatiquement les workflows planifies
 # d'un depot sans aucune activite (commit/push) depuis 60 jours — il faudra
@@ -13,7 +19,7 @@ name: Keep Render services awake
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
 
 jobs:
