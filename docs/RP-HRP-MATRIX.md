@@ -79,7 +79,7 @@ initiale de la Master Directive)
 | Zone | Type | Contexte | Risque | Action | Priorité |
 |---|---|---|---|---|---|
 | Recherche globale + autocomplete | — | Interroge tout le contenu | Fallback SQL laissait passer les SCP non approuvés ; chemin Elasticsearch n'appliquait aucun filtre de département | ✅ Filtre de statut + de département appliqué aux deux chemins | Fait |
-| Sanctions | — | Modèle `Sanction` entièrement lié au personnage (`playerId`) — 5 types tous implicitement RP | Aucun système de sanction HRP (mute/kick/ban compte) n'existe, distinct de Discord | **À trancher avec l'utilisateur** — nouvelle fonctionnalité à construire ou modération HRP volontairement laissée à Discord ? | En attente |
+| Sanctions | — | Modèle `Sanction` entièrement lié au personnage (`playerId`) — 5 types tous implicitement RP | Aucun système de sanction HRP (mute/kick/ban compte) — décision volontaire | Confirmé par l'utilisateur : modération HRP = Discord uniquement, pas de fonctionnalité équivalente sur le site | Fait (décision) |
 
 ## État au 8 septembre 2026
 
