@@ -21,7 +21,7 @@
     "build:terminal": "npm run build -w @redlakes/narrative-core && npm run build -w terminal",
     "build:web": "cd apps/web && npm run build",
     "build:api": "cd apps/api && npm run build",
-    "db:up": "powershell -ExecutionPolicy Bypass -File ./scripts/start-docker.ps1",
+    "db:up": "docker compose up -d elasticsearch",
     "db:migrate": "cd apps/api && npx prisma migrate dev",
     "sync:grades": "python scripts/generate-rp-catalog.py"
   }

@@ -96,7 +96,7 @@ export function DevConsole() {
       detail:
         health?.checks.database === "up"
           ? `${health.checks.databaseLatencyMs ?? "?"} ms`
-          : "port 5432",
+          : "Neon indisponible",
       icon: Database,
     },
   ];
@@ -193,7 +193,7 @@ export function DevConsole() {
             <CmdLine cmd="npm run dev" desc="Lance site + API (+ console)" />
             <CmdLine cmd="npm run dev:full" desc="+ Bot Discord" />
             <CmdLine cmd="npm run hub" desc="Centre de commandement complet" />
-            <CmdLine cmd="npm run db:up" desc="Docker Postgres + Elasticsearch" />
+            <CmdLine cmd="npm run db:up" desc="Elasticsearch (optionnel, Docker requis)" />
             <CmdLine cmd="npm run stop" desc="Arreter site & API" />
           </ul>
         </div>

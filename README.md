@@ -10,7 +10,7 @@ Encyclopédie immersive SCP / DarkRP pour le serveur Minecraft **REDLAKES RP**.
 | Backend | NestJS, Prisma, PostgreSQL |
 | Auth | Microsoft OAuth → profil Minecraft Java |
 | Recherche | Elasticsearch (+ fallback SQL) |
-| Infra | Docker Compose (PostgreSQL + Elasticsearch) |
+| Infra | PostgreSQL hébergé sur Neon (cloud) ; Elasticsearch optionnel (Docker, fallback SQL sinon) |
 
 ## Démarrage rapide (Windows)
 
@@ -61,13 +61,10 @@ Ou double-cliquez **`Arreter-REDLAKES.bat`**.
 
 ## Démarrage rapide (détaillé)
 
-### 1. Services (Docker Desktop requis)
+### 1. Base de données
 
-```bash
-docker compose up -d
-```
-
-### 2. Base de données
+PostgreSQL est hébergé sur Neon (cloud) — pas d'installation locale requise.
+Configurez `DATABASE_URL` dans `apps/api/.env` (voir `.env.example`), puis :
 
 ```bash
 cd apps/api
@@ -76,7 +73,7 @@ npx prisma migrate dev
 npx prisma db seed
 ```
 
-### 3. API
+### 2. API
 
 ```bash
 cd apps/api
@@ -84,7 +81,7 @@ npm run start:dev
 # → http://localhost:3001/api
 ```
 
-### 4. Frontend
+### 3. Frontend
 
 ```bash
 cd apps/web
@@ -130,7 +127,7 @@ play.redlakes.fr
 ```
 apps/web/     → Site encyclopédique Next.js
 apps/api/     → API NestJS + Prisma
-docker-compose.yml → PostgreSQL + Elasticsearch
+docker-compose.yml → Elasticsearch (optionnel — PostgreSQL est sur Neon)
 ```
 
 ## CMS Lore (Staff)

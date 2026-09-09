@@ -3,7 +3,6 @@
 
 param(
     [switch]$AvecBot,
-    [switch]$SansDocker,
     [switch]$SansNavigateur
 )
 
@@ -33,16 +32,7 @@ Write-Ok "Ports liberes"
 
 Write-Host ""
 Write-Step 2 5 "Base de donnees"
-if (-not $SansDocker -and -not (Test-PortListening 5432)) {
-    Write-Host "       Demarrage Docker Postgres..." -ForegroundColor DarkGray
-    & "$PSScriptRoot\start-docker.ps1"
-    Start-Sleep -Seconds 2
-}
-if (Test-PortListening 5432) {
-    Write-Ok "PostgreSQL actif"
-} else {
-    Write-Warn "PostgreSQL indisponible — l'API demarrera en mode degrade"
-}
+Write-Ok "PostgreSQL (Neon, distante — voir DATABASE_URL dans apps\api\.env)"
 
 Write-Host ""
 Write-Step 3 5 "API NestJS (port 3001)"

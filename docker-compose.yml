@@ -1,17 +1,8 @@
+# PostgreSQL n'est plus ici — Docker Desktop cassait de facon persistante sur
+# la machine de dev (socket AF_UNIX bloque, irreparable), la base a migre vers
+# Neon (cloud) le 2026-09-09. Voir DATABASE_URL dans apps/api/.env.
+# Elasticsearch reste optionnel : l'API bascule sur une recherche SQL si absent.
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: redlakes-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: redlakes_user
-      POSTGRES_PASSWORD: redlakes_password
-      POSTGRES_DB: redlakes_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
     container_name: redlakes-elasticsearch
@@ -26,5 +17,4 @@ services:
       - elasticsearch_data:/usr/share/elasticsearch/data
 
 volumes:
-  postgres_data:
   elasticsearch_data:

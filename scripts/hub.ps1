@@ -33,23 +33,15 @@ function Show-Banner {
 
 function Show-Status {
     Write-Host "  --- Etat rapide ---" -ForegroundColor DarkYellow
+    Write-Host "  [ON ] PostgreSQL (Neon, distante)" -ForegroundColor Green
     foreach ($item in @(
-            @{ Port = 5432; Label = "PostgreSQL"; Container = "redlakes-postgres" },
-            @{ Port = 3000; Label = "Site web"; Container = $null },
-            @{ Port = 3001; Label = "API"; Container = $null },
-            @{ Port = 8766; Label = "Bot IA MC"; Container = $null },
-            @{ Port = 9200; Label = "Elasticsearch"; Container = "redlakes-elasticsearch" }
+            @{ Port = 3000; Label = "Site web" },
+            @{ Port = 3001; Label = "API" },
+            @{ Port = 8766; Label = "Bot IA MC" }
         )) {
         $listening = netstat -ano 2>$null | Select-String ":$($item.Port)\s" | Select-String "LISTENING"
         if ($listening) {
             Write-Host "  [ON ] $($item.Label) (port $($item.Port))" -ForegroundColor Green
-        } elseif ($item.Container -and (docker inspect $item.Container 2>$null) -and $LASTEXITCODE -eq 0) {
-            $running = docker inspect -f "{{.State.Running}}" $item.Container 2>$null
-            if ($running -eq "true") {
-                Write-Host "  [ON ] $($item.Label) (docker, port $($item.Port))" -ForegroundColor Green
-            } else {
-                Write-Host "  [OFF] $($item.Label) (conteneur arrete)" -ForegroundColor DarkYellow
-            }
         } else {
             Write-Host "  [OFF] $($item.Label) (port $($item.Port))" -ForegroundColor DarkGray
         }
@@ -126,14 +118,13 @@ function Show-Menu {
     Show-Status
     Write-Host "  DEMARRAGE" -ForegroundColor Yellow
     Write-Host "  [1] TOUT : Site + API + Bot + MC dev"
-    Write-Host "  [2] Plateforme : Site + API + Bot (+ Docker auto)"
+    Write-Host "  [2] Plateforme : Site + API + Bot"
     Write-Host "  [3] Plateforme : Site + API seulement"
     Write-Host "  [P] PRO : npm run dev (console de controle)"
     Write-Host "  [4] Bot Discord seul"
     Write-Host "  [5] Serveur Minecraft (production)"
     Write-Host "  [6] Serveur Minecraft (mode dev)"
     Write-Host "  [7] Bot IA Minecraft seul"
-    Write-Host "  [8] Docker Postgres + Elasticsearch (REDLAKES)"
     Write-Host ""
     Write-Host "  ARRET / OUTILS" -ForegroundColor Yellow
     Write-Host "  [9] Ouvrir la console de controle (/console)"
@@ -169,11 +160,6 @@ function Invoke-HubAction([string]$choice) {
         "5" { Start-MinecraftServer }
         "6" { Start-MinecraftServer -Dev }
         "7" { Start-McBotIa }
-        "8" {
-            if (Test-PathOk $RedlakesRoot "REDLAKES") {
-                & "$RedlakesRoot\scripts\start-docker.ps1"
-            }
-        }
         "9" { Start-Process $cfg.ConsoleUrl }
         "O" { Open-Site }
         "S" { Stop-RedlakesStack }

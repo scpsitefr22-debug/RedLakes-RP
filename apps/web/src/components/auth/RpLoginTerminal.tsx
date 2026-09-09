@@ -193,13 +193,12 @@ export function RpLoginTerminal() {
             <div>
               <p className="font-bold font-mono text-xs">API HORS LIGNE</p>
               <p className="mt-1 text-yellow-400/80">
-                1. Ouvre <strong>Docker Desktop</strong> et attends qu&apos;il soit pret
+                1. Verifiez que l&apos;API tourne : <strong>npm run dev</strong> ou{" "}
+                <strong>Lancer-HUB.bat</strong> → option <strong>2</strong> ou{" "}
+                <strong>3</strong>
                 <br />
-                2. <strong>Lancer-HUB.bat</strong> → option <strong>8</strong> (Postgres)
-                puis <strong>2</strong> ou <strong>3</strong> (Site + API)
-              </p>
-              <p className="mt-2 font-mono text-[10px] text-yellow-500/70">
-                Sans PostgreSQL (port 5432), l&apos;API ne demarre pas.
+                2. Laissez-lui quelques secondes pour compiler, puis rechargez
+                cette page
               </p>
             </div>
           </div>

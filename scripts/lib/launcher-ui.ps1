@@ -95,12 +95,6 @@ function Test-LauncherPreflight {
         Write-Warn "apps\web\.env.local absent (valeurs par defaut)"
     }
 
-    if (Test-PortListening 5432) {
-        Write-Ok "PostgreSQL (5432)"
-    } else {
-        Write-Warn "PostgreSQL arrete — lancez npm run db:up ou HUB [8]"
-    }
-
     return $ok
 }
 
