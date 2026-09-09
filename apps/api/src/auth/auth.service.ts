@@ -91,8 +91,21 @@ export class AuthService {
     await this.prisma.session.deleteMany({ where: { token } });
   }
 
-  /** Marque la creation de compte REDLAKES comme terminee (nom RP renseigne). */
+  /**
+   * Marque la creation de compte REDLAKES comme terminee (nom RP renseigne).
+   * Discord est obligatoire pour tout compte, quelle que soit la methode
+   * d'inscription (mot de passe, dev-login) — verifie ici en plus du gate
+   * cote client (BienvenueTerminal) pour que la regle tienne meme via un
+   * appel direct a l'API.
+   */
   async completeOnboarding(userId: string) {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { discordId: true },
+    });
+    if (!user.discordId) {
+      throw new BadRequestException('DISCORD_LINK_REQUIRED');
+    }
     await this.prisma.user.update({
       where: { id: userId },
       data: { onboardedAt: new Date() },

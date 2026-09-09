@@ -31,9 +31,9 @@ export function BienvenueTerminal() {
           router.replace("/dashboard");
           return;
         }
-        // Discord recommandé mais optionnel — un compte créé par
-        // pseudo/mot de passe n'a jamais de Discord lié au départ,
-        // et peut choisir de continuer sans (ex. comptes de test).
+        // Discord est obligatoire pour tout compte, quelle que soit la
+        // methode d'inscription — voir POST /auth/onboarding/complete
+        // qui refuse aussi sans discordId (meme regle cote serveur).
         setNeedsDiscord(!me.user?.discordLinked);
       } catch {
         router.replace("/connexion");
@@ -84,10 +84,9 @@ export function BienvenueTerminal() {
             Liez votre compte Discord
           </h1>
           <p className="mt-3 text-sm text-gray-500">
-            Recommandé — nécessaire pour la synchronisation avec le bot
+            Obligatoire — nécessaire pour la synchronisation avec le bot
             (grades, notifications) et pour confirmer votre appartenance à
-            la communauté REDLAKES. Vous pouvez aussi continuer sans, et
-            lier votre compte plus tard depuis votre dossier.
+            la communauté REDLAKES. Vous ne pouvez pas continuer sans.
           </p>
         </div>
 
@@ -100,13 +99,6 @@ export function BienvenueTerminal() {
             Lier mon compte Discord
             <ChevronRight className="h-4 w-4 text-gray-500" />
           </a>
-          <button
-            type="button"
-            onClick={() => setNeedsDiscord(false)}
-            className="w-full text-center font-mono text-[10px] uppercase tracking-widest text-gray-600 transition-colors hover:text-gray-400"
-          >
-            Continuer sans Discord pour l&apos;instant
-          </button>
         </div>
       </div>
     );
