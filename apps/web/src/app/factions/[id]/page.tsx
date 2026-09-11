@@ -8,8 +8,9 @@ import {
   FACTION_RELATION_LABELS,
   FACTION_RELATION_COLORS,
   type FactionEvent,
+  type FactionScpObject,
 } from "@/lib/faction-api";
-import { getClassifiedDocuments } from "@/lib/classified-documents-api";
+import type { ClassifiedDocumentSummary } from "@/lib/classified-documents-api";
 import { getFactionTheme } from "@/lib/faction-themes";
 import { getFactionRoleCategories } from "@/data/faction-role-catalog";
 import { API_URL } from "@/lib/api";
@@ -29,7 +30,16 @@ import {
   Swords,
   FileLock2,
   Radio,
+  BookOpen,
 } from "lucide-react";
+
+const SCP_CLASS_COLORS: Record<FactionScpObject["class"], string> = {
+  Safe: "text-green-400",
+  Euclid: "text-yellow-400",
+  Keter: "text-red-400",
+  Thaumiel: "text-purple-400",
+  Apollyon: "text-orange-400",
+};
 
 const EVENT_TYPE_LABELS: Record<string, string> = {
   breach: "Brèche",
@@ -62,6 +72,52 @@ async function getFactionEvents(slug: string): Promise<FactionEvent[]> {
   }
 }
 
+/**
+ * Documents classifies publies (tous, non filtres par faction ici) —
+ * getClassifiedDocuments() de classified-documents-api.ts est inutilisable
+ * ici : elle passe par apiFetch (chemin relatif "/api/...", pensee pour un
+ * appel navigateur avec cookie de session automatique) alors que cette
+ * fonction tourne cote serveur (Server Component), ou un chemin relatif ne
+ * resout rien pour le fetch natif de Node — l'appel echouait silencieusement
+ * (catch -> []), section "Documents classifies" jamais affichee malgre des
+ * documents publics reels. Meme raison/pattern que getFactionEvents.
+ */
+async function getFactionDocuments(): Promise<ClassifiedDocumentSummary[]> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("redlakes_token")?.value;
+  try {
+    const res = await fetch(`${API_URL}/classified-documents`, {
+      cache: "no-store",
+      headers: token ? { Cookie: `redlakes_token=${token}` } : undefined,
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Objets SCP associes a la faction — composes cote API a partir de la
+ * relation ClassifiedDocument<->ScpObject deja posee (Lot 40), aucune
+ * relation directe Faction<->ScpObject en base. Meme raison de fetch
+ * local avec cookie que getFactionEvents ci-dessus.
+ */
+async function getFactionScpObjects(slug: string): Promise<FactionScpObject[]> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("redlakes_token")?.value;
+  try {
+    const res = await fetch(`${API_URL}/factions/${slug}/scp`, {
+      cache: "no-store",
+      headers: token ? { Cookie: `redlakes_token=${token}` } : undefined,
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
 interface Props {
   params: Promise<{ id: string }>;
 }
@@ -81,11 +137,12 @@ export default async function FactionDetailPage({ params }: Props) {
   const { icon: Icon, ...heroTheme } = theme;
   const roleCategories = getFactionRoleCategories(faction.slug);
   const totalRoles = roleCategories.reduce((n, c) => n + c.roles.length, 0);
-  const [relations, members, allDocuments, events] = await Promise.all([
+  const [relations, members, allDocuments, events, scpObjects] = await Promise.all([
     getFactionRelations(faction.id),
     getFactionMembers(faction.slug),
-    getClassifiedDocuments(),
+    getFactionDocuments(),
     getFactionEvents(faction.slug),
+    getFactionScpObjects(faction.slug),
   ]);
   const documents = allDocuments.filter((d) => d.faction?.slug === faction.slug);
   const allyCount = relations.filter((r) => r.status === "ALLIE").length;
@@ -308,6 +365,35 @@ export default async function FactionDetailPage({ params }: Props) {
                 >
                   <p className="text-sm font-bold text-white">{doc.title}</p>
                   {doc.excerpt && <p className="line-clamp-1 text-xs text-gray-500">{doc.excerpt}</p>}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {scpObjects.length > 0 && (
+          <section className="faction-card p-6">
+            <h2 className="faction-heading mb-4 flex items-center gap-2 text-xl font-bold text-white">
+              <BookOpen className="h-5 w-5 faction-accent" />
+              SCP associés
+            </h2>
+            <div className="space-y-2">
+              {scpObjects.map((scp) => (
+                <Link
+                  key={scp.id}
+                  href={`/wiki/${scp.slug}`}
+                  className="flex items-center justify-between gap-3 rounded border border-metal/40 p-3 transition-colors hover:border-redlake/30"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold text-white">
+                      {scp.number} — {scp.name}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 font-mono text-[10px] uppercase tracking-wide ${SCP_CLASS_COLORS[scp.class]}`}
+                  >
+                    {scp.class}
+                  </span>
                 </Link>
               ))}
             </div>

@@ -55,6 +55,15 @@ export interface FactionEvent {
   outcome: string;
 }
 
+export interface FactionScpObject {
+  id: string;
+  slug: string;
+  number: string;
+  name: string;
+  class: "Safe" | "Euclid" | "Keter" | "Thaumiel" | "Apollyon";
+  threatLevel: number;
+}
+
 export type FactionRelationStatus = "ALLIE" | "NEUTRE" | "TENSION" | "HOSTILE";
 
 export const FACTION_RELATION_LABELS: Record<FactionRelationStatus, string> = {

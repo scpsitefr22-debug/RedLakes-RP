@@ -8,6 +8,7 @@ export type {
   ApiFactionRelation,
   FactionEvent,
   FactionMember,
+  FactionScpObject,
 } from "@/lib/faction-types";
 export {
   FACTION_RELATION_COLORS,

@@ -69,6 +69,14 @@ export class FactionsController {
     return this.factions.listEvents(faction.id, await this.departmentIdOf(req));
   }
 
+  @Get(':slug/scp')
+  @UseGuards(OptionalAuthGuard)
+  async listScpObjects(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
+    const faction = await this.factions.findOne(slug);
+    if (!faction) throw new NotFoundException('Faction introuvable');
+    return this.factions.listScpObjects(faction.id, await this.departmentIdOf(req));
+  }
+
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)

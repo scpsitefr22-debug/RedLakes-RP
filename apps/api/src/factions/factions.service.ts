@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Faction } from '@prisma/client';
+import {
+  ClassifiedDocumentStatus,
+  Faction,
+  ScpProposalStatus,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { normalizeGradeName } from '../grades/grades.service';
 import { filterByDepartment } from '../common/department-visibility';
@@ -101,6 +105,49 @@ export class FactionsService {
       take: 6,
     });
     return filterByDepartment(events, departmentId);
+  }
+
+  /**
+   * Objets SCP lies a cette faction via ses documents classifies publies
+   * (ClassifiedDocument.factionId -> linkedScpObjects, relation posee au
+   * Lot 40) — aucune relation directe Faction<->ScpObject en base,
+   * composee a la volee sur une relation deja existante plutot que d'en
+   * ajouter une nouvelle. Double filtre par habilitation, meme regle que
+   * ScpService/ClassifiedDocumentsService : le document ET le SCP doivent
+   * chacun etre visibles au demandeur (un document public peut lier un
+   * SCP restreint, et inversement).
+   */
+  async listScpObjects(factionId: string, departmentId: string | null = null) {
+    const documents = await this.prisma.classifiedDocument.findMany({
+      where: { factionId, status: ClassifiedDocumentStatus.PUBLISHED },
+      select: {
+        restrictedDepartmentIds: true,
+        linkedScpObjects: {
+          where: { status: ScpProposalStatus.APPROVED },
+          select: {
+            id: true,
+            slug: true,
+            number: true,
+            name: true,
+            class: true,
+            threatLevel: true,
+            restrictedDepartmentIds: true,
+          },
+        },
+      },
+    });
+
+    const visibleDocuments = filterByDepartment(documents, departmentId);
+    const bySlug = new Map<
+      string,
+      (typeof visibleDocuments)[number]['linkedScpObjects'][number]
+    >();
+    for (const doc of visibleDocuments) {
+      for (const scp of filterByDepartment(doc.linkedScpObjects, departmentId)) {
+        bySlug.set(scp.slug, scp);
+      }
+    }
+    return [...bySlug.values()].sort((a, b) => a.number.localeCompare(b.number));
   }
 
   findById(id: string) {
