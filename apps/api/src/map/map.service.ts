@@ -4,13 +4,21 @@ import {
   CreateMapLocationDto,
   UpdateMapLocationDto,
 } from './dto/map-location.dto';
+import { buildFactionMatcher } from '../common/resolve-faction-by-name';
 
 @Injectable()
 export class MapService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
-    return this.prisma.mapLocation.findMany({ orderBy: { name: 'asc' } });
+  async findAll() {
+    const [locations, matchFaction] = await Promise.all([
+      this.prisma.mapLocation.findMany({ orderBy: { name: 'asc' } }),
+      buildFactionMatcher(this.prisma),
+    ]);
+    return locations.map((location) => ({
+      ...location,
+      factionRef: matchFaction(location.faction),
+    }));
   }
 
   findOne(slug: string) {

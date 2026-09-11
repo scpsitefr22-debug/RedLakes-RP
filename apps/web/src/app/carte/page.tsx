@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { locationTypeLabels } from "@/data/map";
 import { Badge } from "@/components/ui/Badge";
 import { MapPin, X } from "lucide-react";
@@ -20,6 +21,7 @@ interface ApiMapLocation {
   history: string;
   danger: number;
   faction: string | null;
+  factionRef: { slug: string; name: string; color: string | null } | null;
 }
 
 const typeColors: Record<string, string> = {
@@ -138,10 +140,23 @@ export default function CartePage() {
                 <span className="text-gray-600">
                   Danger : <span className="text-white">{location.danger}/5</span>
                 </span>
-                {location.faction && (
-                  <span className="text-gray-600">
-                    Faction : <span className="text-white">{location.faction}</span>
+                {location.factionRef ? (
+                  <span className="flex items-center gap-1.5 text-gray-600">
+                    Faction :
+                    <Link
+                      href={`/factions/${location.factionRef.slug}`}
+                      className="rounded border px-1.5 py-0.5 text-white transition-colors hover:bg-white/5"
+                      style={{ borderColor: `${location.factionRef.color ?? "#888"}66` }}
+                    >
+                      {location.factionRef.name}
+                    </Link>
                   </span>
+                ) : (
+                  location.faction && (
+                    <span className="text-gray-600">
+                      Faction : <span className="text-white">{location.faction}</span>
+                    </span>
+                  )
                 )}
               </div>
             </>
