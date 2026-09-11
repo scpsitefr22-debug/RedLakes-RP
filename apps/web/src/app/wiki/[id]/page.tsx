@@ -4,7 +4,7 @@ import Link from "next/link";
 import { classColors, SCPClass } from "@/data/scp";
 import { Badge } from "@/components/ui/Badge";
 import { cn, formatDate } from "@/lib/utils";
-import { AlertTriangle, FlaskConical, FileText, ChevronRight, FileLock2 } from "lucide-react";
+import { AlertTriangle, FlaskConical, FileText, ChevronRight, FileLock2, Radio } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { ThreatGauge } from "@/components/wiki/ThreatGauge";
 import { ClassificationStamp } from "@/components/wiki/ClassificationStamp";
@@ -38,7 +38,16 @@ interface ApiScpDetail {
   breachCount: number | null;
   restrictedDepartmentIds: string[];
   linkedDocuments: { id: string; slug: string; title: string; excerpt: string | null }[];
+  linkedEvents: { id: string; slug: string; title: string; date: string; type: string }[];
 }
+
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  breach: "Brèche",
+  invasion: "Invasion",
+  guerre: "Guerre",
+  "crise-xk": "Crise XK",
+  experience: "Expérience",
+};
 
 type ScpFetchResult =
   | { status: "found"; scp: ApiScpDetail }
@@ -274,6 +283,34 @@ export default async function SCPDetailPage({ params }: Props) {
                 >
                   <p className="text-sm font-bold text-white">{doc.title}</p>
                   {doc.excerpt && <p className="line-clamp-1 text-xs text-gray-500">{doc.excerpt}</p>}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {scp.linkedEvents.length > 0 && (
+          <section className="hologram-border rounded-lg p-6">
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
+              <Radio className="h-5 w-5 text-redlake-glow" />
+              Événements liés
+            </h2>
+            <div className="space-y-2">
+              {scp.linkedEvents.map((event) => (
+                <Link
+                  key={event.id}
+                  href={`/evenements/${event.slug}`}
+                  className="flex items-center justify-between gap-3 rounded border border-metal/40 p-3 transition-colors hover:border-redlake/30"
+                >
+                  <p className="truncate text-sm font-bold text-white">{event.title}</p>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="font-mono text-[10px] uppercase tracking-wide text-redlake-glow">
+                      {EVENT_TYPE_LABELS[event.type] ?? event.type}
+                    </span>
+                    <span className="font-mono text-[10px] text-gray-600">
+                      {new Date(event.date).toLocaleDateString("fr-FR")}
+                    </span>
+                  </div>
                 </Link>
               ))}
             </div>

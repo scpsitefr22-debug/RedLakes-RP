@@ -67,7 +67,25 @@ export class ScpService {
       include: {
         linkedDocuments: {
           where: { status: ClassifiedDocumentStatus.PUBLISHED },
-          select: { id: true, slug: true, title: true, excerpt: true, restrictedDepartmentIds: true },
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            excerpt: true,
+            restrictedDepartmentIds: true,
+            minClearanceLevel: true,
+            linkedEvents: {
+              select: {
+                id: true,
+                slug: true,
+                title: true,
+                date: true,
+                type: true,
+                restrictedDepartmentIds: true,
+                minClearanceLevel: true,
+              },
+            },
+          },
         },
       },
     });
@@ -78,9 +96,32 @@ export class ScpService {
     ) {
       throw new NotFoundException('Accès restreint à un autre département');
     }
+
+    const visibleDocuments = filterByClearance(
+      filterByDepartment(scp.linkedDocuments, departmentId),
+      clearanceLevel,
+    );
+    const linkedEventsBySlug = new Map<
+      string,
+      (typeof visibleDocuments)[number]['linkedEvents'][number]
+    >();
+    for (const doc of visibleDocuments) {
+      for (const event of filterByClearance(
+        filterByDepartment(doc.linkedEvents, departmentId),
+        clearanceLevel,
+      )) {
+        linkedEventsBySlug.set(event.slug, event);
+      }
+    }
+
     return {
       ...redactAddendums(scp, departmentId),
-      linkedDocuments: filterByDepartment(scp.linkedDocuments, departmentId),
+      linkedDocuments: visibleDocuments.map(({ linkedEvents: _le, ...doc }) => doc),
+      /// Evenements RP lies a ce SCP via ses documents classifies — meme
+      /// composition transitive que FactionsService.listScpObjects (pas de
+      /// relation directe GameEvent<->ScpObject en base, seulement via
+      /// ClassifiedDocument, posee au Lot 40).
+      linkedEvents: [...linkedEventsBySlug.values()],
     };
   }
 
