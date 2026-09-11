@@ -12,6 +12,7 @@ interface ApiCharacter {
   name: string;
   title: string;
   faction: string;
+  factionRef: { slug: string; name: string; color: string | null } | null;
   biography: string;
   quotes: string[];
   history: string[];
@@ -73,7 +74,20 @@ export function PersonnageDetail({ id }: { id: string }) {
             field="title"
             placeholder="Cliquer pour ajouter un titre…"
           />
-          <p className="mt-1 text-sm text-gray-600">{character.faction}</p>
+          {character.factionRef ? (
+            <Link
+              href={`/factions/${character.factionRef.slug}`}
+              className="mt-1 inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-sm transition-colors hover:bg-white/5"
+              style={{
+                borderColor: `${character.factionRef.color ?? "#888"}66`,
+                color: character.factionRef.color ?? undefined,
+              }}
+            >
+              {character.factionRef.name}
+            </Link>
+          ) : (
+            <p className="mt-1 text-sm text-gray-600">{character.faction}</p>
+          )}
         </div>
       </div>
 

@@ -5,10 +5,31 @@ import {
   filterByDepartment,
   isVisibleToDepartment,
 } from '../common/department-visibility';
+import { normalizeGradeName } from '../grades/grades.service';
 
 @Injectable()
 export class CharactersService {
   constructor(private prisma: PrismaService) {}
+
+  /**
+   * Character.faction reste un champ texte libre (voir commentaire du
+   * schema — melange de vraies factions et d'unites qui n'en sont pas,
+   * "FIM Nu-7" par ex.) : pas de vraie relation Prisma. On tente une
+   * correspondance normalisee best-effort vers le catalogue Faction (meme
+   * logique que FactionsService.findByName, dupliquee ici plutot
+   * qu'importee pour ne pas introduire de dependance CharactersModule ->
+   * FactionsModule pour une seule requete ponctuelle) — null si aucune
+   * faction reelle ne correspond, auquel cas le texte brut reste affiche
+   * tel quel cote client, comportement inchange.
+   */
+  private async resolveFactionRef(factionText: string) {
+    if (!factionText) return null;
+    const key = normalizeGradeName(factionText);
+    const factions = await this.prisma.faction.findMany({
+      select: { slug: true, name: true, color: true },
+    });
+    return factions.find((f) => normalizeGradeName(f.name) === key) ?? null;
+  }
 
   async findAll(departmentId: string | null = null) {
     const characters = await this.prisma.character.findMany({
@@ -31,7 +52,10 @@ export class CharactersService {
     ) {
       throw new NotFoundException('Accès restreint à un autre département');
     }
-    return character;
+    return {
+      ...character,
+      factionRef: await this.resolveFactionRef(character.faction),
+    };
   }
 
   findById(id: string) {
