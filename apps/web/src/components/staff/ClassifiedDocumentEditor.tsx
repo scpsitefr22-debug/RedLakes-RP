@@ -23,6 +23,7 @@ export interface ClassifiedDocumentFormData {
   content: string;
   status: string;
   restrictedDepartmentIds: string[];
+  minClearanceLevel: string;
   factionId: string;
   tags: string;
   attachments: string;
@@ -50,6 +51,7 @@ export function ClassifiedDocumentEditor({
     content: initial?.content ?? "",
     status: initial?.status ?? "DRAFT",
     restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
+    minClearanceLevel: initial?.minClearanceLevel ?? "1",
     factionId: initial?.factionId ?? "",
     tags: initial?.tags ?? "",
     attachments: initial?.attachments ?? "",
@@ -90,6 +92,7 @@ export function ClassifiedDocumentEditor({
         content: form.content,
         status: form.status,
         restrictedDepartmentIds: form.restrictedDepartmentIds,
+        minClearanceLevel: parseInt(form.minClearanceLevel, 10) || 1,
         factionId: form.factionId || undefined,
         tags: toArray(form.tags),
         attachments: toArray(form.attachments),
@@ -197,6 +200,22 @@ export function ClassifiedDocumentEditor({
           value={form.restrictedDepartmentIds}
           onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
         />
+        <div>
+          <label className="mb-1 block font-mono text-xs text-gray-500">
+            Habilitation minimale requise (en plus du département)
+          </label>
+          <select
+            className={inputClass}
+            value={form.minClearanceLevel}
+            onChange={(e) => update("minClearanceLevel", e.target.value)}
+          >
+            <option value="1">Niveau 1 — aucune exigence</option>
+            <option value="2">Niveau 2</option>
+            <option value="3">Niveau 3</option>
+            <option value="4">Niveau 4</option>
+            <option value="5">Niveau 5 — Conseil Oméga uniquement</option>
+          </select>
+        </div>
         <EventMultiSelect
           value={form.linkedEventIds}
           onChange={(ids) => setForm((f) => ({ ...f, linkedEventIds: ids }))}

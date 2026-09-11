@@ -6,8 +6,10 @@ import {
   UpdateClassifiedDocumentDto,
 } from './dto/classified-document.dto';
 import {
+  filterByClearance,
   filterByDepartment,
   isVisibleToDepartment,
+  meetsClearance,
 } from '../common/department-visibility';
 import { DiscordService } from '../sync/discord.service';
 
@@ -51,7 +53,7 @@ export class ClassifiedDocumentsService {
     };
   }
 
-  async findPublished(departmentId: string | null = null) {
+  async findPublished(departmentId: string | null = null, clearanceLevel = 1) {
     const documents = await this.prisma.classifiedDocument.findMany({
       where: { status: ClassifiedDocumentStatus.PUBLISHED },
       orderBy: { publishedAt: 'desc' },
@@ -60,10 +62,10 @@ export class ClassifiedDocumentsService {
         faction: { select: { id: true, slug: true, name: true, color: true } },
       },
     });
-    return filterByDepartment(documents, departmentId);
+    return filterByClearance(filterByDepartment(documents, departmentId), clearanceLevel);
   }
 
-  async findBySlug(slug: string, departmentId: string | null = null) {
+  async findBySlug(slug: string, departmentId: string | null = null, clearanceLevel = 1) {
     const document = await this.prisma.classifiedDocument.findUnique({
       where: { slug },
       include: {
@@ -76,7 +78,10 @@ export class ClassifiedDocumentsService {
     if (!document || document.status !== ClassifiedDocumentStatus.PUBLISHED) {
       throw new NotFoundException('Document introuvable');
     }
-    if (!isVisibleToDepartment(document.restrictedDepartmentIds, departmentId)) {
+    if (
+      !isVisibleToDepartment(document.restrictedDepartmentIds, departmentId) ||
+      !meetsClearance(document.minClearanceLevel, clearanceLevel)
+    ) {
       throw new NotFoundException('Accès restreint à un autre département');
     }
     return this.filterLinks(document, departmentId);

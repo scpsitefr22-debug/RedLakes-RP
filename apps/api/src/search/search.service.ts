@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Client } from '@elastic/elasticsearch';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoreArticle, ScpProposalStatus } from '@prisma/client';
-import { filterByDepartment } from '../common/department-visibility';
+import { filterByClearance, filterByDepartment } from '../common/department-visibility';
 
 export interface SearchHit {
   id: string;
@@ -112,6 +112,7 @@ export class SearchService implements OnModuleInit {
     query: string,
     limit = 20,
     departmentId: string | null = null,
+    clearanceLevel = 1,
   ): Promise<SearchHit[]> {
     if (!query.trim()) return [];
 
@@ -150,7 +151,7 @@ export class SearchService implements OnModuleInit {
       }
     }
 
-    return this.fallbackSearch(query, limit, departmentId);
+    return this.fallbackSearch(query, limit, departmentId, clearanceLevel);
   }
 
   /**
@@ -166,6 +167,7 @@ export class SearchService implements OnModuleInit {
     query: string,
     limit: number,
     departmentId: string | null = null,
+    clearanceLevel = 1,
   ): Promise<SearchHit[]> {
     const insensitive = { contains: query, mode: 'insensitive' as const };
 
@@ -252,7 +254,10 @@ export class SearchService implements OnModuleInit {
     const scpObjects = filterByDepartment(scpObjectsRaw, departmentId);
     const characters = filterByDepartment(charactersRaw, departmentId);
     const events = filterByDepartment(eventsRaw, departmentId);
-    const documents = filterByDepartment(documentsRaw, departmentId);
+    const documents = filterByClearance(
+      filterByDepartment(documentsRaw, departmentId),
+      clearanceLevel,
+    );
 
     const hits: SearchHit[] = [
       ...articles.map((a) => ({

@@ -30,6 +30,10 @@ export class FactionsController {
     return req.user ? this.factions.resolveDepartmentId(req.user.id) : null;
   }
 
+  private async clearanceLevelOf(req: OptionalAuthRequest) {
+    return req.user ? this.factions.resolveClearanceLevel(req.user.id) : 1;
+  }
+
   @Get()
   @UseGuards(OptionalAuthGuard)
   findAll(@Req() req: OptionalAuthRequest) {
@@ -74,7 +78,11 @@ export class FactionsController {
   async listScpObjects(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
     const faction = await this.factions.findOne(slug);
     if (!faction) throw new NotFoundException('Faction introuvable');
-    return this.factions.listScpObjects(faction.id, await this.departmentIdOf(req));
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    return this.factions.listScpObjects(faction.id, departmentId, clearanceLevel);
   }
 
   @Post()

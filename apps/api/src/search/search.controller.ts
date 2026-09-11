@@ -17,6 +17,10 @@ export class SearchController {
     return req.user ? this.players.getDepartmentId(req.user.id) : null;
   }
 
+  private async clearanceLevelOf(req: OptionalAuthRequest) {
+    return req.user ? this.players.getClearanceLevel(req.user.id) : 1;
+  }
+
   @Get()
   @UseGuards(OptionalAuthGuard)
   async query(
@@ -24,10 +28,15 @@ export class SearchController {
     @Req() req: OptionalAuthRequest,
     @Query('limit') limit?: string,
   ) {
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
     return this.searchService.search(
       q ?? '',
       limit ? parseInt(limit) : 20,
-      await this.departmentIdOf(req),
+      departmentId,
+      clearanceLevel,
     );
   }
 }

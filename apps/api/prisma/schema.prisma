@@ -244,6 +244,11 @@ model ClassifiedDocument {
   content                 String
   status                  ClassifiedDocumentStatus @default(DRAFT)
   restrictedDepartmentIds String[]                 @default([])
+  /// Habilitation minimale (1-5, meme echelle que Grade.clearanceLevel)
+  /// requise EN PLUS de restrictedDepartmentIds — un membre du departement
+  /// autorise mais d'un grade trop bas reste bloque. 1 = aucune exigence
+  /// (comportement identique a avant ce champ).
+  minClearanceLevel       Int                      @default(1)
   factionId               String?
   faction                 Faction?                 @relation(fields: [factionId], references: [id], onDelete: SetNull)
   tags                    String[]                 @default([])
@@ -273,6 +278,7 @@ model ClassifiedDocumentRevision {
   content                 String
   status                  ClassifiedDocumentStatus
   restrictedDepartmentIds String[]
+  minClearanceLevel       Int              @default(1)
   factionId               String?
   tags                    String[]
   attachments             String[]

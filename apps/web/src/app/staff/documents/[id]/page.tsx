@@ -13,6 +13,7 @@ interface ApiClassifiedDocumentFull {
   content: string;
   status: string;
   restrictedDepartmentIds: string[];
+  minClearanceLevel: number;
   factionId: string | null;
   tags: string[];
   attachments: string[];
@@ -52,6 +53,7 @@ export default function EditClassifiedDocumentPage() {
           content: doc.content,
           status: doc.status,
           restrictedDepartmentIds: doc.restrictedDepartmentIds,
+          minClearanceLevel: String(doc.minClearanceLevel),
           factionId: doc.factionId ?? "",
           tags: doc.tags.join(", "),
           attachments: doc.attachments.join(", "),

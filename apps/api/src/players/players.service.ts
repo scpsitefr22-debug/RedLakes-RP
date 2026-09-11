@@ -215,6 +215,27 @@ export class PlayersService {
     return player?.gradeInfo?.departmentRefId ?? null;
   }
 
+  /**
+   * Habilitation reelle (1-5) du personnage actif — meme resolution que
+   * formatProfile (catalogue en priorite, regex en filet de securite),
+   * exposee ici pour les endpoints qui doivent filtrer du contenu par
+   * clearance sans avoir deja charge tout le profil (ex. documents
+   * classifies). 1 (public) si aucun personnage actif.
+   */
+  async getClearanceLevel(userId: string): Promise<number> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { activeCharacterId: true },
+    });
+    if (!user?.activeCharacterId) return 1;
+    const player = await this.prisma.player.findUnique({
+      where: { id: user.activeCharacterId },
+      select: { grade: true, gradeInfo: { select: { clearanceLevel: true } } },
+    });
+    if (!player) return 1;
+    return player.gradeInfo?.clearanceLevel ?? clearanceForGrade(player.grade);
+  }
+
   async findIdByUsername(username: string) {
     const user = await this.prisma.user.findUnique({
       where: { minecraftUsername: username },

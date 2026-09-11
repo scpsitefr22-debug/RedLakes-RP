@@ -6,7 +6,11 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { normalizeGradeName } from '../grades/grades.service';
-import { filterByDepartment } from '../common/department-visibility';
+import {
+  filterByClearance,
+  filterByDepartment,
+} from '../common/department-visibility';
+import { clearanceForGrade } from '../players/grade-clearance';
 import { CreateFactionDto, UpdateFactionDto } from './dto/faction.dto';
 
 @Injectable()
@@ -97,6 +101,24 @@ export class FactionsService {
     return player?.gradeInfo?.departmentRefId ?? null;
   }
 
+  /**
+   * Meme requete que PlayersService.getClearanceLevel — dupliquee ici pour
+   * la meme raison anti-cycle que resolveDepartmentId ci-dessus.
+   */
+  async resolveClearanceLevel(userId: string): Promise<number> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { activeCharacterId: true },
+    });
+    if (!user?.activeCharacterId) return 1;
+    const player = await this.prisma.player.findUnique({
+      where: { id: user.activeCharacterId },
+      select: { grade: true, gradeInfo: { select: { clearanceLevel: true } } },
+    });
+    if (!player) return 1;
+    return player.gradeInfo?.clearanceLevel ?? clearanceForGrade(player.grade);
+  }
+
   /** Évènements RP liés à cette faction — filtrés par habilitation du demandeur, même règle que EventsService. */
   async listEvents(factionId: string, departmentId: string | null = null) {
     const events = await this.prisma.gameEvent.findMany({
@@ -117,11 +139,16 @@ export class FactionsService {
    * chacun etre visibles au demandeur (un document public peut lier un
    * SCP restreint, et inversement).
    */
-  async listScpObjects(factionId: string, departmentId: string | null = null) {
+  async listScpObjects(
+    factionId: string,
+    departmentId: string | null = null,
+    clearanceLevel = 1,
+  ) {
     const documents = await this.prisma.classifiedDocument.findMany({
       where: { factionId, status: ClassifiedDocumentStatus.PUBLISHED },
       select: {
         restrictedDepartmentIds: true,
+        minClearanceLevel: true,
         linkedScpObjects: {
           where: { status: ScpProposalStatus.APPROVED },
           select: {
@@ -137,7 +164,10 @@ export class FactionsService {
       },
     });
 
-    const visibleDocuments = filterByDepartment(documents, departmentId);
+    const visibleDocuments = filterByClearance(
+      filterByDepartment(documents, departmentId),
+      clearanceLevel,
+    );
     const bySlug = new Map<
       string,
       (typeof visibleDocuments)[number]['linkedScpObjects'][number]

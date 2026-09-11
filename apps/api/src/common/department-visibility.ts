@@ -20,6 +20,27 @@ export function filterByDepartment<
   );
 }
 
+/**
+ * Deuxieme axe d'habilitation, orthogonal a restrictedDepartmentIds : un
+ * departement autorise n'implique pas un grade suffisant (ex. un document
+ * reserve au departement Securite mais lisible seulement a partir du
+ * niveau 3 — un nouveau recru du departement reste bloque). Compose avec
+ * isVisibleToDepartment/filterByDepartment, jamais un remplacement.
+ */
+export function meetsClearance(
+  minClearanceLevel: number,
+  clearanceLevel: number,
+): boolean {
+  return clearanceLevel >= minClearanceLevel;
+}
+
+export function filterByClearance<T extends { minClearanceLevel: number }>(
+  items: T[],
+  clearanceLevel: number,
+): T[] {
+  return items.filter((item) => meetsClearance(item.minClearanceLevel, clearanceLevel));
+}
+
 interface RestrictableAddendum {
   author: string;
   content: string;

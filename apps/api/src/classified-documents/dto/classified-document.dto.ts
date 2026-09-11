@@ -1,8 +1,11 @@
 import {
   IsArray,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
+  Max,
+  Min,
   MinLength,
 } from 'class-validator';
 import { ClassifiedDocumentStatus } from '@prisma/client';
@@ -32,6 +35,12 @@ export class CreateClassifiedDocumentDto {
   @IsArray()
   @IsString({ each: true })
   restrictedDepartmentIds?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  minClearanceLevel?: number;
 
   @IsOptional()
   @IsString()
@@ -79,6 +88,12 @@ export class UpdateClassifiedDocumentDto {
   @IsArray()
   @IsString({ each: true })
   restrictedDepartmentIds?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  minClearanceLevel?: number;
 
   @IsOptional()
   @IsString()
