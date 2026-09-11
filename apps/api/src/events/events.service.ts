@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ClassifiedDocumentStatus } from '@prisma/client';
+import { ClassifiedDocumentStatus, ScpProposalStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateGameEventDto, UpdateGameEventDto } from './dto/game-event.dto';
 import {
@@ -42,7 +42,27 @@ export class EventsService {
         faction: { select: { id: true, slug: true, name: true, color: true } },
         linkedDocuments: {
           where: { status: ClassifiedDocumentStatus.PUBLISHED },
-          select: { id: true, slug: true, title: true, excerpt: true, restrictedDepartmentIds: true },
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            excerpt: true,
+            restrictedDepartmentIds: true,
+            minClearanceLevel: true,
+            linkedScpObjects: {
+              where: { status: ScpProposalStatus.APPROVED },
+              select: {
+                id: true,
+                slug: true,
+                number: true,
+                name: true,
+                class: true,
+                threatLevel: true,
+                restrictedDepartmentIds: true,
+                minClearanceLevel: true,
+              },
+            },
+          },
         },
       },
     });
@@ -53,9 +73,31 @@ export class EventsService {
     ) {
       throw new NotFoundException('Accès restreint à un autre département');
     }
+
+    const visibleDocuments = filterByClearance(
+      filterByDepartment(event.linkedDocuments, departmentId),
+      clearanceLevel,
+    );
+    const linkedScpBySlug = new Map<
+      string,
+      (typeof visibleDocuments)[number]['linkedScpObjects'][number]
+    >();
+    for (const doc of visibleDocuments) {
+      for (const scp of filterByClearance(
+        filterByDepartment(doc.linkedScpObjects, departmentId),
+        clearanceLevel,
+      )) {
+        linkedScpBySlug.set(scp.slug, scp);
+      }
+    }
+
     return {
       ...event,
-      linkedDocuments: filterByDepartment(event.linkedDocuments, departmentId),
+      linkedDocuments: visibleDocuments.map(({ linkedScpObjects: _s, ...doc }) => doc),
+      /// SCP lies a cet evenement via ses documents classifies — meme
+      /// composition transitive que ScpService.findOne (miroir exact,
+      /// meme relation ClassifiedDocument<->ScpObject du Lot 40).
+      linkedScpObjects: [...linkedScpBySlug.values()],
     };
   }
 

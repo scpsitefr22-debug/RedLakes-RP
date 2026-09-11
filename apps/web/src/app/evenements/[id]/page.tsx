@@ -1,6 +1,7 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { FileLock2 } from "lucide-react";
+import { FileLock2, BookOpen } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
 import { EditableText } from "@/components/staff/EditableText";
@@ -8,6 +9,14 @@ import { OptionalSection } from "@/components/staff/OptionalSection";
 
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+interface ApiScpRef {
+  id: string;
+  slug: string;
+  number: string;
+  name: string;
+  class: "Safe" | "Euclid" | "Keter" | "Thaumiel" | "Apollyon";
 }
 
 interface ApiGameEventDetail {
@@ -19,11 +28,32 @@ interface ApiGameEventDetail {
   outcome: string;
   faction: { slug: string; name: string; color: string | null } | null;
   linkedDocuments: { id: string; slug: string; title: string; excerpt: string | null }[];
+  linkedScpObjects: ApiScpRef[];
 }
 
+const SCP_CLASS_COLORS: Record<ApiScpRef["class"], string> = {
+  Safe: "text-green-400",
+  Euclid: "text-yellow-400",
+  Keter: "text-red-400",
+  Thaumiel: "text-purple-400",
+  Apollyon: "text-orange-400",
+};
+
+/**
+ * Fetch anonyme jusqu'ici (aucun cookie transmis) — un vrai bug, pas juste
+ * une amelioration : un evenement restreint par departement/habilitation
+ * etait donc INACCESSIBLE A TOUT LE MONDE, meme au personnel autorise, la
+ * verification cote API n'ayant jamais l'identite du visiteur. Corrige au
+ * meme moment que l'ajout des SCP lies, meme fonction touchee.
+ */
 async function getGameEvent(slug: string): Promise<ApiGameEventDetail | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("redlakes_token")?.value;
   try {
-    const res = await fetch(`${API_URL}/events/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/events/${slug}`, {
+      cache: "no-store",
+      headers: token ? { Cookie: `redlakes_token=${token}` } : undefined,
+    });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -110,6 +140,33 @@ export default async function EvenementDetailPage({ params }: Props) {
                 >
                   <p className="text-sm font-bold text-white">{doc.title}</p>
                   {doc.excerpt && <p className="line-clamp-1 text-xs text-gray-500">{doc.excerpt}</p>}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {event.linkedScpObjects.length > 0 && (
+          <section className="hologram-border rounded-lg p-6">
+            <h2 className="mb-4 flex items-center gap-2 font-bold text-white">
+              <BookOpen className="h-4 w-4 text-redlake-glow" />
+              Objets SCP liés
+            </h2>
+            <div className="space-y-2">
+              {event.linkedScpObjects.map((scp) => (
+                <Link
+                  key={scp.id}
+                  href={`/wiki/${scp.slug}`}
+                  className="flex items-center justify-between gap-3 rounded border border-metal/40 p-3 transition-colors hover:border-redlake/30"
+                >
+                  <p className="truncate text-sm font-bold text-white">
+                    {scp.number} — {scp.name}
+                  </p>
+                  <span
+                    className={`shrink-0 font-mono text-[10px] uppercase tracking-wide ${SCP_CLASS_COLORS[scp.class]}`}
+                  >
+                    {scp.class}
+                  </span>
                 </Link>
               ))}
             </div>
