@@ -11,6 +11,38 @@ import { clearanceForGrade } from './grade-clearance';
 
 const MAX_CHARACTERS_PER_ACCOUNT = 5;
 
+/**
+ * Profil de permissions "derive du Grade" — voir REDLAKES-CORE-SPEC.md,
+ * section Permissions : "suppression progressive de PLAYER/STAFF/ADMIN au
+ * profit de permissions derivees du Grade... le systeme actuel reste en
+ * place EN PARALLELE jusqu'a preuve que les permissions derivees donnent
+ * les memes resultats." Ceci EST cette premiere preuve — un profil
+ * calcule en lecture seule, compare au systeme actuel, mais qui
+ * n'autorise ni ne bloque encore rien. Aucun @Roles/@MinRank existant
+ * n'est touche par ce lot.
+ *
+ * Regle explicite a respecter en continu (memoire projet) : un grade RP
+ * (ex. Directeur de Branche) ne doit JAMAIS auto-devenir STAFF. Ce profil
+ * reste donc purement informatif/comparatif ; la decision de brancher un
+ * jour une vraie regle dessus revient au staff, pas a un calcul automatique.
+ */
+export interface DerivedPermissionProfile {
+  userId: string;
+  activeCharacterId: string | null;
+  gradeId: string | null;
+  gradeName: string | null;
+  clearanceLevel: number;
+  departmentId: string | null;
+  departmentName: string | null;
+  factionId: string | null;
+  factionName: string | null;
+  isDepartmentChief: boolean;
+  isFactionChief: boolean;
+  isTeamChief: boolean;
+  currentRole: UserRole;
+  currentStaffRank: StaffRank | null;
+}
+
 @Injectable()
 export class PlayersService {
   constructor(
@@ -234,6 +266,105 @@ export class PlayersService {
     });
     if (!player) return 1;
     return player.gradeInfo?.clearanceLevel ?? clearanceForGrade(player.grade);
+  }
+
+  /** Voir le commentaire sur DerivedPermissionProfile plus haut dans ce fichier. */
+  async resolveDerivedPermissions(userId: string): Promise<DerivedPermissionProfile> {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+        staffRank: true,
+        activeCharacterId: true,
+        activeCharacter: {
+          select: {
+            grade: true,
+            gradeInfo: {
+              select: {
+                id: true,
+                name: true,
+                clearanceLevel: true,
+                departmentRef: { select: { id: true, name: true, chefId: true } },
+              },
+            },
+            factionInfo: { select: { id: true, name: true, chefId: true } },
+            teamInfo: { select: { id: true, chefId: true } },
+          },
+        },
+      },
+    });
+
+    const character = user.activeCharacter;
+    const clearanceLevel = character
+      ? (character.gradeInfo?.clearanceLevel ?? clearanceForGrade(character.grade))
+      : 1;
+
+    return {
+      userId: user.id,
+      activeCharacterId: user.activeCharacterId,
+      gradeId: character?.gradeInfo?.id ?? null,
+      gradeName: character?.gradeInfo?.name ?? character?.grade ?? null,
+      clearanceLevel,
+      departmentId: character?.gradeInfo?.departmentRef?.id ?? null,
+      departmentName: character?.gradeInfo?.departmentRef?.name ?? null,
+      factionId: character?.factionInfo?.id ?? null,
+      factionName: character?.factionInfo?.name ?? null,
+      isDepartmentChief:
+        !!character?.gradeInfo?.departmentRef &&
+        character.gradeInfo.departmentRef.chefId === userId,
+      isFactionChief:
+        !!character?.factionInfo && character.factionInfo.chefId === userId,
+      isTeamChief: !!character?.teamInfo && character.teamInfo.chefId === userId,
+      currentRole: user.role,
+      currentStaffRank: user.staffRank,
+    };
+  }
+
+  /**
+   * Rapport de comparaison pour tous les comptes avec un personnage actif —
+   * l'outil de "preuve" demande par le spec avant toute bascule reelle.
+   * "matches" compare une premiere hypothese (chef de departement/faction/
+   * equipe <-> compte STAFF ou ADMIN) — une observation, pas une regle
+   * appliquee. Reserve au staff (donnees de tous les comptes).
+   */
+  async compareGradePermissions() {
+    const users = await this.prisma.user.findMany({
+      where: { activeCharacterId: { not: null } },
+      select: {
+        id: true,
+        minecraftUsername: true,
+        discordUsername: true,
+        username: true,
+      },
+    });
+
+    const rows = await Promise.all(
+      users.map(async (u) => {
+        const profile = await this.resolveDerivedPermissions(u.id);
+        const label =
+          u.discordUsername ?? u.minecraftUsername ?? u.username ?? u.id;
+        const derivedLead =
+          profile.isDepartmentChief || profile.isFactionChief || profile.isTeamChief;
+        const currentlyStaff =
+          profile.currentRole === UserRole.STAFF ||
+          profile.currentRole === UserRole.ADMIN;
+        return {
+          label,
+          ...profile,
+          derivedLead,
+          currentlyStaff,
+          matches: derivedLead === currentlyStaff,
+        };
+      }),
+    );
+
+    return {
+      generatedAt: new Date().toISOString(),
+      total: rows.length,
+      agreementCount: rows.filter((r) => r.matches).length,
+      rows,
+    };
   }
 
   async findIdByUsername(username: string) {

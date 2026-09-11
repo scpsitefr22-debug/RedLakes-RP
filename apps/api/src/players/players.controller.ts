@@ -44,6 +44,29 @@ export class PlayersController {
     return this.players.getCareerHistory(req.user.id);
   }
 
+  /**
+   * Profil de permissions derive du Grade pour SON PROPRE compte — voir
+   * DerivedPermissionProfile dans players.service.ts. Informatif
+   * uniquement, ne change aucun acces reel.
+   */
+  @Get('me/derived-permissions')
+  @UseGuards(AuthGuard)
+  getMyDerivedPermissions(@Req() req: Request & { user: { id: string } }) {
+    return this.players.resolveDerivedPermissions(req.user.id);
+  }
+
+  /**
+   * Rapport de comparaison (tous les comptes) — outil de "preuve" avant
+   * toute bascule vers des permissions derivees du Grade, voir spec CORE.
+   * Reserve au staff : expose des donnees sur tous les comptes.
+   */
+  @Get('permissions-report')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  getPermissionsReport() {
+    return this.players.compareGradePermissions();
+  }
+
   @Get('me/characters')
   @UseGuards(AuthGuard)
   listMyCharacters(@Req() req: Request & { user: { id: string } }) {
