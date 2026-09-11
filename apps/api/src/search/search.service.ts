@@ -250,10 +250,22 @@ export class SearchService implements OnModuleInit {
       }),
     ]);
 
-    const articles = filterByDepartment(articlesRaw, departmentId);
-    const scpObjects = filterByDepartment(scpObjectsRaw, departmentId);
-    const characters = filterByDepartment(charactersRaw, departmentId);
-    const events = filterByDepartment(eventsRaw, departmentId);
+    const articles = filterByClearance(
+      filterByDepartment(articlesRaw, departmentId),
+      clearanceLevel,
+    );
+    const scpObjects = filterByClearance(
+      filterByDepartment(scpObjectsRaw, departmentId),
+      clearanceLevel,
+    );
+    const characters = filterByClearance(
+      filterByDepartment(charactersRaw, departmentId),
+      clearanceLevel,
+    );
+    const events = filterByClearance(
+      filterByDepartment(eventsRaw, departmentId),
+      clearanceLevel,
+    );
     const documents = filterByClearance(
       filterByDepartment(documentsRaw, departmentId),
       clearanceLevel,

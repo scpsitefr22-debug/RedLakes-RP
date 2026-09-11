@@ -5,6 +5,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  Max,
   Min,
   MinLength,
 } from 'class-validator';
@@ -88,6 +89,12 @@ export class CreateScpObjectDto {
   @IsArray()
   @IsString({ each: true })
   restrictedDepartmentIds?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  minClearanceLevel?: number;
 }
 
 export class UpdateScpObjectDto {
@@ -154,4 +161,10 @@ export class UpdateScpObjectDto {
   @IsArray()
   @IsString({ each: true })
   restrictedDepartmentIds?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  minClearanceLevel?: number;
 }

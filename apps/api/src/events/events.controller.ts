@@ -37,10 +37,18 @@ export class EventsController {
     return req.user ? this.players.getDepartmentId(req.user.id) : null;
   }
 
+  private async clearanceLevelOf(req: OptionalAuthRequest) {
+    return req.user ? this.players.getClearanceLevel(req.user.id) : 1;
+  }
+
   @Get()
   @UseGuards(OptionalAuthGuard)
   async findAll(@Req() req: OptionalAuthRequest) {
-    return this.events.findAll(await this.departmentIdOf(req));
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    return this.events.findAll(departmentId, clearanceLevel);
   }
 
   @Get('cms')
@@ -62,10 +70,11 @@ export class EventsController {
   @Get(':slug')
   @UseGuards(OptionalAuthGuard)
   async findOne(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
-    const event = await this.events.findOne(
-      slug,
-      await this.departmentIdOf(req),
-    );
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    const event = await this.events.findOne(slug, departmentId, clearanceLevel);
     if (!event) throw new NotFoundException('Événement introuvable');
     return event;
   }

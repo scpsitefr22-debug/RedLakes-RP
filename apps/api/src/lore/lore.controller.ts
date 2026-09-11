@@ -33,10 +33,18 @@ export class LoreController {
     return req.user ? this.players.getDepartmentId(req.user.id) : null;
   }
 
+  private async clearanceLevelOf(req: OptionalAuthRequest) {
+    return req.user ? this.players.getClearanceLevel(req.user.id) : 1;
+  }
+
   @Get()
   @UseGuards(OptionalAuthGuard)
   async findPublished(@Req() req: OptionalAuthRequest) {
-    return this.lore.findPublished(await this.departmentIdOf(req));
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    return this.lore.findPublished(departmentId, clearanceLevel);
   }
 
   @Get('cms')
@@ -49,7 +57,11 @@ export class LoreController {
   @Get(':slug')
   @UseGuards(OptionalAuthGuard)
   async findOne(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
-    return this.lore.findBySlug(slug, await this.departmentIdOf(req));
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    return this.lore.findBySlug(slug, departmentId, clearanceLevel);
   }
 
   @Post()

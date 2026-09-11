@@ -43,6 +43,7 @@ export interface ScpFormData {
   personnelAssigned: string;
   breachCount: string;
   restrictedDepartmentIds: string[];
+  minClearanceLevel: string;
 }
 
 interface ScpEditorProps {
@@ -74,6 +75,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
     personnelAssigned: initial?.personnelAssigned ?? "",
     breachCount: initial?.breachCount ?? "",
     restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
+    minClearanceLevel: initial?.minClearanceLevel ?? "1",
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -128,6 +130,7 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
         personnelAssigned: form.personnelAssigned === "" ? undefined : Number(form.personnelAssigned),
         breachCount: form.breachCount === "" ? undefined : Number(form.breachCount),
         restrictedDepartmentIds: form.restrictedDepartmentIds,
+        minClearanceLevel: parseInt(form.minClearanceLevel, 10) || 1,
       };
 
       if (mode === "create") {
@@ -218,6 +221,22 @@ export function ScpEditor({ initial, scpId, mode }: ScpEditorProps) {
           value={form.restrictedDepartmentIds}
           onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
         />
+        <div>
+          <label className="mb-1 block font-mono text-xs text-gray-500">
+            Habilitation minimale requise (en plus du département)
+          </label>
+          <select
+            className={inputClass}
+            value={form.minClearanceLevel}
+            onChange={(e) => setForm((f) => ({ ...f, minClearanceLevel: e.target.value }))}
+          >
+            <option value="1">Niveau 1 — aucune exigence</option>
+            <option value="2">Niveau 2</option>
+            <option value="3">Niveau 3</option>
+            <option value="4">Niveau 4</option>
+            <option value="5">Niveau 5 — Conseil Oméga uniquement</option>
+          </select>
+        </div>
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">Confinement</label>
           <textarea rows={2} className={inputClass} value={form.containment} onChange={(e) => update("containment", e.target.value)} />

@@ -185,6 +185,8 @@ model LoreArticle {
   category                LoreCategory
   status                  LoreStatus   @default(DRAFT)
   restrictedDepartmentIds String[]     @default([])
+  /// Meme principe que ClassifiedDocument.minClearanceLevel.
+  minClearanceLevel       Int          @default(1)
   featured                Boolean      @default(false)
   coverImage              String?
   tags                    String[]     @default([])
@@ -211,6 +213,7 @@ model LoreRevision {
   category                LoreCategory
   status                  LoreStatus
   restrictedDepartmentIds String[]
+  minClearanceLevel       Int      @default(1)
   featured                Boolean
   coverImage              String?
   tags                    String[]
@@ -829,6 +832,9 @@ model ScpObject {
   personnelAssigned       Int?
   breachCount             Int?
   restrictedDepartmentIds String[]          @default([])
+  /// Meme principe que ClassifiedDocument.minClearanceLevel : deuxieme axe
+  /// d'habilitation, orthogonal au departement.
+  minClearanceLevel       Int               @default(1)
   status                  ScpProposalStatus @default(APPROVED)
   submittedById           String?
   submittedBy             User?             @relation(fields: [submittedById], references: [id], onDelete: SetNull)
@@ -895,6 +901,8 @@ model Character {
   history                 String[] @default([])
   portrait                String?
   restrictedDepartmentIds String[] @default([])
+  /// Meme principe que ClassifiedDocument.minClearanceLevel.
+  minClearanceLevel       Int      @default(1)
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   revisions               CharacterRevision[]
@@ -939,6 +947,8 @@ model GameEvent {
   casualties              String?
   outcome                 String
   restrictedDepartmentIds String[] @default([])
+  /// Meme principe que ClassifiedDocument.minClearanceLevel.
+  minClearanceLevel       Int      @default(1)
   factionId               String?
   faction                 Faction? @relation(fields: [factionId], references: [id], onDelete: SetNull)
   createdAt               DateTime @default(now())

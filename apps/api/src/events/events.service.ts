@@ -3,8 +3,10 @@ import { ClassifiedDocumentStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateGameEventDto, UpdateGameEventDto } from './dto/game-event.dto';
 import {
+  filterByClearance,
   filterByDepartment,
   isVisibleToDepartment,
+  meetsClearance,
 } from '../common/department-visibility';
 import { DiscordService } from '../sync/discord.service';
 
@@ -15,18 +17,25 @@ export class EventsService {
     private discord: DiscordService,
   ) {}
 
-  async findAll(departmentId: string | null = null) {
+  async findAll(departmentId: string | null = null, clearanceLevel = 1) {
     const events = await this.prisma.gameEvent.findMany({
       orderBy: { date: 'desc' },
     });
-    return filterByDepartment(events, departmentId);
+    return filterByClearance(
+      filterByDepartment(events, departmentId),
+      clearanceLevel,
+    );
   }
 
   findAllAdmin() {
     return this.prisma.gameEvent.findMany({ orderBy: { date: 'desc' } });
   }
 
-  async findOne(slug: string, departmentId: string | null = null) {
+  async findOne(
+    slug: string,
+    departmentId: string | null = null,
+    clearanceLevel = 1,
+  ) {
     const event = await this.prisma.gameEvent.findUnique({
       where: { slug },
       include: {
@@ -38,7 +47,10 @@ export class EventsService {
       },
     });
     if (!event) return null;
-    if (!isVisibleToDepartment(event.restrictedDepartmentIds, departmentId)) {
+    if (
+      !isVisibleToDepartment(event.restrictedDepartmentIds, departmentId) ||
+      !meetsClearance(event.minClearanceLevel, clearanceLevel)
+    ) {
       throw new NotFoundException('Accès restreint à un autre département');
     }
     return {

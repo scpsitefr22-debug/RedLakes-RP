@@ -24,6 +24,7 @@ export interface GameEventFormData {
   casualties: string;
   outcome: string;
   restrictedDepartmentIds: string[];
+  minClearanceLevel: string;
   factionId: string;
 }
 
@@ -44,6 +45,7 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
     casualties: initial?.casualties ?? "",
     outcome: initial?.outcome ?? "",
     restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
+    minClearanceLevel: initial?.minClearanceLevel ?? "1",
     factionId: initial?.factionId ?? "",
   });
   const [error, setError] = useState("");
@@ -80,6 +82,7 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
         casualties: form.casualties || undefined,
         outcome: form.outcome,
         restrictedDepartmentIds: form.restrictedDepartmentIds,
+        minClearanceLevel: parseInt(form.minClearanceLevel, 10) || 1,
         factionId: form.factionId || undefined,
       };
 
@@ -165,6 +168,22 @@ export function GameEventEditor({ initial, eventId, mode }: GameEventEditorProps
           value={form.restrictedDepartmentIds}
           onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
         />
+        <div>
+          <label className="mb-1 block font-mono text-xs text-gray-500">
+            Habilitation minimale requise (en plus du département)
+          </label>
+          <select
+            className={inputClass}
+            value={form.minClearanceLevel}
+            onChange={(e) => setForm((f) => ({ ...f, minClearanceLevel: e.target.value }))}
+          >
+            <option value="1">Niveau 1 — aucune exigence</option>
+            <option value="2">Niveau 2</option>
+            <option value="3">Niveau 3</option>
+            <option value="4">Niveau 4</option>
+            <option value="5">Niveau 5 — Conseil Oméga uniquement</option>
+          </select>
+        </div>
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">
             Faction liée (optionnel — affiché sur la fiche de la faction)

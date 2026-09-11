@@ -1,8 +1,11 @@
 import {
   IsArray,
   IsDateString,
+  IsInt,
   IsOptional,
   IsString,
+  Max,
+  Min,
   MinLength,
 } from 'class-validator';
 
@@ -35,6 +38,12 @@ export class CreateGameEventDto {
   @IsArray()
   @IsString({ each: true })
   restrictedDepartmentIds?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  minClearanceLevel?: number;
 
   @IsOptional()
   @IsString()
@@ -70,6 +79,12 @@ export class UpdateGameEventDto {
   @IsArray()
   @IsString({ each: true })
   restrictedDepartmentIds?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  minClearanceLevel?: number;
 
   @IsOptional()
   @IsString()

@@ -10,8 +10,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateScpObjectDto, UpdateScpObjectDto } from './dto/scp-object.dto';
 import { ProposeScpDto } from './dto/propose-scp.dto';
 import {
+  filterByClearance,
   filterByDepartment,
   isVisibleToDepartment,
+  meetsClearance,
   redactAddendums,
 } from '../common/department-visibility';
 import { AuditService } from '../platform/audit.service';
@@ -25,7 +27,11 @@ export class ScpService {
     private notifications: NotificationsService,
   ) {}
 
-  async findAll(scpClass?: ScpClass, departmentId: string | null = null) {
+  async findAll(
+    scpClass?: ScpClass,
+    departmentId: string | null = null,
+    clearanceLevel = 1,
+  ) {
     const objects = await this.prisma.scpObject.findMany({
       where: {
         status: ScpProposalStatus.APPROVED,
@@ -33,9 +39,10 @@ export class ScpService {
       },
       orderBy: { number: 'asc' },
     });
-    return filterByDepartment(objects, departmentId).map((scp) =>
-      redactAddendums(scp, departmentId),
-    );
+    return filterByClearance(
+      filterByDepartment(objects, departmentId),
+      clearanceLevel,
+    ).map((scp) => redactAddendums(scp, departmentId));
   }
 
   findAllAdmin(status?: ScpProposalStatus) {
@@ -50,7 +57,11 @@ export class ScpService {
     });
   }
 
-  async findOne(slug: string, departmentId: string | null = null) {
+  async findOne(
+    slug: string,
+    departmentId: string | null = null,
+    clearanceLevel = 1,
+  ) {
     const scp = await this.prisma.scpObject.findUnique({
       where: { slug },
       include: {
@@ -61,7 +72,10 @@ export class ScpService {
       },
     });
     if (!scp || scp.status !== ScpProposalStatus.APPROVED) return null;
-    if (!isVisibleToDepartment(scp.restrictedDepartmentIds, departmentId)) {
+    if (
+      !isVisibleToDepartment(scp.restrictedDepartmentIds, departmentId) ||
+      !meetsClearance(scp.minClearanceLevel, clearanceLevel)
+    ) {
       throw new NotFoundException('Accès restreint à un autre département');
     }
     return {

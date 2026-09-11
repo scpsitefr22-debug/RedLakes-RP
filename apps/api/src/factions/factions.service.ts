@@ -120,13 +120,17 @@ export class FactionsService {
   }
 
   /** Évènements RP liés à cette faction — filtrés par habilitation du demandeur, même règle que EventsService. */
-  async listEvents(factionId: string, departmentId: string | null = null) {
+  async listEvents(
+    factionId: string,
+    departmentId: string | null = null,
+    clearanceLevel = 1,
+  ) {
     const events = await this.prisma.gameEvent.findMany({
       where: { factionId },
       orderBy: { date: 'desc' },
       take: 6,
     });
-    return filterByDepartment(events, departmentId);
+    return filterByClearance(filterByDepartment(events, departmentId), clearanceLevel);
   }
 
   /**

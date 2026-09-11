@@ -37,10 +37,18 @@ export class CharactersController {
     return req.user ? this.players.getDepartmentId(req.user.id) : null;
   }
 
+  private async clearanceLevelOf(req: OptionalAuthRequest) {
+    return req.user ? this.players.getClearanceLevel(req.user.id) : 1;
+  }
+
   @Get()
   @UseGuards(OptionalAuthGuard)
   async findAll(@Req() req: OptionalAuthRequest) {
-    return this.characters.findAll(await this.departmentIdOf(req));
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    return this.characters.findAll(departmentId, clearanceLevel);
   }
 
   @Get('cms')
@@ -62,9 +70,14 @@ export class CharactersController {
   @Get(':slug')
   @UseGuards(OptionalAuthGuard)
   async findOne(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
     const character = await this.characters.findOne(
       slug,
-      await this.departmentIdOf(req),
+      departmentId,
+      clearanceLevel,
     );
     if (!character) throw new NotFoundException('Personnage introuvable');
     return character;

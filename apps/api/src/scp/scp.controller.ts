@@ -38,13 +38,21 @@ export class ScpController {
     return req.user ? this.players.getDepartmentId(req.user.id) : null;
   }
 
+  private async clearanceLevelOf(req: OptionalAuthRequest) {
+    return req.user ? this.players.getClearanceLevel(req.user.id) : 1;
+  }
+
   @Get()
   @UseGuards(OptionalAuthGuard)
   async findAll(
     @Req() req: OptionalAuthRequest,
     @Query('class') scpClass?: ScpClass,
   ) {
-    return this.scp.findAll(scpClass, await this.departmentIdOf(req));
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    return this.scp.findAll(scpClass, departmentId, clearanceLevel);
   }
 
   @Get('cms')
@@ -72,7 +80,11 @@ export class ScpController {
   @Get(':slug')
   @UseGuards(OptionalAuthGuard)
   async findOne(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
-    const scp = await this.scp.findOne(slug, await this.departmentIdOf(req));
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    const scp = await this.scp.findOne(slug, departmentId, clearanceLevel);
     if (!scp) throw new NotFoundException('Objet SCP introuvable');
     return scp;
   }

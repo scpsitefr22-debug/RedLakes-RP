@@ -2,8 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCharacterDto, UpdateCharacterDto } from './dto/character.dto';
 import {
+  filterByClearance,
   filterByDepartment,
   isVisibleToDepartment,
+  meetsClearance,
 } from '../common/department-visibility';
 import { resolveFactionByName } from '../common/resolve-faction-by-name';
 
@@ -11,24 +13,32 @@ import { resolveFactionByName } from '../common/resolve-faction-by-name';
 export class CharactersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(departmentId: string | null = null) {
+  async findAll(departmentId: string | null = null, clearanceLevel = 1) {
     const characters = await this.prisma.character.findMany({
       orderBy: { name: 'asc' },
     });
-    return filterByDepartment(characters, departmentId);
+    return filterByClearance(
+      filterByDepartment(characters, departmentId),
+      clearanceLevel,
+    );
   }
 
   findAllAdmin() {
     return this.prisma.character.findMany({ orderBy: { name: 'asc' } });
   }
 
-  async findOne(slug: string, departmentId: string | null = null) {
+  async findOne(
+    slug: string,
+    departmentId: string | null = null,
+    clearanceLevel = 1,
+  ) {
     const character = await this.prisma.character.findUnique({
       where: { slug },
     });
     if (!character) return null;
     if (
-      !isVisibleToDepartment(character.restrictedDepartmentIds, departmentId)
+      !isVisibleToDepartment(character.restrictedDepartmentIds, departmentId) ||
+      !meetsClearance(character.minClearanceLevel, clearanceLevel)
     ) {
       throw new NotFoundException('Accès restreint à un autre département');
     }

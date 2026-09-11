@@ -70,7 +70,11 @@ export class FactionsController {
   async listEvents(@Param('slug') slug: string, @Req() req: OptionalAuthRequest) {
     const faction = await this.factions.findOne(slug);
     if (!faction) throw new NotFoundException('Faction introuvable');
-    return this.factions.listEvents(faction.id, await this.departmentIdOf(req));
+    const [departmentId, clearanceLevel] = await Promise.all([
+      this.departmentIdOf(req),
+      this.clearanceLevelOf(req),
+    ]);
+    return this.factions.listEvents(faction.id, departmentId, clearanceLevel);
   }
 
   @Get(':slug/scp')
