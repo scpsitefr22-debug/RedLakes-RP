@@ -28,7 +28,7 @@ export function IntegrationReturnBanner() {
   if (!active || pathname === "/integration") return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2">
+    <div className="fixed bottom-4 left-1/2 z-50 w-max max-w-[90vw] -translate-x-1/2">
       <div className="flex items-center gap-3 rounded-full border border-redlake/40 bg-black/95 py-2 pl-4 pr-2 shadow-xl backdrop-blur">
         <ClipboardList className="h-4 w-4 shrink-0 text-redlake-glow" />
         <Link
