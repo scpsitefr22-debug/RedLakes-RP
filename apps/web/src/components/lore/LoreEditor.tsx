@@ -22,6 +22,7 @@ export interface LoreFormData {
   category: string;
   status: string;
   restrictedDepartmentIds: string[];
+  minClearanceLevel: string;
   featured: boolean;
   tags: string;
 }
@@ -42,6 +43,7 @@ export function LoreEditor({ initial, articleId, mode }: LoreEditorProps) {
     category: initial?.category ?? "MONDE",
     status: initial?.status ?? "DRAFT",
     restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
+    minClearanceLevel: initial?.minClearanceLevel ?? "1",
     featured: initial?.featured ?? false,
     tags: initial?.tags ?? "",
   });
@@ -68,6 +70,7 @@ export function LoreEditor({ initial, articleId, mode }: LoreEditorProps) {
       const payload = {
         ...form,
         tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        minClearanceLevel: parseInt(form.minClearanceLevel, 10) || 1,
       };
 
       if (mode === "create") {
@@ -165,6 +168,22 @@ export function LoreEditor({ initial, articleId, mode }: LoreEditorProps) {
           value={form.restrictedDepartmentIds}
           onChange={(ids) => setForm((f) => ({ ...f, restrictedDepartmentIds: ids }))}
         />
+        <div>
+          <label className="mb-1 block font-mono text-xs text-gray-500">
+            Habilitation minimale requise (en plus du département)
+          </label>
+          <select
+            className={inputClass}
+            value={form.minClearanceLevel}
+            onChange={(e) => setForm((f) => ({ ...f, minClearanceLevel: e.target.value }))}
+          >
+            <option value="1">Niveau 1 — aucune exigence</option>
+            <option value="2">Niveau 2</option>
+            <option value="3">Niveau 3</option>
+            <option value="4">Niveau 4</option>
+            <option value="5">Niveau 5 — Conseil Oméga uniquement</option>
+          </select>
+        </div>
         <div>
           <label className="mb-1 block font-mono text-xs text-gray-500">Tags (séparés par virgule)</label>
           <input className={inputClass} value={form.tags} onChange={(e) => update("tags", e.target.value)} placeholder="aegis, faction, lore" />

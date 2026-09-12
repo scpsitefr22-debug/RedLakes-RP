@@ -53,6 +53,7 @@ export default function EditLorePage() {
           restrictedDepartmentIds: Array.isArray(article.restrictedDepartmentIds)
             ? (article.restrictedDepartmentIds as string[])
             : [],
+          minClearanceLevel: ((article.minClearanceLevel as number) ?? 1).toString(),
           featured: article.featured as boolean,
           tags: Array.isArray(article.tags) ? (article.tags as string[]).join(", ") : "",
         }}
