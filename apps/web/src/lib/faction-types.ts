@@ -5,6 +5,11 @@
  * sans entrainer next/headers dans leur bundle navigateur.
  */
 
+/**
+ * chefId/deputyIds/budget sont omis par l'API pour un visiteur non connecte
+ * (voir FactionsService/DepartmentsService — infos internes) : optionnels
+ * ici, pas juste absents de fait, pour que le typage reflete les deux cas.
+ */
 export interface ApiDepartment {
   id: string;
   slug: string;
@@ -15,9 +20,9 @@ export interface ApiDepartment {
   color: string | null;
   utilities: string[];
   objectives: string[];
-  chefId: string | null;
-  deputyIds: string[];
-  budget: number;
+  chefId?: string | null;
+  deputyIds?: string[];
+  budget?: number;
 }
 
 export interface ApiFaction {
@@ -30,9 +35,9 @@ export interface ApiFaction {
   color: string | null;
   playable: boolean;
   objectives: string[];
-  chefId: string | null;
-  deputyIds: string[];
-  budget: number;
+  chefId?: string | null;
+  deputyIds?: string[];
+  budget?: number;
   departments: ApiDepartment[];
   memberCount: number;
   topGrade: { name: string; pay: number } | null;

@@ -24,18 +24,19 @@ export class FactionsService {
       orderBy: { name: 'asc' },
     });
     if (authenticated) return factions;
-    return factions.map((f) => ({
-      ...f,
-      departments: f.departments.map(
+    return factions.map(({ chefId: _fc, deputyIds: _fd, budget: _fb, ...faction }) => ({
+      ...faction,
+      departments: faction.departments.map(
         ({ leadership: _l, chefId: _c, deputyIds: _d, budget: _b, ...pub }) => pub,
       ),
     }));
   }
 
   /**
-   * authenticated=false (visiteur non connecte) : masque direction/budget
-   * des departements (leadership, chefId, deputyIds, budget) — infos
-   * internes, pas la simple existence/description publique de la faction.
+   * authenticated=false (visiteur non connecte) : masque direction/budget —
+   * a la fois ceux de la faction elle-meme (chefId, deputyIds, budget) et
+   * ceux de chacun de ses departements (+ leadership) — infos internes, pas
+   * la simple existence/description publique de la faction.
    */
   async findOne(slug: string, authenticated = false) {
     const faction = await this.prisma.faction.findUnique({
@@ -55,13 +56,16 @@ export class FactionsService {
       }),
     ]);
 
-    const departments = authenticated
-      ? faction.departments
-      : faction.departments.map(
-          ({ leadership: _l, chefId: _c, deputyIds: _d, budget: _b, ...pub }) => pub,
-        );
+    if (authenticated) {
+      return { ...faction, memberCount, topGrade };
+    }
 
-    return { ...faction, departments, memberCount, topGrade };
+    const { chefId: _fc, deputyIds: _fd, budget: _fb, ...pubFaction } = faction;
+    const departments = faction.departments.map(
+      ({ leadership: _l, chefId: _c, deputyIds: _d, budget: _b, ...pub }) => pub,
+    );
+
+    return { ...pubFaction, departments, memberCount, topGrade };
   }
 
   /** Personnages actifs affilies a cette faction — pour la vitrine publique. */

@@ -27,6 +27,7 @@ import {
   Users,
   UserCheck,
   Banknote,
+  Coins,
   Swords,
   FileLock2,
   Radio,
@@ -158,7 +159,9 @@ export default async function FactionDetailPage({ params }: Props) {
         roleCategoryCount={roleCategories.length}
       />
 
-      <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div
+        className={`mb-8 grid grid-cols-2 gap-3 ${faction.budget != null ? "sm:grid-cols-5" : "sm:grid-cols-4"}`}
+      >
         <div className="faction-card p-4 text-center">
           <UserCheck className="mx-auto mb-2 h-5 w-5 faction-accent" />
           <p className="text-2xl font-bold text-white">{faction.memberCount}</p>
@@ -183,6 +186,13 @@ export default async function FactionDetailPage({ params }: Props) {
           <p className="text-2xl font-bold text-white">{allyCount} / {hostileCount}</p>
           <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Alliées / Hostiles</p>
         </div>
+        {faction.budget != null && (
+          <div className="faction-card p-4 text-center">
+            <Coins className="mx-auto mb-2 h-5 w-5 faction-accent" />
+            <p className="text-2xl font-bold text-white">{faction.budget.toLocaleString("fr-FR")} $</p>
+            <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Budget</p>
+          </div>
+        )}
       </div>
 
       <div className="prose-redlake space-y-8">

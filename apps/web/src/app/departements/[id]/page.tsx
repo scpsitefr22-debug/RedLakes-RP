@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { Banknote } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { site12Departments } from "@/data/site12";
 import { EditableText } from "@/components/staff/EditableText";
@@ -30,11 +32,25 @@ interface ApiDepartment {
   utilities: string[];
   grades: ApiGrade[];
   teams: ApiTeam[];
+  /** Absent pour un visiteur non connecte — voir DepartmentsService.stripInternalFields. */
+  budget?: number;
 }
 
+/**
+ * Ne transmettait jamais le cookie de session — un visiteur authentifie
+ * recevait donc systematiquement la version "publique" de la fiche
+ * departement (budget masque cote API, voir DepartmentsService), meme
+ * pattern deja corrige sur wiki/page.tsx, evenements/page.tsx et
+ * factions/[id]/page.tsx.
+ */
 async function getDepartment(slug: string): Promise<ApiDepartment | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("redlakes_token")?.value;
   try {
-    const res = await fetch(`${API_URL}/departments/${slug}`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/departments/${slug}`, {
+      cache: "no-store",
+      headers: token ? { Cookie: `redlakes_token=${token}` } : undefined,
+    });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -62,6 +78,17 @@ export default async function DepartmentDetailPage({ params }: Props) {
         field="name"
       />
       <p className="mb-8 text-gray-500">Directeur : {dept.directorGradeName ?? "Non assigné"}</p>
+
+      {dept.budget != null && (
+        <section className="hologram-border mb-6 rounded-lg p-6">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white">
+            <Banknote className="h-4 w-4 text-redlake-glow" />
+            Budget
+          </h2>
+          <p className="text-2xl font-bold text-white">{dept.budget.toLocaleString("fr-FR")} $</p>
+          <p className="text-xs text-gray-600">alloué à ce département</p>
+        </section>
+      )}
 
       <div className="space-y-6">
         <section className="hologram-border rounded-lg p-6">
