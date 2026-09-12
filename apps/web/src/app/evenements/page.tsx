@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { API_URL } from "@/lib/api";
 import { EvenementsCatalog } from "@/components/evenements/EvenementsCatalog";
 
@@ -12,9 +13,15 @@ interface ApiGameEvent {
   description: string;
 }
 
+/** Meme correctif que evenements/[id] : le cookie n'etait jamais transmis. */
 async function getGameEvents(): Promise<ApiGameEvent[]> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("redlakes_token")?.value;
   try {
-    const res = await fetch(`${API_URL}/events`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/events`, {
+      cache: "no-store",
+      headers: token ? { Cookie: `redlakes_token=${token}` } : undefined,
+    });
     if (!res.ok) return [];
     return res.json();
   } catch {

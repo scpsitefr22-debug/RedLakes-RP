@@ -60,6 +60,7 @@ export class SearchService implements OnModuleInit {
             href: { type: 'keyword' },
             tags: { type: 'keyword' },
             restrictedDepartmentIds: { type: 'keyword' },
+            minClearanceLevel: { type: 'integer' },
           },
         },
       });
@@ -79,6 +80,7 @@ export class SearchService implements OnModuleInit {
         href: `/lore/${article.slug}`,
         tags: article.tags,
         restrictedDepartmentIds: article.restrictedDepartmentIds,
+        minClearanceLevel: article.minClearanceLevel,
       },
     });
   }
@@ -141,11 +143,15 @@ export class SearchService implements OnModuleInit {
             href: src.href as string,
             score: hit._score ?? 0,
             restrictedDepartmentIds: (src.restrictedDepartmentIds as string[]) ?? [],
+            minClearanceLevel: (src.minClearanceLevel as number) ?? 1,
           };
         });
-        return filterByDepartment(hits, departmentId)
+        return filterByClearance(
+          filterByDepartment(hits, departmentId),
+          clearanceLevel,
+        )
           .slice(0, limit)
-          .map(({ restrictedDepartmentIds: _omit, ...hit }) => hit);
+          .map(({ restrictedDepartmentIds: _omit, minClearanceLevel: _omit2, ...hit }) => hit);
       } catch {
         this.logger.warn('Recherche ES échouée, fallback SQL');
       }
