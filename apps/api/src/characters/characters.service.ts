@@ -36,11 +36,14 @@ export class CharactersService {
       where: { slug },
     });
     if (!character) return null;
+    // null plutot qu'une exception distincte — le controleur renvoie le meme
+    // "Personnage introuvable" que pour un slug reellement inexistant, jamais
+    // de "trouve mais interdit" distinguable (department-visibility.spec.ts).
     if (
       !isVisibleToDepartment(character.restrictedDepartmentIds, departmentId) ||
       !meetsClearance(character.minClearanceLevel, clearanceLevel)
     ) {
-      throw new NotFoundException('Accès restreint à un autre département');
+      return null;
     }
     return {
       ...character,

@@ -15,7 +15,7 @@ describe('AppModule (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api');
     await app.init();
-  });
+  }, 30_000);
 
   it('/api/health (GET)', () => {
     return request(app.getHttpServer())

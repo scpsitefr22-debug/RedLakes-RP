@@ -48,14 +48,15 @@ export class LoreService {
         author: { select: { minecraftUsername: true } },
       },
     });
-    if (!article || article.status !== LoreStatus.PUBLISHED) {
-      throw new NotFoundException('Article introuvable');
-    }
     if (
+      !article ||
+      article.status !== LoreStatus.PUBLISHED ||
       !isVisibleToDepartment(article.restrictedDepartmentIds, departmentId) ||
       !meetsClearance(article.minClearanceLevel, clearanceLevel)
     ) {
-      throw new NotFoundException('Accès restreint à un autre département');
+      // Meme message qu'un slug reellement inexistant — jamais de "trouve
+      // mais interdit" distinguable (voir department-visibility.spec.ts).
+      throw new NotFoundException('Article introuvable');
     }
     return article;
   }

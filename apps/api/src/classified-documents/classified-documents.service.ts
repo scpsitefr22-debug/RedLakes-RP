@@ -75,14 +75,15 @@ export class ClassifiedDocumentsService {
         linkedScpObjects: { select: LINKED_SCP_SELECT },
       },
     });
-    if (!document || document.status !== ClassifiedDocumentStatus.PUBLISHED) {
-      throw new NotFoundException('Document introuvable');
-    }
     if (
+      !document ||
+      document.status !== ClassifiedDocumentStatus.PUBLISHED ||
       !isVisibleToDepartment(document.restrictedDepartmentIds, departmentId) ||
       !meetsClearance(document.minClearanceLevel, clearanceLevel)
     ) {
-      throw new NotFoundException('Accès restreint à un autre département');
+      // Meme message qu'un slug reellement inexistant — jamais de "trouve
+      // mais interdit" distinguable (voir department-visibility.spec.ts).
+      throw new NotFoundException('Document introuvable');
     }
     return this.filterLinks(document, departmentId);
   }

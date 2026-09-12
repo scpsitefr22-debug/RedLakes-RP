@@ -90,11 +90,14 @@ export class ScpService {
       },
     });
     if (!scp || scp.status !== ScpProposalStatus.APPROVED) return null;
+    // null plutot qu'une exception distincte — le controleur renvoie le meme
+    // "Objet SCP introuvable" que pour un slug reellement inexistant, jamais
+    // de "trouve mais interdit" distinguable (department-visibility.spec.ts).
     if (
       !isVisibleToDepartment(scp.restrictedDepartmentIds, departmentId) ||
       !meetsClearance(scp.minClearanceLevel, clearanceLevel)
     ) {
-      throw new NotFoundException('Accès restreint à un autre département');
+      return null;
     }
 
     const visibleDocuments = filterByClearance(

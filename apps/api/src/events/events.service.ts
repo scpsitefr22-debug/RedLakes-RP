@@ -67,11 +67,14 @@ export class EventsService {
       },
     });
     if (!event) return null;
+    // null plutot qu'une exception distincte — le controleur renvoie le meme
+    // "Événement introuvable" que pour un slug reellement inexistant, jamais
+    // de "trouve mais interdit" distinguable (department-visibility.spec.ts).
     if (
       !isVisibleToDepartment(event.restrictedDepartmentIds, departmentId) ||
       !meetsClearance(event.minClearanceLevel, clearanceLevel)
     ) {
-      throw new NotFoundException('Accès restreint à un autre département');
+      return null;
     }
 
     const visibleDocuments = filterByClearance(
