@@ -366,8 +366,9 @@ export function isContentUnlocked(
   return true;
 }
 
-export function getPlayerClearance(_gns: GlobalNarrativeSave): number {
-  return 1;
+/** Niveau 1 par défaut, +1 par chapitre terminé, plafonné à 5 (barre d'accréditation du dashboard). */
+export function getPlayerClearance(gns: GlobalNarrativeSave): number {
+  return Math.min(5, 1 + gns.session.chaptersCompleted.length);
 }
 
 export function getDocumentAccessState(
