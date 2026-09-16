@@ -68,7 +68,7 @@ export async function renderTransmissions(ownerId: string): Promise<View> {
     }
     for (const t of items) {
       embed.addFields({
-        name: `${t.channelLabel} — Niv. ${t.clearance}`,
+        name: t.channelLabel,
         value: `${t.title}\n${(t.excerpt ?? t.body).slice(0, 150)}`,
       });
     }
