@@ -5,6 +5,7 @@ import { App } from 'supertest/types';
 import { ClassifiedDocumentStatus } from '@prisma/client';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { authHeader, setupLeakFixtures, teardownLeakFixtures } from './support/leak-fixtures';
 
 /**
  * Anti-leak e2e — couvre les scenarios explicitement nommes dans le spec
@@ -27,15 +28,13 @@ describe('Classified documents — anti-leak (e2e)', () => {
   let prisma: PrismaService;
 
   const RUN_ID = `e2e${Date.now()}`;
-  const createdUserIds: string[] = [];
 
   let deptA: { id: string };
-  let deptB: { id: string };
-
   let tokenNoCharacter: string;
   let tokenDeptALow: string;
   let tokenDeptAHigh: string;
   let tokenDeptBHigh: string;
+  let createdUserIds: string[];
 
   let docPublicSlug: string;
   let docDeptASlug: string;
@@ -56,70 +55,13 @@ describe('Classified documents — anti-leak (e2e)', () => {
 
     prisma = app.get(PrismaService);
 
-    deptA = await prisma.department.create({
-      data: { slug: `${RUN_ID}-dept-a`, name: `${RUN_ID} Dept A` },
-    });
-    deptB = await prisma.department.create({
-      data: { slug: `${RUN_ID}-dept-b`, name: `${RUN_ID} Dept B` },
-    });
-
-    const gradeDeptALow = await prisma.grade.create({
-      data: {
-        slug: `${RUN_ID}-grade-a-low`,
-        name: 'Test A Low',
-        branch: 'Test',
-        tier: 'Test',
-        clearanceLevel: 1,
-        departmentRefId: deptA.id,
-      },
-    });
-    const gradeDeptAHigh = await prisma.grade.create({
-      data: {
-        slug: `${RUN_ID}-grade-a-high`,
-        name: 'Test A High',
-        branch: 'Test',
-        tier: 'Test',
-        clearanceLevel: 5,
-        departmentRefId: deptA.id,
-      },
-    });
-    const gradeDeptBHigh = await prisma.grade.create({
-      data: {
-        slug: `${RUN_ID}-grade-b-high`,
-        name: 'Test B High',
-        branch: 'Test',
-        tier: 'Test',
-        clearanceLevel: 5,
-        departmentRefId: deptB.id,
-      },
-    });
-
-    const makeAgent = async (label: string, gradeId?: string) => {
-      const user = await prisma.user.create({
-        data: { minecraftUsername: `${RUN_ID}-${label}`, role: 'PLAYER' },
-      });
-      createdUserIds.push(user.id);
-      if (gradeId) {
-        const player = await prisma.player.create({ data: { userId: user.id, gradeId } });
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { activeCharacterId: player.id },
-        });
-      }
-      const session = await prisma.session.create({
-        data: {
-          userId: user.id,
-          token: `${RUN_ID}-token-${label}`,
-          expiresAt: new Date(Date.now() + 3_600_000),
-        },
-      });
-      return session.token;
-    };
-
-    tokenNoCharacter = await makeAgent('no-character');
-    tokenDeptALow = await makeAgent('dept-a-low', gradeDeptALow.id);
-    tokenDeptAHigh = await makeAgent('dept-a-high', gradeDeptAHigh.id);
-    tokenDeptBHigh = await makeAgent('dept-b-high', gradeDeptBHigh.id);
+    const fixtures = await setupLeakFixtures(prisma, RUN_ID);
+    deptA = fixtures.deptA;
+    tokenNoCharacter = fixtures.tokenNoCharacter;
+    tokenDeptALow = fixtures.tokenDeptALow;
+    tokenDeptAHigh = fixtures.tokenDeptAHigh;
+    tokenDeptBHigh = fixtures.tokenDeptBHigh;
+    createdUserIds = fixtures.createdUserIds;
 
     const docPublic = await prisma.classifiedDocument.create({
       data: {
@@ -169,20 +111,12 @@ describe('Classified documents — anti-leak (e2e)', () => {
   afterAll(async () => {
     if (!prisma) return;
     await prisma.classifiedDocument.deleteMany({ where: { slug: { startsWith: RUN_ID } } });
-    await prisma.session.deleteMany({ where: { token: { startsWith: `${RUN_ID}-token-` } } });
-    await prisma.user.updateMany({
-      where: { id: { in: createdUserIds } },
-      data: { activeCharacterId: null },
-    });
-    await prisma.player.deleteMany({ where: { userId: { in: createdUserIds } } });
-    await prisma.user.deleteMany({ where: { id: { in: createdUserIds } } });
-    await prisma.grade.deleteMany({ where: { slug: { startsWith: RUN_ID } } });
-    await prisma.department.deleteMany({ where: { slug: { startsWith: RUN_ID } } });
+    await teardownLeakFixtures(prisma, RUN_ID, createdUserIds);
     await app.close();
   }, 30_000);
 
   const slugsOf = (body: { slug: string }[]) => body.map((d) => d.slug);
-  const auth = (token: string) => ({ Authorization: `Bearer ${token}` });
+  const auth = authHeader;
 
   describe('GET /classified-documents (list)', () => {
     it('shows an anonymous visitor only the public document', async () => {
