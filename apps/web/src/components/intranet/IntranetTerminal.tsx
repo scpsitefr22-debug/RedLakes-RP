@@ -17,6 +17,7 @@ import {
   Globe,
   Sparkles,
   Skull,
+  MessageCircle,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { MyReportsPanel } from "@/components/intranet/MyReportsPanel";
@@ -241,6 +242,14 @@ export function IntranetTerminal() {
             </div>
           )}
         </div>
+        <Link
+          href="/messagerie"
+          className="mt-4 inline-flex items-center gap-2 rounded border px-4 py-2 font-mono text-xs transition-colors hover:text-white"
+          style={{ borderColor: `${theme.color}66`, color: theme.color }}
+        >
+          <MessageCircle className="h-4 w-4" />
+          Ouvrir la messagerie
+        </Link>
       </div>
 
       {isFondation && (
