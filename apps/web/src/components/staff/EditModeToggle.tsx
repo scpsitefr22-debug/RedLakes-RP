@@ -14,7 +14,7 @@ export function EditModeToggle() {
     <button
       type="button"
       onClick={() => setEditMode(!editMode)}
-      className={`fixed bottom-6 right-6 z-[60] flex items-center gap-2 rounded-full border px-4 py-3 font-mono text-xs shadow-lg backdrop-blur transition-colors ${
+      className={`fixed left-6 top-20 z-[60] flex items-center gap-2 rounded-full border px-4 py-3 font-mono text-xs shadow-lg backdrop-blur transition-colors ${
         editMode
           ? "border-green-400 bg-green-400/20 text-green-400 hover:bg-green-400/30"
           : "border-redlake bg-black/80 text-redlake-glow hover:bg-redlake/20"

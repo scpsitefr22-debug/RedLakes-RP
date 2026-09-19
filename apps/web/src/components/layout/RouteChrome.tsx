@@ -6,6 +6,7 @@ import { Footer } from "./Footer";
 import { IntegrationReturnBanner } from "@/components/integration/IntegrationReturnBanner";
 import { EditModeProvider } from "@/components/staff/EditModeProvider";
 import { EditModeToggle } from "@/components/staff/EditModeToggle";
+import { MessagerieWidget } from "@/components/messagerie/MessagerieWidget";
 
 export function RouteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ export function RouteChrome({ children }: { children: React.ReactNode }) {
       {!hideChrome && <Footer />}
       <IntegrationReturnBanner />
       {!hideChrome && <EditModeToggle />}
+      {!hideChrome && <MessagerieWidget />}
     </EditModeProvider>
   );
 }
