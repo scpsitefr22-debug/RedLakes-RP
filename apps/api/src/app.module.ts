@@ -30,6 +30,7 @@ import { MapModule } from './map/map.module';
 import { SystemModule } from './system/system.module';
 import { CoreMessagesModule } from './core-messages/core-messages.module';
 import { CoreDmModule } from './core-dm/core-dm.module';
+import { IncidentReportsModule } from './incident-reports/incident-reports.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { CoreDmModule } from './core-dm/core-dm.module';
     SystemModule,
     CoreMessagesModule,
     CoreDmModule,
+    IncidentReportsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

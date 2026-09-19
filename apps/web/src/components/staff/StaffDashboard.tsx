@@ -25,6 +25,7 @@ import {
   Radio,
   FileLock2,
   Scale,
+  AlertTriangle,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -49,6 +50,7 @@ const MANAGEMENT_LINKS = [
   { icon: Zap, label: "Gestion des événements", caption: "Brèches, invasions, crises", href: "/staff/evenements" },
   { icon: Newspaper, label: "Gestion des actualités", caption: "Articles, mises à jour", href: "/staff/actualites" },
   { icon: FileLock2, label: "Documents classifiés", caption: "Dossiers restreints par département", href: "/staff/documents" },
+  { icon: AlertTriangle, label: "Rapports d'incident", caption: "Journal de sécurité du site", href: "/staff/rapports-incidents" },
   { icon: MapPin, label: "Gestion de la carte", caption: "Emplacements, coordonnées", href: "/staff/carte" },
   { icon: Radio, label: "Système", caption: "Niveau d'alerte, statut (Fondateur)", href: "/staff/systeme" },
 ];

@@ -109,6 +109,7 @@ model User {
   coreMessages               CoreMessage[]
   coreDmSent                 CoreDirectMessage[] @relation("CoreDmSent")
   coreDmReceived             CoreDirectMessage[] @relation("CoreDmReceived")
+  incidentReports            IncidentReport[]
 }
 
 model Session {
@@ -292,6 +293,58 @@ model ClassifiedDocumentRevision {
   createdAt     DateTime @default(now())
 
   @@index([documentId])
+}
+
+/// Meme classes que ScpObject.class (Safe/Euclid/Keter/Thaumiel/Apollyon) —
+/// reutilisee ici plutot que ScpClass car un rapport d'incident n'est pas
+/// toujours lie a un SCP a proprement parler (agression, vol, defaillance
+/// technique...) : c'est le niveau d'urgence du rapport lui-meme.
+enum IncidentThreatClass {
+  Safe
+  Euclid
+  Keter
+  Thaumiel
+  Apollyon
+}
+
+/// Rapport d'incident de securite — demande par le Directeur de la Securite
+/// pour remplacer les PDF remplis a la main (voir la maquette imprimable
+/// livree avant ce lot). Lignes de personnel/equipement en Json plutot que
+/// des tables dediees : structure variable (4 a 7 lignes selon l'incident),
+/// jamais interrogee independamment du rapport — meme raisonnement deja
+/// suivi pour ScpObject.incidents/tests/addendums dans ce schema.
+model IncidentReport {
+  id           String              @id @default(cuid())
+  slug         String              @unique
+  reference    String
+  incidentAt   DateTime
+  anomalyLabel String
+  threatClass  IncidentThreatClass @default(Euclid)
+  factsTag     String?
+  narrative    String
+
+  /// [{ unite, grade, statut, obs }]
+  personnelRows Json @default("[]")
+  /// [{ designation, quantite, etat, cout }]
+  equipmentRows Json @default("[]")
+  totalCost     Int  @default(0)
+
+  authorLabel    String
+  authorRole     String?
+  validatorLabel String?
+  validatorRole  String?
+
+  restrictedDepartmentIds String[] @default([])
+  /// Meme principe que ClassifiedDocument.minClearanceLevel.
+  minClearanceLevel Int @default(1)
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([incidentAt])
 }
 
 model GalleryAsset {
