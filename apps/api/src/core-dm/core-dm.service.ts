@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CoreDmChannel } from '@prisma/client';
+import { CoreDmChannel, PlatformEntityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../platform/notifications.service';
 
 const USER_SELECT = {
   id: true,
@@ -9,9 +10,17 @@ const USER_SELECT = {
   avatarUrl: true,
 };
 
+const CHANNEL_LABELS: Record<CoreDmChannel, string> = {
+  PERSONNEL: 'Personnel',
+  PROFESSIONNEL: 'Professionnel',
+};
+
 @Injectable()
 export class CoreDmService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifications: NotificationsService,
+  ) {}
 
   private async resolveSenderLabel(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -52,9 +61,19 @@ export class CoreDmService {
       throw new BadRequestException('Impossible de vous envoyer un message à vous-même');
     }
     const senderLabel = await this.resolveSenderLabel(senderId);
-    return this.prisma.coreDirectMessage.create({
+    const message = await this.prisma.coreDirectMessage.create({
       data: { senderId, recipientId, senderLabel, content, channel },
     });
+
+    await this.notifications.notify({
+      userId: recipientId,
+      title: `Message ${CHANNEL_LABELS[channel]} — ${senderLabel}`,
+      body: content.length > 140 ? `${content.slice(0, 140)}…` : content,
+      entityType: PlatformEntityType.CORE_DM,
+      entityId: message.id,
+    });
+
+    return message;
   }
 
   /**

@@ -68,6 +68,20 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channel]);
 
+  // Rafraîchissement en direct — évite de devoir fermer/rouvrir pour voir
+  // arriver un message, comme une vraie messagerie. Fil actif : toutes les
+  // 4s (silencieux, ne remet pas "Chargement…"). Sinon liste des
+  // conversations : toutes les 12s, pour faire remonter les nouveaux fils.
+  useEffect(() => {
+    if (activePartner) {
+      const id = setInterval(() => fetchThread(activePartner, { silent: true }), 4_000);
+      return () => clearInterval(id);
+    }
+    const id = setInterval(() => loadConversations(), 12_000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePartner, channel]);
+
   const switchChannel = (next: Channel) => {
     if (next === channel) return;
     setChannel(next);
@@ -76,16 +90,22 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
     setError(null);
   };
 
-  const openThread = (partner: ApiUser) => {
-    setActivePartner(partner);
-    setThread(null);
-    setError(null);
+  const fetchThread = (partner: ApiUser, opts?: { silent?: boolean }) => {
+    if (!opts?.silent) setThread(null);
     apiFetch<ApiDmMessage[]>(
       `/core-dm/with/${encodeURIComponent(partner.minecraftUsername)}?channel=${channel}`,
     )
       .then(setThread)
       .then(() => onActivity?.())
-      .catch(() => setThread([]));
+      .catch(() => {
+        if (!opts?.silent) setThread([]);
+      });
+  };
+
+  const openThread = (partner: ApiUser) => {
+    setActivePartner(partner);
+    setError(null);
+    fetchThread(partner);
   };
 
   const sendMessage = async (e: FormEvent) => {

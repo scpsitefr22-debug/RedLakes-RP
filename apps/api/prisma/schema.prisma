@@ -498,6 +498,7 @@ enum PlatformEntityType {
   USER
   SCP_OBJECT
   SYSTEM_STATE
+  CORE_DM
 }
 
 enum AuditAction {
