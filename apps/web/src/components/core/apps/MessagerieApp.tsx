@@ -1,9 +1,16 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, Send, User } from "lucide-react";
+import { ArrowLeft, Send, User, MessageCircle, Briefcase } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
+
+type Channel = "PERSONNEL" | "PROFESSIONNEL";
+
+const CHANNELS: { value: Channel; label: string; icon: typeof MessageCircle; hint: string }[] = [
+  { value: "PERSONNEL", label: "Personnel", icon: MessageCircle, hint: "Hors-RP, entre joueurs" },
+  { value: "PROFESSIONNEL", label: "Professionnel", icon: Briefcase, hint: "En personnage, voie hiérarchique" },
+];
 
 interface ApiUser {
   id: string;
@@ -33,6 +40,7 @@ function partnerName(u: ApiUser) {
 }
 
 export function MessagerieApp() {
+  const [channel, setChannel] = useState<Channel>("PERSONNEL");
   const [conversations, setConversations] = useState<ApiConversation[] | null>(null);
   const [activePartner, setActivePartner] = useState<ApiUser | null>(null);
   const [thread, setThread] = useState<ApiDmMessage[] | null>(null);
@@ -41,19 +49,33 @@ export function MessagerieApp() {
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
 
-  const loadConversations = () => {
-    apiFetch<ApiConversation[]>("/core-dm/conversations")
+  const loadConversations = (ch: Channel = channel) => {
+    apiFetch<ApiConversation[]>(`/core-dm/conversations?channel=${ch}`)
       .then(setConversations)
       .catch(() => setConversations([]));
   };
 
-  useEffect(loadConversations, []);
+  useEffect(() => {
+    setConversations(null);
+    loadConversations(channel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channel]);
+
+  const switchChannel = (next: Channel) => {
+    if (next === channel) return;
+    setChannel(next);
+    setActivePartner(null);
+    setThread(null);
+    setError(null);
+  };
 
   const openThread = (partner: ApiUser) => {
     setActivePartner(partner);
     setThread(null);
     setError(null);
-    apiFetch<ApiDmMessage[]>(`/core-dm/with/${encodeURIComponent(partner.minecraftUsername)}`)
+    apiFetch<ApiDmMessage[]>(
+      `/core-dm/with/${encodeURIComponent(partner.minecraftUsername)}?channel=${channel}`,
+    )
       .then(setThread)
       .catch(() => setThread([]));
   };
@@ -68,7 +90,7 @@ export function MessagerieApp() {
     try {
       await apiFetch("/core-dm", {
         method: "POST",
-        body: JSON.stringify({ toUsername, content }),
+        body: JSON.stringify({ toUsername, content, channel }),
       });
       setDraft("");
       if (activePartner) {
@@ -84,10 +106,36 @@ export function MessagerieApp() {
     }
   };
 
+  const channelTabs = (
+    <div className="mb-3 flex gap-1.5 border-b border-metal/40 pb-3">
+      {CHANNELS.map((c) => {
+        const Icon = c.icon;
+        const active = c.value === channel;
+        return (
+          <button
+            key={c.value}
+            type="button"
+            onClick={() => switchChannel(c.value)}
+            title={c.hint}
+            className={`flex items-center gap-1.5 rounded border px-3 py-1.5 font-mono text-xs transition-colors ${
+              active
+                ? "border-redlake bg-redlake/20 text-redlake-glow"
+                : "border-metal/50 text-gray-500 hover:border-metal hover:text-white"
+            }`}
+          >
+            <Icon className="h-3.5 w-3.5" />
+            {c.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   // Vue fil de discussion
   if (activePartner) {
     return (
       <div className="flex h-[55vh] flex-col">
+        {channelTabs}
         <button
           type="button"
           onClick={() => {
@@ -146,6 +194,7 @@ export function MessagerieApp() {
   // Vue liste des conversations
   return (
     <div className="flex h-[55vh] flex-col">
+      {channelTabs}
       <form onSubmit={sendMessage} className="mb-3 flex gap-2">
         <input
           value={newRecipient}

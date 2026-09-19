@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { CoreDmChannel } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 const USER_SELECT = {
@@ -40,21 +41,31 @@ export class CoreDmService {
     return user.id;
   }
 
-  async send(senderId: string, toUsername: string, content: string) {
+  async send(
+    senderId: string,
+    toUsername: string,
+    content: string,
+    channel: CoreDmChannel = CoreDmChannel.PERSONNEL,
+  ) {
     const recipientId = await this.resolveUserByUsername(toUsername);
     if (recipientId === senderId) {
       throw new BadRequestException('Impossible de vous envoyer un message à vous-même');
     }
     const senderLabel = await this.resolveSenderLabel(senderId);
     return this.prisma.coreDirectMessage.create({
-      data: { senderId, recipientId, senderLabel, content },
+      data: { senderId, recipientId, senderLabel, content, channel },
     });
   }
 
-  /** Liste des conversations de l'utilisateur, une entrée par interlocuteur, la plus récente en premier. */
-  async listConversations(userId: string) {
+  /**
+   * Liste des conversations de l'utilisateur sur UN canal (Personnel ou
+   * Professionnel), une entrée par interlocuteur, la plus récente en
+   * premier. Les deux canaux sont volontairement des listes distinctes —
+   * separation demandee, pas juste un badge different sur la meme liste.
+   */
+  async listConversations(userId: string, channel: CoreDmChannel) {
     const messages = await this.prisma.coreDirectMessage.findMany({
-      where: { OR: [{ senderId: userId }, { recipientId: userId }] },
+      where: { channel, OR: [{ senderId: userId }, { recipientId: userId }] },
       orderBy: { createdAt: 'desc' },
       include: { sender: { select: USER_SELECT }, recipient: { select: USER_SELECT } },
     });
@@ -84,17 +95,18 @@ export class CoreDmService {
     return [...byPartner.values()].sort((a, b) => b.lastAt.getTime() - a.lastAt.getTime());
   }
 
-  /** Fil de discussion avec un interlocuteur donné — marque ses messages comme lus. */
-  async getThread(userId: string, otherUsername: string) {
+  /** Fil de discussion avec un interlocuteur donné sur UN canal — marque ses messages (ce canal seulement) comme lus. */
+  async getThread(userId: string, otherUsername: string, channel: CoreDmChannel) {
     const otherId = await this.resolveUserByUsername(otherUsername);
 
     await this.prisma.coreDirectMessage.updateMany({
-      where: { senderId: otherId, recipientId: userId, readAt: null },
+      where: { senderId: otherId, recipientId: userId, channel, readAt: null },
       data: { readAt: new Date() },
     });
 
     return this.prisma.coreDirectMessage.findMany({
       where: {
+        channel,
         OR: [
           { senderId: userId, recipientId: otherId },
           { senderId: otherId, recipientId: userId },
@@ -105,6 +117,7 @@ export class CoreDmService {
     });
   }
 
+  /** Total non lu, tous canaux confondus — sert uniquement au badge global de la barre CORE. */
   async unreadCount(userId: string) {
     return this.prisma.coreDirectMessage.count({
       where: { recipientId: userId, readAt: null },

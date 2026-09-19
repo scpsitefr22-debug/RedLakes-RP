@@ -379,23 +379,35 @@ model CoreMessage {
   @@index([createdAt])
 }
 
+/// PERSONNEL = hors-RP, entre joueurs. PROFESSIONNEL = en personnage, dans
+/// la chaine hierarchique RP (ex. un agent qui ecrit a son directeur). Les
+/// deux restent au sein du meme compte/personnage : ce n'est pas une regle
+/// d'acces differente, juste une separation d'affichage demandee pour ne
+/// pas melanger les deux registres dans un seul fil.
+enum CoreDmChannel {
+  PERSONNEL
+  PROFESSIONNEL
+}
+
 /// Messagerie privee 1-a-1 de REDLAKES CORE — distincte de CoreMessage
 /// (canal partage par faction). senderLabel snapshotte le nom RP + grade au
 /// moment de l'envoi, meme convention que CoreMessage.authorLabel.
 model CoreDirectMessage {
-  id          String    @id @default(cuid())
+  id          String        @id @default(cuid())
   senderId    String
-  sender      User      @relation("CoreDmSent", fields: [senderId], references: [id], onDelete: Cascade)
+  sender      User          @relation("CoreDmSent", fields: [senderId], references: [id], onDelete: Cascade)
   senderLabel String
   recipientId String
-  recipient   User      @relation("CoreDmReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipient   User          @relation("CoreDmReceived", fields: [recipientId], references: [id], onDelete: Cascade)
   content     String
+  channel     CoreDmChannel @default(PERSONNEL)
   readAt      DateTime?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime      @default(now())
 
   @@index([senderId])
   @@index([recipientId])
   @@index([createdAt])
+  @@index([channel])
 }
 
 /// Évènements Discord relayés par le bot, transformés en "transmissions" RP (thème SCP).

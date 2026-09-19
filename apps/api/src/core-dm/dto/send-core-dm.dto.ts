@@ -1,4 +1,5 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { CoreDmChannel } from '@prisma/client';
 
 export class SendCoreDmDto {
   @IsString()
@@ -9,4 +10,8 @@ export class SendCoreDmDto {
   @MinLength(1)
   @MaxLength(2000)
   content: string;
+
+  @IsOptional()
+  @IsEnum(CoreDmChannel)
+  channel?: CoreDmChannel;
 }
