@@ -136,6 +136,21 @@ export class CoreDmService {
     });
   }
 
+  /**
+   * Liste des contacts pour le sélecteur "nouvelle discussion" — tous les
+   * comptes adressables (pseudo Minecraft requis, comme resolveUserByUsername
+   * ci-dessus), hors soi-même. Alphabétique, plafonné pour rester léger dans
+   * un panneau qu'on fait défiler.
+   */
+  async listContacts(excludeUserId: string) {
+    return this.prisma.user.findMany({
+      where: { id: { not: excludeUserId }, minecraftUsername: { not: null } },
+      select: USER_SELECT,
+      orderBy: { minecraftUsername: 'asc' },
+      take: 300,
+    });
+  }
+
   /** Total non lu, tous canaux confondus — sert uniquement au badge global de la barre CORE. */
   async unreadCount(userId: string) {
     return this.prisma.coreDirectMessage.count({

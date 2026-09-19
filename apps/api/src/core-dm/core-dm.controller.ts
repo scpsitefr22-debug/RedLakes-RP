@@ -25,6 +25,11 @@ export class CoreDmController {
     return this.dm.unreadCount(req.user.id);
   }
 
+  @Get('contacts')
+  listContacts(@Req() req: AuthedRequest) {
+    return this.dm.listContacts(req.user.id);
+  }
+
   @Get('with/:username')
   getThread(
     @Req() req: AuthedRequest,

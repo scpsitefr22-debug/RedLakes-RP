@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, Send, User, MessageCircle, Briefcase } from "lucide-react";
+import { ArrowLeft, Send, User, MessageCircle, Briefcase, UserPlus, Search } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 
@@ -39,6 +39,26 @@ function partnerName(u: ApiUser) {
   return u.discordUsername ?? u.minecraftUsername;
 }
 
+function ContactAvatar({ user, className = "h-9 w-9" }: { user: ApiUser; className?: string }) {
+  if (user.avatarUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={user.avatarUrl}
+        alt={partnerName(user)}
+        className={`${className} shrink-0 rounded-full border border-metal/50`}
+      />
+    );
+  }
+  return (
+    <div
+      className={`flex ${className} shrink-0 items-center justify-center rounded-full border border-metal/50 bg-redlake/10`}
+    >
+      <User className="h-4 w-4 text-gray-500" />
+    </div>
+  );
+}
+
 interface MessagerieViewProps {
   /** Hauteur de la zone défilante (liste + fil) — plein écran vs widget compact. */
   heightClass?: string;
@@ -52,9 +72,11 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
   const [activePartner, setActivePartner] = useState<ApiUser | null>(null);
   const [thread, setThread] = useState<ApiDmMessage[] | null>(null);
   const [draft, setDraft] = useState("");
-  const [newRecipient, setNewRecipient] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [contacts, setContacts] = useState<ApiUser[] | null>(null);
+  const [contactFilter, setContactFilter] = useState("");
 
   const loadConversations = (ch: Channel = channel) => {
     apiFetch<ApiConversation[]>(`/core-dm/conversations?channel=${ch}`)
@@ -103,30 +125,41 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
   };
 
   const openThread = (partner: ApiUser) => {
+    setPickerOpen(false);
     setActivePartner(partner);
     setError(null);
     fetchThread(partner);
   };
 
+  const openPicker = () => {
+    setPickerOpen(true);
+    setContactFilter("");
+    if (contacts === null) {
+      apiFetch<ApiUser[]>("/core-dm/contacts")
+        .then(setContacts)
+        .catch(() => setContacts([]));
+    }
+  };
+
+  const filteredContacts = (contacts ?? []).filter((c) => {
+    const q = contactFilter.trim().toLowerCase();
+    if (!q) return true;
+    return partnerName(c).toLowerCase().includes(q) || c.minecraftUsername.toLowerCase().includes(q);
+  });
+
   const sendMessage = async (e: FormEvent) => {
     e.preventDefault();
     const content = draft.trim();
-    const toUsername = activePartner?.minecraftUsername ?? newRecipient.trim();
-    if (!content || !toUsername || sending) return;
+    if (!content || !activePartner || sending) return;
     setSending(true);
     setError(null);
     try {
       await apiFetch("/core-dm", {
         method: "POST",
-        body: JSON.stringify({ toUsername, content, channel }),
+        body: JSON.stringify({ toUsername: activePartner.minecraftUsername, content, channel }),
       });
       setDraft("");
-      if (activePartner) {
-        openThread(activePartner);
-      } else {
-        setNewRecipient("");
-        loadConversations();
-      }
+      fetchThread(activePartner);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Envoi impossible.");
     } finally {
@@ -219,32 +252,68 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
     );
   }
 
+  // Vue sélecteur de contact — liste qu'on fait défiler, on clique sur
+  // quelqu'un et son fil s'ouvre directement, plutôt que de taper un pseudo.
+  if (pickerOpen) {
+    return (
+      <div className={`flex ${heightClass} flex-col`}>
+        {channelTabs}
+        <button
+          type="button"
+          onClick={() => setPickerOpen(false)}
+          className="mb-3 flex items-center gap-1.5 font-mono text-[11px] text-gray-500 hover:text-white"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Nouvelle discussion
+        </button>
+        <div className="relative mb-3">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-600" />
+          <input
+            value={contactFilter}
+            onChange={(e) => setContactFilter(e.target.value)}
+            placeholder="Filtrer un pseudo…"
+            autoFocus
+            className="w-full rounded border border-metal/50 bg-black/40 py-2 pl-8 pr-3 text-sm text-white outline-none placeholder:text-gray-600 focus:border-redlake"
+          />
+        </div>
+        <div className="flex-1 space-y-1 overflow-y-auto">
+          {contacts === null ? (
+            <p className="text-sm text-gray-500">Chargement…</p>
+          ) : filteredContacts.length === 0 ? (
+            <p className="py-8 text-center text-sm text-gray-600">Aucun agent ne correspond.</p>
+          ) : (
+            filteredContacts.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => openThread(c)}
+                className="flex w-full items-center gap-3 rounded border border-metal/40 bg-black/30 p-2.5 text-left hover:border-redlake/40"
+              >
+                <ContactAvatar user={c} className="h-8 w-8" />
+                <p className="truncate text-sm font-medium text-white">{partnerName(c)}</p>
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Vue liste des conversations
   return (
     <div className={`flex ${heightClass} flex-col`}>
       {channelTabs}
-      <form onSubmit={sendMessage} className="mb-3 flex flex-wrap gap-2">
-        <input
-          value={newRecipient}
-          onChange={(e) => setNewRecipient(e.target.value)}
-          placeholder="Pseudo Minecraft du destinataire…"
-          className="min-w-0 flex-1 rounded border border-metal/50 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-600 focus:border-redlake"
-        />
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder="Message…"
-          maxLength={2000}
-          className="min-w-0 flex-1 rounded border border-metal/50 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-600 focus:border-redlake"
-        />
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <p className="font-mono text-[11px] uppercase tracking-widest text-gray-500">Conversations</p>
         <button
-          type="submit"
-          disabled={sending || !draft.trim() || !newRecipient.trim()}
-          className="rounded border border-redlake bg-redlake/20 px-3 py-2 text-redlake-glow transition-colors hover:bg-redlake/30 disabled:opacity-50"
+          type="button"
+          onClick={openPicker}
+          className="flex items-center gap-1.5 rounded border border-redlake/40 bg-redlake/10 px-2.5 py-1.5 font-mono text-[11px] text-redlake-glow transition-colors hover:bg-redlake/20"
         >
-          <Send className="h-4 w-4" />
+          <UserPlus className="h-3.5 w-3.5" />
+          Nouvelle discussion
         </button>
-      </form>
+      </div>
       {error && <p className="mb-2 font-mono text-[10px] text-redlake-glow">{error}</p>}
 
       <div className="flex-1 space-y-2 overflow-y-auto">
@@ -252,7 +321,7 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
           <p className="text-sm text-gray-500">Chargement…</p>
         ) : conversations.length === 0 ? (
           <p className="py-8 text-center text-sm text-gray-600">
-            Aucune conversation. Écrivez à un pseudo ci-dessus pour commencer.
+            Aucune conversation. Lancez-en une avec « Nouvelle discussion ».
           </p>
         ) : (
           conversations.map((c) => (
@@ -262,18 +331,7 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
               onClick={() => openThread(c.partner)}
               className="flex w-full items-center gap-3 rounded border border-metal/40 bg-black/30 p-3 text-left hover:border-redlake/40"
             >
-              {c.partner.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={c.partner.avatarUrl}
-                  alt={partnerName(c.partner)}
-                  className="h-9 w-9 rounded-full border border-metal/50"
-                />
-              ) : (
-                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-metal/50 bg-redlake/10">
-                  <User className="h-4 w-4 text-gray-500" />
-                </div>
-              )}
+              <ContactAvatar user={c.partner} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <p className="truncate text-sm font-medium text-white">{partnerName(c.partner)}</p>
