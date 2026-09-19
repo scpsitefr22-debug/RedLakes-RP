@@ -42,18 +42,21 @@ export default async function StaffJoueursPage() {
             sanctions?: number;
             rpFirstName?: string | null;
             rpLastName?: string | null;
-            user: { minecraftUsername: string; avatarUrl: string };
-          }) => (
+            user: { minecraftUsername: string | null; username: string | null; avatarUrl: string };
+          }) => {
+            const identifier = player.user.minecraftUsername ?? player.user.username;
+            if (!identifier) return null;
+            return (
             <Link
               key={player.id}
-              href={`/staff/joueurs/${encodeURIComponent(player.user.minecraftUsername)}`}
+              href={`/staff/joueurs/${encodeURIComponent(identifier)}`}
               className="flex items-center justify-between hologram-border rounded-lg p-4 transition-colors hover:border-redlake/40"
             >
               <div className="flex items-center gap-3">
                 {player.user.avatarUrl ? (
                   <Image
                     src={player.user.avatarUrl}
-                    alt={player.user.minecraftUsername}
+                    alt={identifier}
                     width={40}
                     height={40}
                     className="rounded-full border border-redlake/30"
@@ -66,10 +69,10 @@ export default async function StaffJoueursPage() {
                 <div>
                   <h3 className="font-bold text-white">
                     {[player.rpFirstName, player.rpLastName].filter(Boolean).join(" ") ||
-                      player.user.minecraftUsername}
+                      identifier}
                   </h3>
                   <p className="font-mono text-xs text-gray-600">
-                    {player.user.minecraftUsername} — {player.grade}
+                    {identifier} — {player.grade}
                   </p>
                 </div>
               </div>
@@ -80,7 +83,8 @@ export default async function StaffJoueursPage() {
                 </span>
               )}
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

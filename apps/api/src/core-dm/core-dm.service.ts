@@ -8,6 +8,7 @@ const USER_SELECT = {
   minecraftUsername: true,
   discordUsername: true,
   avatarUrl: true,
+  activeCharacter: { select: { rpFirstName: true, rpLastName: true, grade: true } },
 };
 
 const CHANNEL_LABELS: Record<CoreDmChannel, string> = {
@@ -22,7 +23,13 @@ export class CoreDmService {
     private notifications: NotificationsService,
   ) {}
 
-  private async resolveSenderLabel(userId: string) {
+  /**
+   * Libelle affiche pour l'auteur d'un message — depend du canal : en
+   * Professionnel (RP, voie hierarchique) on montre le personnage (nom +
+   * grade), en Personnel (hors-RP, entre joueurs) on montre le compte
+   * (Discord/Minecraft), jamais l'identite RP qui n'a pas sa place hors-RP.
+   */
+  private async resolveSenderLabel(userId: string, channel: CoreDmChannel) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -32,13 +39,14 @@ export class CoreDmService {
       },
     });
     if (!user) throw new BadRequestException('Utilisateur introuvable');
+    const accountLabel = user.discordUsername ?? user.minecraftUsername ?? 'Agent';
+    if (channel !== CoreDmChannel.PROFESSIONNEL) return accountLabel;
+
     const character = user.activeCharacter;
     const rpName = character
       ? [character.rpFirstName, character.rpLastName].filter(Boolean).join(' ')
       : '';
-    return rpName
-      ? `${rpName} (${character!.grade})`
-      : (user.discordUsername ?? user.minecraftUsername ?? 'Agent');
+    return rpName ? `${rpName} (${character!.grade})` : accountLabel;
   }
 
   private async resolveUserByUsername(username: string) {
@@ -60,7 +68,7 @@ export class CoreDmService {
     if (recipientId === senderId) {
       throw new BadRequestException('Impossible de vous envoyer un message à vous-même');
     }
-    const senderLabel = await this.resolveSenderLabel(senderId);
+    const senderLabel = await this.resolveSenderLabel(senderId, channel);
     const message = await this.prisma.coreDirectMessage.create({
       data: { senderId, recipientId, senderLabel, content, channel },
     });

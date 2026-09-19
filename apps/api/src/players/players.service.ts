@@ -180,6 +180,8 @@ export class PlayersService {
           select: {
             minecraftUsername: true,
 
+            username: true,
+
             avatarUrl: true,
 
             discordId: true,
@@ -368,16 +370,16 @@ export class PlayersService {
   }
 
   async findIdByUsername(username: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { minecraftUsername: username },
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ minecraftUsername: username }, { username }] },
       select: { activeCharacterId: true },
     });
     return user?.activeCharacterId ?? null;
   }
 
   async findByUsername(username: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { minecraftUsername: username },
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ minecraftUsername: username }, { username }] },
       select: { activeCharacterId: true },
     });
     if (!user?.activeCharacterId) throw new NotFoundException('Joueur introuvable');
@@ -591,8 +593,8 @@ export class PlayersService {
 
   /** Personnages RP d'un compte, vus par le staff via son pseudo Minecraft. */
   async listCharactersByUsername(username: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { minecraftUsername: username },
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ minecraftUsername: username }, { username }] },
       select: { id: true, activeCharacterId: true },
     });
     if (!user) throw new NotFoundException('Utilisateur introuvable');
@@ -631,8 +633,8 @@ export class PlayersService {
     actorId: string,
     actorLabel: string,
   ) {
-    const user = await this.prisma.user.findUnique({
-      where: { minecraftUsername: username },
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ minecraftUsername: username }, { username }] },
       select: { id: true, activeCharacterId: true },
     });
     if (!user) throw new NotFoundException('Utilisateur introuvable');
@@ -713,8 +715,8 @@ export class PlayersService {
     actorId: string,
     actorLabel: string,
   ) {
-    const user = await this.prisma.user.findUnique({
-      where: { minecraftUsername: username },
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ minecraftUsername: username }, { username }] },
     });
     if (!user) throw new NotFoundException('Utilisateur introuvable');
 
@@ -778,8 +780,8 @@ export class PlayersService {
     actorId: string,
     actorLabel: string,
   ) {
-    const user = await this.prisma.user.findUnique({
-      where: { minecraftUsername: username },
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ minecraftUsername: username }, { username }] },
       select: { activeCharacterId: true },
     });
     if (!user?.activeCharacterId) {

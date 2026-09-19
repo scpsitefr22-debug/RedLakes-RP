@@ -17,6 +17,7 @@ interface ApiUser {
   minecraftUsername: string;
   discordUsername: string | null;
   avatarUrl: string | null;
+  activeCharacter: { rpFirstName: string | null; rpLastName: string | null; grade: string } | null;
 }
 
 interface ApiConversation {
@@ -35,17 +36,38 @@ interface ApiDmMessage {
   readAt: string | null;
 }
 
-function partnerName(u: ApiUser) {
+/**
+ * En Professionnel (RP, voie hiérarchique) on adresse le personnage — nom
+ * RP, éventuellement son grade en dessous. En Personnel (hors-RP) on
+ * adresse le compte (Discord/Minecraft) : jamais l'identité RP hors-RP.
+ */
+function partnerName(u: ApiUser, channel: Channel) {
+  if (channel === "PROFESSIONNEL" && u.activeCharacter) {
+    const rp = [u.activeCharacter.rpFirstName, u.activeCharacter.rpLastName].filter(Boolean).join(" ");
+    if (rp) return rp;
+  }
   return u.discordUsername ?? u.minecraftUsername;
 }
 
-function ContactAvatar({ user, className = "h-9 w-9" }: { user: ApiUser; className?: string }) {
+function partnerGrade(u: ApiUser, channel: Channel) {
+  return channel === "PROFESSIONNEL" ? (u.activeCharacter?.grade ?? null) : null;
+}
+
+function ContactAvatar({
+  user,
+  channel,
+  className = "h-9 w-9",
+}: {
+  user: ApiUser;
+  channel: Channel;
+  className?: string;
+}) {
   if (user.avatarUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={user.avatarUrl}
-        alt={partnerName(user)}
+        alt={partnerName(user, channel)}
         className={`${className} shrink-0 rounded-full border border-metal/50`}
       />
     );
@@ -144,7 +166,10 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
   const filteredContacts = (contacts ?? []).filter((c) => {
     const q = contactFilter.trim().toLowerCase();
     if (!q) return true;
-    return partnerName(c).toLowerCase().includes(q) || c.minecraftUsername.toLowerCase().includes(q);
+    return (
+      partnerName(c, channel).toLowerCase().includes(q) ||
+      c.minecraftUsername.toLowerCase().includes(q)
+    );
   });
 
   const sendMessage = async (e: FormEvent) => {
@@ -206,7 +231,7 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
           className="mb-3 flex items-center gap-1.5 font-mono text-[11px] text-gray-500 hover:text-white"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          {partnerName(activePartner)}
+          {partnerName(activePartner, channel)}
         </button>
 
         <div className="flex-1 space-y-2 overflow-y-auto">
@@ -235,7 +260,7 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder={`Écrire à ${partnerName(activePartner)}…`}
+            placeholder={`Écrire à ${partnerName(activePartner, channel)}…`}
             maxLength={2000}
             className="flex-1 rounded border border-metal/50 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-gray-600 focus:border-redlake"
           />
@@ -289,8 +314,13 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
                 onClick={() => openThread(c)}
                 className="flex w-full items-center gap-3 rounded border border-metal/40 bg-black/30 p-2.5 text-left hover:border-redlake/40"
               >
-                <ContactAvatar user={c} className="h-8 w-8" />
-                <p className="truncate text-sm font-medium text-white">{partnerName(c)}</p>
+                <ContactAvatar user={c} channel={channel} className="h-8 w-8" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-white">{partnerName(c, channel)}</p>
+                  {partnerGrade(c, channel) && (
+                    <p className="truncate text-xs text-gray-500">{partnerGrade(c, channel)}</p>
+                  )}
+                </div>
               </button>
             ))
           )}
@@ -331,10 +361,10 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
               onClick={() => openThread(c.partner)}
               className="flex w-full items-center gap-3 rounded border border-metal/40 bg-black/30 p-3 text-left hover:border-redlake/40"
             >
-              <ContactAvatar user={c.partner} />
+              <ContactAvatar user={c.partner} channel={channel} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-medium text-white">{partnerName(c.partner)}</p>
+                  <p className="truncate text-sm font-medium text-white">{partnerName(c.partner, channel)}</p>
                   {c.unreadCount > 0 && (
                     <span className="rounded-full bg-redlake px-1.5 py-0.5 text-[9px] font-bold text-white">
                       {c.unreadCount}
