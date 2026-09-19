@@ -6,6 +6,7 @@ import { NotificationsService } from '../platform/notifications.service';
 const USER_SELECT = {
   id: true,
   minecraftUsername: true,
+  username: true,
   discordUsername: true,
   avatarUrl: true,
   activeCharacter: { select: { rpFirstName: true, rpLastName: true, grade: true } },
@@ -49,9 +50,10 @@ export class CoreDmService {
     return rpName ? `${rpName} (${character!.grade})` : accountLabel;
   }
 
-  private async resolveUserByUsername(username: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { minecraftUsername: username },
+  /** Identifiant = pseudo Minecraft (historique) ou pseudo de connexion (comptes par mot de passe non encore liés Minecraft). */
+  private async resolveUserByUsername(identifier: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ minecraftUsername: identifier }, { username: identifier }] },
       select: { id: true },
     });
     if (!user) throw new NotFoundException('Destinataire introuvable');
@@ -146,13 +148,16 @@ export class CoreDmService {
 
   /**
    * Liste des contacts pour le sélecteur "nouvelle discussion" — tous les
-   * comptes adressables (pseudo Minecraft requis, comme resolveUserByUsername
-   * ci-dessus), hors soi-même. Alphabétique, plafonné pour rester léger dans
-   * un panneau qu'on fait défiler.
+   * comptes adressables (pseudo Minecraft OU pseudo de connexion, comme
+   * resolveUserByUsername ci-dessus), hors soi-même. Alphabétique, plafonné
+   * pour rester léger dans un panneau qu'on fait défiler.
    */
   async listContacts(excludeUserId: string) {
     return this.prisma.user.findMany({
-      where: { id: { not: excludeUserId }, minecraftUsername: { not: null } },
+      where: {
+        id: { not: excludeUserId },
+        OR: [{ minecraftUsername: { not: null } }, { username: { not: null } }],
+      },
       select: USER_SELECT,
       orderBy: { minecraftUsername: 'asc' },
       take: 300,

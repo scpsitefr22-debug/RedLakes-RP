@@ -14,10 +14,16 @@ const CHANNELS: { value: Channel; label: string; icon: typeof MessageCircle; hin
 
 interface ApiUser {
   id: string;
-  minecraftUsername: string;
+  minecraftUsername: string | null;
+  username: string | null;
   discordUsername: string | null;
   avatarUrl: string | null;
   activeCharacter: { rpFirstName: string | null; rpLastName: string | null; grade: string } | null;
+}
+
+/** Identifiant à envoyer à l'API pour viser ce compte — pseudo Minecraft, ou pseudo de connexion s'il n'a pas encore lié Minecraft. */
+function identifierOf(u: ApiUser) {
+  return u.minecraftUsername ?? u.username ?? "";
 }
 
 interface ApiConversation {
@@ -46,7 +52,7 @@ function partnerName(u: ApiUser, channel: Channel) {
     const rp = [u.activeCharacter.rpFirstName, u.activeCharacter.rpLastName].filter(Boolean).join(" ");
     if (rp) return rp;
   }
-  return u.discordUsername ?? u.minecraftUsername;
+  return u.discordUsername ?? u.minecraftUsername ?? u.username ?? "Agent";
 }
 
 function partnerGrade(u: ApiUser, channel: Channel) {
@@ -137,7 +143,7 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
   const fetchThread = (partner: ApiUser, opts?: { silent?: boolean }) => {
     if (!opts?.silent) setThread(null);
     apiFetch<ApiDmMessage[]>(
-      `/core-dm/with/${encodeURIComponent(partner.minecraftUsername)}?channel=${channel}`,
+      `/core-dm/with/${encodeURIComponent(identifierOf(partner))}?channel=${channel}`,
     )
       .then(setThread)
       .then(() => onActivity?.())
@@ -168,7 +174,7 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
     if (!q) return true;
     return (
       partnerName(c, channel).toLowerCase().includes(q) ||
-      c.minecraftUsername.toLowerCase().includes(q)
+      identifierOf(c).toLowerCase().includes(q)
     );
   });
 
@@ -181,7 +187,7 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
     try {
       await apiFetch("/core-dm", {
         method: "POST",
-        body: JSON.stringify({ toUsername: activePartner.minecraftUsername, content, channel }),
+        body: JSON.stringify({ toUsername: identifierOf(activePartner), content, channel }),
       });
       setDraft("");
       fetchThread(activePartner);
