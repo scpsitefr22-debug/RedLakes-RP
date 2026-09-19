@@ -34,9 +34,11 @@ interface IncidentReportFull {
   validatorLabel: string | null;
   validatorRole: string | null;
   minClearanceLevel: number;
+  departmentRef: { name: string; slug: string } | null;
 }
 
-const THREAT_COLORS: Record<string, string> = {
+/** Couleur d'accent par classe de menace — même logique que sur les rapports papier d'origine. */
+const THREAT_ACCENT: Record<string, string> = {
   Safe: "#16a34a",
   Euclid: "#ea580c",
   Keter: "#dc2626",
@@ -44,12 +46,23 @@ const THREAT_COLORS: Record<string, string> = {
   Apollyon: "#7f1d1d",
 };
 
+/** Mots-clés statut, teintes foncées pour rester lisibles sur fond clair (le document reste clair, contrairement au reste du site). */
 const STATUS_COLORS: Record<string, string> = {
-  "DÉCÉDÉ": "text-red-400", "DÉCÉDÉS": "text-red-400",
-  "BLESSÉ": "text-orange-400", "BLESSÉ GRAVE": "text-orange-400",
-  "INTACT": "text-green-400", "INTACTS": "text-green-400",
-  "ISOLÉ": "text-blue-400", "ISOLÉS": "text-blue-400",
+  "DÉCÉDÉ": "text-red-600", "DÉCÉDÉS": "text-red-600",
+  "BLESSÉ": "text-orange-600", "BLESSÉ GRAVE": "text-orange-600",
+  "INTACT": "text-green-600", "INTACTS": "text-green-600",
+  "ISOLÉ": "text-blue-600", "ISOLÉS": "text-blue-600",
 };
+
+const CLEARANCE_WORDS: Record<number, string> = {
+  1: "PUBLIC",
+  2: "ARCHIVE",
+  3: "CONFIDENTIEL",
+  4: "RESTREINT",
+  5: "CONSEIL OMÉGA",
+};
+
+const URGENT_CLASSES = new Set(["Keter", "Thaumiel", "Apollyon"]);
 
 async function getIncidentReport(slug: string): Promise<IncidentReportFull | null> {
   try {
@@ -92,7 +105,10 @@ export function IncidentReportReader({ slug }: { slug: string }) {
     );
   }
 
-  const accent = THREAT_COLORS[report.threatClass] ?? THREAT_COLORS.Euclid;
+  const accent = THREAT_ACCENT[report.threatClass] ?? THREAT_ACCENT.Euclid;
+  const severityWord = URGENT_CLASSES.has(report.threatClass) ? "URGENCE" : "CLASSE";
+  const clearanceWord = CLEARANCE_WORDS[report.minClearanceLevel] ?? "CONFIDENTIEL";
+  const departmentName = report.departmentRef?.name.toUpperCase() ?? "DÉPARTEMENT SÉCURITÉ";
 
   return (
     <>
@@ -103,69 +119,82 @@ export function IncidentReportReader({ slug }: { slug: string }) {
         <ArrowLeft className="h-3 w-3" /> Rapports d&apos;incident
       </Link>
 
-      <div className="overflow-hidden rounded-lg border border-metal/40">
-        <div className="flex flex-wrap items-center justify-between gap-3 p-6" style={{ background: "#0a1120", borderLeft: `6px solid ${accent}` }}>
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-gray-500">
-              Fondation SCP — Rapport d&apos;incident officiel
-            </p>
-            <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">Rapport d&apos;Incident de Sécurité</h1>
+      {/* Reproduction fidèle du gabarit PDF officiel — volontairement en dehors du thème sombre du site : c'est un document, pas une page du site. */}
+      <div className="overflow-hidden rounded-lg border border-black/10 bg-white text-slate-900 shadow-2xl">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-6" style={{ background: "#0a1120" }}>
+          <div className="flex items-center gap-4">
+            <div
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2"
+              style={{ borderColor: accent, background: "#0f1729" }}
+            >
+              <AlertTriangle className="h-5 w-5" style={{ color: accent }} />
+            </div>
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
+                Fondation SCP — {departmentName}
+              </p>
+              <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">Rapport d&apos;Incident</h1>
+            </div>
           </div>
           <div className="rounded px-4 py-2 text-right" style={{ background: accent }}>
-            <p className="font-bold text-white">{report.threatClass}</p>
-            {report.minClearanceLevel > 1 && (
-              <p className="font-mono text-[10px] uppercase text-white/80">Niveau {report.minClearanceLevel}</p>
-            )}
+            <p className="text-sm font-bold uppercase text-white">{severityWord} {report.threatClass}</p>
+            <p className="font-mono text-[10px] uppercase text-white/80">
+              Niveau {report.minClearanceLevel} / {clearanceWord}
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 divide-y divide-metal/30 border-b border-metal/30 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+        <div className="grid grid-cols-1 divide-y divide-slate-200 border-b border-slate-200 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
           {[
             ["Référence incident", report.reference],
             ["Date & heure", new Date(report.incidentAt).toLocaleString("fr-FR")],
             ["Anomalie & lieu", report.anomalyLabel],
             ["Classe menace", report.threatClass],
           ].map(([label, value]) => (
-            <div key={label} className="p-4" style={{ borderLeft: `3px solid ${accent}` }}>
-              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">{label}</p>
-              <p className="mt-1 font-bold text-white">{value}</p>
+            <div key={label} className="bg-slate-50 p-4" style={{ borderLeft: `3px solid ${accent}` }}>
+              <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
+              <p className="mt-1 font-bold text-slate-900">{value}</p>
             </div>
           ))}
         </div>
 
         <div className="p-6">
-          <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-white">
-            <AlertTriangle className="h-4 w-4" style={{ color: accent }} />
-            Description détaillée des faits
+          <div className="mb-3 flex items-center justify-between gap-2 rounded px-3 py-2" style={{ background: "#0a1120" }}>
+            <h2 className="text-sm font-bold uppercase tracking-wide text-white">1. Description détaillée des faits</h2>
             {report.factsTag && (
-              <span className="rounded-full px-2 py-0.5 font-mono text-[10px] text-white" style={{ background: accent }}>
+              <span className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] text-white" style={{ background: accent }}>
                 {report.factsTag}
               </span>
             )}
-          </h2>
-          <p className="whitespace-pre-wrap text-gray-300">{report.narrative}</p>
+          </div>
+          <p className="whitespace-pre-wrap text-slate-700">{report.narrative}</p>
         </div>
 
         {report.personnelRows.length > 0 && (
-          <div className="border-t border-metal/30 p-6">
-            <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-white">Bilan du personnel impacté</h2>
+          <div className="border-t border-slate-200 p-6">
+            <div className="mb-3 flex items-center justify-between gap-2 rounded px-3 py-2" style={{ background: "#0a1120" }}>
+              <h2 className="text-sm font-bold uppercase tracking-wide text-white">2. Bilan du personnel impacté</h2>
+              <span className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] text-white" style={{ background: accent }}>
+                IMPACT PHYSIQUE &amp; SÉCURITÉ
+              </span>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-metal/40 text-gray-500">
-                    <th className="py-2 pr-3 font-mono text-[10px] uppercase">Équipe / unité</th>
-                    <th className="py-2 pr-3 font-mono text-[10px] uppercase">Personnel &amp; grade</th>
-                    <th className="py-2 pr-3 font-mono text-[10px] uppercase">Statut</th>
-                    <th className="py-2 font-mono text-[10px] uppercase">Observations</th>
+                  <tr style={{ background: "#0a1120" }}>
+                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Équipe / unité</th>
+                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Personnel &amp; grade</th>
+                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Statut</th>
+                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Observations</th>
                   </tr>
                 </thead>
                 <tbody>
                   {report.personnelRows.map((row, i) => (
-                    <tr key={i} className="border-b border-metal/20">
-                      <td className="py-2 pr-3 text-gray-300">{row.unite}</td>
-                      <td className="py-2 pr-3 text-gray-300">{row.grade}</td>
-                      <td className={`py-2 pr-3 font-bold ${STATUS_COLORS[row.statut] ?? "text-gray-300"}`}>{row.statut}</td>
-                      <td className="py-2 text-gray-400">{row.obs}</td>
+                    <tr key={i} className={`border-b border-slate-200 ${i % 2 === 1 ? "bg-slate-50" : "bg-white"}`}>
+                      <td className="py-2 px-3 text-slate-700">{row.unite}</td>
+                      <td className="py-2 px-3 text-slate-700">{row.grade}</td>
+                      <td className={`py-2 px-3 font-bold ${STATUS_COLORS[row.statut] ?? "text-slate-700"}`}>{row.statut}</td>
+                      <td className="py-2 px-3 text-slate-600">{row.obs}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -175,34 +204,42 @@ export function IncidentReportReader({ slug }: { slug: string }) {
         )}
 
         {report.equipmentRows.length > 0 && (
-          <div className="border-t border-metal/30 p-6">
-            <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-white">
-              Bilan logistique, munitions &amp; récupération
-            </h2>
+          <div className="border-t border-slate-200 p-6">
+            <div className="mb-3 flex items-center justify-between gap-2 rounded px-3 py-2" style={{ background: "#0a1120" }}>
+              <h2 className="text-sm font-bold uppercase tracking-wide text-white">
+                3. Bilan logistique, munitions &amp; récupération
+              </h2>
+              <span className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] text-white" style={{ background: accent }}>
+                ÉQUIPEMENTS &amp; COÛTS
+              </span>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-metal/40 text-gray-500">
-                    <th className="py-2 pr-3 font-mono text-[10px] uppercase">Désignation</th>
-                    <th className="py-2 pr-3 font-mono text-[10px] uppercase">Quantité</th>
-                    <th className="py-2 pr-3 font-mono text-[10px] uppercase">État / bilan</th>
-                    <th className="py-2 text-right font-mono text-[10px] uppercase">Coût</th>
+                  <tr style={{ background: "#0a1120" }}>
+                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Désignation</th>
+                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Quantité</th>
+                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">État / bilan</th>
+                    <th className="py-2 px-3 text-right font-mono text-[10px] uppercase text-white">Coût</th>
                   </tr>
                 </thead>
                 <tbody>
                   {report.equipmentRows.map((row, i) => (
-                    <tr key={i} className="border-b border-metal/20">
-                      <td className="py-2 pr-3 text-gray-300">{row.designation}</td>
-                      <td className="py-2 pr-3 text-gray-400">{row.quantite}</td>
-                      <td className="py-2 pr-3 text-gray-400">{row.etat}</td>
-                      <td className="py-2 text-right font-mono text-gray-300">{row.cout.toLocaleString("fr-FR")} $</td>
+                    <tr key={i} className={`border-b border-slate-200 ${i % 2 === 1 ? "bg-slate-50" : "bg-white"}`}>
+                      <td className="py-2 px-3 text-slate-700">{row.designation}</td>
+                      <td className="py-2 px-3 text-slate-600">{row.quantite}</td>
+                      <td className="py-2 px-3 text-slate-600">{row.etat}</td>
+                      <td className="py-2 px-3 text-right font-mono text-slate-700">{row.cout.toLocaleString("fr-FR")} $</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="mt-3 flex items-center justify-between rounded p-3" style={{ background: `${accent}1a`, borderLeft: `4px solid ${accent}` }}>
-              <span className="text-sm font-bold text-white">Perte financière totale du site</span>
+            <div
+              className="mt-3 flex items-center justify-between rounded p-3"
+              style={{ background: `${accent}14`, borderLeft: `4px solid ${accent}` }}
+            >
+              <span className="text-sm font-bold text-slate-900">Perte financière totale du site</span>
               <span className="font-mono text-lg font-bold" style={{ color: accent }}>
                 {report.totalCost.toLocaleString("fr-FR")} $
               </span>
@@ -210,17 +247,32 @@ export function IncidentReportReader({ slug }: { slug: string }) {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-3 border-t border-metal/30 p-6 sm:grid-cols-2">
-          <div className="rounded border border-metal/40 bg-black/30 p-3">
-            <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Rédacteur</p>
-            <p className="font-bold text-white">{report.authorLabel}</p>
-            {report.authorRole && <p className="text-xs text-gray-500">{report.authorRole}</p>}
+        <div className="grid grid-cols-1 gap-3 border-t border-slate-200 p-6 sm:grid-cols-2">
+          <div className="rounded border border-slate-200 bg-slate-50 p-3">
+            <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">Rédacteur</p>
+            <p className="font-bold text-slate-900">{report.authorLabel}</p>
+            {report.authorRole && <p className="text-xs text-slate-500">{report.authorRole}</p>}
+            <p className="mt-2 rounded border border-dashed border-slate-300 px-2 py-1 text-center font-mono text-[10px] text-slate-500">
+              [ SIGNÉ ÉLECTRONIQUEMENT ]
+            </p>
           </div>
-          <div className="rounded border border-metal/40 bg-black/30 p-3">
-            <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Validation officielle de sécurité</p>
-            <p className="font-bold text-white">{report.validatorLabel || "—"}</p>
-            {report.validatorRole && <p className="text-xs text-gray-500">{report.validatorRole}</p>}
+          <div className="rounded border border-slate-200 bg-slate-50 p-3">
+            <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">Validation officielle</p>
+            <p className="font-bold text-slate-900">{report.validatorLabel || "—"}</p>
+            {report.validatorRole && <p className="text-xs text-slate-500">{report.validatorRole}</p>}
+            {report.validatorLabel && (
+              <p className="mt-2 rounded border border-dashed border-slate-300 px-2 py-1 text-center font-mono text-[10px] text-slate-500">
+                [ APPROUVÉ ]
+              </p>
+            )}
           </div>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-slate-200 px-6 py-3">
+          <p className="font-mono text-[9px] uppercase tracking-widest text-slate-400">
+            Fondation SCP — Rapport d&apos;incident officiel
+          </p>
+          <p className="font-mono text-[9px] uppercase tracking-widest text-slate-400">Accès {clearanceWord.toLowerCase()}</p>
         </div>
       </div>
     </>

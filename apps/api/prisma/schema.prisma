@@ -338,6 +338,13 @@ model IncidentReport {
   /// Meme principe que ClassifiedDocument.minClearanceLevel.
   minClearanceLevel Int @default(1)
 
+  /// Departement REDACTEUR du rapport (pas la visibilite — voir
+  /// restrictedDepartmentIds) : affiche dans l'en-tete du document, ex.
+  /// "FONDATION SCP — DEPARTEMENT SECURITE". Nullable pour les rapports
+  /// crees avant l'ouverture aux autres departements (Securite implicite).
+  departmentId  String?
+  departmentRef Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
   authorId String?
   author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
@@ -708,6 +715,7 @@ model Department {
 
   grades Grade[]
   teams  Team[]
+  incidentReports IncidentReport[]
 
   @@index([factionId])
 }

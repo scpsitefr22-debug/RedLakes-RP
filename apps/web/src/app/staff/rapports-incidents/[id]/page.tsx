@@ -35,6 +35,7 @@ interface ApiIncidentReportFull {
   validatorRole: string | null;
   restrictedDepartmentIds: string[];
   minClearanceLevel: number;
+  departmentId: string | null;
 }
 
 export default function EditIncidentReportPage() {
@@ -77,6 +78,7 @@ export default function EditIncidentReportPage() {
         validatorRole: report.validatorRole ?? "",
         restrictedDepartmentIds: report.restrictedDepartmentIds,
         minClearanceLevel: String(report.minClearanceLevel),
+        departmentId: report.departmentId ?? "",
       }}
     />
   );

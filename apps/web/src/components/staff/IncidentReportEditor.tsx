@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
@@ -9,6 +9,11 @@ import { DepartmentMultiSelect } from "@/components/staff/DepartmentMultiSelect"
 
 const THREAT_CLASSES = ["Safe", "Euclid", "Keter", "Thaumiel", "Apollyon"] as const;
 const STATUS_OPTIONS = ["INTACT", "INTACTS", "BLESSÉ", "BLESSÉ GRAVE", "ISOLÉ", "ISOLÉS", "DÉCÉDÉ", "DÉCÉDÉS"];
+
+interface DepartmentOption {
+  id: string;
+  name: string;
+}
 
 interface PersonnelRow {
   unite: string;
@@ -40,6 +45,7 @@ export interface IncidentReportFormData {
   validatorRole: string;
   restrictedDepartmentIds: string[];
   minClearanceLevel: string;
+  departmentId: string;
 }
 
 interface IncidentReportEditorProps {
@@ -74,9 +80,24 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
     validatorRole: initial?.validatorRole ?? "",
     restrictedDepartmentIds: initial?.restrictedDepartmentIds ?? [],
     minClearanceLevel: initial?.minClearanceLevel ?? "3",
+    departmentId: initial?.departmentId ?? "",
   });
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [departments, setDepartments] = useState<DepartmentOption[]>([]);
+
+  useEffect(() => {
+    apiFetch<DepartmentOption[]>("/departments")
+      .then((depts) => {
+        setDepartments(depts);
+        if (mode === "create" && !form.departmentId) {
+          const securite = depts.find((d) => d.name.toLowerCase().includes("sécurité"));
+          if (securite) setForm((f) => ({ ...f, departmentId: securite.id }));
+        }
+      })
+      .catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const update = (key: keyof IncidentReportFormData, value: string) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -129,6 +150,7 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
         validatorRole: form.validatorRole || undefined,
         restrictedDepartmentIds: form.restrictedDepartmentIds,
         minClearanceLevel: parseInt(form.minClearanceLevel, 10) || 1,
+        departmentId: form.departmentId || undefined,
       };
 
       if (mode === "create") {
@@ -232,6 +254,15 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
             <select className={inputClass} value={form.threatClass} onChange={(e) => update("threatClass", e.target.value)}>
               {THREAT_CLASSES.map((c) => (
                 <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block font-mono text-xs text-gray-500">Département rédacteur</label>
+            <select className={inputClass} value={form.departmentId} onChange={(e) => update("departmentId", e.target.value)}>
+              <option value="">—</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.name}</option>
               ))}
             </select>
           </div>

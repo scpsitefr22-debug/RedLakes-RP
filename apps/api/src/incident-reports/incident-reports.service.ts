@@ -19,12 +19,16 @@ export class IncidentReportsService {
   async findPublished(departmentId: string | null = null, clearanceLevel = 1) {
     const reports = await this.prisma.incidentReport.findMany({
       orderBy: { incidentAt: 'desc' },
+      include: { departmentRef: { select: { name: true, slug: true } } },
     });
     return filterByClearance(filterByDepartment(reports, departmentId), clearanceLevel);
   }
 
   async findBySlug(slug: string, departmentId: string | null = null, clearanceLevel = 1) {
-    const report = await this.prisma.incidentReport.findUnique({ where: { slug } });
+    const report = await this.prisma.incidentReport.findUnique({
+      where: { slug },
+      include: { departmentRef: { select: { name: true, slug: true } } },
+    });
     if (
       !report ||
       !isVisibleToDepartment(report.restrictedDepartmentIds, departmentId) ||
@@ -40,12 +44,18 @@ export class IncidentReportsService {
   findAllAdmin() {
     return this.prisma.incidentReport.findMany({
       orderBy: { incidentAt: 'desc' },
-      include: { author: { select: { minecraftUsername: true } } },
+      include: {
+        author: { select: { minecraftUsername: true } },
+        departmentRef: { select: { name: true, slug: true } },
+      },
     });
   }
 
   findById(id: string) {
-    return this.prisma.incidentReport.findUnique({ where: { id } });
+    return this.prisma.incidentReport.findUnique({
+      where: { id },
+      include: { departmentRef: { select: { name: true, slug: true } } },
+    });
   }
 
   create(authorId: string, dto: CreateIncidentReportDto) {

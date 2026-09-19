@@ -92,6 +92,10 @@ export class CreateIncidentReportDto {
   @Min(1)
   @Max(5)
   minClearanceLevel?: number;
+
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
 }
 
 export class UpdateIncidentReportDto {
@@ -162,4 +166,8 @@ export class UpdateIncidentReportDto {
   @Min(1)
   @Max(5)
   minClearanceLevel?: number;
+
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
 }
