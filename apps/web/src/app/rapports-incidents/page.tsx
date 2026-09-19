@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Eye } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
 interface ApiIncidentReport {
@@ -12,6 +12,7 @@ interface ApiIncidentReport {
   threatClass: string;
   incidentAt: string;
   factsTag: string | null;
+  departmentRef: { name: string; slug: string } | null;
 }
 
 const THREAT_COLORS: Record<string, string> = {
@@ -21,6 +22,19 @@ const THREAT_COLORS: Record<string, string> = {
   Thaumiel: "text-purple-400 border-purple-400/30",
   Apollyon: "text-orange-400 border-orange-400/30",
 };
+
+/** Protocole d'audit AEGIS — jamais colore comme une classe de menace (voir Directive Staff AEGIS). */
+const AEGIS_LEVEL_LABELS: Record<string, string> = {
+  Observation: "Niveau 1 — Observation",
+  Restriction: "Niveau 2 — Restriction",
+  ConformiteForcee: "Niveau 3 — Conformité Forcée",
+  Defaillance: "Niveau 4 — Défaillance",
+};
+const AEGIS_BADGE_CLASS = "text-slate-400 border-slate-500/40";
+
+function isAegisReport(r: ApiIncidentReport) {
+  return r.departmentRef?.slug === "aegis-general" || r.threatClass in AEGIS_LEVEL_LABELS;
+}
 
 export default function RapportsIncidentsPage() {
   const [reports, setReports] = useState<ApiIncidentReport[] | null>(null);
@@ -35,11 +49,11 @@ export default function RapportsIncidentsPage() {
     <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="mb-12">
         <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-          DÉPARTEMENT DE LA SÉCURITÉ DU SITE
+          JOURNAL OFFICIEL DES DÉPARTEMENTS
         </p>
         <h1 className="text-4xl font-bold text-white">Rapports d&apos;incident</h1>
         <p className="mt-4 max-w-2xl text-gray-500">
-          Journal officiel des incidents de sécurité — accès filtré selon votre département et votre habilitation.
+          Rapports de tous les départements — accès filtré selon votre département et votre habilitation.
         </p>
       </div>
 
@@ -51,29 +65,36 @@ export default function RapportsIncidentsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {reports.map((r) => (
-            <Link
-              key={r.slug}
-              href={`/rapports-incidents/${r.slug}`}
-              className="flex items-center justify-between hologram-border rounded-lg p-4 transition-colors hover:border-redlake/40"
-            >
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-redlake-glow" />
-                <div>
-                  <h3 className="font-bold text-white">
-                    {r.reference} — {r.anomalyLabel}
-                  </h3>
-                  <p className="font-mono text-xs text-gray-600">
-                    {new Date(r.incidentAt).toLocaleDateString("fr-FR")}
-                    {r.factsTag ? ` — ${r.factsTag}` : ""}
-                  </p>
+          {reports.map((r) => {
+            const aegis = isAegisReport(r);
+            const Icon = aegis ? Eye : AlertTriangle;
+            const badgeClass = aegis ? AEGIS_BADGE_CLASS : (THREAT_COLORS[r.threatClass] ?? "text-gray-500 border-metal");
+            const badgeLabel = aegis ? (AEGIS_LEVEL_LABELS[r.threatClass] ?? r.threatClass) : r.threatClass;
+            return (
+              <Link
+                key={r.slug}
+                href={`/rapports-incidents/${r.slug}`}
+                className="flex items-center justify-between hologram-border rounded-lg p-4 transition-colors hover:border-redlake/40"
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className="h-5 w-5 text-redlake-glow" />
+                  <div>
+                    <h3 className="font-bold text-white">
+                      {r.reference} — {r.anomalyLabel}
+                    </h3>
+                    <p className="font-mono text-xs text-gray-600">
+                      {r.departmentRef?.name ?? "Département Sécurité"} —{" "}
+                      {new Date(r.incidentAt).toLocaleDateString("fr-FR")}
+                      {r.factsTag ? ` — ${r.factsTag}` : ""}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <span className={`rounded border px-2 py-1 font-mono text-xs uppercase ${THREAT_COLORS[r.threatClass] ?? "text-gray-500 border-metal"}`}>
-                {r.threatClass}
-              </span>
-            </Link>
-          ))}
+                <span className={`rounded border px-2 py-1 font-mono text-xs uppercase ${badgeClass}`}>
+                  {badgeLabel}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

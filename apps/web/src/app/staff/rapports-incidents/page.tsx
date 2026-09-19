@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import { Plus, AlertTriangle } from "lucide-react";
+import { Plus, AlertTriangle, Eye } from "lucide-react";
 
 interface StaffIncidentReport {
   id: string;
@@ -13,6 +13,7 @@ interface StaffIncidentReport {
   threatClass: string;
   incidentAt: string;
   author: { minecraftUsername: string } | null;
+  departmentRef: { name: string; slug: string } | null;
 }
 
 const THREAT_COLORS: Record<string, string> = {
@@ -22,6 +23,18 @@ const THREAT_COLORS: Record<string, string> = {
   Thaumiel: "text-purple-400",
   Apollyon: "text-orange-400",
 };
+
+/** Protocole d'audit AEGIS — jamais colore comme une classe de menace (voir Directive Staff AEGIS). */
+const AEGIS_LEVEL_LABELS: Record<string, string> = {
+  Observation: "Niveau 1 — Observation",
+  Restriction: "Niveau 2 — Restriction",
+  ConformiteForcee: "Niveau 3 — Conformité Forcée",
+  Defaillance: "Niveau 4 — Défaillance",
+};
+
+function isAegisReport(r: StaffIncidentReport) {
+  return r.departmentRef?.slug === "aegis-general" || r.threatClass in AEGIS_LEVEL_LABELS;
+}
 
 export default function StaffIncidentReportsPage() {
   const [reports, setReports] = useState<StaffIncidentReport[]>([]);
@@ -40,11 +53,11 @@ export default function StaffIncidentReportsPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
-            GESTION DES RAPPORTS D&apos;INCIDENT — SÉCURITÉ
+            GESTION DES RAPPORTS D&apos;INCIDENT — TOUS DÉPARTEMENTS
           </p>
           <h1 className="text-4xl font-bold text-white">Rapports d&apos;incident</h1>
           <p className="mt-4 text-gray-500">
-            Journal officiel des incidents de sécurité du site, par le Directeur de la Sécurité et son équipe.
+            Journal officiel des rapports de tous les départements et d&apos;AEGIS.
           </p>
         </div>
         <Link
@@ -68,29 +81,36 @@ export default function StaffIncidentReportsPage() {
       )}
 
       <div className="space-y-3">
-        {reports.map((r) => (
-          <Link
-            key={r.id}
-            href={`/staff/rapports-incidents/${r.id}`}
-            className="flex items-center justify-between hologram-border rounded-lg p-4 transition-colors hover:border-redlake/40"
-          >
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="h-5 w-5 text-redlake-glow" />
-              <div>
-                <h3 className="font-bold text-white">
-                  {r.reference} — {r.anomalyLabel}
-                </h3>
-                <p className="font-mono text-xs text-gray-600">
-                  {new Date(r.incidentAt).toLocaleString("fr-FR")}
-                  {r.author ? ` — ${r.author.minecraftUsername}` : ""}
-                </p>
+        {reports.map((r) => {
+          const aegis = isAegisReport(r);
+          const Icon = aegis ? Eye : AlertTriangle;
+          const badgeClass = aegis ? "text-slate-400" : (THREAT_COLORS[r.threatClass] ?? "text-gray-500");
+          const badgeLabel = aegis ? (AEGIS_LEVEL_LABELS[r.threatClass] ?? r.threatClass) : r.threatClass;
+          return (
+            <Link
+              key={r.id}
+              href={`/staff/rapports-incidents/${r.id}`}
+              className="flex items-center justify-between hologram-border rounded-lg p-4 transition-colors hover:border-redlake/40"
+            >
+              <div className="flex items-center gap-3">
+                <Icon className="h-5 w-5 text-redlake-glow" />
+                <div>
+                  <h3 className="font-bold text-white">
+                    {r.reference} — {r.anomalyLabel}
+                  </h3>
+                  <p className="font-mono text-xs text-gray-600">
+                    {r.departmentRef?.name ?? "Département Sécurité"} —{" "}
+                    {new Date(r.incidentAt).toLocaleString("fr-FR")}
+                    {r.author ? ` — ${r.author.minecraftUsername}` : ""}
+                  </p>
+                </div>
               </div>
-            </div>
-            <span className={`font-mono text-xs uppercase ${THREAT_COLORS[r.threatClass] ?? "text-gray-500"}`}>
-              {r.threatClass}
-            </span>
-          </Link>
-        ))}
+              <span className={`font-mono text-xs uppercase ${badgeClass}`}>
+                {badgeLabel}
+              </span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
