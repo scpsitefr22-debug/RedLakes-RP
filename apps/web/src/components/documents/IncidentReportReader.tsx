@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Lock, ArrowLeft, AlertTriangle } from "lucide-react";
+import { Lock, ArrowLeft, AlertTriangle, Eye } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 
 interface PersonnelRow {
@@ -26,6 +26,8 @@ interface IncidentReportFull {
   threatClass: string;
   factsTag: string | null;
   narrative: string;
+  conclusion: string | null;
+  recommendation: string | null;
   personnelRows: PersonnelRow[];
   equipmentRows: EquipmentRow[];
   totalCost: number;
@@ -46,6 +48,16 @@ const THREAT_ACCENT: Record<string, string> = {
   Apollyon: "#7f1d1d",
 };
 
+/** AEGIS n'a pas de code couleur — "toujours froide, administrative, impersonnelle" (Directive Staff AEGIS). Un seul gris acier, jamais de rouge/vert dramatique. */
+const AEGIS_ACCENT = "#475569";
+
+const AEGIS_LEVEL_LABELS: Record<string, string> = {
+  Observation: "1 — OBSERVATION",
+  Restriction: "2 — RESTRICTION",
+  ConformiteForcee: "3 — CONFORMITÉ FORCÉE",
+  Defaillance: "4 — DÉFAILLANCE",
+};
+
 /** Mots-clés statut, teintes foncées pour rester lisibles sur fond clair (le document reste clair, contrairement au reste du site). */
 const STATUS_COLORS: Record<string, string> = {
   "DÉCÉDÉ": "text-red-600", "DÉCÉDÉS": "text-red-600",
@@ -63,6 +75,7 @@ const CLEARANCE_WORDS: Record<number, string> = {
 };
 
 const URGENT_CLASSES = new Set(["Keter", "Thaumiel", "Apollyon"]);
+const AEGIS_LEVELS = new Set(["Observation", "Restriction", "ConformiteForcee", "Defaillance"]);
 
 async function getIncidentReport(slug: string): Promise<IncidentReportFull | null> {
   try {
@@ -70,6 +83,19 @@ async function getIncidentReport(slug: string): Promise<IncidentReportFull | nul
   } catch {
     return null;
   }
+}
+
+function SectionHeader({ title, tag, accent }: { title: string; tag?: string | null; accent: string }) {
+  return (
+    <div className="mb-3 flex items-center justify-between gap-2 rounded px-3 py-2" style={{ background: "#0a1120" }}>
+      <h2 className="text-sm font-bold uppercase tracking-wide text-white">{title}</h2>
+      {tag && (
+        <span className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] text-white" style={{ background: accent }}>
+          {tag}
+        </span>
+      )}
+    </div>
+  );
 }
 
 export function IncidentReportReader({ slug }: { slug: string }) {
@@ -105,10 +131,19 @@ export function IncidentReportReader({ slug }: { slug: string }) {
     );
   }
 
-  const accent = THREAT_ACCENT[report.threatClass] ?? THREAT_ACCENT.Euclid;
-  const severityWord = URGENT_CLASSES.has(report.threatClass) ? "URGENCE" : "CLASSE";
+  const isAegis = report.departmentRef?.slug === "aegis-general" || AEGIS_LEVELS.has(report.threatClass);
+  const accent = isAegis ? AEGIS_ACCENT : (THREAT_ACCENT[report.threatClass] ?? THREAT_ACCENT.Euclid);
   const clearanceWord = CLEARANCE_WORDS[report.minClearanceLevel] ?? "CONFIDENTIEL";
-  const departmentName = report.departmentRef?.name.toUpperCase() ?? "DÉPARTEMENT SÉCURITÉ";
+
+  const badgeTop = isAegis
+    ? "AUDIT AEGIS"
+    : `${URGENT_CLASSES.has(report.threatClass) ? "URGENCE" : "CLASSE"} ${report.threatClass}`;
+  const badgeBottom = isAegis
+    ? `NIVEAU ${AEGIS_LEVEL_LABELS[report.threatClass] ?? report.threatClass}`
+    : `NIVEAU ${report.minClearanceLevel} / ${clearanceWord}`;
+
+  const authority = isAegis ? "A.E.G.I.S. — Autorité Exécutive de Garantie des Intérêts Suprêmes" : `Fondation SCP — ${report.departmentRef?.name.toUpperCase() ?? "DÉPARTEMENT SÉCURITÉ"}`;
+  const docTitle = isAegis ? "Rapport d'Inspection" : "Rapport d'Incident";
 
   return (
     <>
@@ -119,7 +154,7 @@ export function IncidentReportReader({ slug }: { slug: string }) {
         <ArrowLeft className="h-3 w-3" /> Rapports d&apos;incident
       </Link>
 
-      {/* Reproduction fidèle du gabarit PDF officiel — volontairement en dehors du thème sombre du site : c'est un document, pas une page du site. */}
+      {/* Reproduction fidèle du gabarit PDF officiel — volontairement en dehors du thème sombre du site : c'est un document, pas une page du site. AEGIS reprend la même charpente mais en gris acier uniforme (jamais de rouge/vert dramatique) et sans tableaux tactiques, conformément à la Directive Staff — "toujours froide, administrative, impersonnelle". */}
       <div className="overflow-hidden rounded-lg border border-black/10 bg-white text-slate-900 shadow-2xl">
         <div className="flex flex-wrap items-center justify-between gap-3 p-6" style={{ background: "#0a1120" }}>
           <div className="flex items-center gap-4">
@@ -127,29 +162,29 @@ export function IncidentReportReader({ slug }: { slug: string }) {
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2"
               style={{ borderColor: accent, background: "#0f1729" }}
             >
-              <AlertTriangle className="h-5 w-5" style={{ color: accent }} />
+              {isAegis ? (
+                <Eye className="h-5 w-5" style={{ color: accent }} />
+              ) : (
+                <AlertTriangle className="h-5 w-5" style={{ color: accent }} />
+              )}
             </div>
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-slate-400">
-                Fondation SCP — {departmentName}
-              </p>
-              <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">Rapport d&apos;Incident</h1>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-slate-400">{authority}</p>
+              <h1 className="mt-1 text-2xl font-bold text-white sm:text-3xl">{docTitle}</h1>
             </div>
           </div>
           <div className="rounded px-4 py-2 text-right" style={{ background: accent }}>
-            <p className="text-sm font-bold uppercase text-white">{severityWord} {report.threatClass}</p>
-            <p className="font-mono text-[10px] uppercase text-white/80">
-              Niveau {report.minClearanceLevel} / {clearanceWord}
-            </p>
+            <p className="text-sm font-bold uppercase text-white">{badgeTop}</p>
+            <p className="font-mono text-[10px] uppercase text-white/80">{badgeBottom}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 divide-y divide-slate-200 border-b border-slate-200 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
           {[
-            ["Référence incident", report.reference],
+            ["Référence", report.reference],
             ["Date & heure", new Date(report.incidentAt).toLocaleString("fr-FR")],
-            ["Anomalie & lieu", report.anomalyLabel],
-            ["Classe menace", report.threatClass],
+            [isAegis ? "Site audité" : "Anomalie & lieu", report.anomalyLabel],
+            [isAegis ? "Niveau d'audit" : "Classe menace", isAegis ? (AEGIS_LEVEL_LABELS[report.threatClass] ?? report.threatClass) : report.threatClass],
           ].map(([label, value]) => (
             <div key={label} className="bg-slate-50 p-4" style={{ borderLeft: `3px solid ${accent}` }}>
               <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
@@ -159,97 +194,108 @@ export function IncidentReportReader({ slug }: { slug: string }) {
         </div>
 
         <div className="p-6">
-          <div className="mb-3 flex items-center justify-between gap-2 rounded px-3 py-2" style={{ background: "#0a1120" }}>
-            <h2 className="text-sm font-bold uppercase tracking-wide text-white">1. Description détaillée des faits</h2>
-            {report.factsTag && (
-              <span className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] text-white" style={{ background: accent }}>
-                {report.factsTag}
-              </span>
-            )}
-          </div>
+          <SectionHeader
+            title={isAegis ? "1. Constat de l'inspecteur" : "1. Description détaillée des faits"}
+            tag={report.factsTag}
+            accent={accent}
+          />
           <p className="whitespace-pre-wrap text-slate-700">{report.narrative}</p>
         </div>
 
-        {report.personnelRows.length > 0 && (
-          <div className="border-t border-slate-200 p-6">
-            <div className="mb-3 flex items-center justify-between gap-2 rounded px-3 py-2" style={{ background: "#0a1120" }}>
-              <h2 className="text-sm font-bold uppercase tracking-wide text-white">2. Bilan du personnel impacté</h2>
-              <span className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] text-white" style={{ background: accent }}>
-                IMPACT PHYSIQUE &amp; SÉCURITÉ
-              </span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr style={{ background: "#0a1120" }}>
-                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Équipe / unité</th>
-                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Personnel &amp; grade</th>
-                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Statut</th>
-                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Observations</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {report.personnelRows.map((row, i) => (
-                    <tr key={i} className={`border-b border-slate-200 ${i % 2 === 1 ? "bg-slate-50" : "bg-white"}`}>
-                      <td className="py-2 px-3 text-slate-700">{row.unite}</td>
-                      <td className="py-2 px-3 text-slate-700">{row.grade}</td>
-                      <td className={`py-2 px-3 font-bold ${STATUS_COLORS[row.statut] ?? "text-slate-700"}`}>{row.statut}</td>
-                      <td className="py-2 px-3 text-slate-600">{row.obs}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        {isAegis ? (
+          <>
+            {report.conclusion && (
+              <div className="border-t border-slate-200 p-6">
+                <SectionHeader title="2. Conclusion" accent={accent} />
+                <p className="whitespace-pre-wrap text-slate-700">{report.conclusion}</p>
+              </div>
+            )}
+            {report.recommendation && (
+              <div className="border-t border-slate-200 p-6">
+                <SectionHeader title="3. Recommandation" accent={accent} />
+                <p
+                  className="rounded p-3 font-mono text-sm text-slate-800"
+                  style={{ background: `${accent}14`, borderLeft: `4px solid ${accent}` }}
+                >
+                  {report.recommendation}
+                </p>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {report.personnelRows.length > 0 && (
+              <div className="border-t border-slate-200 p-6">
+                <SectionHeader title="2. Bilan du personnel impacté" tag="IMPACT PHYSIQUE & SÉCURITÉ" accent={accent} />
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr style={{ background: "#0a1120" }}>
+                        <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Équipe / unité</th>
+                        <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Personnel &amp; grade</th>
+                        <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Statut</th>
+                        <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Observations</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {report.personnelRows.map((row, i) => (
+                        <tr key={i} className={`border-b border-slate-200 ${i % 2 === 1 ? "bg-slate-50" : "bg-white"}`}>
+                          <td className="py-2 px-3 text-slate-700">{row.unite}</td>
+                          <td className="py-2 px-3 text-slate-700">{row.grade}</td>
+                          <td className={`py-2 px-3 font-bold ${STATUS_COLORS[row.statut] ?? "text-slate-700"}`}>{row.statut}</td>
+                          <td className="py-2 px-3 text-slate-600">{row.obs}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
-        {report.equipmentRows.length > 0 && (
-          <div className="border-t border-slate-200 p-6">
-            <div className="mb-3 flex items-center justify-between gap-2 rounded px-3 py-2" style={{ background: "#0a1120" }}>
-              <h2 className="text-sm font-bold uppercase tracking-wide text-white">
-                3. Bilan logistique, munitions &amp; récupération
-              </h2>
-              <span className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] text-white" style={{ background: accent }}>
-                ÉQUIPEMENTS &amp; COÛTS
-              </span>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr style={{ background: "#0a1120" }}>
-                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Désignation</th>
-                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Quantité</th>
-                    <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">État / bilan</th>
-                    <th className="py-2 px-3 text-right font-mono text-[10px] uppercase text-white">Coût</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {report.equipmentRows.map((row, i) => (
-                    <tr key={i} className={`border-b border-slate-200 ${i % 2 === 1 ? "bg-slate-50" : "bg-white"}`}>
-                      <td className="py-2 px-3 text-slate-700">{row.designation}</td>
-                      <td className="py-2 px-3 text-slate-600">{row.quantite}</td>
-                      <td className="py-2 px-3 text-slate-600">{row.etat}</td>
-                      <td className="py-2 px-3 text-right font-mono text-slate-700">{row.cout.toLocaleString("fr-FR")} $</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div
-              className="mt-3 flex items-center justify-between rounded p-3"
-              style={{ background: `${accent}14`, borderLeft: `4px solid ${accent}` }}
-            >
-              <span className="text-sm font-bold text-slate-900">Perte financière totale du site</span>
-              <span className="font-mono text-lg font-bold" style={{ color: accent }}>
-                {report.totalCost.toLocaleString("fr-FR")} $
-              </span>
-            </div>
-          </div>
+            {report.equipmentRows.length > 0 && (
+              <div className="border-t border-slate-200 p-6">
+                <SectionHeader title="3. Bilan logistique, munitions & récupération" tag="ÉQUIPEMENTS & COÛTS" accent={accent} />
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr style={{ background: "#0a1120" }}>
+                        <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Désignation</th>
+                        <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">Quantité</th>
+                        <th className="py-2 px-3 font-mono text-[10px] uppercase text-white">État / bilan</th>
+                        <th className="py-2 px-3 text-right font-mono text-[10px] uppercase text-white">Coût</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {report.equipmentRows.map((row, i) => (
+                        <tr key={i} className={`border-b border-slate-200 ${i % 2 === 1 ? "bg-slate-50" : "bg-white"}`}>
+                          <td className="py-2 px-3 text-slate-700">{row.designation}</td>
+                          <td className="py-2 px-3 text-slate-600">{row.quantite}</td>
+                          <td className="py-2 px-3 text-slate-600">{row.etat}</td>
+                          <td className="py-2 px-3 text-right font-mono text-slate-700">{row.cout.toLocaleString("fr-FR")} $</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div
+                  className="mt-3 flex items-center justify-between rounded p-3"
+                  style={{ background: `${accent}14`, borderLeft: `4px solid ${accent}` }}
+                >
+                  <span className="text-sm font-bold text-slate-900">Perte financière totale du site</span>
+                  <span className="font-mono text-lg font-bold" style={{ color: accent }}>
+                    {report.totalCost.toLocaleString("fr-FR")} $
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         <div className="grid grid-cols-1 gap-3 border-t border-slate-200 p-6 sm:grid-cols-2">
           <div className="rounded border border-slate-200 bg-slate-50 p-3">
-            <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">Rédacteur</p>
+            <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">
+              {isAegis ? "Inspecteur" : "Rédacteur"}
+            </p>
             <p className="font-bold text-slate-900">{report.authorLabel}</p>
             {report.authorRole && <p className="text-xs text-slate-500">{report.authorRole}</p>}
             <p className="mt-2 rounded border border-dashed border-slate-300 px-2 py-1 text-center font-mono text-[10px] text-slate-500">
@@ -257,7 +303,9 @@ export function IncidentReportReader({ slug }: { slug: string }) {
             </p>
           </div>
           <div className="rounded border border-slate-200 bg-slate-50 p-3">
-            <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">Validation officielle</p>
+            <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">
+              {isAegis ? "Validation — Directoire AEGIS" : "Validation officielle"}
+            </p>
             <p className="font-bold text-slate-900">{report.validatorLabel || "—"}</p>
             {report.validatorRole && <p className="text-xs text-slate-500">{report.validatorRole}</p>}
             {report.validatorLabel && (
@@ -270,9 +318,11 @@ export function IncidentReportReader({ slug }: { slug: string }) {
 
         <div className="flex items-center justify-between border-t border-slate-200 px-6 py-3">
           <p className="font-mono text-[9px] uppercase tracking-widest text-slate-400">
-            Fondation SCP — Rapport d&apos;incident officiel
+            {isAegis ? "A.E.G.I.S. — Rapport d'inspection officiel" : "Fondation SCP — Rapport d'incident officiel"}
           </p>
-          <p className="font-mono text-[9px] uppercase tracking-widest text-slate-400">Accès {clearanceWord.toLowerCase()}</p>
+          <p className="font-mono text-[9px] uppercase tracking-widest text-slate-400">
+            {isAegis ? "Classification interne staff" : `Accès ${clearanceWord.toLowerCase()}`}
+          </p>
         </div>
       </div>
     </>

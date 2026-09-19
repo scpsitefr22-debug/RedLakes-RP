@@ -299,12 +299,20 @@ model ClassifiedDocumentRevision {
 /// reutilisee ici plutot que ScpClass car un rapport d'incident n'est pas
 /// toujours lie a un SCP a proprement parler (agression, vol, defaillance
 /// technique...) : c'est le niveau d'urgence du rapport lui-meme.
+/// Les 4 dernieres valeurs sont le protocole d'audit AEGIS (voir DIRECTIVE
+/// STAFF — A.E.G.I.S.) — AEGIS ne classe pas ses rapports par danger
+/// d'anomalie mais par niveau d'escalade institutionnelle. Meme champ,
+/// vocabulaire choisi cote editeur/lecteur selon le departement redacteur.
 enum IncidentThreatClass {
   Safe
   Euclid
   Keter
   Thaumiel
   Apollyon
+  Observation
+  Restriction
+  ConformiteForcee
+  Defaillance
 }
 
 /// Rapport d'incident de securite — demande par le Directeur de la Securite
@@ -322,6 +330,11 @@ model IncidentReport {
   threatClass  IncidentThreatClass @default(Euclid)
   factsTag     String?
   narrative    String
+  /// AEGIS uniquement — jugement institutionnel distinct du recit des faits
+  /// (voir le modele de rapport d'inspection dans la directive AEGIS).
+  conclusion     String?
+  /// AEGIS uniquement — mesure decidee (gel de projet, surveillance...).
+  recommendation String?
 
   /// [{ unite, grade, statut, obs }]
   personnelRows Json @default("[]")

@@ -54,6 +54,14 @@ export class CreateIncidentReportDto {
   narrative!: string;
 
   @IsOptional()
+  @IsString()
+  conclusion?: string;
+
+  @IsOptional()
+  @IsString()
+  recommendation?: string;
+
+  @IsOptional()
   @IsArray()
   personnelRows?: PersonnelRowDto[];
 
@@ -125,6 +133,14 @@ export class UpdateIncidentReportDto {
   @IsString()
   @MinLength(10)
   narrative?: string;
+
+  @IsOptional()
+  @IsString()
+  conclusion?: string;
+
+  @IsOptional()
+  @IsString()
+  recommendation?: string;
 
   @IsOptional()
   @IsArray()

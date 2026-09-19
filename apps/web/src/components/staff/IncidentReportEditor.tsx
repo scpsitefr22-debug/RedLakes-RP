@@ -8,11 +8,19 @@ import { Save, ArrowLeft, Trash2, Plus, X } from "lucide-react";
 import { DepartmentMultiSelect } from "@/components/staff/DepartmentMultiSelect";
 
 const THREAT_CLASSES = ["Safe", "Euclid", "Keter", "Thaumiel", "Apollyon"] as const;
+/** Protocole d'audit AEGIS (DIRECTIVE STAFF — A.E.G.I.S.) — AEGIS n'a pas de "classe de menace", elle a un niveau d'escalade institutionnelle. */
+const AEGIS_LEVELS: { value: string; label: string }[] = [
+  { value: "Observation", label: "1 — Observation" },
+  { value: "Restriction", label: "2 — Restriction" },
+  { value: "ConformiteForcee", label: "3 — Conformité Forcée" },
+  { value: "Defaillance", label: "4 — Défaillance" },
+];
 const STATUS_OPTIONS = ["INTACT", "INTACTS", "BLESSÉ", "BLESSÉ GRAVE", "ISOLÉ", "ISOLÉS", "DÉCÉDÉ", "DÉCÉDÉS"];
 
 interface DepartmentOption {
   id: string;
   name: string;
+  slug: string;
 }
 
 interface PersonnelRow {
@@ -37,6 +45,8 @@ export interface IncidentReportFormData {
   threatClass: string;
   factsTag: string;
   narrative: string;
+  conclusion: string;
+  recommendation: string;
   personnelRows: PersonnelRow[];
   equipmentRows: EquipmentRow[];
   authorLabel: string;
@@ -72,6 +82,8 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
     threatClass: initial?.threatClass ?? "Euclid",
     factsTag: initial?.factsTag ?? "",
     narrative: initial?.narrative ?? "",
+    conclusion: initial?.conclusion ?? "",
+    recommendation: initial?.recommendation ?? "",
     personnelRows: initial?.personnelRows?.length ? initial.personnelRows : [emptyPersonnelRow(), emptyPersonnelRow()],
     equipmentRows: initial?.equipmentRows?.length ? initial.equipmentRows : [emptyEquipmentRow()],
     authorLabel: initial?.authorLabel ?? "",
@@ -85,6 +97,7 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
+  const isAegis = departments.find((d) => d.id === form.departmentId)?.slug === "aegis-general";
 
   useEffect(() => {
     apiFetch<DepartmentOption[]>("/departments")
@@ -109,6 +122,17 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "");
       setForm((f) => ({ ...f, slug }));
+    }
+    if (key === "departmentId") {
+      // Vocabulaire de classification different (menace SCP vs niveau d'audit
+      // AEGIS) — on remet une valeur coherente avec la nouvelle branche.
+      const nowAegis = departments.find((d) => d.id === value)?.slug === "aegis-general";
+      const levelValid = nowAegis
+        ? AEGIS_LEVELS.some((l) => l.value === form.threatClass)
+        : THREAT_CLASSES.some((c) => c === form.threatClass);
+      if (!levelValid) {
+        setForm((f) => ({ ...f, threatClass: nowAegis ? "Observation" : "Euclid" }));
+      }
     }
   };
 
@@ -139,6 +163,8 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
         threatClass: form.threatClass,
         factsTag: form.factsTag || undefined,
         narrative: form.narrative,
+        conclusion: form.conclusion || undefined,
+        recommendation: form.recommendation || undefined,
         personnelRows: form.personnelRows.filter((r) => r.unite || r.grade || r.obs),
         equipmentRows: form.equipmentRows
           .filter((r) => r.designation || r.etat)
@@ -200,7 +226,9 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
       </Link>
 
       <h1 className="mb-8 text-3xl font-bold text-white">
-        {mode === "create" ? "Nouveau rapport d'incident" : `Modifier — ${form.reference}`}
+        {mode === "create"
+          ? isAegis ? "Nouveau rapport d'inspection AEGIS" : "Nouveau rapport d'incident"
+          : `Modifier — ${form.reference}`}
       </h1>
 
       {error && (
@@ -241,20 +269,24 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
             />
           </div>
           <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Anomalie &amp; lieu</label>
+            <label className="mb-1 block font-mono text-xs text-gray-500">
+              {isAegis ? "Site audité" : "Anomalie & lieu"}
+            </label>
             <input
               className={inputClass}
               value={form.anomalyLabel}
               onChange={(e) => update("anomalyLabel", e.target.value)}
-              placeholder="SCP-106 (Confinement)"
+              placeholder={isAegis ? "Site-12" : "SCP-106 (Confinement)"}
             />
           </div>
           <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Classe de menace</label>
+            <label className="mb-1 block font-mono text-xs text-gray-500">
+              {isAegis ? "Niveau d'audit" : "Classe de menace"}
+            </label>
             <select className={inputClass} value={form.threatClass} onChange={(e) => update("threatClass", e.target.value)}>
-              {THREAT_CLASSES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
+              {isAegis
+                ? AEGIS_LEVELS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)
+                : THREAT_CLASSES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div>
@@ -278,101 +310,138 @@ export function IncidentReportEditor({ initial, reportId, mode }: IncidentReport
         </div>
 
         <div>
-          <label className="mb-1 block font-mono text-xs text-gray-500">Description détaillée des faits</label>
+          <label className="mb-1 block font-mono text-xs text-gray-500">
+            {isAegis ? "Constat de l'inspecteur" : "Description détaillée des faits"}
+          </label>
           <textarea
             rows={6}
             className={inputClass}
             value={form.narrative}
             onChange={(e) => update("narrative", e.target.value)}
-            placeholder="Déroulé chronologique de l'incident..."
+            placeholder={isAegis ? "Ce qui a été observé sur place, factuellement..." : "Déroulé chronologique de l'incident..."}
           />
         </div>
 
-        {/* Personnel impacté */}
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="font-mono text-xs text-gray-500">Bilan du personnel impacté</label>
-            <button
-              type="button"
-              onClick={() => setForm((f) => ({ ...f, personnelRows: [...f.personnelRows, emptyPersonnelRow()] }))}
-              className="flex items-center gap-1 rounded border border-metal px-2 py-1 font-mono text-[11px] text-gray-400 hover:border-redlake hover:text-white"
-            >
-              <Plus className="h-3 w-3" /> Ligne
-            </button>
-          </div>
-          <div className="space-y-2">
-            {form.personnelRows.map((row, i) => (
-              <div key={i} className="grid grid-cols-1 gap-1.5 rounded border border-metal/40 p-2 sm:grid-cols-[1fr_1fr_1fr_1.5fr_auto]">
-                <input className={cellClass} placeholder="Équipe/unité" value={row.unite} onChange={(e) => updatePersonnelRow(i, "unite", e.target.value)} />
-                <input className={cellClass} placeholder="Personnel & grade" value={row.grade} onChange={(e) => updatePersonnelRow(i, "grade", e.target.value)} />
-                <select className={cellClass} value={row.statut} onChange={(e) => updatePersonnelRow(i, "statut", e.target.value)}>
-                  {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-                <input className={cellClass} placeholder="Observations" value={row.obs} onChange={(e) => updatePersonnelRow(i, "obs", e.target.value)} />
+        {isAegis ? (
+          <>
+            <div>
+              <label className="mb-1 block font-mono text-xs text-gray-500">Conclusion</label>
+              <textarea
+                rows={3}
+                className={inputClass}
+                value={form.conclusion}
+                onChange={(e) => update("conclusion", e.target.value)}
+                placeholder="Le jugement institutionnel d'AEGIS — froid, factuel."
+              />
+            </div>
+            <div>
+              <label className="mb-1 block font-mono text-xs text-gray-500">Recommandation</label>
+              <textarea
+                rows={2}
+                className={inputClass}
+                value={form.recommendation}
+                onChange={(e) => update("recommendation", e.target.value)}
+                placeholder="Gel du projet, surveillance renforcée, convocation..."
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Personnel impacté */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="font-mono text-xs text-gray-500">Bilan du personnel impacté</label>
                 <button
                   type="button"
-                  onClick={() => setForm((f) => ({ ...f, personnelRows: f.personnelRows.filter((_, idx) => idx !== i) }))}
-                  className="flex items-center justify-center rounded border border-metal/60 text-gray-500 hover:border-red-400/60 hover:text-red-400"
-                  title="Supprimer la ligne"
+                  onClick={() => setForm((f) => ({ ...f, personnelRows: [...f.personnelRows, emptyPersonnelRow()] }))}
+                  className="flex items-center gap-1 rounded border border-metal px-2 py-1 font-mono text-[11px] text-gray-400 hover:border-redlake hover:text-white"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <Plus className="h-3 w-3" /> Ligne
                 </button>
               </div>
-            ))}
-          </div>
-        </div>
+              <div className="space-y-2">
+                {form.personnelRows.map((row, i) => (
+                  <div key={i} className="grid grid-cols-1 gap-1.5 rounded border border-metal/40 p-2 sm:grid-cols-[1fr_1fr_1fr_1.5fr_auto]">
+                    <input className={cellClass} placeholder="Équipe/unité" value={row.unite} onChange={(e) => updatePersonnelRow(i, "unite", e.target.value)} />
+                    <input className={cellClass} placeholder="Personnel & grade" value={row.grade} onChange={(e) => updatePersonnelRow(i, "grade", e.target.value)} />
+                    <select className={cellClass} value={row.statut} onChange={(e) => updatePersonnelRow(i, "statut", e.target.value)}>
+                      {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <input className={cellClass} placeholder="Observations" value={row.obs} onChange={(e) => updatePersonnelRow(i, "obs", e.target.value)} />
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, personnelRows: f.personnelRows.filter((_, idx) => idx !== i) }))}
+                      className="flex items-center justify-center rounded border border-metal/60 text-gray-500 hover:border-red-400/60 hover:text-red-400"
+                      title="Supprimer la ligne"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-        {/* Équipements */}
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <label className="font-mono text-xs text-gray-500">Bilan logistique, munitions &amp; récupération</label>
-            <button
-              type="button"
-              onClick={() => setForm((f) => ({ ...f, equipmentRows: [...f.equipmentRows, emptyEquipmentRow()] }))}
-              className="flex items-center gap-1 rounded border border-metal px-2 py-1 font-mono text-[11px] text-gray-400 hover:border-redlake hover:text-white"
-            >
-              <Plus className="h-3 w-3" /> Ligne
-            </button>
-          </div>
-          <div className="space-y-2">
-            {form.equipmentRows.map((row, i) => (
-              <div key={i} className="grid grid-cols-1 gap-1.5 rounded border border-metal/40 p-2 sm:grid-cols-[1.5fr_1fr_1.5fr_0.8fr_auto]">
-                <input className={cellClass} placeholder="Désignation" value={row.designation} onChange={(e) => updateEquipmentRow(i, "designation", e.target.value)} />
-                <input className={cellClass} placeholder="Quantité" value={row.quantite} onChange={(e) => updateEquipmentRow(i, "quantite", e.target.value)} />
-                <input className={cellClass} placeholder="État / bilan" value={row.etat} onChange={(e) => updateEquipmentRow(i, "etat", e.target.value)} />
-                <input className={cellClass} placeholder="Coût $" inputMode="decimal" value={row.cout} onChange={(e) => updateEquipmentRow(i, "cout", e.target.value)} />
+            {/* Équipements */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="font-mono text-xs text-gray-500">Bilan logistique, munitions &amp; récupération</label>
                 <button
                   type="button"
-                  onClick={() => setForm((f) => ({ ...f, equipmentRows: f.equipmentRows.filter((_, idx) => idx !== i) }))}
-                  className="flex items-center justify-center rounded border border-metal/60 text-gray-500 hover:border-red-400/60 hover:text-red-400"
-                  title="Supprimer la ligne"
+                  onClick={() => setForm((f) => ({ ...f, equipmentRows: [...f.equipmentRows, emptyEquipmentRow()] }))}
+                  className="flex items-center gap-1 rounded border border-metal px-2 py-1 font-mono text-[11px] text-gray-400 hover:border-redlake hover:text-white"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <Plus className="h-3 w-3" /> Ligne
                 </button>
               </div>
-            ))}
-          </div>
-          <p className="mt-2 text-right font-mono text-sm text-redlake-glow">
-            Perte financière totale : {totalCost.toLocaleString("fr-FR")} $
-          </p>
-        </div>
+              <div className="space-y-2">
+                {form.equipmentRows.map((row, i) => (
+                  <div key={i} className="grid grid-cols-1 gap-1.5 rounded border border-metal/40 p-2 sm:grid-cols-[1.5fr_1fr_1.5fr_0.8fr_auto]">
+                    <input className={cellClass} placeholder="Désignation" value={row.designation} onChange={(e) => updateEquipmentRow(i, "designation", e.target.value)} />
+                    <input className={cellClass} placeholder="Quantité" value={row.quantite} onChange={(e) => updateEquipmentRow(i, "quantite", e.target.value)} />
+                    <input className={cellClass} placeholder="État / bilan" value={row.etat} onChange={(e) => updateEquipmentRow(i, "etat", e.target.value)} />
+                    <input className={cellClass} placeholder="Coût $" inputMode="decimal" value={row.cout} onChange={(e) => updateEquipmentRow(i, "cout", e.target.value)} />
+                    <button
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, equipmentRows: f.equipmentRows.filter((_, idx) => idx !== i) }))}
+                      className="flex items-center justify-center rounded border border-metal/60 text-gray-500 hover:border-red-400/60 hover:text-red-400"
+                      title="Supprimer la ligne"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-2 text-right font-mono text-sm text-redlake-glow">
+                Perte financière totale : {totalCost.toLocaleString("fr-FR")} $
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Rédacteur (nom)</label>
-            <input className={inputClass} value={form.authorLabel} onChange={(e) => update("authorLabel", e.target.value)} placeholder="Chef d'Équipe Élite" />
+            <label className="mb-1 block font-mono text-xs text-gray-500">
+              {isAegis ? "Inspecteur (nom)" : "Rédacteur (nom)"}
+            </label>
+            <input className={inputClass} value={form.authorLabel} onChange={(e) => update("authorLabel", e.target.value)} placeholder={isAegis ? "Inspecteur AEGIS" : "Chef d'Équipe Élite"} />
           </div>
           <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Rédacteur (fonction)</label>
-            <input className={inputClass} value={form.authorRole} onChange={(e) => update("authorRole", e.target.value)} placeholder="Commandant de la Team Élite 01" />
+            <label className="mb-1 block font-mono text-xs text-gray-500">
+              {isAegis ? "Inspecteur (fonction)" : "Rédacteur (fonction)"}
+            </label>
+            <input className={inputClass} value={form.authorRole} onChange={(e) => update("authorRole", e.target.value)} placeholder={isAegis ? "Niveau 2 — Inspecteur AEGIS" : "Commandant de la Team Élite 01"} />
           </div>
           <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Validation officielle (nom)</label>
-            <input className={inputClass} value={form.validatorLabel} onChange={(e) => update("validatorLabel", e.target.value)} />
+            <label className="mb-1 block font-mono text-xs text-gray-500">
+              {isAegis ? "Validation (Directoire)" : "Validation officielle (nom)"}
+            </label>
+            <input className={inputClass} value={form.validatorLabel} onChange={(e) => update("validatorLabel", e.target.value)} placeholder={isAegis ? "Directoire AEGIS" : undefined} />
           </div>
           <div>
-            <label className="mb-1 block font-mono text-xs text-gray-500">Validation officielle (fonction)</label>
-            <input className={inputClass} value={form.validatorRole} onChange={(e) => update("validatorRole", e.target.value)} placeholder="Responsable de la Sécurité du Site" />
+            <label className="mb-1 block font-mono text-xs text-gray-500">
+              {isAegis ? "Validation (fonction)" : "Validation officielle (fonction)"}
+            </label>
+            <input className={inputClass} value={form.validatorRole} onChange={(e) => update("validatorRole", e.target.value)} placeholder={isAegis ? "Niveau 1 — Directoire" : "Responsable de la Sécurité du Site"} />
           </div>
         </div>
 

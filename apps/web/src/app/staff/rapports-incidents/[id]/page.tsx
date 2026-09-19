@@ -27,6 +27,8 @@ interface ApiIncidentReportFull {
   threatClass: string;
   factsTag: string | null;
   narrative: string;
+  conclusion: string | null;
+  recommendation: string | null;
   personnelRows: ApiPersonnelRow[];
   equipmentRows: ApiEquipmentRow[];
   authorLabel: string;
@@ -70,6 +72,8 @@ export default function EditIncidentReportPage() {
         threatClass: report.threatClass,
         factsTag: report.factsTag ?? "",
         narrative: report.narrative,
+        conclusion: report.conclusion ?? "",
+        recommendation: report.recommendation ?? "",
         personnelRows: report.personnelRows,
         equipmentRows: report.equipmentRows.map((r) => ({ ...r, cout: String(r.cout) })),
         authorLabel: report.authorLabel,
