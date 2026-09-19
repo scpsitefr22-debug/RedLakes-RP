@@ -764,4 +764,63 @@ export class PlayersService {
       unchanged: false,
     };
   }
+
+  /**
+   * Affecte un Grade (le "metier") au personnage actif d'un joueur — geste
+   * courant sans equivalent web jusqu'ici (le seul chemin reel etait la
+   * sync Discord/MC via un nom de grade en texte libre, voir sync.service.ts).
+   * Synchronise aussi les champs texte legacy (grade/faction) et factionId
+   * pour rester coherent avec tout le code qui lit encore ces chaines.
+   */
+  async assignGrade(
+    username: string,
+    gradeId: string,
+    actorId: string,
+    actorLabel: string,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { minecraftUsername: username },
+      select: { activeCharacterId: true },
+    });
+    if (!user?.activeCharacterId) {
+      throw new BadRequestException(
+        `${username} n'a pas de personnage actif — impossible d'affecter un grade`,
+      );
+    }
+
+    const grade = await this.prisma.grade.findUnique({
+      where: { id: gradeId },
+      include: { departmentRef: { include: { faction: true } } },
+    });
+    if (!grade) throw new NotFoundException('Grade introuvable');
+
+    const previous = await this.prisma.player.findUnique({
+      where: { id: user.activeCharacterId },
+      select: { grade: true, gradeId: true },
+    });
+
+    const updated = await this.prisma.player.update({
+      where: { id: user.activeCharacterId },
+      data: {
+        gradeId: grade.id,
+        grade: grade.name,
+        ...(grade.departmentRef?.faction
+          ? { factionId: grade.departmentRef.faction.id, faction: grade.departmentRef.faction.name }
+          : {}),
+        roleUpdatedAt: new Date(),
+      },
+    });
+
+    await this.audit.log({
+      entityType: PlatformEntityType.PLAYER,
+      entityId: updated.id,
+      action: 'UPDATED',
+      actorId,
+      actorLabel,
+      summary: `Grade de ${username} affecté : ${previous?.grade ?? '—'} → ${grade.name}`,
+      metadata: { previousGradeId: previous?.gradeId, newGradeId: grade.id, targetUsername: username },
+    });
+
+    return updated;
+  }
 }

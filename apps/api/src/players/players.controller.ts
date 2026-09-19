@@ -18,6 +18,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UpdatePlayerProfileDto } from './dto/update-player-profile.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { AssignGradeDto } from './dto/assign-grade.dto';
 import { SyncService } from '../sync/sync.service';
 
 @Controller('players')
@@ -171,5 +172,18 @@ export class PlayersController {
       req.user.id,
       actorLabel,
     );
+  }
+
+  @Patch(':username/grade')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  assignGrade(
+    @Req() req: Request & { user: { id: string; minecraftUsername?: string; discordUsername?: string } },
+    @Param('username') username: string,
+    @Body() dto: AssignGradeDto,
+  ) {
+    const actorLabel =
+      req.user.discordUsername ?? req.user.minecraftUsername ?? 'Staff';
+    return this.players.assignGrade(username, dto.gradeId, req.user.id, actorLabel);
   }
 }

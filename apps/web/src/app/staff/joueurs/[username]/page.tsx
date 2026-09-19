@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import { ArrowLeft, ShieldAlert, History, Plus, X, Check, KeyRound, UserX } from "lucide-react";
+import { ArrowLeft, ShieldAlert, History, Plus, X, Check, KeyRound, UserX, Briefcase } from "lucide-react";
 
 interface PlayerProfile {
   grade: string;
@@ -13,12 +13,19 @@ interface PlayerProfile {
   rpFirstName: string | null;
   rpLastName: string | null;
   sanctions: number;
+  gradeInfo: { id: string; name: string } | null;
   user: {
     minecraftUsername: string;
     avatarUrl: string | null;
     role: string;
     staffRank: string | null;
   };
+}
+
+interface GradeOption {
+  id: string;
+  name: string;
+  departmentRef: { name: string } | null;
 }
 
 const ROLES = ["PLAYER", "STAFF", "ADMIN"];
@@ -92,6 +99,11 @@ export default function StaffPlayerPage() {
   const [roleSaving, setRoleSaving] = useState(false);
   const [roleMessage, setRoleMessage] = useState("");
 
+  const [grades, setGrades] = useState<GradeOption[]>([]);
+  const [gradeValue, setGradeValue] = useState("");
+  const [gradeSaving, setGradeSaving] = useState(false);
+  const [gradeMessage, setGradeMessage] = useState("");
+
   const load = useCallback(async () => {
     try {
       const [prof, { id }] = await Promise.all([
@@ -102,6 +114,7 @@ export default function StaffPlayerPage() {
       setPlayerId(id);
       setRoleValue(prof.user.role);
       setRankValue(prof.user.staffRank ?? "SURVEILLANT");
+      setGradeValue(prof.gradeInfo?.id ?? "");
       const [s, a, c] = await Promise.all([
         apiFetch<SanctionRow[]>(`/sanctions/player/${id}`),
         apiFetch<AssignmentRow[]>(`/assignments/player/${id}`),
@@ -124,6 +137,7 @@ export default function StaffPlayerPage() {
     apiFetch<EntityOption[]>("/factions").then(setFactions).catch(() => undefined);
     apiFetch<EntityOption[]>("/departments").then(setDepartments).catch(() => undefined);
     apiFetch<EntityOption[]>("/teams").then(setTeams).catch(() => undefined);
+    apiFetch<GradeOption[]>("/grades").then(setGrades).catch(() => undefined);
     apiFetch<{ authenticated: boolean; user?: { role: string } }>("/auth/me")
       .then((res) => setViewerRole(res.user?.role ?? null))
       .catch(() => undefined);
@@ -154,6 +168,27 @@ export default function StaffPlayerPage() {
       setRoleMessage(err instanceof Error ? err.message : "Échec de la mise à jour du rôle");
     } finally {
       setRoleSaving(false);
+    }
+  };
+
+  const gradeUnchanged = !!profile && gradeValue === (profile.gradeInfo?.id ?? "");
+
+  const assignGrade = async () => {
+    if (!profile || gradeUnchanged || !gradeValue) return;
+    setGradeSaving(true);
+    setGradeMessage("");
+    try {
+      await apiFetch(`/players/${username}/grade`, {
+        method: "PATCH",
+        body: JSON.stringify({ gradeId: gradeValue }),
+      });
+      const gradeName = grades.find((g) => g.id === gradeValue)?.name ?? gradeValue;
+      setGradeMessage(`Grade affecté : ${gradeName}.`);
+      await load();
+    } catch (err) {
+      setGradeMessage(err instanceof Error ? err.message : "Échec de l'affectation du grade");
+    } finally {
+      setGradeSaving(false);
     }
   };
 
@@ -324,6 +359,45 @@ export default function StaffPlayerPage() {
             </p>
           )}
           {roleMessage && <p className="mt-2 font-mono text-xs text-gray-500">{roleMessage}</p>}
+        </section>
+      )}
+
+      {/* Grade du personnage (le "métier") — STAFF+ADMIN */}
+      {(viewerRole === "STAFF" || viewerRole === "ADMIN") && (
+        <section className="mb-10 hologram-border rounded-lg p-6">
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
+            <Briefcase className="h-5 w-5 text-redlake-glow" /> Grade du personnage
+          </h2>
+          <p className="mb-4 text-sm text-gray-500">
+            Grade actuel : <span className="font-mono text-white">{profile.gradeInfo?.name ?? profile.grade}</span>
+          </p>
+          {!profile.gradeInfo && (
+            <p className="mb-4 rounded border border-yellow-500/30 bg-yellow-500/10 p-2 font-mono text-xs text-yellow-500/90">
+              Pas de grade du catalogue — &quot;{profile.grade}&quot; est un texte libre non lié.
+            </p>
+          )}
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto]">
+            <select className={inputClass} value={gradeValue} onChange={(e) => setGradeValue(e.target.value)}>
+              <option value="">— Choisir un grade —</option>
+              {grades.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}{g.departmentRef ? ` — ${g.departmentRef.name}` : ""}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={assignGrade}
+              disabled={gradeSaving || gradeUnchanged || !gradeValue}
+              className="flex items-center gap-1 rounded border border-redlake bg-redlake/20 px-3 text-sm text-white hover:bg-redlake/30 disabled:opacity-50"
+            >
+              <Check className="h-4 w-4" /> Affecter
+            </button>
+          </div>
+          <p className="mt-2 font-mono text-xs text-gray-600">
+            Affecte le grade (et la faction/département qui en découlent) au personnage actif de ce joueur —
+            le seul autre chemin aujourd&apos;hui passe par la synchronisation Discord/Minecraft.
+          </p>
+          {gradeMessage && <p className="mt-2 font-mono text-xs text-gray-500">{gradeMessage}</p>}
         </section>
       )}
 
