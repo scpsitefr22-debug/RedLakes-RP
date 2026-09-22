@@ -12,8 +12,10 @@ import { SyncDiscordGradeDto } from './dto/sync-discord-grade.dto';
 import { SyncDiscordStaffDto } from './dto/sync-discord-staff.dto';
 import {
   AssignmentEntityType,
+  MissionStatus,
   PersonnelReportStatus,
   PlatformEntityType,
+  SanctionStatus,
   StaffRank,
   UserRole,
 } from '@prisma/client';
@@ -218,6 +220,112 @@ export class SyncService {
       rpLastName: player.rpLastName,
       discordSynced: !!user.discordId,
       roleUpdatedAt: player.roleUpdatedAt,
+    };
+  }
+
+  /**
+   * Contexte complet d'un joueur pour le plugin Minecraft (GET /sync/minecraft/:uuid).
+   * Le plugin l'appelle à la connexion puis à intervalle régulier (polling) —
+   * jamais dans un tick — pour rester synchronisé sur le grade/faction/
+   * département/équipe/clearance/zones/sanctions réels côté CORE, qui reste
+   * seul décisionnaire (le plugin ne fait qu'appliquer cette réponse).
+   */
+  async getMinecraftSession(uuid: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { minecraftUuid: uuid },
+      include: {
+        activeCharacter: {
+          include: {
+            gradeInfo: { include: { departmentRef: { include: { faction: true } } } },
+            factionInfo: true,
+            teamInfo: true,
+            sanctionRecords: { where: { status: SanctionStatus.ACTIVE } },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Aucun compte lié à cet UUID Minecraft');
+    }
+
+    if (!user.activeCharacter) {
+      return {
+        linked: true,
+        hasCharacter: false,
+        minecraftUsername: user.minecraftUsername,
+      };
+    }
+
+    const character = user.activeCharacter;
+    const department = character.gradeInfo?.departmentRef ?? null;
+
+    const missions = await this.prisma.mission.findMany({
+      where: {
+        status: MissionStatus.ASSIGNED,
+        OR: [
+          { assignedPlayerId: character.id },
+          ...(character.teamId ? [{ assignedTeamId: character.teamId }] : []),
+        ],
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        reward: true,
+        dueAt: true,
+        assignedTeamId: true,
+      },
+      orderBy: [{ dueAt: 'asc' }, { createdAt: 'desc' }],
+    });
+
+    return {
+      linked: true,
+      hasCharacter: true,
+      userId: user.id,
+      minecraftUsername: user.minecraftUsername,
+      characterId: character.id,
+      rpFirstName: character.rpFirstName,
+      rpLastName: character.rpLastName,
+      grade: {
+        id: character.gradeInfo?.id ?? null,
+        slug: character.gradeInfo?.slug ?? null,
+        name: character.grade,
+        clearanceLevel: character.gradeInfo?.clearanceLevel ?? 1,
+        accessZones: character.gradeInfo?.accessZones ?? [],
+        siteSections: character.gradeInfo?.siteSections ?? [],
+      },
+      faction: {
+        id: character.factionInfo?.id ?? null,
+        slug: character.factionInfo?.slug ?? null,
+        name: character.faction,
+      },
+      department: department
+        ? { id: department.id, slug: department.slug, name: department.name }
+        : null,
+      team: character.teamInfo
+        ? {
+            id: character.teamInfo.id,
+            slug: character.teamInfo.slug,
+            name: character.teamInfo.name,
+          }
+        : null,
+      activeSanctions: character.sanctionRecords.map((sanction) => ({
+        id: sanction.id,
+        type: sanction.type,
+        reason: sanction.reason,
+        issuedAt: sanction.issuedAt,
+        expiresAt: sanction.expiresAt,
+      })),
+      missions: missions.map((mission) => ({
+        id: mission.id,
+        title: mission.title,
+        description: mission.description,
+        reward: mission.reward,
+        dueAt: mission.dueAt,
+        isTeamMission: mission.assignedTeamId !== null,
+      })),
+      roleUpdatedAt: character.roleUpdatedAt,
     };
   }
 

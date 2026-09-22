@@ -67,8 +67,12 @@ function Start-MinecraftServer {
         Write-Host "  ERREUR : $bat introuvable" -ForegroundColor Red
         return
     }
-    $title = if ($Dev) { "Serveur MC - DEV" } else { "Serveur MC - PROD" }
-    Start-Process cmd.exe -ArgumentList @("/k", "title $title && cd /d `"$McServerRoot`" && call `"$bat`"")
+    # Les .bat (start.bat / start_dev.bat) definissent deja leur propre "title".
+    # Ne pas construire une commande cmd composite ("title X && cd /d ... && call ...")
+    # dans une seule chaine : l'echappement des guillemets imbriques via -ArgumentList
+    # casse le parsing de cmd.exe ("'start_dev.bat' n'est pas reconnu..."). Le chemin
+    # absolu + -WorkingDirectory evite tout guillemet manuel.
+    Start-Process cmd.exe -ArgumentList @("/k", $batPath) -WorkingDirectory $McServerRoot
     Write-Host "  Serveur Minecraft : fenetre ouverte ($bat)." -ForegroundColor Green
 }
 

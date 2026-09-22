@@ -32,6 +32,12 @@ export class SyncController {
     return this.sync.syncRole(dto);
   }
 
+  /** Contexte joueur pour le plugin Minecraft — connexion / resynchronisation périodique */
+  @Get('minecraft/:uuid')
+  getMinecraftSession(@Param('uuid') uuid: string) {
+    return this.sync.getMinecraftSession(uuid);
+  }
+
   @Post('discord/link')
   linkDiscord(@Body() dto: DiscordLinkDto) {
     return this.sync.linkDiscord(dto);

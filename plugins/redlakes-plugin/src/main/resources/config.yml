@@ -1,0 +1,11 @@
+# Identité technique de ce serveur auprès du CORE — jamais une donnée RP.
+core:
+  url: "http://localhost:3001/api"
+  server-id: "redlakes-main"
+  sync-key: "change-me-redlakes-sync-secret"
+  request-timeout-seconds: 8
+
+# Fréquence de resynchronisation des joueurs connectés (hors connexion initiale).
+sync:
+  poll-interval-minutes: 5
+  cache-ttl-minutes: 10

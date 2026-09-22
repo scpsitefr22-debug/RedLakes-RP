@@ -8,6 +8,6 @@ echo   REDLAKES RP — Centre de commandement
 echo   Site, API, Minecraft, Docker, Bot Discord
 echo.
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\hub.ps1"
+pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\hub.ps1"
 
 exit /b %ERRORLEVEL%

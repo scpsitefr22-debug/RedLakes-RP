@@ -1,0 +1,16 @@
+name: RedLakesPlugin
+main: fr.redlakes.mc.RedLakesPlugin
+version: '${version}'
+api-version: '1.12'
+author: REDLAKES
+description: Couche d'exécution Minecraft du REDLAKES CORE — CORE décide, Minecraft applique.
+
+commands:
+  rl:
+    description: Commandes REDLAKES
+    usage: /rl <profil|missions|staff>
+
+permissions:
+  redlakes.staff:
+    description: Accès aux sous-commandes staff (/rl staff ...)
+    default: op
