@@ -4,6 +4,7 @@ version: '${version}'
 api-version: '1.12'
 author: REDLAKES
 description: Couche d'exécution Minecraft du REDLAKES CORE — CORE décide, Minecraft applique.
+softdepend: [ProtocolLib]
 
 commands:
   rl:

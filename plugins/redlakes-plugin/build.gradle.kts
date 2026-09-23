@@ -17,6 +17,10 @@ dependencies {
     // API Spigot 1.12.2 — Mohist expose cette API pour les plugins Bukkit/Spigot
     // en plus de la couche Forge. Gson est apporté transitivement par spigot-api.
     compileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
+    // Jar vendu directement (pas de coordonnées maven fiables trouvées pour
+    // cette version) — doit rester identique à celle installée sur le vrai
+    // serveur (plugins/ProtocolLib.jar), sinon les packets ne matcheront pas.
+    compileOnly(files("libs/ProtocolLib-4.8.0.jar"))
 }
 
 java {

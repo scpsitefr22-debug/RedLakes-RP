@@ -9,6 +9,7 @@ import fr.redlakes.mc.player.PlayerConnectionListener;
 import fr.redlakes.mc.player.SessionCache;
 import fr.redlakes.mc.player.SessionSyncService;
 import fr.redlakes.mc.presentation.PresentationManager;
+import fr.redlakes.mc.presentation.TabListManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,6 +34,7 @@ public final class RedLakesPlugin extends JavaPlugin {
     private SessionCache sessionCache;
     private SessionSyncService sessionSyncService;
     private PresentationManager presentationManager;
+    private TabListManager tabListManager;
     private PlayerConnectionListener playerConnectionListener;
 
     @Override
@@ -50,6 +52,7 @@ public final class RedLakesPlugin extends JavaPlugin {
         coreClient = new CoreClient(coreConfig, getLogger());
         sessionSyncService = new SessionSyncService(coreClient, connectionManager, sessionCache, getLogger());
         presentationManager = new PresentationManager();
+        tabListManager = new TabListManager(this, getLogger());
 
         playerConnectionListener = new PlayerConnectionListener(this);
         Bukkit.getPluginManager().registerEvents(playerConnectionListener, this);
@@ -87,5 +90,9 @@ public final class RedLakesPlugin extends JavaPlugin {
 
     public PresentationManager getPresentationManager() {
         return presentationManager;
+    }
+
+    public TabListManager getTabListManager() {
+        return tabListManager;
     }
 }

@@ -70,6 +70,7 @@ public final class PlayerConnectionListener implements Listener {
                 return;
             }
             plugin.getPresentationManager().applyToPlayer(player, session);
+            plugin.getTabListManager().applyToPlayer(player, session);
             notify(player, session, change);
         });
     }
