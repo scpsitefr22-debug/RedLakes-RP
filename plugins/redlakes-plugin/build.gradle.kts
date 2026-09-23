@@ -21,6 +21,13 @@ dependencies {
     // cette version) — doit rester identique à celle installée sur le vrai
     // serveur (plugins/ProtocolLib.jar), sinon les packets ne matcheront pas.
     compileOnly(files("libs/ProtocolLib-4.8.0.jar"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 java {

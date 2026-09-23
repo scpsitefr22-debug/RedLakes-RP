@@ -299,6 +299,10 @@ export class SyncService {
         id: character.factionInfo?.id ?? null,
         slug: character.factionInfo?.slug ?? null,
         name: character.faction,
+        // Défaut true si la faction n'est pas résolue au catalogue (texte
+        // libre) — mieux vaut un tag affiché par erreur qu'une identité
+        // masquée par erreur pour un cas qu'on ne connaît pas.
+        showAffiliationTag: character.factionInfo?.showAffiliationTag ?? true,
       },
       department: department
         ? { id: department.id, slug: department.slug, name: department.name }

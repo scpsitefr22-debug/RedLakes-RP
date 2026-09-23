@@ -54,8 +54,7 @@ public final class ChatFormatListener implements Listener {
     }
 
     private String tag(MinecraftSession session) {
-        if (session.faction == null || session.faction.slug == null
-                || session.faction.slug.equalsIgnoreCase("civil")) {
+        if (session.faction == null || !session.faction.showAffiliationTag) {
             return "";
         }
         String source = session.department != null && session.department.name != null

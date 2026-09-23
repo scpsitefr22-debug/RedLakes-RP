@@ -31,7 +31,7 @@ public final class PresentationManager {
     public void applyToPlayer(Player player, MinecraftSession session) {
         removePlayer(player);
 
-        if (session == null || !session.hasCharacter || isCivil(session)) {
+        if (session == null || !session.hasCharacter || !showsTag(session)) {
             return;
         }
 
@@ -63,9 +63,12 @@ public final class PresentationManager {
         }
     }
 
-    private boolean isCivil(MinecraftSession session) {
-        return session.faction == null || session.faction.slug == null
-                || session.faction.slug.equalsIgnoreCase("civil");
+    /**
+     * Décidé côté CORE (Faction.showAffiliationTag), jamais par un nom de
+     * faction en dur ici — cf. §65 : pas de données RP figées dans le jar.
+     */
+    private boolean showsTag(MinecraftSession session) {
+        return session.faction != null && session.faction.showAffiliationTag;
     }
 
     /** Département si connu, sinon faction — tronqué pour tenir dans un préfixe de team. */

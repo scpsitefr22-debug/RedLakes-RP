@@ -37,6 +37,7 @@ public final class MinecraftSession {
         public String id;
         public String slug;
         public String name;
+        public boolean showAffiliationTag;
     }
 
     public static final class Department {

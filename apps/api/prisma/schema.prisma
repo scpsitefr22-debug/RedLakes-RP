@@ -660,6 +660,9 @@ model Faction {
   history     String?
   color       String?
   playable    Boolean  @default(true)
+  /// Si faux, les clients (ex: plugin Minecraft) n'affichent aucun tag
+  /// d'appartenance pour cette faction (identité civile masquée, cf. faction "Civil").
+  showAffiliationTag Boolean @default(true)
   objectives  String[] @default([])
   chefId      String?
   chef        User?    @relation("FactionChef", fields: [chefId], references: [id], onDelete: SetNull)
