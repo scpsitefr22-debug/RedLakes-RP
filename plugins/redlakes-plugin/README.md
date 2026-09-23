@@ -19,6 +19,10 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 ### Phase 2 (identité) — ✅ complète
 - Résolution User/Character/Faction/Département/Équipe/Grade/permissions (déjà exposée par l'endpoint Phase 1)
 - `player/SessionChange` — vraie détection GradeChanged/FactionChanged (§12-13) : compare l'ancienne et la nouvelle session, ne notifie que sur un vrai changement (jamais à chaque poll silencieux)
+- `Faction.showAffiliationTag` (§65) : le masquage d'identité civile est décidé côté CORE, plus par une comparaison de slug `"civil"` en dur dans le plugin
+
+### Tests
+`src/test/java` (JUnit 5, `./gradlew test`) — 16 tests sur `SessionChange` et `SessionCache`, purement Java, aucune dépendance Bukkit nécessaire.
 
 ### Phase 3 (présentation) — partiellement complète, **pas encore vérifiée visuellement en jeu**
 - `presentation/PresentationManager` — nametag + tag tablist via scoreboard Team (couleur dérivée du `clearanceLevel`, texte dérivé du département/faction, tronqué à 4 lettres pour tenir dans la limite historique 16 caractères des Team 1.12.2). Aucun préfixe pour la faction "civil" (identité civile masquée, §19).
