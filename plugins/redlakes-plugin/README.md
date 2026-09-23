@@ -24,10 +24,10 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 - `presentation/PresentationManager` — nametag + tag tablist via scoreboard Team (couleur dérivée du `clearanceLevel`, texte dérivé du département/faction, tronqué à 4 lettres pour tenir dans la limite historique 16 caractères des Team 1.12.2). Aucun préfixe pour la faction "civil" (identité civile masquée, §19).
 - `chat/ChatFormatListener` — reformate le chat global avec l'identité RP (`[TAG] Prénom Nom : message`), priorité HIGHEST (vérifié : ChatManager a son propre formatage RP désactivé sur ce serveur, donc pas de conflit)
 - Notifications de connexion/changement dans `PlayerConnectionListener`
+- `presentation/TabListManager` — bandeau tablist (§20, branding + grade/faction) via ProtocolLib (`PLAYER_LIST_HEADER_FOOTER` packet, par joueur). ProtocolLib 5.4.0 était cassé sur le vrai serveur (compilé Java 17+, serveur en Java 8) — remplacé par la dernière version compatible Java 8 (4.8.0), vendue dans `libs/` faute de coordonnées maven fiables. `softdepend` dans plugin.yml : dégradation silencieuse si ProtocolLib est absent/désactivé.
 
 **Explicitement différé, avec raison technique :**
-- Header/footer tablist (§20) : `Player#setPlayerListHeaderFooter` n'existe pas dans l'API Spigot 1.12.2 pure (extension Paper) — nécessiterait ProtocolLib. **Note :** ProtocolLib.jar est présent sur le serveur mais échoue actuellement à charger (compilé pour Java 17+, le serveur tourne en Java 8) — à corriger côté serveur avant d'envisager de l'utiliser.
-- Scoreboard sidebar personnalisé par joueur (§21) : un scoreboard personnel par joueur (`player.setScoreboard(...)`) casserait la visibilité des nametags des AUTRES joueurs (les Team du nametag vivent sur le scoreboard principal partagé) — nécessite soit de répliquer les Team sur chaque scoreboard personnel, soit ProtocolLib (même blocage que ci-dessus).
+- Scoreboard sidebar personnalisé par joueur (§21) : un scoreboard personnel par joueur (`player.setScoreboard(...)`) casserait la visibilité des nametags des AUTRES joueurs (les Team du nametag vivent sur le scoreboard principal partagé) — nécessite soit de répliquer les Team sur chaque scoreboard personnel, soit des packets ProtocolLib dédiés (maintenant possible, pas encore fait)
 - Canaux de chat LOCAL/FACTION/DEPARTMENT/TEAM/RADIO/WHISPER/OOC/STAFF (§18) : seul GLOBAL est fait
 
 ### Phase 6 (monde dynamique) — Missions : lecture seule branchée
