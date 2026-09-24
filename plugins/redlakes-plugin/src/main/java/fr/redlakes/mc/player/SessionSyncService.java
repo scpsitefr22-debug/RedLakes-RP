@@ -48,6 +48,15 @@ public final class SessionSyncService {
             }
 
             MinecraftSession session = gson.fromJson(response.body, MinecraftSession.class);
+            if (session == null) {
+                // Corps 200 vide ou littéralement "null" — Gson ne lève pas
+                // d'exception dans ce cas. ConcurrentHashMap#put refuse les
+                // valeurs null (NullPointerException immédiate) : ne jamais
+                // mettre en cache, traiter comme un échec de sync.
+                connectionManager.recordFailure();
+                logger.warning("Réponse CORE vide pour " + usernameForLogs);
+                return null;
+            }
             connectionManager.recordSuccess(latency);
             cache.put(uuid, session);
             return session;
@@ -58,6 +67,13 @@ public final class SessionSyncService {
         } catch (JsonSyntaxException e) {
             connectionManager.recordFailure();
             logger.log(Level.WARNING, "Réponse CORE invalide pour " + usernameForLogs, e);
+            return null;
+        } catch (RuntimeException e) {
+            // Filet de sécurité : une session async ne doit jamais faire
+            // remonter une exception non catchée jusqu'au scheduler Bukkit
+            // (risque d'annuler la tâche périodique pour tous les joueurs).
+            connectionManager.recordFailure();
+            logger.log(Level.WARNING, "Erreur inattendue lors de la sync pour " + usernameForLogs, e);
             return null;
         }
     }

@@ -2,6 +2,7 @@ package fr.redlakes.mc.chat;
 
 import fr.redlakes.mc.RedLakesPlugin;
 import fr.redlakes.mc.player.MinecraftSession;
+import fr.redlakes.mc.presentation.TagLabel;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,18 +55,7 @@ public final class ChatFormatListener implements Listener {
     }
 
     private String tag(MinecraftSession session) {
-        if (session.faction == null || !session.faction.showAffiliationTag) {
-            return "";
-        }
-        String source = session.department != null && session.department.name != null
-                ? session.department.name
-                : session.faction.name;
-        if (source == null || source.trim().isEmpty()) {
-            return "";
-        }
-        String firstWord = source.trim().split("\\s+")[0];
-        String upper = firstWord.toUpperCase();
-        String label = upper.length() > 4 ? upper.substring(0, 4) : upper;
-        return ChatColor.GRAY + "[" + label + "] ";
+        String label = TagLabel.shortLabel(session);
+        return label.isEmpty() ? "" : ChatColor.GRAY + "[" + label + "] ";
     }
 }

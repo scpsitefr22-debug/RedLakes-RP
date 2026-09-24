@@ -71,11 +71,11 @@ public final class PlayerConnectionListener implements Listener {
             }
             plugin.getPresentationManager().applyToPlayer(player, session);
             plugin.getTabListManager().applyToPlayer(player, session);
-            notify(player, session, change);
+            notifyPlayer(player, session, change);
         });
     }
 
-    private void notify(Player player, MinecraftSession session, SessionChange change) {
+    private void notifyPlayer(Player player, MinecraftSession session, SessionChange change) {
         if (change.firstSync) {
             player.sendMessage(ChatColor.GOLD + "[REDLAKES] " + ChatColor.WHITE
                     + session.grade.name + ChatColor.GRAY + " — " + ChatColor.WHITE + session.faction.name);
