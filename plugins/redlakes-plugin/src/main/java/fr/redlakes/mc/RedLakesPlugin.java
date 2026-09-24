@@ -10,6 +10,8 @@ import fr.redlakes.mc.player.SessionCache;
 import fr.redlakes.mc.player.SessionSyncService;
 import fr.redlakes.mc.presentation.PresentationManager;
 import fr.redlakes.mc.presentation.TabListManager;
+import fr.redlakes.mc.zones.DoorListener;
+import fr.redlakes.mc.zones.DoorRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,6 +37,7 @@ public final class RedLakesPlugin extends JavaPlugin {
     private SessionSyncService sessionSyncService;
     private PresentationManager presentationManager;
     private TabListManager tabListManager;
+    private DoorRegistry doorRegistry;
     private PlayerConnectionListener playerConnectionListener;
 
     @Override
@@ -53,10 +56,12 @@ public final class RedLakesPlugin extends JavaPlugin {
         sessionSyncService = new SessionSyncService(coreClient, connectionManager, sessionCache, getLogger());
         presentationManager = new PresentationManager();
         tabListManager = new TabListManager(this, getLogger());
+        doorRegistry = new DoorRegistry(getDataFolder(), getLogger());
 
         playerConnectionListener = new PlayerConnectionListener(this);
         Bukkit.getPluginManager().registerEvents(playerConnectionListener, this);
         Bukkit.getPluginManager().registerEvents(new ChatFormatListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new DoorListener(this), this);
         getCommand("rl").setExecutor(new RlCommand(this));
 
         long intervalTicks = coreConfig.getPollIntervalMinutes() * 60L * 20L;
@@ -94,5 +99,9 @@ public final class RedLakesPlugin extends JavaPlugin {
 
     public TabListManager getTabListManager() {
         return tabListManager;
+    }
+
+    public DoorRegistry getDoorRegistry() {
+        return doorRegistry;
     }
 }

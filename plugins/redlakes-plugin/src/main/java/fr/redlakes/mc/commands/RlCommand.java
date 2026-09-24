@@ -16,9 +16,11 @@ import org.bukkit.entity.Player;
 public final class RlCommand implements CommandExecutor {
 
     private final RedLakesPlugin plugin;
+    private final DoorCommand doorCommand;
 
     public RlCommand(RedLakesPlugin plugin) {
         this.plugin = plugin;
+        this.doorCommand = new DoorCommand(plugin);
     }
 
     @Override
@@ -29,10 +31,27 @@ public final class RlCommand implements CommandExecutor {
         if (args.length >= 1 && args[0].equalsIgnoreCase("missions")) {
             return handleMissions(sender);
         }
-        if (args.length >= 2 && args[0].equalsIgnoreCase("staff") && args[1].equalsIgnoreCase("status")) {
+        if (args.length >= 1 && args[0].equalsIgnoreCase("staff")) {
+            return handleStaff(sender, args);
+        }
+        sender.sendMessage(ChatColor.GRAY + "Usage: /rl <profil|missions|staff>");
+        return true;
+    }
+
+    private boolean handleStaff(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("redlakes.staff")) {
+            sender.sendMessage(ChatColor.RED + "Permission refusée.");
+            return true;
+        }
+        if (args.length >= 2 && args[1].equalsIgnoreCase("status")) {
             return handleStaffStatus(sender);
         }
-        sender.sendMessage(ChatColor.GRAY + "Usage: /rl <profil|missions|staff status>");
+        if (args.length >= 2 && args[1].equalsIgnoreCase("door")) {
+            String[] doorArgs = new String[args.length - 2];
+            System.arraycopy(args, 2, doorArgs, 0, doorArgs.length);
+            return doorCommand.handle(sender, doorArgs);
+        }
+        sender.sendMessage(ChatColor.GRAY + "Usage: /rl staff <status|door>");
         return true;
     }
 
@@ -89,11 +108,6 @@ public final class RlCommand implements CommandExecutor {
     }
 
     private boolean handleStaffStatus(CommandSender sender) {
-        if (!sender.hasPermission("redlakes.staff")) {
-            sender.sendMessage(ChatColor.RED + "Permission refusée.");
-            return true;
-        }
-
         ConnectionState state = plugin.getConnectionManager().getState();
         ChatColor color = state == ConnectionState.ONLINE ? ChatColor.GREEN
                 : state == ConnectionState.DEGRADED ? ChatColor.YELLOW : ChatColor.RED;

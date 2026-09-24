@@ -9,7 +9,7 @@ softdepend: [ProtocolLib]
 commands:
   rl:
     description: Commandes REDLAKES
-    usage: /rl <profil|missions|staff>
+    usage: /rl <profil|missions|staff status|staff door <add|remove|list>>
 
 permissions:
   redlakes.staff:

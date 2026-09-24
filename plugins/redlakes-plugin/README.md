@@ -22,7 +22,7 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 - `Faction.showAffiliationTag` (§65) : le masquage d'identité civile est décidé côté CORE, plus par une comparaison de slug `"civil"` en dur dans le plugin
 
 ### Tests
-`src/test/java` (JUnit 5, `./gradlew test`) — 16 tests sur `SessionChange` et `SessionCache`, purement Java, aucune dépendance Bukkit nécessaire.
+`src/test/java` (JUnit 5, `./gradlew test`) — 32 tests (`SessionChange`, `SessionCache`, `TagLabel`, `DoorAccessResolver`), purement Java, aucune dépendance Bukkit nécessaire.
 
 ### Phase 3 (présentation) — partiellement complète, **pas encore vérifiée visuellement en jeu**
 - `presentation/PresentationManager` — nametag + tag tablist via scoreboard Team (couleur dérivée du `clearanceLevel`, texte dérivé du département/faction, tronqué à 4 lettres pour tenir dans la limite historique 16 caractères des Team 1.12.2). Aucun préfixe pour la faction "civil" (identité civile masquée, §19).
@@ -39,7 +39,13 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 - `/rl missions` affiche les missions en cours
 - Pas encore fait : mise à jour du statut depuis le jeu (compléter un objectif), déclencheurs d'objectifs (§36)
 
-**Non implémenté** (phases suivantes du cahier des charges) : zones/portes, badges/équipements, terminaux, rapports/documents in-game, NPC, SCP, économie.
+### Phase 4 (gameplay) — Portes : premier morceau
+- `zones/Door` + `zones/DoorAccessResolver` (pur, testé) + `zones/DoorRegistry` (persistance `doors.yml`) + `zones/DoorListener` (`PlayerInteractEvent`) — §24 "CanCharacterAccess(character, door)", réutilise exactement `clearanceLevel` + `department.slug` déjà exposés, aucune nouvelle couche de permissions.
+- `commands/DoorCommand` — `/rl staff door add <clearance> [departement]|remove|list`, cible le bloc regardé (`getTargetBlock`, 6 blocs).
+- Volontairement **sans WorldGuard** : la version installée sur le serveur est cassée (même souci Java que ProtocolLib avant réparation, pas encore corrigée) — un système de zones/portes autonome évite cette dépendance.
+- Pas encore fait : zones géographiques (au-delà d'un seul bloc), badges/équipements, terminaux.
+
+**Non implémenté** (phases suivantes du cahier des charges) : badges/équipements, terminaux, rapports/documents in-game, NPC, SCP, économie.
 
 ## Build
 
