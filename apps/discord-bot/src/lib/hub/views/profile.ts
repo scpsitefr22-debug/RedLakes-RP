@@ -2,7 +2,6 @@ import {
   ActionRowBuilder,
   AttachmentBuilder,
   ButtonBuilder,
-  EmbedBuilder,
   MessageFlags,
   ModalBuilder,
   TextInputBuilder,
@@ -11,11 +10,8 @@ import {
   type ModalSubmitInteraction,
 } from "discord.js";
 import { api, ApiError } from "../../api.js";
-import { COLORS, BRAND } from "../../theme.js";
-import { formatRpNickname } from "../../format-rp-nickname.js";
 import { applyMemberRoles } from "../../roles.js";
-import { generateRpCardPng } from "../../rp-card.js";
-import { upsertDossierChannel } from "../../dossier-channel.js";
+import { buildProfilCard, refreshDossier } from "../../dossier-channel.js";
 import {
   backButton,
   hubId,
@@ -31,35 +27,10 @@ const CARD_FILENAME = "profil-card.png";
 export async function renderProfil(ownerId: string, guild: Guild | null): Promise<View> {
   try {
     const p = await api.getProfileByDiscord(ownerId);
-    const rpName = [p.rpFirstName, p.rpLastName].filter(Boolean).join(" ") || null;
-
-    const cardPng = await generateRpCardPng({
-      minecraftUsername: p.minecraftUsername,
-      rpName,
-      grade: p.grade,
-      factionName: p.faction,
-      factionColor: p.factionInfo?.color ?? null,
-      departmentName: p.gradeInfo?.departmentRef?.name ?? null,
-      teamName: p.teamName,
-    });
-
-    const embed = new EmbedBuilder()
-      .setColor(COLORS.redlake)
-      .setTitle(`📁 Dossier personnel — ${p.minecraftUsername ?? "Inconnu"}`)
-      .addFields(
-        ...(p.gradeInfo?.pay != null
-          ? [{ name: "Salaire", value: `${p.gradeInfo.pay.toLocaleString("fr-FR")} $/sem.`, inline: true }]
-          : []),
-        { name: "Sanctions", value: String(p.sanctions), inline: true },
-        { name: "Pseudo Discord", value: formatRpNickname(p) },
-      )
-      .setFooter({ text: BRAND.footer });
+    const { embed, cardPng } = await buildProfilCard(p);
 
     const files: AttachmentBuilder[] = [];
-    if (cardPng) {
-      files.push(new AttachmentBuilder(cardPng, { name: CARD_FILENAME }));
-      embed.setImage(`attachment://${CARD_FILENAME}`);
-    }
+    if (cardPng) files.push(new AttachmentBuilder(cardPng, { name: CARD_FILENAME }));
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       backButton(ownerId, "menu"),
@@ -68,16 +39,7 @@ export async function renderProfil(ownerId: string, guild: Guild | null): Promis
       siteButton(),
     );
 
-    if (guild) {
-      const dossierEmbed = EmbedBuilder.from(embed);
-      const dossierFiles = cardPng ? [new AttachmentBuilder(cardPng, { name: CARD_FILENAME })] : [];
-      const dossierRow = new ActionRowBuilder<ButtonBuilder>().addComponents(siteButton());
-      upsertDossierChannel(guild, ownerId, rpName, {
-        embeds: [dossierEmbed],
-        files: dossierFiles,
-        components: [dossierRow],
-      }).catch(() => undefined);
-    }
+    if (guild) refreshDossier(guild, ownerId, p).catch(() => undefined);
 
     return { embeds: [embed], components: [row], files };
   } catch (err) {

@@ -13,6 +13,7 @@ import { api, ApiError } from "../../api.js";
 import { config } from "../../../config.js";
 import { COLORS, BRAND } from "../../theme.js";
 import { applyMemberRoles, removeManagedRoles, logToChannel } from "../../roles.js";
+import { refreshDossier } from "../../dossier-channel.js";
 import {
   backButton,
   backRow,
@@ -55,6 +56,7 @@ export async function handleLinkModalSubmit(
     if (interaction.inCachedGuild()) {
       const profile = await api.getProfileByDiscord(ownerId);
       await applyMemberRoles(interaction.member, profile).catch(() => undefined);
+      refreshDossier(interaction.guild, ownerId, profile).catch(() => undefined);
     }
     await interaction.editReply(
       `✅ Compte lié à **${result.minecraftUsername}**.\nTon grade in-game sera synchronisé automatiquement. ` +

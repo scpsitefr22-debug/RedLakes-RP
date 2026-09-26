@@ -20,13 +20,14 @@ export const SOON_REASON: Record<string, string> = {
     "API GAP — `GET /applications/me` exige une session utilisateur, inaccessible avec la cle bot.",
   sanctions:
     "API GAP — `GET /sanctions/player/:id` est reserve aux sessions STAFF/ADMIN, inaccessible avec la cle bot.",
-  missions: "Le modele Mission n'existe pas encore dans le CORE.",
+  missions:
+    "API GAP — le modele Mission existe desormais dans le CORE, mais `GET /missions/me` exige une session utilisateur, inaccessible avec la cle bot.",
   notifications:
-    "API GAP — le service de notifications existe cote API mais aucune route n'est encore exposee.",
+    "API GAP — `GET /platform/notifications/me` existe mais exige une session utilisateur, inaccessible avec la cle bot.",
   candidatures_staff:
     "API GAP — `GET /applications` exige une session STAFF/ADMIN, inaccessible avec la cle bot.",
   notifications_staff:
-    "API GAP — aucune route n'est encore exposee pour les notifications.",
+    "API GAP — seule une route par-utilisateur existe (`/platform/notifications/me`, session requise) ; aucune vue d'ensemble staff n'est exposee.",
   outils: "Aucune fonctionnalite concrete identifiee pour l'instant.",
 };
 

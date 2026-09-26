@@ -1,6 +1,7 @@
 import { PermissionFlagsBits, type Guild, type GuildMember } from "discord.js";
 import { api, ApiError } from "../lib/api.js";
 import { resolveMemberRpGrade } from "../lib/member-grade.js";
+import { refreshDossier } from "../lib/dossier-channel.js";
 import { config } from "../config.js";
 
 /** Evite boucle Discord -> Site -> Discord apres sync bot */
@@ -142,6 +143,10 @@ export async function handleMemberRoleChange(
 
     console.log(
       `[sync] Discord -> Site : ${newMember.user.tag} => ${detected.grade} (${detected.roleName})`,
+    );
+
+    refreshDossier(newMember.guild, newMember.id, { ...profile, grade: detected.grade }).catch(
+      () => undefined,
     );
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) return;

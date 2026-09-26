@@ -1,12 +1,19 @@
 import {
+  ActionRowBuilder,
+  AttachmentBuilder,
+  ButtonBuilder,
   ChannelType,
+  EmbedBuilder,
   PermissionFlagsBits,
-  type ActionRowBuilder,
-  type AttachmentBuilder,
-  type ButtonBuilder,
-  type EmbedBuilder,
   type Guild,
 } from "discord.js";
+import type { PlayerProfile } from "./api.js";
+import { COLORS, BRAND } from "./theme.js";
+import { formatRpNickname } from "./format-rp-nickname.js";
+import { generateRpCardPng } from "./rp-card.js";
+import { siteButton } from "./hub/navigation.js";
+
+const CARD_FILENAME = "profil-card.png";
 
 const CATEGORY_NAME = "📁 DOSSIERS PERSONNEL";
 const TOPIC_PREFIX = "RL-PROFILE:";
@@ -108,5 +115,58 @@ export async function upsertDossierChannel(
     }
   } catch (err) {
     console.warn("[dossier-channel] Synchronisation echouee :", err);
+  }
+}
+
+/** Construit l'embed + la carte RP d'un profil — partage entre /hub (Mon profil) et le dossier auto. */
+export async function buildProfilCard(
+  p: PlayerProfile,
+): Promise<{ embed: EmbedBuilder; cardPng: Buffer | null; rpName: string | null }> {
+  const rpName = [p.rpFirstName, p.rpLastName].filter(Boolean).join(" ") || null;
+
+  const cardPng = await generateRpCardPng({
+    minecraftUsername: p.minecraftUsername,
+    rpName,
+    grade: p.grade,
+    factionName: p.faction,
+    factionColor: p.factionInfo?.color ?? null,
+    departmentName: p.gradeInfo?.departmentRef?.name ?? null,
+    teamName: p.teamName,
+  });
+
+  const embed = new EmbedBuilder()
+    .setColor(COLORS.redlake)
+    .setTitle(`📁 Dossier personnel — ${p.minecraftUsername ?? "Inconnu"}`)
+    .addFields(
+      ...(p.gradeInfo?.pay != null
+        ? [{ name: "Salaire", value: `${p.gradeInfo.pay.toLocaleString("fr-FR")} $/sem.`, inline: true }]
+        : []),
+      { name: "Sanctions", value: String(p.sanctions), inline: true },
+      { name: "Pseudo Discord", value: formatRpNickname(p) },
+    )
+    .setFooter({ text: BRAND.footer });
+
+  if (cardPng) embed.setImage(`attachment://${CARD_FILENAME}`);
+
+  return { embed, cardPng, rpName };
+}
+
+/**
+ * Rafraichit le salon dossier d'un joueur a partir de son profil deja recupere —
+ * a appeler a chaque fois que son grade/identite change reellement (pas
+ * seulement quand il ouvre /hub lui-meme). Best-effort, ne leve jamais.
+ */
+export async function refreshDossier(
+  guild: Guild,
+  discordId: string,
+  p: PlayerProfile,
+): Promise<void> {
+  try {
+    const { embed, cardPng, rpName } = await buildProfilCard(p);
+    const files = cardPng ? [new AttachmentBuilder(cardPng, { name: CARD_FILENAME })] : [];
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(siteButton());
+    await upsertDossierChannel(guild, discordId, rpName, { embeds: [embed], files, components: [row] });
+  } catch (err) {
+    console.warn("[dossier-channel] Rafraichissement echoue :", err);
   }
 }
