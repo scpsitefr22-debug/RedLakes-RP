@@ -334,8 +334,9 @@ export default async function FactionDetailPage({ params }: Props) {
               Membres ({members.length})
             </h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              {members.map((m) => {
-                const name = [m.rpFirstName, m.rpLastName].filter(Boolean).join(" ") || m.minecraftUsername || "Agent";
+              {members.map((m, i) => {
+                const identifier = m.minecraftUsername ?? m.username;
+                const name = [m.rpFirstName, m.rpLastName].filter(Boolean).join(" ") || identifier || "Agent";
                 const card = (
                   <div className="flex items-center gap-3 rounded border border-metal/40 p-3 transition-colors hover:border-redlake/30">
                     {m.avatarUrl && (
@@ -348,12 +349,12 @@ export default async function FactionDetailPage({ params }: Props) {
                     </div>
                   </div>
                 );
-                return m.minecraftUsername ? (
-                  <Link key={m.minecraftUsername} href={`/joueurs/${m.minecraftUsername}`}>
+                return identifier ? (
+                  <Link key={identifier} href={`/joueurs/${encodeURIComponent(identifier)}`}>
                     {card}
                   </Link>
                 ) : (
-                  <div key={name}>{card}</div>
+                  <div key={`${name}-${i}`}>{card}</div>
                 );
               })}
             </div>

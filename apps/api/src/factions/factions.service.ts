@@ -75,7 +75,7 @@ export class FactionsService {
       orderBy: { seniority: 'asc' },
       include: {
         gradeInfo: { select: { name: true } },
-        user: { select: { minecraftUsername: true, avatarUrl: true } },
+        user: { select: { minecraftUsername: true, username: true, avatarUrl: true } },
       },
     });
     return players.map((p) => ({
@@ -83,6 +83,7 @@ export class FactionsService {
       rpLastName: p.rpLastName,
       grade: p.gradeInfo?.name ?? p.grade,
       minecraftUsername: p.user.minecraftUsername,
+      username: p.user.username,
       avatarUrl: p.user.avatarUrl,
     }));
   }

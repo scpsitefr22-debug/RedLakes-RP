@@ -13,7 +13,7 @@ interface ApiPlayer {
   reputation: number;
   medals: string[];
   roleUpdatedAt?: string;
-  user: { minecraftUsername: string; avatarUrl: string };
+  user: { minecraftUsername: string | null; username: string | null; avatarUrl: string };
 }
 
 async function getPlayers(): Promise<ApiPlayer[]> {

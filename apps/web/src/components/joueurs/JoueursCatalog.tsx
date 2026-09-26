@@ -15,7 +15,12 @@ interface ApiPlayer {
   reputation: number;
   medals: string[];
   roleUpdatedAt?: string;
-  user: { minecraftUsername: string; avatarUrl: string };
+  user: { minecraftUsername: string | null; username: string | null; avatarUrl: string };
+}
+
+/** Identifiant à afficher/utiliser dans les liens — pseudo Minecraft, ou pseudo de connexion s'il n'a pas encore lié Minecraft. */
+function identifierOf(p: ApiPlayer) {
+  return p.user.minecraftUsername ?? p.user.username ?? "";
 }
 
 type SortMode = "recent" | "reputation" | "name";
@@ -44,15 +49,15 @@ export function JoueursCatalog({ players }: { players: ApiPlayer[] }) {
       const name = [p.rpFirstName, p.rpLastName].filter(Boolean).join(" ");
       return (
         name.toLowerCase().includes(q) ||
-        p.user.minecraftUsername.toLowerCase().includes(q) ||
+        identifierOf(p).toLowerCase().includes(q) ||
         p.grade.toLowerCase().includes(q)
       );
     });
     list = [...list].sort((a, b) => {
       if (sort === "reputation") return b.reputation - a.reputation;
       if (sort === "name") {
-        const nameA = [a.rpFirstName, a.rpLastName].filter(Boolean).join(" ") || a.user.minecraftUsername;
-        const nameB = [b.rpFirstName, b.rpLastName].filter(Boolean).join(" ") || b.user.minecraftUsername;
+        const nameA = [a.rpFirstName, a.rpLastName].filter(Boolean).join(" ") || identifierOf(a);
+        const nameB = [b.rpFirstName, b.rpLastName].filter(Boolean).join(" ") || identifierOf(b);
         return nameA.localeCompare(nameB, "fr");
       }
       return new Date(b.roleUpdatedAt ?? 0).getTime() - new Date(a.roleUpdatedAt ?? 0).getTime();
@@ -105,14 +110,14 @@ export function JoueursCatalog({ players }: { players: ApiPlayer[] }) {
           {visible.map((player) => (
             <Link
               key={player.id}
-              href={`/joueurs/${encodeURIComponent(player.user.minecraftUsername)}`}
+              href={`/joueurs/${encodeURIComponent(identifierOf(player))}`}
               className="hologram-border block rounded-lg p-5 transition-colors hover:border-redlake/40"
             >
               <div className="mb-4 flex items-center gap-3">
                 {player.user.avatarUrl ? (
                   <Image
                     src={player.user.avatarUrl}
-                    alt={player.user.minecraftUsername}
+                    alt={identifierOf(player)}
                     width={48}
                     height={48}
                     className="rounded-full border border-redlake/30"
@@ -125,12 +130,12 @@ export function JoueursCatalog({ players }: { players: ApiPlayer[] }) {
                 <div>
                   <h3 className="font-bold text-white">
                     {[player.rpFirstName, player.rpLastName].filter(Boolean).join(" ") ||
-                      player.user.minecraftUsername}
+                      identifierOf(player)}
                   </h3>
                   <p className="text-xs text-gray-500">{player.grade}</p>
                   {(player.rpFirstName || player.rpLastName) && (
                     <p className="font-mono text-[10px] text-gray-600">
-                      MC : {player.user.minecraftUsername}
+                      MC : {player.user.minecraftUsername ?? "— (compte non lié)"}
                     </p>
                   )}
                 </div>

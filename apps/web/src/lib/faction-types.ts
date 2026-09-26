@@ -48,6 +48,7 @@ export interface FactionMember {
   rpLastName: string | null;
   grade: string;
   minecraftUsername: string | null;
+  username: string | null;
   avatarUrl: string | null;
 }
 
