@@ -22,17 +22,18 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 - `Faction.showAffiliationTag` (§65) : le masquage d'identité civile est décidé côté CORE, plus par une comparaison de slug `"civil"` en dur dans le plugin
 
 ### Tests
-`src/test/java` (JUnit 5, `./gradlew test`) — 24 tests (`SessionChange`, `SessionCache`, `TagLabel`), purement Java, aucune dépendance Bukkit nécessaire.
+`src/test/java` (JUnit 5, `./gradlew test`) — 28 tests (`SessionChange`, `SessionCache`, `TagLabel`, `ChatIdentity`), purement Java, aucune dépendance Bukkit nécessaire.
 
 ### Phase 3 (présentation) — partiellement complète, **pas encore vérifiée visuellement en jeu**
 - `presentation/PresentationManager` — nametag + tag tablist via scoreboard Team (couleur dérivée du `clearanceLevel`, texte dérivé du département/faction, tronqué à 4 lettres pour tenir dans la limite historique 16 caractères des Team 1.12.2). Aucun préfixe pour la faction "civil" (identité civile masquée, §19).
 - `chat/ChatFormatListener` — reformate le chat global avec l'identité RP (`[TAG] Prénom Nom : message`), priorité HIGHEST (vérifié : ChatManager a son propre formatage RP désactivé sur ce serveur, donc pas de conflit)
+- `chat/ChannelCommand` + `chat/WhisperCommand` — canaux LOCAL (rayon 30 blocs)/FACTION/DEPARTMENT/TEAM/OOC/STAFF/WHISPER (§18), filtrage des destinataires uniquement à partir du cache déjà rempli (aucun appel réseau). `chat/ChatIdentity` centralise le nom RP + le tag, partagé avec ChatFormatListener.
 - Notifications de connexion/changement dans `PlayerConnectionListener`
 - `presentation/TabListManager` — bandeau tablist (§20, branding + grade/faction) via ProtocolLib (`PLAYER_LIST_HEADER_FOOTER` packet, par joueur). ProtocolLib 5.4.0 était cassé sur le vrai serveur (compilé Java 17+, serveur en Java 8) — remplacé par la dernière version compatible Java 8 (4.8.0), vendue dans `libs/` faute de coordonnées maven fiables. `softdepend` dans plugin.yml : dégradation silencieuse si ProtocolLib est absent/désactivé.
 
 **Explicitement différé, avec raison technique :**
 - Scoreboard sidebar personnalisé par joueur (§21) : un scoreboard personnel par joueur (`player.setScoreboard(...)`) casserait la visibilité des nametags des AUTRES joueurs (les Team du nametag vivent sur le scoreboard principal partagé) — nécessite soit de répliquer les Team sur chaque scoreboard personnel, soit des packets ProtocolLib dédiés (maintenant possible, pas encore fait)
-- Canaux de chat LOCAL/FACTION/DEPARTMENT/TEAM/RADIO/WHISPER/OOC/STAFF (§18) : seul GLOBAL est fait
+- Canal RADIO (§18) : nécessiterait une intégration avec le mod SCP Radio (Forge, pas d'API Bukkit connue) — pas fait
 
 ### Phase 6 (monde dynamique) — Missions : lecture seule branchée
 - L'endpoint `/sync/minecraft/:uuid` renvoie aussi `missions` (statut ASSIGNED, personnage ou équipe) — réutilise `MissionsService`-like logic côté CORE

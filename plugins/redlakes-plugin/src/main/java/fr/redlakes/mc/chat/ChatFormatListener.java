@@ -2,7 +2,6 @@ package fr.redlakes.mc.chat;
 
 import fr.redlakes.mc.RedLakesPlugin;
 import fr.redlakes.mc.player.MinecraftSession;
-import fr.redlakes.mc.presentation.TagLabel;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,26 +35,13 @@ public final class ChatFormatListener implements Listener {
             return;
         }
 
-        String rpName = rpName(session, player.getName());
-        String tag = tag(session);
+        String rpName = ChatIdentity.rpName(session, player.getName());
+        String tag = ChatIdentity.tag(session);
         String header = tag + ChatColor.WHITE + rpName + ChatColor.GRAY + " : " + ChatColor.WHITE;
 
         // %2$s reste le seul emplacement de substitution — echapper tout '%'
         // venant des donnees CORE (nom RP/departement) pour ne pas casser
         // String.format cote Bukkit.
         event.setFormat(header.replace("%", "%%") + "%2$s");
-    }
-
-    private String rpName(MinecraftSession session, String fallback) {
-        if (session.rpFirstName != null && !session.rpFirstName.trim().isEmpty()) {
-            String last = session.rpLastName != null ? " " + session.rpLastName : "";
-            return session.rpFirstName + last;
-        }
-        return fallback;
-    }
-
-    private String tag(MinecraftSession session) {
-        String label = TagLabel.shortLabel(session);
-        return label.isEmpty() ? "" : ChatColor.GRAY + "[" + label + "] ";
     }
 }

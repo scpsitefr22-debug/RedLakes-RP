@@ -10,6 +10,34 @@ commands:
   rl:
     description: Commandes REDLAKES
     usage: /rl <profil|missions|staff status>
+  local:
+    description: Chat local (§18) — visible dans un rayon de 30 blocs
+    usage: /local <message>
+    aliases: [l]
+  faction:
+    description: Chat de faction (§18)
+    usage: /faction <message>
+    aliases: [f]
+  department:
+    description: Chat de département (§18)
+    usage: /department <message>
+    aliases: [dept, d]
+  team:
+    description: Chat d'équipe (§18)
+    usage: /team <message>
+    aliases: [t]
+  ooc:
+    description: Chat hors-RP (§18)
+    usage: /ooc <message>
+  staffchat:
+    description: Chat staff (§18)
+    usage: /staffchat <message>
+    aliases: [sc]
+    permission: redlakes.staff
+  whisper:
+    description: Message privé à un joueur (§18)
+    usage: /whisper <joueur> <message>
+    aliases: [w, msg]
 
 permissions:
   redlakes.staff:

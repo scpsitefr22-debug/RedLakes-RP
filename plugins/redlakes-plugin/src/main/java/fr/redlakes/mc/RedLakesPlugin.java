@@ -1,6 +1,8 @@
 package fr.redlakes.mc;
 
+import fr.redlakes.mc.chat.ChannelCommand;
 import fr.redlakes.mc.chat.ChatFormatListener;
+import fr.redlakes.mc.chat.WhisperCommand;
 import fr.redlakes.mc.commands.RlCommand;
 import fr.redlakes.mc.core.ConnectionManager;
 import fr.redlakes.mc.core.CoreClient;
@@ -58,6 +60,12 @@ public final class RedLakesPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(playerConnectionListener, this);
         Bukkit.getPluginManager().registerEvents(new ChatFormatListener(this), this);
         getCommand("rl").setExecutor(new RlCommand(this));
+
+        ChannelCommand channelCommand = new ChannelCommand(this);
+        for (String channel : new String[] {"local", "faction", "department", "team", "ooc", "staffchat"}) {
+            getCommand(channel).setExecutor(channelCommand);
+        }
+        getCommand("whisper").setExecutor(new WhisperCommand(this));
 
         long intervalTicks = coreConfig.getPollIntervalMinutes() * 60L * 20L;
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::refreshOnlinePlayers, intervalTicks, intervalTicks);
