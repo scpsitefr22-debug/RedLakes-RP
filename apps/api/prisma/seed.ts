@@ -32,8 +32,8 @@ async function main() {
       minecraftUsername: 'Directeur_Site',
       minecraftUuid: '00000000-0000-0000-0000-000000000001',
       role: UserRole.ADMIN,
-      player: {
-        create: {
+      players: {
+        create: [{
           grade: 'Directeur du Site',
           faction: 'Fondation SCP',
           playtime: 120000,
@@ -43,7 +43,7 @@ async function main() {
             { name: 'Fondateur Site-12', date: '2019-01-01' },
             { name: 'Survivant Brèche Keter', date: '2015-07-22' },
           ],
-        },
+        }],
       },
     },
   });
