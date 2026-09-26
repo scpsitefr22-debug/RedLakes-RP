@@ -16,11 +16,9 @@ import org.bukkit.entity.Player;
 public final class RlCommand implements CommandExecutor {
 
     private final RedLakesPlugin plugin;
-    private final DoorCommand doorCommand;
 
     public RlCommand(RedLakesPlugin plugin) {
         this.plugin = plugin;
-        this.doorCommand = new DoorCommand(plugin);
     }
 
     @Override
@@ -46,12 +44,7 @@ public final class RlCommand implements CommandExecutor {
         if (args.length >= 2 && args[1].equalsIgnoreCase("status")) {
             return handleStaffStatus(sender);
         }
-        if (args.length >= 2 && args[1].equalsIgnoreCase("door")) {
-            String[] doorArgs = new String[args.length - 2];
-            System.arraycopy(args, 2, doorArgs, 0, doorArgs.length);
-            return doorCommand.handle(sender, doorArgs);
-        }
-        sender.sendMessage(ChatColor.GRAY + "Usage: /rl staff <status|door>");
+        sender.sendMessage(ChatColor.GRAY + "Usage: /rl staff <status>");
         return true;
     }
 

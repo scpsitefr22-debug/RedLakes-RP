@@ -22,7 +22,7 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 - `Faction.showAffiliationTag` (§65) : le masquage d'identité civile est décidé côté CORE, plus par une comparaison de slug `"civil"` en dur dans le plugin
 
 ### Tests
-`src/test/java` (JUnit 5, `./gradlew test`) — 32 tests (`SessionChange`, `SessionCache`, `TagLabel`, `DoorAccessResolver`), purement Java, aucune dépendance Bukkit nécessaire.
+`src/test/java` (JUnit 5, `./gradlew test`) — 24 tests (`SessionChange`, `SessionCache`, `TagLabel`), purement Java, aucune dépendance Bukkit nécessaire.
 
 ### Phase 3 (présentation) — partiellement complète, **pas encore vérifiée visuellement en jeu**
 - `presentation/PresentationManager` — nametag + tag tablist via scoreboard Team (couleur dérivée du `clearanceLevel`, texte dérivé du département/faction, tronqué à 4 lettres pour tenir dans la limite historique 16 caractères des Team 1.12.2). Aucun préfixe pour la faction "civil" (identité civile masquée, §19).
@@ -39,11 +39,8 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 - `/rl missions` affiche les missions en cours
 - Pas encore fait : mise à jour du statut depuis le jeu (compléter un objectif), déclencheurs d'objectifs (§36)
 
-### Phase 4 (gameplay) — Portes : premier morceau
-- `zones/Door` + `zones/DoorAccessResolver` (pur, testé) + `zones/DoorRegistry` (persistance `doors.yml`) + `zones/DoorListener` (`PlayerInteractEvent`) — §24 "CanCharacterAccess(character, door)", réutilise exactement `clearanceLevel` + `department.slug` déjà exposés, aucune nouvelle couche de permissions.
-- `commands/DoorCommand` — `/rl staff door add <clearance> [departement]|remove|list`, cible le bloc regardé (`getTargetBlock`, 6 blocs).
-- Volontairement **sans WorldGuard** : la version installée sur le serveur est cassée (même souci Java que ProtocolLib avant réparation, pas encore corrigée) — un système de zones/portes autonome évite cette dépendance.
-- Pas encore fait : zones géographiques (au-delà d'un seul bloc), badges/équipements, terminaux.
+### Phase 4 (gameplay) — Portes : abandonné
+Un système de portes maison (`zones/Door*`) avait été construit puis retiré : les mods déjà installés (SecurityCraft et consorts) fournissent des lecteurs de cartes/badges qui couvrent ce besoin — inutile de dupliquer une couche de contrôle d'accès custom.
 
 **Non implémenté** (phases suivantes du cahier des charges) : badges/équipements, terminaux, rapports/documents in-game, NPC, SCP, économie.
 
@@ -76,7 +73,3 @@ Un seul endpoint consommé pour l'instant : `GET /sync/minecraft/:uuid` (header 
 
 - Identité par serveur : `core.server-id` est déjà dans la config (affiché par `/rl staff status`) mais le CORE ne le vérifie pas encore — une seule clé `SYNC_API_KEY` partagée avec le bot Discord et tout futur serveur.
 - Pas de push CORE→Minecraft (grade changé, sanction, alerte) : uniquement du polling pour l'instant, volontairement, cf. cahier des charges §07-08/58.
-
-## ⚠️ Ce dossier n'était pas suivi par git
-
-Tout ce module a été perdu une fois cette nuit (fichiers disparus du disque, cause exacte non confirmée — probablement un `git clean` lancé ailleurs, ce dossier n'ayant jamais été commité). Reconstruit à l'identique depuis l'historique de session. **Committer ce dossier dès que possible** pour ne pas revivre ça.
