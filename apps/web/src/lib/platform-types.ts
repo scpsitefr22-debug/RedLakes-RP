@@ -12,7 +12,10 @@ export type PlatformEntityType =
   | "APPLICATION"
   | "LORE_ARTICLE"
   | "PLAYER"
-  | "USER";
+  | "USER"
+  | "SCP_OBJECT"
+  | "SYSTEM_STATE"
+  | "CORE_DM";
 
 export type AuditAction =
   | "CREATED"

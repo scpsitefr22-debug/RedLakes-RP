@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Send, User, MessageCircle, Briefcase, UserPlus, Search } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
@@ -95,6 +96,7 @@ interface MessagerieViewProps {
 }
 
 export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: MessagerieViewProps) {
+  const searchParams = useSearchParams();
   const [channel, setChannel] = useState<Channel>("PERSONNEL");
   const [conversations, setConversations] = useState<ApiConversation[] | null>(null);
   const [activePartner, setActivePartner] = useState<ApiUser | null>(null);
@@ -158,6 +160,22 @@ export function MessagerieView({ heightClass = "h-[65vh]", onActivity }: Message
     setError(null);
     fetchThread(partner);
   };
+
+  // Arrivée depuis une notification (?dm=<messageId>) — ouvre directement le
+  // fil concerné au lieu de la liste des conversations. Une seule fois au
+  // montage : le param ne doit pas rouvrir le fil si l'utilisateur navigue
+  // ailleurs dans la messagerie ensuite.
+  useEffect(() => {
+    const dm = searchParams.get("dm");
+    if (!dm) return;
+    apiFetch<{ channel: Channel; partner: ApiUser }>(`/core-dm/message/${dm}`)
+      .then(({ channel: dmChannel, partner }) => {
+        setChannel(dmChannel);
+        openThread(partner);
+      })
+      .catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const openPicker = () => {
     setPickerOpen(true);

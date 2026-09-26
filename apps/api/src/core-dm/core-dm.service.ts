@@ -164,6 +164,30 @@ export class CoreDmService {
     });
   }
 
+  /**
+   * Resout un message vers { channel, partner } pour le clic sur une
+   * notification CORE_DM — la messagerie s'adresse par interlocuteur/canal,
+   * pas par id de message, donc il faut cette etape avant d'ouvrir le fil.
+   * Refuse si l'appelant n'est ni l'expediteur ni le destinataire.
+   */
+  async resolveMessageTarget(userId: string, messageId: string) {
+    const message = await this.prisma.coreDirectMessage.findUnique({
+      where: { id: messageId },
+      select: {
+        channel: true,
+        senderId: true,
+        recipientId: true,
+        sender: { select: USER_SELECT },
+        recipient: { select: USER_SELECT },
+      },
+    });
+    if (!message || (message.senderId !== userId && message.recipientId !== userId)) {
+      throw new NotFoundException('Message introuvable');
+    }
+    const partner = message.senderId === userId ? message.recipient : message.sender;
+    return { channel: message.channel, partner };
+  }
+
   /** Total non lu, tous canaux confondus — sert uniquement au badge global de la barre CORE. */
   async unreadCount(userId: string) {
     return this.prisma.coreDirectMessage.count({

@@ -2,18 +2,50 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Bell, CheckCheck } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import {
   type NotificationsPage,
+  type PlatformNotification,
   buildQueryString,
 } from "@/lib/platform-types";
 import { cn } from "@/lib/utils";
+import { usePlayerSession } from "@/hooks/usePlayerSession";
+
+const STAFF_ROLES = new Set(["STAFF", "ADMIN"]);
+
+/**
+ * Où envoyer l'utilisateur en cliquant une notification. La plupart des
+ * types (candidature, rapport RP, fiche SCP) se traitent en ligne sur le
+ * tableau de bord staff — pas de page dédiée par item — donc un membre du
+ * staff y est renvoyé ; l'auteur d'origine (pas staff) va sur son propre
+ * tableau de bord. CORE_DM est le seul cas avec une vraie destination par
+ * item : le fil de discussion exact via /messagerie?dm=.
+ */
+function notificationHref(n: PlatformNotification, isStaff: boolean): string {
+  switch (n.entityType) {
+    case "CORE_DM":
+      return `/messagerie?dm=${encodeURIComponent(n.entityId ?? "")}`;
+    case "SYSTEM_STATE":
+      return "/";
+    case "APPLICATION":
+    case "PERSONNEL_REPORT":
+      return isStaff ? "/staff" : "/dashboard";
+    case "SCP_OBJECT":
+      return isStaff && n.entityId ? `/staff/scp/${n.entityId}` : "/dashboard";
+    default:
+      return "/intranet";
+  }
+}
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<NotificationsPage | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { role } = usePlayerSession();
+  const isStaff = STAFF_ROLES.has(role ?? "");
 
   const load = useCallback(async () => {
     try {
@@ -97,6 +129,8 @@ export function NotificationBell() {
                     type="button"
                     onClick={() => {
                       if (!n.readAt) void markRead(n.id);
+                      setOpen(false);
+                      router.push(notificationHref(n, isStaff));
                     }}
                     className={cn(
                       "w-full border-b border-metal/20 px-3 py-2.5 text-left transition-colors hover:bg-redlake/5",

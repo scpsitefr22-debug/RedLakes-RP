@@ -30,6 +30,11 @@ export class CoreDmController {
     return this.dm.listContacts(req.user.id);
   }
 
+  @Get('message/:id')
+  resolveMessageTarget(@Req() req: AuthedRequest, @Param('id') id: string) {
+    return this.dm.resolveMessageTarget(req.user.id, id);
+  }
+
   @Get('with/:username')
   getThread(
     @Req() req: AuthedRequest,
