@@ -32,7 +32,21 @@ Write-Ok "Ports liberes"
 
 Write-Host ""
 Write-Step 2 5 "Base de donnees"
-Write-Ok "PostgreSQL (Neon, distante — voir DATABASE_URL dans apps\api\.env)"
+# Detecte la cible reelle au lieu d'annoncer Neon en dur — la bascule du
+# 2026-09-26 (quota Neon epuise) pointe apps\api\.env sur un Postgres
+# local ; ce script doit refleter ce qui est reellement configure, que ce
+# soit local ou distant, sans qu'on ait a revenir l'editer a chaque fois.
+$envPath = Join-Path $root "apps\api\.env"
+$dbLine = if (Test-Path $envPath) {
+    Get-Content $envPath | Where-Object { $_ -match '^\s*DATABASE_URL=' } | Select-Object -First 1
+} else { $null }
+if ($dbLine -match '@(localhost|127\.0\.0\.1)[:/]') {
+    Write-Ok "PostgreSQL (local — service Windows postgresql-x64-16)"
+} elseif ($dbLine -match '@([^:/]+)') {
+    Write-Ok "PostgreSQL (distante — $($Matches[1]))"
+} else {
+    Write-Fail "DATABASE_URL introuvable dans apps\api\.env"
+}
 
 Write-Host ""
 Write-Step 3 5 "API NestJS (port 3001)"

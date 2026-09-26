@@ -33,7 +33,16 @@ function Show-Banner {
 
 function Show-Status {
     Write-Host "  --- Etat rapide ---" -ForegroundColor DarkYellow
-    Write-Host "  [ON ] PostgreSQL (Neon, distante)" -ForegroundColor Green
+    # Bascule du 2026-09-26 : Neon a atteint son quota gratuit, le dev
+    # tourne desormais sur un Postgres local natif (service Windows
+    # "postgresql-x64-16", installe via choco — pas Docker, abandonne le
+    # 2026-09-09). L'etat affiche ici doit refleter ca, pas Neon.
+    $pgService = Get-Service -Name "postgresql-x64-16" -ErrorAction SilentlyContinue
+    if ($pgService -and $pgService.Status -eq "Running") {
+        Write-Host "  [ON ] PostgreSQL (local)" -ForegroundColor Green
+    } else {
+        Write-Host "  [OFF] PostgreSQL (local) — service postgresql-x64-16 introuvable ou arrete" -ForegroundColor Red
+    }
     foreach ($item in @(
             @{ Port = 3000; Label = "Site web" },
             @{ Port = 3001; Label = "API" },
