@@ -3,7 +3,15 @@ core:
   url: "http://localhost:3001/api"
   server-id: "redlakes-main"
   sync-key: "change-me-redlakes-sync-secret"
-  request-timeout-seconds: 8
+  # Délais séparés : établir la connexion doit échouer vite si l'API est
+  # tombée ; la lecture peut prendre un peu plus longtemps.
+  connect-timeout-seconds: 3
+  read-timeout-seconds: 8
+  # Nouvelles tentatives sur erreur réseau / 5xx uniquement (jamais sur 4xx).
+  # Une seule tentative quand le CORE est déjà OFFLINE.
+  retry:
+    max-attempts: 3
+    base-delay-ms: 500
 
 # Fréquence de resynchronisation des joueurs connectés (hors connexion initiale).
 sync:

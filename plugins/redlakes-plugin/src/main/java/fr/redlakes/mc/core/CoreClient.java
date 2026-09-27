@@ -10,18 +10,21 @@ import java.util.logging.Logger;
 
 /**
  * Client HTTP centralisé vers REDLAKES CORE. Toute méthode ici est
- * bloquante — l'appelant est seul responsable de ne jamais l'invoquer
- * depuis le thread principal Minecraft (cf. §58-59 du cahier des charges).
+ * bloquante (y compris les pauses entre tentatives) — l'appelant est seul
+ * responsable de ne jamais l'invoquer depuis le thread principal Minecraft
+ * (cf. §58-59 du cahier des charges).
  */
 public final class CoreClient {
 
     public static final class Response {
         public final int status;
         public final String body;
+        public final int attempts;
 
-        Response(int status, String body) {
+        Response(int status, String body, int attempts) {
             this.status = status;
             this.body = body;
+            this.attempts = attempts;
         }
     }
 
@@ -31,23 +34,86 @@ public final class CoreClient {
         }
     }
 
-    private final CoreConfig config;
+    private final String apiUrl;
+    private final String syncKey;
+    private final int connectTimeoutMs;
+    private final int readTimeoutMs;
+    private final RetryPolicy retryPolicy;
     private final Logger logger;
 
     public CoreClient(CoreConfig config, Logger logger) {
-        this.config = config;
+        this(config.getApiUrl(), config.getSyncKey(),
+                config.getConnectTimeoutSeconds() * 1000, config.getReadTimeoutSeconds() * 1000,
+                new RetryPolicy(config.getRetryMaxAttempts(), config.getRetryBaseDelayMs(), 5_000L),
+                logger);
+    }
+
+    /** Constructeur sans Bukkit, utilisé par les tests. */
+    public CoreClient(String apiUrl, String syncKey, int connectTimeoutMs, int readTimeoutMs,
+                      RetryPolicy retryPolicy, Logger logger) {
+        this.apiUrl = apiUrl;
+        this.syncKey = syncKey;
+        this.connectTimeoutMs = connectTimeoutMs;
+        this.readTimeoutMs = readTimeoutMs;
+        this.retryPolicy = retryPolicy;
         this.logger = logger;
     }
 
+    public int getMaxAttempts() {
+        return retryPolicy.getMaxAttempts();
+    }
+
     public Response get(String path) throws CoreClientException {
+        return get(path, retryPolicy.getMaxAttempts());
+    }
+
+    /**
+     * {@code maxAttempts} permet à l'appelant de couper court (ex. 1 seule
+     * tentative quand le CORE est déjà OFFLINE, pour ne pas bloquer le
+     * rafraîchissement de tous les joueurs sur des pauses inutiles).
+     */
+    public Response get(String path, int maxAttempts) throws CoreClientException {
+        int attempts = Math.max(1, Math.min(maxAttempts, retryPolicy.getMaxAttempts()));
+        IOException lastError = null;
+        Response lastResponse = null;
+
+        for (int attempt = 1; attempt <= attempts; attempt++) {
+            if (attempt > 1 && !pause(retryPolicy.delayBeforeAttempt(attempt))) {
+                break;
+            }
+            try {
+                lastResponse = send(path, attempt);
+                lastError = null;
+                if (!RetryPolicy.isRetryableStatus(lastResponse.status)) {
+                    return lastResponse;
+                }
+                logger.warning("CORE a répondu " + lastResponse.status + " sur " + path
+                        + " (tentative " + attempt + "/" + attempts + ")");
+            } catch (IOException e) {
+                lastError = e;
+                lastResponse = null;
+                if (attempt < attempts) {
+                    logger.warning("CORE injoignable sur " + path + " (tentative " + attempt + "/" + attempts
+                            + ") : " + e.getClass().getSimpleName());
+                }
+            }
+        }
+
+        if (lastResponse != null) {
+            return lastResponse;
+        }
+        throw new CoreClientException("Requête CORE injoignable: " + path, lastError);
+    }
+
+    private Response send(String path, int attempt) throws IOException {
         HttpURLConnection connection = null;
         try {
-            URL url = new URL(config.getApiUrl() + path);
+            URL url = new URL(apiUrl + path);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(config.getRequestTimeoutSeconds() * 1000);
-            connection.setReadTimeout(config.getRequestTimeoutSeconds() * 1000);
-            connection.setRequestProperty("X-Redlakes-Sync-Key", config.getSyncKey());
+            connection.setConnectTimeout(connectTimeoutMs);
+            connection.setReadTimeout(readTimeoutMs);
+            connection.setRequestProperty("X-Redlakes-Sync-Key", syncKey);
             connection.setRequestProperty("Accept", "application/json");
 
             int status = connection.getResponseCode();
@@ -55,18 +121,25 @@ public final class CoreClient {
                     ? connection.getInputStream()
                     : connection.getErrorStream();
             String body = stream == null ? "" : readAll(stream);
-
-            if (status >= 500) {
-                logger.warning("CORE a répondu " + status + " sur " + path);
-            }
-
-            return new Response(status, body);
-        } catch (IOException e) {
-            throw new CoreClientException("Requête CORE injoignable: " + path, e);
+            return new Response(status, body, attempt);
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
+        }
+    }
+
+    /** false si le thread a été interrompu (arrêt du plugin) — on arrête alors de retenter. */
+    private static boolean pause(long delayMs) {
+        if (delayMs <= 0) {
+            return true;
+        }
+        try {
+            Thread.sleep(delayMs);
+            return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
 

@@ -3,6 +3,7 @@ package fr.redlakes.mc.player;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import fr.redlakes.mc.core.ConnectionManager;
+import fr.redlakes.mc.core.ConnectionState;
 import fr.redlakes.mc.core.CoreClient;
 
 import java.util.UUID;
@@ -29,22 +30,29 @@ public final class SessionSyncService {
         this.logger = logger;
     }
 
-    /** Session fraîchement récupérée, ou null si le joueur n'est pas (encore) lié côté CORE. */
-    public MinecraftSession fetch(UUID uuid, String usernameForLogs) {
+    /**
+     * OK + session, NOT_LINKED (404 : aucun compte CORE pour cet UUID), ou
+     * FAILED (réseau, 5xx, 401, réponse invalide) — dans ce dernier cas le
+     * cache n'est pas modifié.
+     */
+    public SyncResult fetch(UUID uuid, String usernameForLogs) {
         long start = System.currentTimeMillis();
         try {
-            CoreClient.Response response = client.get("/sync/minecraft/" + uuid);
+            // Déjà OFFLINE : une seule tentative, pour que le rafraîchissement
+            // périodique de tous les joueurs ne s'étire pas en pauses de retry.
+            int attempts = connectionManager.getState() == ConnectionState.OFFLINE ? 1 : client.getMaxAttempts();
+            CoreClient.Response response = client.get("/sync/minecraft/" + uuid, attempts);
             long latency = System.currentTimeMillis() - start;
 
             if (response.status == 404) {
                 connectionManager.recordSuccess(latency);
                 cache.remove(uuid);
-                return null;
+                return SyncResult.notLinked();
             }
             if (response.status < 200 || response.status >= 300) {
                 connectionManager.recordFailure();
                 logger.warning("Sync CORE échouée (" + response.status + ") pour " + usernameForLogs);
-                return null;
+                return SyncResult.failed();
             }
 
             MinecraftSession session = gson.fromJson(response.body, MinecraftSession.class);
@@ -55,26 +63,26 @@ public final class SessionSyncService {
                 // mettre en cache, traiter comme un échec de sync.
                 connectionManager.recordFailure();
                 logger.warning("Réponse CORE vide pour " + usernameForLogs);
-                return null;
+                return SyncResult.failed();
             }
             connectionManager.recordSuccess(latency);
             cache.put(uuid, session);
-            return session;
+            return SyncResult.ok(session);
         } catch (CoreClient.CoreClientException e) {
             connectionManager.recordFailure();
             logger.log(Level.WARNING, "CORE injoignable pour " + usernameForLogs, e);
-            return null;
+            return SyncResult.failed();
         } catch (JsonSyntaxException e) {
             connectionManager.recordFailure();
             logger.log(Level.WARNING, "Réponse CORE invalide pour " + usernameForLogs, e);
-            return null;
+            return SyncResult.failed();
         } catch (RuntimeException e) {
             // Filet de sécurité : une session async ne doit jamais faire
             // remonter une exception non catchée jusqu'au scheduler Bukkit
             // (risque d'annuler la tâche périodique pour tous les joueurs).
             connectionManager.recordFailure();
             logger.log(Level.WARNING, "Erreur inattendue lors de la sync pour " + usernameForLogs, e);
-            return null;
+            return SyncResult.failed();
         }
     }
 }

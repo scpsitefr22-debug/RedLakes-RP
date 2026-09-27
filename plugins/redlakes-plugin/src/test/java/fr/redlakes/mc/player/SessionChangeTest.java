@@ -48,9 +48,24 @@ class SessionChangeTest {
     }
 
     @Test
-    void currentSessionNullIsNeverRelevant() {
+    void currentSessionNullAfterNothingIsNotRelevant() {
+        assertFalse(SessionChange.compare(null, null).isRelevant());
+        assertFalse(SessionChange.compare(sessionWithoutCharacter(), null).isRelevant());
+    }
+
+    @Test
+    void unlinkedAfterHavingACharacterIsCharacterLost() {
+        // 404 confirmé par le CORE (compte délié) : l'identité RP doit être retirée.
         SessionChange change = SessionChange.compare(sessionWithCharacter("g1", "f1", null), null);
-        assertFalse(change.isRelevant());
+        assertTrue(change.characterLost);
+        assertTrue(change.isRelevant());
+        assertFalse(change.firstSync);
+    }
+
+    @Test
+    void noActiveCharacterAnymoreIsCharacterLost() {
+        SessionChange change = SessionChange.compare(sessionWithCharacter("g1", "f1", "d1"), sessionWithoutCharacter());
+        assertTrue(change.characterLost);
     }
 
     @Test
@@ -131,5 +146,48 @@ class SessionChangeTest {
         SessionChange change = SessionChange.compare(previous, current);
 
         assertTrue(change.gradeChanged);
+    }
+
+    private static MinecraftSession withCharacterAndTeam(String characterId, String teamId) {
+        MinecraftSession s = sessionWithCharacter("g1", "f1", "d1");
+        s.characterId = characterId;
+        if (teamId != null) {
+            s.team = new MinecraftSession.Team();
+            s.team.id = teamId;
+            s.team.name = "Équipe Test";
+        }
+        return s;
+    }
+
+    @Test
+    void detectsCharacterSwitchEvenWhenGradeFactionDepartmentAreIdentical() {
+        // Deux personnages du même compte avec la même affectation : sans
+        // comparaison du characterId, le changement passait inaperçu.
+        SessionChange change = SessionChange.compare(withCharacterAndTeam("c1", null), withCharacterAndTeam("c2", null));
+        assertTrue(change.characterChanged);
+        assertTrue(change.isRelevant());
+        assertFalse(change.gradeChanged);
+    }
+
+    @Test
+    void sameCharacterIsNotACharacterChange() {
+        SessionChange change = SessionChange.compare(withCharacterAndTeam("c1", "t1"), withCharacterAndTeam("c1", "t1"));
+        assertFalse(change.characterChanged);
+        assertFalse(change.teamChanged);
+        assertFalse(change.isRelevant());
+    }
+
+    @Test
+    void detectsTeamChange() {
+        SessionChange change = SessionChange.compare(withCharacterAndTeam("c1", "t1"), withCharacterAndTeam("c1", "t2"));
+        assertTrue(change.teamChanged);
+        assertFalse(change.characterChanged);
+        assertTrue(change.isRelevant());
+    }
+
+    @Test
+    void detectsJoiningAndLeavingATeam() {
+        assertTrue(SessionChange.compare(withCharacterAndTeam("c1", null), withCharacterAndTeam("c1", "t1")).teamChanged);
+        assertTrue(SessionChange.compare(withCharacterAndTeam("c1", "t1"), withCharacterAndTeam("c1", null)).teamChanged);
     }
 }

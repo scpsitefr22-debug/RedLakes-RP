@@ -8,7 +8,10 @@ public final class CoreConfig {
     private final String apiUrl;
     private final String serverId;
     private final String syncKey;
-    private final int requestTimeoutSeconds;
+    private final int connectTimeoutSeconds;
+    private final int readTimeoutSeconds;
+    private final int retryMaxAttempts;
+    private final long retryBaseDelayMs;
     private final int pollIntervalMinutes;
     private final int cacheTtlMinutes;
 
@@ -16,7 +19,13 @@ public final class CoreConfig {
         this.apiUrl = stripTrailingSlash(source.getString("core.url", "http://localhost:3001/api"));
         this.serverId = source.getString("core.server-id", "redlakes-main");
         this.syncKey = source.getString("core.sync-key", "");
-        this.requestTimeoutSeconds = source.getInt("core.request-timeout-seconds", 8);
+        // request-timeout-seconds = ancienne clé unique, conservée comme valeur
+        // par défaut du délai de lecture pour les config.yml déjà déployés.
+        int legacyTimeout = source.getInt("core.request-timeout-seconds", 8);
+        this.connectTimeoutSeconds = Math.max(1, source.getInt("core.connect-timeout-seconds", 3));
+        this.readTimeoutSeconds = Math.max(1, source.getInt("core.read-timeout-seconds", legacyTimeout));
+        this.retryMaxAttempts = source.getInt("core.retry.max-attempts", 3);
+        this.retryBaseDelayMs = source.getLong("core.retry.base-delay-ms", 500L);
         this.pollIntervalMinutes = source.getInt("sync.poll-interval-minutes", 5);
         this.cacheTtlMinutes = source.getInt("sync.cache-ttl-minutes", 10);
     }
@@ -37,8 +46,20 @@ public final class CoreConfig {
         return syncKey;
     }
 
-    public int getRequestTimeoutSeconds() {
-        return requestTimeoutSeconds;
+    public int getConnectTimeoutSeconds() {
+        return connectTimeoutSeconds;
+    }
+
+    public int getReadTimeoutSeconds() {
+        return readTimeoutSeconds;
+    }
+
+    public int getRetryMaxAttempts() {
+        return retryMaxAttempts;
+    }
+
+    public long getRetryBaseDelayMs() {
+        return retryBaseDelayMs;
     }
 
     public int getPollIntervalMinutes() {

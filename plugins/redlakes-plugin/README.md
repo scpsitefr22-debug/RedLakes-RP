@@ -7,7 +7,7 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 ## État actuel
 
 ### Phase 1 (fondation) — ✅ complète, vérifiée en direct sur le vrai serveur
-- `core/CoreClient` — client HTTP (bloquant, à appeler uniquement hors du thread principal)
+- `core/CoreClient` — client HTTP (bloquant, à appeler uniquement hors du thread principal), délais de connexion et de lecture séparés, nouvelles tentatives bornées avec backoff (`core/RetryPolicy`) sur erreur réseau / 5xx / 408 / 429 uniquement, jamais sur un autre 4xx ; une seule tentative quand le CORE est déjà OFFLINE
 - `core/CoreConfig` — lecture de `config.yml`
 - `core/ConnectionManager` + `ConnectionState` — heartbeat ONLINE/DEGRADED/OFFLINE (3 échecs consécutifs → OFFLINE)
 - `player/SessionCache` — cache mémoire TTL, jamais une seconde source de vérité
@@ -18,11 +18,12 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 
 ### Phase 2 (identité) — ✅ complète
 - Résolution User/Character/Faction/Département/Équipe/Grade/permissions (déjà exposée par l'endpoint Phase 1)
-- `player/SessionChange` — vraie détection GradeChanged/FactionChanged (§12-13) : compare l'ancienne et la nouvelle session, ne notifie que sur un vrai changement (jamais à chaque poll silencieux)
+- `player/SessionChange` — vraie détection CharacterChanged / CharacterLost / GradeChanged / FactionChanged / DepartmentChanged / TeamChanged (§10, §12-13) par identifiants CORE : compare l'ancienne et la nouvelle session, ne notifie que sur un vrai changement (jamais à chaque poll silencieux). Un changement de personnage réapplique toute la présentation, rien ne subsiste du personnage précédent
+- `player/SyncResult` — distingue OK / NOT_LINKED (404 confirmé par le CORE : l'identité RP est retirée) / FAILED (panne : rien n'est modifié, le cache reste)
 - `Faction.showAffiliationTag` (§65) : le masquage d'identité civile est décidé côté CORE, plus par une comparaison de slug `"civil"` en dur dans le plugin
 
 ### Tests
-`src/test/java` (JUnit 5, `./gradlew test`) — 28 tests (`SessionChange`, `SessionCache`, `TagLabel`, `ChatIdentity`), purement Java, aucune dépendance Bukkit nécessaire.
+`src/test/java` (JUnit 5, `./gradlew test`) — 46 tests (`SessionChange`, `SessionCache`, `TagLabel`, `ChatIdentity`, `RetryPolicy`, `CoreClient` — ce dernier contre un vrai serveur HTTP local du JDK : 2xx, 4xx, 5xx, timeout, API éteinte), purement Java, aucune dépendance Bukkit nécessaire.
 
 ### Phase 3 (présentation) — partiellement complète, **pas encore vérifiée visuellement en jeu**
 - `presentation/PresentationManager` — nametag + tag tablist via scoreboard Team (couleur dérivée du `clearanceLevel`, texte dérivé du département/faction, tronqué à 4 lettres pour tenir dans la limite historique 16 caractères des Team 1.12.2). Aucun préfixe pour la faction "civil" (identité civile masquée, §19).
@@ -60,7 +61,11 @@ core:
   url: "https://api.redlakes.fr/api"
   server-id: "redlakes-main"
   sync-key: "votre-SYNC_API_KEY"      # même valeur que le bot Discord — voir apps/api SYNC_API_KEY
-  request-timeout-seconds: 8
+  connect-timeout-seconds: 3
+  read-timeout-seconds: 8          # défaut = ancienne clé request-timeout-seconds si présente
+  retry:
+    max-attempts: 3                # borné entre 1 et 5
+    base-delay-ms: 500             # doublé à chaque tentative, plafonné à 5 s
 sync:
   poll-interval-minutes: 5
   cache-ttl-minutes: 10
