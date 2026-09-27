@@ -13,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Canaux de chat contextuels (§18) — LOCAL/FACTION/DEPARTMENT/TEAM/OOC/STAFF.
+ * Canaux de chat contextuels (§18) — LOCAL/FACTION/DEPARTMENT/TEAM/OOC/STAFF, plus
+ * OP (participants d'une même opération active, §33-34).
  * Un seul executor enregistré sur plusieurs commandes (command.getName()
  * distingue le canal) — ne fait que filtrer les destinataires à partir de
  * la session déjà en cache, aucun appel réseau ici (§58-59).
@@ -60,6 +61,9 @@ public final class ChannelCommand implements CommandExecutor {
                 return true;
             case "staffchat":
                 sendStaff(player, message);
+                return true;
+            case "operation":
+                sendOperation(player, message);
                 return true;
             default:
                 return false;
@@ -127,6 +131,26 @@ public final class ChannelCommand implements CommandExecutor {
                 + ChatIdentity.rpName(session, player.getName()) + ChatColor.GRAY + ": " + ChatColor.WHITE;
         broadcastToMatching(message, header,
                 other -> other.team != null && session.team.id.equals(other.team.id));
+    }
+
+    /**
+     * Canal d'opération : uniquement les participants de la MÊME opération
+     * active, identifiés par leur fonction temporaire (jamais le grade).
+     */
+    private void sendOperation(Player player, String message) {
+        MinecraftSession session = requireSession(player);
+        if (session == null) {
+            return;
+        }
+        if (session.eventAssignment == null || session.eventAssignment.eventId == null) {
+            player.sendMessage(ChatColor.RED + "Tu n'es affecté à aucune opération en cours.");
+            return;
+        }
+        String eventId = session.eventAssignment.eventId;
+        String header = ChatColor.DARK_RED + "[OP · " + session.eventAssignment.roleLabel + "] " + ChatColor.WHITE
+                + ChatIdentity.rpName(session, player.getName()) + ChatColor.GRAY + ": " + ChatColor.WHITE;
+        broadcastToMatching(message, header,
+                other -> other.eventAssignment != null && eventId.equals(other.eventAssignment.eventId));
     }
 
     private void sendOoc(Player player, String message) {

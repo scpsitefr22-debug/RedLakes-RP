@@ -1,6 +1,7 @@
 package fr.redlakes.mc.player;
 
 import fr.redlakes.mc.RedLakesPlugin;
+import fr.redlakes.mc.chat.OperationCard;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -82,8 +83,19 @@ public final class PlayerConnectionListener implements Listener {
         }
         if (change.characterChanged) {
             plugin.getLogger().info(name + " — CharacterChanged: " + rpName(previous) + " -> " + rpName(session));
-            return;
+        } else {
+            logIdentityChanges(name, previous, session, change);
         }
+        if (change.eventAssigned) {
+            plugin.getLogger().info(name + " — EventAssigned: " + session.eventAssignment.eventTitle
+                    + " / " + session.eventAssignment.roleLabel);
+        }
+        if (change.eventEnded) {
+            plugin.getLogger().info(name + " — EventEnded: " + previous.eventAssignment.eventTitle);
+        }
+    }
+
+    private void logIdentityChanges(String name, MinecraftSession previous, MinecraftSession session, SessionChange change) {
         if (change.gradeChanged) {
             plugin.getLogger().info(name + " — GradeChanged: "
                     + (previous.grade != null ? previous.grade.name : "?") + " -> " + session.grade.name);
@@ -111,19 +123,28 @@ public final class PlayerConnectionListener implements Listener {
                 player.sendMessage(prefix + "Personnage actif : " + ChatColor.YELLOW + rpName(session));
             }
             player.sendMessage(prefix + session.grade.name + ChatColor.GRAY + " — " + ChatColor.WHITE + session.faction.name);
-            return;
+        } else {
+            if (change.gradeChanged) {
+                player.sendMessage(prefix + "Votre grade a été mis à jour : " + ChatColor.YELLOW + session.grade.name);
+            }
+            if (change.factionChanged) {
+                player.sendMessage(prefix + "Votre faction a été mise à jour : " + ChatColor.YELLOW + session.faction.name);
+            }
+            if (change.departmentChanged) {
+                player.sendMessage(prefix + "Votre département a été mis à jour : " + ChatColor.YELLOW + departmentName(session));
+            }
+            if (change.teamChanged) {
+                player.sendMessage(prefix + "Votre équipe a été mise à jour : " + ChatColor.YELLOW + teamName(session));
+            }
         }
-        if (change.gradeChanged) {
-            player.sendMessage(prefix + "Votre grade a été mis à jour : " + ChatColor.YELLOW + session.grade.name);
-        }
-        if (change.factionChanged) {
-            player.sendMessage(prefix + "Votre faction a été mise à jour : " + ChatColor.YELLOW + session.faction.name);
-        }
-        if (change.departmentChanged) {
-            player.sendMessage(prefix + "Votre département a été mis à jour : " + ChatColor.YELLOW + departmentName(session));
-        }
-        if (change.teamChanged) {
-            player.sendMessage(prefix + "Votre équipe a été mise à jour : " + ChatColor.YELLOW + teamName(session));
+
+        // Opération : la carte d'affectation passe après l'identité permanente,
+        // qui reste inchangée pendant toute l'opération.
+        if (change.eventAssigned && session.eventAssignment != null) {
+            OperationCard.send(player, session.eventAssignment);
+        } else if (change.eventEnded) {
+            player.sendMessage(ChatColor.DARK_RED + "[OPÉRATION] " + ChatColor.WHITE
+                    + "Affectation levée. Reprenez votre poste habituel.");
         }
     }
 

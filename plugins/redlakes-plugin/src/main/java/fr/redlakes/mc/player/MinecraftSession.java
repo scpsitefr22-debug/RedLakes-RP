@@ -22,6 +22,8 @@ public final class MinecraftSession {
     public Team team;
     public List<Sanction> activeSanctions;
     public List<Mission> missions;
+    /** Affectation temporaire d'opération (RpEvent ACTIVE), null hors opération. */
+    public EventAssignment eventAssignment;
     public String roleUpdatedAt;
 
     public static final class Grade {
@@ -67,5 +69,18 @@ public final class MinecraftSession {
         public String reward;
         public String dueAt;
         public boolean isTeamMission;
+    }
+
+    public static final class EventAssignment {
+        public String id;
+        public String eventId;
+        public String eventTitle;
+        public String briefing;
+        public String startedAt;
+        public String roleLabel;
+        public Department department;
+        public String sector;
+        public String equipment;
+        public String instruction;
     }
 }

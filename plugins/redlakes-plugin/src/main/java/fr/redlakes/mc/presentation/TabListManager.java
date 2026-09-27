@@ -57,6 +57,12 @@ public final class TabListManager {
         if (session == null || !session.hasCharacter) {
             return ChatColor.DARK_GRAY + "Compte non lié au CORE";
         }
-        return ChatColor.GRAY + session.grade.name + ChatColor.DARK_GRAY + " — " + ChatColor.GRAY + session.faction.name;
+        String identity = ChatColor.GRAY + session.grade.name + ChatColor.DARK_GRAY + " — " + ChatColor.GRAY + session.faction.name;
+        if (session.eventAssignment == null) {
+            return identity;
+        }
+        // Ligne d'opération sous l'identité permanente, qui reste affichée.
+        return identity + "\n" + ChatColor.DARK_RED + "OPÉRATION " + ChatColor.WHITE + session.eventAssignment.eventTitle
+                + ChatColor.DARK_GRAY + " — " + ChatColor.RED + session.eventAssignment.roleLabel;
     }
 }

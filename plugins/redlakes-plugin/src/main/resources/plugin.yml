@@ -9,7 +9,7 @@ softdepend: [ProtocolLib]
 commands:
   rl:
     description: Commandes REDLAKES
-    usage: /rl <profil|missions|staff status>
+    usage: /rl <profil|missions|operation|sync|staff status|staff sync>
   local:
     description: Chat local (§18) — visible dans un rayon de 30 blocs
     usage: /local <message>
@@ -34,6 +34,11 @@ commands:
     usage: /staffchat <message>
     aliases: [sc]
     permission: redlakes.staff
+  # Jamais "op" : entrerait en conflit avec la commande vanilla /op (droits opérateur).
+  operation:
+    description: Canal d'opération — participants de la même opération active (§33-34)
+    usage: /operation <message>
+    aliases: [ops]
   whisper:
     description: Message privé à un joueur (§18)
     usage: /whisper <joueur> <message>

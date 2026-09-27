@@ -34,6 +34,8 @@ function notificationHref(n: PlatformNotification, isStaff: boolean): string {
       return isStaff ? "/staff" : "/dashboard";
     case "SCP_OBJECT":
       return isStaff && n.entityId ? `/staff/scp/${n.entityId}` : "/dashboard";
+    case "RP_EVENT":
+      return isStaff && n.entityId ? `/staff/operations/${n.entityId}` : "/dashboard";
     default:
       return "/intranet";
   }

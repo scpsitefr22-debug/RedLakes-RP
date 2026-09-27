@@ -31,6 +31,7 @@ import { SystemModule } from './system/system.module';
 import { CoreMessagesModule } from './core-messages/core-messages.module';
 import { CoreDmModule } from './core-dm/core-dm.module';
 import { IncidentReportsModule } from './incident-reports/incident-reports.module';
+import { RpEventsModule } from './rp-events/rp-events.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { IncidentReportsModule } from './incident-reports/incident-reports.modul
     CoreMessagesModule,
     CoreDmModule,
     IncidentReportsModule,
+    RpEventsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

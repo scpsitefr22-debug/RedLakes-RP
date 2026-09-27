@@ -23,6 +23,9 @@ dependencies {
     compileOnly(files("libs/ProtocolLib-4.8.0.jar"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    // Même version que celle embarquée par spigot-api 1.12.2 (compileOnly,
+    // donc absente du classpath de test) — pour lire les vraies réponses CORE.
+    testImplementation("com.google.code.gson:gson:2.8.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
 }
 

@@ -15,7 +15,8 @@ export type PlatformEntityType =
   | "USER"
   | "SCP_OBJECT"
   | "SYSTEM_STATE"
-  | "CORE_DM";
+  | "CORE_DM"
+  | "RP_EVENT";
 
 export type AuditAction =
   | "CREATED"

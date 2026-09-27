@@ -15,6 +15,7 @@ import {
   MissionStatus,
   PersonnelReportStatus,
   PlatformEntityType,
+  RpEventStatus,
   SanctionStatus,
   StaffRank,
   UserRole,
@@ -279,6 +280,23 @@ export class SyncService {
       orderBy: [{ dueAt: 'asc' }, { createdAt: 'desc' }],
     });
 
+    // Couche TEMPORAIRE d'opération (RpEvent ACTIVE uniquement) : disparaît
+    // d'elle-même de la réponse à la clôture, le grade permanent n'est
+    // jamais touché. Requête directe (pas RpEventsService) pour ne pas
+    // créer de cycle Auth → Sync → RpEvents → Auth.
+    const eventAssignment = await this.prisma.rpEventAssignment.findFirst({
+      where: {
+        playerId: character.id,
+        event: { status: RpEventStatus.ACTIVE },
+      },
+      include: {
+        event: {
+          select: { id: true, title: true, briefing: true, startedAt: true },
+        },
+        department: { select: { id: true, slug: true, name: true } },
+      },
+    });
+
     return {
       linked: true,
       hasCharacter: true,
@@ -329,6 +347,20 @@ export class SyncService {
         dueAt: mission.dueAt,
         isTeamMission: mission.assignedTeamId !== null,
       })),
+      eventAssignment: eventAssignment
+        ? {
+            id: eventAssignment.id,
+            eventId: eventAssignment.event.id,
+            eventTitle: eventAssignment.event.title,
+            briefing: eventAssignment.event.briefing,
+            startedAt: eventAssignment.event.startedAt,
+            roleLabel: eventAssignment.roleLabel,
+            department: eventAssignment.department,
+            sector: eventAssignment.sector,
+            equipment: eventAssignment.equipment,
+            instruction: eventAssignment.instruction,
+          }
+        : null,
       roleUpdatedAt: character.roleUpdatedAt,
     };
   }

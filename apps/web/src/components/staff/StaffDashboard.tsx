@@ -26,6 +26,7 @@ import {
   FileLock2,
   Scale,
   AlertTriangle,
+  Siren,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -45,6 +46,7 @@ const MANAGEMENT_LINKS = [
   { icon: UserCog, label: "Gestion des joueurs", caption: "Sanctions, affectations", href: "/staff/joueurs" },
   { icon: Scale, label: "Permissions dérivées du Grade", caption: "Outil de preuve, lecture seule", href: "/staff/permissions" },
   { icon: Target, label: "Missions", caption: "Objectifs joueurs et équipes", href: "/staff/missions" },
+  { icon: Siren, label: "Opérations en direct", caption: "Affectations temporaires en jeu", href: "/staff/operations" },
   { icon: FlaskConical, label: "Gestion du wiki SCP", caption: "Objets, classes, incidents", href: "/staff/scp" },
   { icon: User, label: "Gestion des personnages", caption: "Fiches narratives", href: "/staff/personnages" },
   { icon: Zap, label: "Gestion des événements", caption: "Brèches, invasions, crises", href: "/staff/evenements" },

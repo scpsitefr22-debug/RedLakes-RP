@@ -62,7 +62,7 @@ public final class RedLakesPlugin extends JavaPlugin {
         getCommand("rl").setExecutor(new RlCommand(this));
 
         ChannelCommand channelCommand = new ChannelCommand(this);
-        for (String channel : new String[] {"local", "faction", "department", "team", "ooc", "staffchat"}) {
+        for (String channel : new String[] {"local", "faction", "department", "team", "ooc", "staffchat", "operation"}) {
             getCommand(channel).setExecutor(channelCommand);
         }
         getCommand("whisper").setExecutor(new WhisperCommand(this));
@@ -78,6 +78,20 @@ public final class RedLakesPlugin extends JavaPlugin {
         for (Player player : Bukkit.getOnlinePlayers()) {
             playerConnectionListener.syncPlayer(player);
         }
+    }
+
+    /**
+     * Resynchronisation immédiate de tous les joueurs (/rl staff sync), hors
+     * thread principal — utile au lancement ou à la clôture d'une opération
+     * sans attendre le prochain poll.
+     */
+    public void refreshOnlinePlayersAsync() {
+        Bukkit.getScheduler().runTaskAsynchronously(this, this::refreshOnlinePlayers);
+    }
+
+    /** Resynchronisation immédiate d'un seul joueur (/rl sync). */
+    public void refreshPlayerAsync(Player player) {
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> playerConnectionListener.syncPlayer(player));
     }
 
     public CoreConfig getCoreConfig() {

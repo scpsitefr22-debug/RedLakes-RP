@@ -1,6 +1,7 @@
 package fr.redlakes.mc.commands;
 
 import fr.redlakes.mc.RedLakesPlugin;
+import fr.redlakes.mc.chat.OperationCard;
 import fr.redlakes.mc.core.ConnectionState;
 import fr.redlakes.mc.player.MinecraftSession;
 import org.bukkit.ChatColor;
@@ -9,13 +10,22 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * Dispatcher racine /rl. Ne contient que le strict Phase 1 : lecture du
- * profil déjà en cache (aucune écriture RP ici) et diagnostic staff.
+ * Dispatcher racine /rl : lecture du profil, des missions et de
+ * l'affectation d'opération déjà en cache (aucune écriture RP ici),
+ * resynchronisation à la demande et diagnostic staff.
  */
 public final class RlCommand implements CommandExecutor {
 
+    /** Anti-spam de /rl sync : chaque appel coûte une requête CORE. */
+    private static final long SYNC_COOLDOWN_MS = 10_000L;
+
     private final RedLakesPlugin plugin;
+    private final Map<UUID, Long> lastSyncRequest = new ConcurrentHashMap<>();
 
     public RlCommand(RedLakesPlugin plugin) {
         this.plugin = plugin;
@@ -29,10 +39,16 @@ public final class RlCommand implements CommandExecutor {
         if (args.length >= 1 && args[0].equalsIgnoreCase("missions")) {
             return handleMissions(sender);
         }
+        if (args.length >= 1 && (args[0].equalsIgnoreCase("operation") || args[0].equalsIgnoreCase("op"))) {
+            return handleOperation(sender);
+        }
+        if (args.length >= 1 && args[0].equalsIgnoreCase("sync")) {
+            return handleSelfSync(sender);
+        }
         if (args.length >= 1 && args[0].equalsIgnoreCase("staff")) {
             return handleStaff(sender, args);
         }
-        sender.sendMessage(ChatColor.GRAY + "Usage: /rl <profil|missions|staff>");
+        sender.sendMessage(ChatColor.GRAY + "Usage: /rl <profil|missions|operation|sync|staff>");
         return true;
     }
 
@@ -44,7 +60,45 @@ public final class RlCommand implements CommandExecutor {
         if (args.length >= 2 && args[1].equalsIgnoreCase("status")) {
             return handleStaffStatus(sender);
         }
-        sender.sendMessage(ChatColor.GRAY + "Usage: /rl staff <status>");
+        if (args.length >= 2 && args[1].equalsIgnoreCase("sync")) {
+            plugin.refreshOnlinePlayersAsync();
+            sender.sendMessage(ChatColor.GREEN + "Resynchronisation CORE lancée pour tous les joueurs connectés.");
+            return true;
+        }
+        sender.sendMessage(ChatColor.GRAY + "Usage: /rl staff <status|sync>");
+        return true;
+    }
+
+    private boolean handleOperation(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Commande réservée aux joueurs.");
+            return true;
+        }
+        Player player = (Player) sender;
+        MinecraftSession session = plugin.getSessionCache().getStale(player.getUniqueId());
+        if (session == null || !session.hasCharacter || session.eventAssignment == null) {
+            sender.sendMessage(ChatColor.GRAY + "Aucune affectation d'opération en cours.");
+            return true;
+        }
+        OperationCard.send(player, session.eventAssignment);
+        return true;
+    }
+
+    private boolean handleSelfSync(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Commande réservée aux joueurs.");
+            return true;
+        }
+        Player player = (Player) sender;
+        long now = System.currentTimeMillis();
+        Long last = lastSyncRequest.get(player.getUniqueId());
+        if (last != null && now - last < SYNC_COOLDOWN_MS) {
+            sender.sendMessage(ChatColor.GRAY + "Patiente quelques secondes avant de resynchroniser.");
+            return true;
+        }
+        lastSyncRequest.put(player.getUniqueId(), now);
+        plugin.refreshPlayerAsync(player);
+        sender.sendMessage(ChatColor.GRAY + "Synchronisation avec le CORE en cours...");
         return true;
     }
 

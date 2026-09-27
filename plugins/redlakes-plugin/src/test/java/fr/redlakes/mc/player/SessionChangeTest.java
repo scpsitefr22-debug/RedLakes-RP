@@ -190,4 +190,56 @@ class SessionChangeTest {
         assertTrue(SessionChange.compare(withCharacterAndTeam("c1", null), withCharacterAndTeam("c1", "t1")).teamChanged);
         assertTrue(SessionChange.compare(withCharacterAndTeam("c1", "t1"), withCharacterAndTeam("c1", null)).teamChanged);
     }
+
+    private static MinecraftSession withAssignment(String assignmentId, String eventId) {
+        MinecraftSession s = withCharacterAndTeam("c1", null);
+        if (assignmentId != null) {
+            s.eventAssignment = new MinecraftSession.EventAssignment();
+            s.eventAssignment.id = assignmentId;
+            s.eventAssignment.eventId = eventId;
+            s.eventAssignment.eventTitle = "Opération Test";
+            s.eventAssignment.roleLabel = "Agent de sécurité";
+        }
+        return s;
+    }
+
+    @Test
+    void operationStartIsEventAssignedWithoutTouchingPermanentIdentity() {
+        SessionChange change = SessionChange.compare(withAssignment(null, null), withAssignment("a1", "e1"));
+        assertTrue(change.eventAssigned);
+        assertFalse(change.eventEnded);
+        assertFalse(change.gradeChanged);
+        assertFalse(change.factionChanged);
+        assertTrue(change.isRelevant());
+    }
+
+    @Test
+    void operationCloseIsEventEnded() {
+        SessionChange change = SessionChange.compare(withAssignment("a1", "e1"), withAssignment(null, null));
+        assertTrue(change.eventEnded);
+        assertFalse(change.eventAssigned);
+        assertTrue(change.isRelevant());
+    }
+
+    @Test
+    void sameAssignmentOnNextPollIsSilent() {
+        SessionChange change = SessionChange.compare(withAssignment("a1", "e1"), withAssignment("a1", "e1"));
+        assertFalse(change.eventAssigned);
+        assertFalse(change.eventEnded);
+        assertFalse(change.isRelevant());
+    }
+
+    @Test
+    void reassignmentProducesANewCardNotAnEnd() {
+        SessionChange change = SessionChange.compare(withAssignment("a1", "e1"), withAssignment("a2", "e2"));
+        assertTrue(change.eventAssigned);
+        assertFalse(change.eventEnded);
+    }
+
+    @Test
+    void joiningDuringAnActiveOperationShowsTheCard() {
+        SessionChange change = SessionChange.compare(null, withAssignment("a1", "e1"));
+        assertTrue(change.firstSync);
+        assertTrue(change.eventAssigned);
+    }
 }
