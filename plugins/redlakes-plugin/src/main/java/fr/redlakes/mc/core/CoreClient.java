@@ -3,6 +3,7 @@ package fr.redlakes.mc.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -73,6 +74,19 @@ public final class CoreClient {
      * rafraîchissement de tous les joueurs sur des pauses inutiles).
      */
     public Response get(String path, int maxAttempts) throws CoreClientException {
+        return request("GET", path, null, maxAttempts);
+    }
+
+    /**
+     * POST JSON. Retenté comme un GET : sans risque uniquement parce que
+     * chaque écriture envoyée par le plugin porte une clé d'idempotence
+     * (eventId) que le CORE déduplique — ne jamais appeler sans.
+     */
+    public Response postJson(String path, String jsonBody, int maxAttempts) throws CoreClientException {
+        return request("POST", path, jsonBody, maxAttempts);
+    }
+
+    private Response request(String method, String path, String jsonBody, int maxAttempts) throws CoreClientException {
         int attempts = Math.max(1, Math.min(maxAttempts, retryPolicy.getMaxAttempts()));
         IOException lastError = null;
         Response lastResponse = null;
@@ -82,7 +96,7 @@ public final class CoreClient {
                 break;
             }
             try {
-                lastResponse = send(path, attempt);
+                lastResponse = send(method, path, jsonBody, attempt);
                 lastError = null;
                 if (!RetryPolicy.isRetryableStatus(lastResponse.status)) {
                     return lastResponse;
@@ -105,16 +119,25 @@ public final class CoreClient {
         throw new CoreClientException("Requête CORE injoignable: " + path, lastError);
     }
 
-    private Response send(String path, int attempt) throws IOException {
+    private Response send(String method, String path, String jsonBody, int attempt) throws IOException {
         HttpURLConnection connection = null;
         try {
             URL url = new URL(apiUrl + path);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+            connection.setRequestMethod(method);
             connection.setConnectTimeout(connectTimeoutMs);
             connection.setReadTimeout(readTimeoutMs);
             connection.setRequestProperty("X-Redlakes-Sync-Key", syncKey);
             connection.setRequestProperty("Accept", "application/json");
+            if (jsonBody != null) {
+                byte[] bytes = jsonBody.getBytes(StandardCharsets.UTF_8);
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                connection.setFixedLengthStreamingMode(bytes.length);
+                try (OutputStream out = connection.getOutputStream()) {
+                    out.write(bytes);
+                }
+            }
 
             int status = connection.getResponseCode();
             InputStream stream = (status >= 200 && status < 300)

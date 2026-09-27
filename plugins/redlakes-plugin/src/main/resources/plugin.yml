@@ -39,6 +39,10 @@ commands:
     description: Canal d'opération — participants de la même opération active (§33-34)
     usage: /operation <message>
     aliases: [ops]
+  rapport:
+    description: Dépose un rapport personnel dans le CORE (§31) — mis en file si le CORE est indisponible
+    usage: /rapport <incident|autorisation|memo|equipement> <sujet> | <description>
+    aliases: [rap]
   whisper:
     description: Message privé à un joueur (§18)
     usage: /whisper <joueur> <message>

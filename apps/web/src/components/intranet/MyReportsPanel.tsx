@@ -26,6 +26,8 @@ export interface PersonnelReport {
   status: ReportStatus;
   clearance: number;
   staffNote?: string | null;
+  source?: string | null;
+  location?: string | null;
   createdAt: string;
 }
 
@@ -214,6 +216,11 @@ export function MyReportsPanel({ refreshKey = 0 }: MyReportsPanelProps) {
                 </span>
               </p>
               <h4 className="text-lg font-bold text-white">{selected.subject}</h4>
+              {selected.source === "MINECRAFT" && (
+                <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-terminal">
+                  Déposé en jeu{selected.location ? ` · ${selected.location}` : ""}
+                </p>
+              )}
             </div>
             <button
               type="button"

@@ -146,4 +146,29 @@ class CoreClientTest {
                 300, 300, new RetryPolicy(3, 10, 50), LOGGER);
         assertThrows(CoreClient.CoreClientException.class, () -> offline.get("/test"));
     }
+
+    @Test
+    void postSendsUtf8JsonWithTheSyncKeyAndIsRetriedOnServerError() throws Exception {
+        AtomicReference<String> body = new AtomicReference<>();
+        AtomicReference<String> contentType = new AtomicReference<>();
+        server.createContext("/api/post", exchange -> {
+            int i = hits.getAndIncrement();
+            receivedKey.set(exchange.getRequestHeaders().getFirst("X-Redlakes-Sync-Key"));
+            contentType.set(exchange.getRequestHeaders().getFirst("Content-Type"));
+            byte[] raw = new byte[4096];
+            int n = exchange.getRequestBody().read(raw);
+            body.set(new String(raw, 0, Math.max(n, 0), StandardCharsets.UTF_8));
+            int status = i == 0 ? 503 : 201;
+            exchange.sendResponseHeaders(status, -1);
+            exchange.close();
+        });
+        String json = "{\"eventId\":\"e1\",\"subject\":\"Fuite Bloc médical\"}";
+        CoreClient.Response response = client(3, 1000).postJson("/post", json, 3);
+
+        assertEquals(201, response.status);
+        assertEquals(2, hits.get());
+        assertEquals(json, body.get());
+        assertEquals("cle-test", receivedKey.get());
+        assertEquals("application/json; charset=utf-8", contentType.get());
+    }
 }

@@ -12,9 +12,16 @@ import fr.redlakes.mc.player.SessionCache;
 import fr.redlakes.mc.player.SessionSyncService;
 import fr.redlakes.mc.presentation.PresentationManager;
 import fr.redlakes.mc.presentation.TabListManager;
+import fr.redlakes.mc.queue.Outbox;
+import fr.redlakes.mc.queue.OutboxSender;
+import fr.redlakes.mc.reports.ReportCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
 
 /**
  * Couche d'exécution Minecraft du REDLAKES CORE. Le CORE décide, ce plugin
@@ -38,6 +45,13 @@ public final class RedLakesPlugin extends JavaPlugin {
     private PresentationManager presentationManager;
     private TabListManager tabListManager;
     private PlayerConnectionListener playerConnectionListener;
+    private Outbox outbox;
+    private OutboxSender outboxSender;
+
+    /** Au-delà, un nouveau rapport est refusé plutôt que d'accumuler sans fin pendant une longue panne. */
+    private static final int OUTBOX_MAX_ENTRIES = 500;
+    /** Passage de la file d'envoi : toutes les 60 s. */
+    private static final long OUTBOX_FLUSH_TICKS = 60L * 20L;
 
     @Override
     public void onEnable() {
@@ -66,6 +80,21 @@ public final class RedLakesPlugin extends JavaPlugin {
             getCommand(channel).setExecutor(channelCommand);
         }
         getCommand("whisper").setExecutor(new WhisperCommand(this));
+
+        outbox = new Outbox(new File(getDataFolder(), "outbox.json"), OUTBOX_MAX_ENTRIES);
+        try {
+            int pending = outbox.load();
+            if (pending > 0) {
+                getLogger().info(pending + " envoi(s) en attente repris de la session précédente.");
+            }
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "File d'envoi illisible — repart d'une file vide", e);
+        }
+        outboxSender = new OutboxSender(this, outbox, coreClient);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, outboxSender::flush, 200L, OUTBOX_FLUSH_TICKS);
+        ReportCommand reportCommand = new ReportCommand(this);
+        getCommand("rapport").setExecutor(reportCommand);
+        getCommand("rapport").setTabCompleter(reportCommand);
 
         long intervalTicks = coreConfig.getPollIntervalMinutes() * 60L * 20L;
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::refreshOnlinePlayers, intervalTicks, intervalTicks);
@@ -112,6 +141,14 @@ public final class RedLakesPlugin extends JavaPlugin {
 
     public PresentationManager getPresentationManager() {
         return presentationManager;
+    }
+
+    public Outbox getOutbox() {
+        return outbox;
+    }
+
+    public OutboxSender getOutboxSender() {
+        return outboxSender;
     }
 
     public TabListManager getTabListManager() {

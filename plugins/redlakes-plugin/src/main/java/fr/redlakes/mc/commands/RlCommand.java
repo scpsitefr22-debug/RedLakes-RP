@@ -169,6 +169,9 @@ public final class RlCommand implements CommandExecutor {
         sender.sendMessage(ChatColor.GRAY + "Dernière sync: " + ChatColor.WHITE + lastSync);
         sender.sendMessage(ChatColor.GRAY + "Échecs consécutifs: " + ChatColor.WHITE + plugin.getConnectionManager().getConsecutiveFailures());
         sender.sendMessage(ChatColor.GRAY + "Cache: " + ChatColor.WHITE + plugin.getSessionCache().size() + " joueur(s)");
+        int queued = plugin.getOutbox().size();
+        sender.sendMessage(ChatColor.GRAY + "File d'envoi: " + (queued == 0 ? ChatColor.WHITE : ChatColor.GOLD)
+                + queued + " en attente");
         return true;
     }
 }

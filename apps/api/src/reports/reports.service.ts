@@ -17,7 +17,10 @@ import { clearanceForGrade } from '../players/grade-clearance';
 
 import { GradesService } from '../grades/grades.service';
 
-import { CreatePersonnelReportDto } from './dto/create-personnel-report.dto';
+import {
+  CreateMinecraftReportDto,
+  CreatePersonnelReportDto,
+} from './dto/create-personnel-report.dto';
 
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 
@@ -80,7 +83,64 @@ export class ReportsService {
     return { [field]: order };
   }
 
-  async create(userId: string, dto: CreatePersonnelReportDto) {
+  /**
+   * Rapport déposé depuis Minecraft (§31) : même chaîne que le site
+   * (classification par habilitation, notification du staff de la
+   * faction, relais Discord) + idempotence par `eventId` — un rapport
+   * rejoué par la file d'attente du plugin après une panne n'est jamais
+   * créé deux fois, le rapport existant est renvoyé tel quel.
+   */
+  async createFromMinecraft(
+    minecraftUuid: string,
+    dto: CreateMinecraftReportDto,
+  ) {
+    const existing = await this.prisma.personnelReport.findUnique({
+      where: { externalId: dto.eventId },
+      select: { id: true, subject: true, status: true },
+    });
+    if (existing) return { ...existing, duplicate: true };
+
+    const user = await this.prisma.user.findUnique({
+      where: { minecraftUuid },
+      select: { id: true },
+    });
+    if (!user)
+      throw new NotFoundException('Aucun compte lié à cet UUID Minecraft');
+
+    try {
+      const report = await this.create(user.id, dto, {
+        externalId: dto.eventId,
+        source: 'MINECRAFT',
+        location: dto.location?.trim() || null,
+      });
+      return {
+        id: report.id,
+        subject: report.subject,
+        status: report.status,
+        duplicate: false,
+      };
+    } catch (e) {
+      // Deux envois simultanés du même eventId : le second perd la course
+      // sur la contrainte unique — on renvoie le rapport déjà créé.
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        const again = await this.prisma.personnelReport.findUnique({
+          where: { externalId: dto.eventId },
+          select: { id: true, subject: true, status: true },
+        });
+        if (again) return { ...again, duplicate: true };
+      }
+      throw e;
+    }
+  }
+
+  async create(
+    userId: string,
+    dto: CreatePersonnelReportDto,
+    origin?: { externalId: string; source: string; location: string | null },
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
 
@@ -119,6 +179,12 @@ export class ReportsService {
         clearance,
 
         factionId: user.activeCharacter.factionId,
+
+        externalId: origin?.externalId,
+
+        source: origin?.source,
+
+        location: origin?.location,
       },
 
       include: {
@@ -147,7 +213,11 @@ export class ReportsService {
 
       summary: `Rapport déposé : ${report.subject}`,
 
-      metadata: { type: report.type, clearance: report.clearance },
+      metadata: {
+        type: report.type,
+        clearance: report.clearance,
+        ...(origin ? { source: origin.source } : {}),
+      },
 
       clearance: report.clearance,
     });
@@ -250,7 +320,9 @@ export class ReportsService {
           user: {
             select: {
               minecraftUsername: true,
-              activeCharacter: { select: { rpFirstName: true, rpLastName: true, grade: true } },
+              activeCharacter: {
+                select: { rpFirstName: true, rpLastName: true, grade: true },
+              },
             },
           },
         },

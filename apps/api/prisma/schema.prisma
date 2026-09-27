@@ -424,6 +424,11 @@ model PersonnelReport {
   reviewedBy String?
   reviewedAt DateTime?
   factionId  String?
+  // Rapports déposés depuis Minecraft (§31) : clé d'idempotence générée par
+  // le plugin — un rapport rejoué après une panne n'est jamais créé deux fois.
+  externalId String?               @unique
+  source     String?
+  location   String?
   faction    Faction?              @relation(fields: [factionId], references: [id], onDelete: SetNull)
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @updatedAt

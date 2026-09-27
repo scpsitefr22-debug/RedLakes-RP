@@ -23,7 +23,7 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 - `Faction.showAffiliationTag` (§65) : le masquage d'identité civile est décidé côté CORE, plus par une comparaison de slug `"civil"` en dur dans le plugin
 
 ### Tests
-`src/test/java` (JUnit 5, `./gradlew test`) — 53 tests (`SessionChange`, `SessionCache`, `TagLabel`, `ChatIdentity`, `RetryPolicy`, `MinecraftSessionJson` — vraies réponses de l'API capturées —, `CoreClient` — ce dernier contre un vrai serveur HTTP local du JDK : 2xx, 4xx, 5xx, timeout, API éteinte), purement Java, aucune dépendance Bukkit nécessaire.
+`src/test/java` (JUnit 5, `./gradlew test`) — 68 tests (`Outbox`, `DeliveryOutcome`, `ReportRequest`, `SessionChange`, `SessionCache`, `TagLabel`, `ChatIdentity`, `RetryPolicy`, `MinecraftSessionJson` — vraies réponses de l'API capturées —, `CoreClient` — ce dernier contre un vrai serveur HTTP local du JDK : 2xx, 4xx, 5xx, timeout, API éteinte), purement Java, aucune dépendance Bukkit nécessaire.
 
 ### Phase 3 (présentation) — partiellement complète, **pas encore vérifiée visuellement en jeu**
 - `presentation/PresentationManager` — nametag + tag tablist via scoreboard Team (couleur dérivée du `clearanceLevel`, texte dérivé du département/faction, tronqué à 4 lettres pour tenir dans la limite historique 16 caractères des Team 1.12.2). Aucun préfixe pour la faction "civil" (identité civile masquée, §19).
@@ -43,6 +43,14 @@ Remplace à terme [`plugins/redlakes-sync`](../redlakes-sync) (Paper 1.21/Java 2
 - Canal `/operation <message>` (alias `/ops`) : participants de la même opération uniquement. **Jamais `/op`** (écraserait la commande vanilla d'opérateur).
 - `/rl operation` réaffiche sa carte ; `/rl sync` (anti-spam 10 s) resynchronise son personnage ; `/rl staff sync` resynchronise tous les joueurs connectés — à lancer juste après le lancement ou la clôture côté site, sinon l'effet arrive au prochain poll (5 min).
 - Non inclus volontairement : accès aux zones (pas de système de zones ; les portes sont gérées par les cartes SecurityCraft), équipement donné automatiquement, point de départ.
+
+### Phase 5 (interaction CORE) — Rapports depuis le jeu : livré, **pas encore vérifié en jeu**
+- `/rapport <incident|autorisation|memo|equipement> <sujet> | <description>` (alias `/rap`) — `reports/ReportCommand` + `reports/ReportRequest` (analyse pure, bornes identiques au DTO CORE, types insensibles aux accents). Position ajoutée par le serveur. Anti-spam 60 s.
+- Première écriture Minecraft → CORE : `POST /sync/minecraft/:uuid/reports`, même chaîne qu'un rapport déposé sur le site (classification, staff de la faction, Discord).
+- **File d'envoi persistante** (`queue/Outbox`, fichier `outbox.json` dans le dossier du plugin) : chaque rapport reçoit un `eventId` à la saisie, conservé jusqu'à l'acceptation ; le CORE déduplique, donc un renvoi après panne ou redémarrage ne crée jamais de doublon (§60-61). Écriture atomique, plafond 500 entrées, fichier illisible mis de côté (`.corrompu-…`) plutôt qu'effacé.
+- `queue/OutboxSender` : envoi immédiat puis passage toutes les 60 s, toujours asynchrone ; `queue/DeliveryOutcome` décide : 2xx → retiré ; 400/404 → refus définitif, retiré et joueur prévenu ; 401/408/429/5xx/réseau → gardé (une clé corrigée dans `config.yml` débloque la file).
+- `/rl staff status` affiche la taille de la file.
+- `CoreClient.postJson` : POST JSON UTF-8, mêmes retries que GET — sûr uniquement parce que chaque écriture porte une clé d'idempotence.
 
 ### Phase 6 (monde dynamique) — Missions : lecture seule branchée
 - L'endpoint `/sync/minecraft/:uuid` renvoie aussi `missions` (statut ASSIGNED, personnage ou équipe) — réutilise `MissionsService`-like logic côté CORE

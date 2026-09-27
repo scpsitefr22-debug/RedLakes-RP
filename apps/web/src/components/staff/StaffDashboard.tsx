@@ -74,6 +74,8 @@ interface PersonnelReport {
   content: string;
   status: string;
   createdAt: string;
+  source?: string | null;
+  location?: string | null;
   user: {
     minecraftUsername: string | null;
     discordUsername: string | null;
@@ -317,6 +319,11 @@ export function StaffDashboard() {
                     </button>
                   </div>
                   <p className="font-medium text-white">{r.subject}</p>
+                  {r.source === "MINECRAFT" && (
+                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-terminal">
+                      Déposé en jeu{r.location ? ` · ${r.location}` : ""}
+                    </p>
+                  )}
                   <DiscordMarkdown text={r.content} className="mt-1 text-sm text-gray-500" />
                   {expanded && (
                     <>
