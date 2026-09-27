@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Terminal } from "lucide-react";
 import { MessagerieView } from "@/components/messagerie/MessagerieView";
 
@@ -19,7 +20,11 @@ export default function MessageriePage() {
       </div>
 
       <div className="hologram-border rounded-lg p-6">
-        <MessagerieView />
+        {/* MessagerieView lit ?dm= (useSearchParams) : sans Suspense, le build
+            de production échoue sur cette page (prerender impossible). */}
+        <Suspense fallback={<p className="text-sm text-gray-500">Chargement de la messagerie...</p>}>
+          <MessagerieView />
+        </Suspense>
       </div>
     </div>
   );
