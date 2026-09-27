@@ -21,6 +21,7 @@ import {
   UserRole,
 } from '@prisma/client';
 import { GradesService } from '../grades/grades.service';
+import { reportLabelsForFaction } from '../reports/report-labels';
 import { FactionsService } from '../factions/factions.service';
 import { AuditService } from '../platform/audit.service';
 import { STAFF_RANK_ORDER } from '../auth/staff-rank-order';
@@ -321,6 +322,8 @@ export class SyncService {
         // libre) — mieux vaut un tag affiché par erreur qu'une identité
         // masquée par erreur pour un cas qu'on ne connaît pas.
         showAffiliationTag: character.factionInfo?.showAffiliationTag ?? true,
+        // Vocabulaire RP des rapports pour le formulaire en jeu (/rapport).
+        reportLabels: reportLabelsForFaction(character.factionInfo?.slug),
       },
       department: department
         ? { id: department.id, slug: department.slug, name: department.name }

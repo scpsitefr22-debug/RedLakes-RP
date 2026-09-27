@@ -1,6 +1,7 @@
 package fr.redlakes.mc.player;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Reflet exact de la réponse GET /sync/minecraft/:uuid côté CORE
@@ -40,6 +41,8 @@ public final class MinecraftSession {
         public String slug;
         public String name;
         public boolean showAffiliationTag;
+        /** Vocabulaire RP des types de rapport (INCIDENT → « Rapport d'intervention »...). */
+        public Map<String, String> reportLabels;
     }
 
     public static final class Department {

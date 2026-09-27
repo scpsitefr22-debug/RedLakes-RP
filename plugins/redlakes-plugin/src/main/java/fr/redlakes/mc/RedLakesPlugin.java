@@ -14,7 +14,10 @@ import fr.redlakes.mc.presentation.PresentationManager;
 import fr.redlakes.mc.presentation.TabListManager;
 import fr.redlakes.mc.queue.Outbox;
 import fr.redlakes.mc.queue.OutboxSender;
+import fr.redlakes.mc.reports.ReportBookListener;
 import fr.redlakes.mc.reports.ReportCommand;
+import fr.redlakes.mc.reports.ReportMenu;
+import fr.redlakes.mc.reports.ReportSubmitter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -92,7 +95,11 @@ public final class RedLakesPlugin extends JavaPlugin {
         }
         outboxSender = new OutboxSender(this, outbox, coreClient);
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, outboxSender::flush, 200L, OUTBOX_FLUSH_TICKS);
-        ReportCommand reportCommand = new ReportCommand(this);
+        ReportSubmitter reportSubmitter = new ReportSubmitter(this);
+        ReportMenu reportMenu = new ReportMenu(this);
+        Bukkit.getPluginManager().registerEvents(reportMenu, this);
+        Bukkit.getPluginManager().registerEvents(new ReportBookListener(this, reportSubmitter), this);
+        ReportCommand reportCommand = new ReportCommand(this, reportSubmitter, reportMenu);
         getCommand("rapport").setExecutor(reportCommand);
         getCommand("rapport").setTabCompleter(reportCommand);
 

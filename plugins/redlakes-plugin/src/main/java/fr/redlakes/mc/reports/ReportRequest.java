@@ -67,16 +67,24 @@ public final class ReportRequest {
         }
         String subject = rest.substring(0, bar).trim();
         String content = rest.substring(bar + 1).trim();
+        return of(type, subject, content);
+    }
+
+    /** Validation commune à la commande en une ligne et au formulaire papier. */
+    public static ReportRequest of(String coreType, String subject, String content) {
+        if (coreType == null || !TYPES.containsValue(coreType)) {
+            return invalid("Type de rapport inconnu.");
+        }
         if (subject.length() < SUBJECT_MIN || subject.length() > SUBJECT_MAX) {
             return invalid("Le sujet doit faire entre " + SUBJECT_MIN + " et " + SUBJECT_MAX + " caractères.");
         }
         if (content.length() < CONTENT_MIN || content.length() > CONTENT_MAX) {
             return invalid("La description doit faire entre " + CONTENT_MIN + " et " + CONTENT_MAX + " caractères.");
         }
-        return new ReportRequest(type, subject, content, null);
+        return new ReportRequest(coreType, subject, content, null);
     }
 
-    private static ReportRequest invalid(String error) {
+    static ReportRequest invalid(String error) {
         return new ReportRequest(null, null, null, error);
     }
 
