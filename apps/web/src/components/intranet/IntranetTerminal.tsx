@@ -24,7 +24,7 @@ import { MyReportsPanel } from "@/components/intranet/MyReportsPanel";
 import { MunicipalAdvisory } from "@/components/intranet/MunicipalAdvisory";
 import { FactionLog } from "@/components/intranet/FactionLog";
 import {
-  getAccessibleSections,
+  getAccessibleSectionsForAccount,
   SITE_SECTION_LABELS,
   type SiteSection,
 } from "@/lib/grade-access";
@@ -201,7 +201,7 @@ export function IntranetTerminal() {
   }
 
   const departmentName = player.gradeInfo?.departmentRef?.name ?? null;
-  const sections = getAccessibleSections(player.grade);
+  const sections = getAccessibleSectionsForAccount(player.grade, player.user.role);
   const rpName = [player.rpFirstName, player.rpLastName].filter(Boolean).join(" ");
   const factionSlug = player.factionInfo?.slug ?? null;
   const theme = getFactionTheme(factionSlug);
@@ -284,8 +284,9 @@ export function IntranetTerminal() {
             })}
           </div>
           <p className="mt-4 font-mono text-xs text-gray-600">
-            Ces accès reflètent votre grade in-game. Les transmissions Discord sont filtrées
-            selon votre habilitation réelle.
+            {player.user.role === "ADMIN"
+              ? "Compte Fondateur : toutes les sections sont ouvertes, quel que soit votre grade in-game."
+              : "Ces accès reflètent votre grade in-game. Les transmissions Discord sont filtrées selon votre habilitation réelle."}
           </p>
         </section>
       )}

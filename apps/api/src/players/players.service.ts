@@ -8,6 +8,7 @@ import { Grade, Faction, Team, User, UserRole, StaffRank, PlatformEntityType } f
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../platform/audit.service';
 import { clearanceForGrade } from './grade-clearance';
+import { ALL_DEPARTMENTS } from '../common/department-visibility';
 
 const MAX_CHARACTERS_PER_ACCOUNT = 5;
 
@@ -239,8 +240,11 @@ export class PlayersService {
   async getDepartmentId(userId: string): Promise<string | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { activeCharacterId: true },
+      select: { activeCharacterId: true, role: true },
     });
+    // Le compte Fondateur (ADMIN) voit le contenu de tous les départements,
+    // quel que soit le grade de son personnage — c'est un rôle, pas un grade RP.
+    if (user?.role === UserRole.ADMIN) return ALL_DEPARTMENTS;
     if (!user?.activeCharacterId) return null;
     const player = await this.prisma.player.findUnique({
       where: { id: user.activeCharacterId },
@@ -259,8 +263,9 @@ export class PlayersService {
   async getClearanceLevel(userId: string): Promise<number> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { activeCharacterId: true },
+      select: { activeCharacterId: true, role: true },
     });
+    if (user?.role === UserRole.ADMIN) return 5;
     if (!user?.activeCharacterId) return 1;
     const player = await this.prisma.player.findUnique({
       where: { id: user.activeCharacterId },

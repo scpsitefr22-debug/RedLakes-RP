@@ -1,10 +1,35 @@
 import {
+  ALL_DEPARTMENTS,
   filterByClearance,
   filterByDepartment,
   isVisibleToDepartment,
   meetsClearance,
   redactAddendums,
 } from './department-visibility';
+
+describe('ALL_DEPARTMENTS (compte Fondateur)', () => {
+  it('sees content restricted to any department', () => {
+    expect(isVisibleToDepartment(['dept-a', 'dept-b'], ALL_DEPARTMENTS)).toBe(true);
+  });
+
+  it('keeps every item when filtering', () => {
+    const items = [
+      { id: 1, restrictedDepartmentIds: [] },
+      { id: 2, restrictedDepartmentIds: ['dept-a'] },
+      { id: 3, restrictedDepartmentIds: ['dept-b'] },
+    ];
+    expect(filterByDepartment(items, ALL_DEPARTMENTS).map((i) => i.id)).toEqual([1, 2, 3]);
+  });
+
+  it('reveals restricted addendums', () => {
+    const scp = { addendums: [{ author: 'Dr. B', content: 'Secret', restrictedDepartmentIds: ['dept-a'] }] };
+    expect(redactAddendums(scp, ALL_DEPARTMENTS).addendums[0]).toHaveProperty('content', 'Secret');
+  });
+
+  it('is not a value a real department id could take', () => {
+    expect(isVisibleToDepartment(['dept-a'], 'dept-*')).toBe(false);
+  });
+});
 
 describe('isVisibleToDepartment', () => {
   it('treats an empty restriction list as public, even for an anonymous visitor', () => {

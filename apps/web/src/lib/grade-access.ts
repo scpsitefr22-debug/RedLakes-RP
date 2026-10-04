@@ -75,6 +75,15 @@ export function getAccessibleSections(grade: string | null | undefined): SiteSec
   return meta.siteSections as SiteSection[];
 }
 
+/** Le compte Fondateur (rôle ADMIN) voit toutes les sections, quel que soit le grade de son personnage. */
+export function getAccessibleSectionsForAccount(
+  grade: string | null | undefined,
+  role: string | null | undefined,
+): SiteSection[] {
+  if (role === "ADMIN") return Object.keys(SITE_SECTION_LABELS) as SiteSection[];
+  return getAccessibleSections(grade);
+}
+
 export function getGradesForBranch(branch: string): RpGradeMeta[] {
   return (rpGradesByBranch[branch as keyof typeof rpGradesByBranch] ?? []) as RpGradeMeta[];
 }

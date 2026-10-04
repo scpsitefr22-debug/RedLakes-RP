@@ -4,11 +4,18 @@
  * departement courant figure dans la liste. Remplace l'ancien systeme de
  * "clearance" numerique (1-5) — voir docs/REDLAKES-CORE-SPEC.md.
  */
+/**
+ * Portée « tous départements », réservée au compte Fondateur (rôle ADMIN) —
+ * voir PlayersService.getDepartmentId. Jamais un vrai identifiant de département.
+ */
+export const ALL_DEPARTMENTS = '*';
+
 export function isVisibleToDepartment(
   restrictedDepartmentIds: string[],
   departmentId: string | null,
 ): boolean {
   if (restrictedDepartmentIds.length === 0) return true;
+  if (departmentId === ALL_DEPARTMENTS) return true;
   return !!departmentId && restrictedDepartmentIds.includes(departmentId);
 }
 
