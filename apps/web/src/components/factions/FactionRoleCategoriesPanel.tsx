@@ -7,6 +7,7 @@ import {
 } from "@/data/faction-role-catalog";
 import { Badge } from "@/components/ui/Badge";
 import { CLEARANCE_LABELS } from "@/lib/clearance";
+import { missionsHeading } from "@/lib/grade-labels";
 import { Shield, Target, Globe } from "lucide-react";
 
 interface Props {
@@ -102,7 +103,7 @@ function RoleCard({
       {role.missions && role.missions.length > 0 && (
         <div className="mb-2">
           <p className="mb-1 flex items-center gap-1 font-mono text-xs text-redlake-glow">
-            <Target className="h-3 w-3" /> Missions
+            <Target className="h-3 w-3" /> {missionsHeading(role.missions)}
           </p>
           <ul className="space-y-1 text-xs text-gray-500">
             {role.missions.map((m) => (

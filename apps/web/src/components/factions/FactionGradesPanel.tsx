@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { rpGrades, type RpBranch, type RpGradeMeta } from "@/data/rp-grades";
 import { Badge } from "@/components/ui/Badge";
 import { CLEARANCE_LABELS } from "@/lib/clearance";
+import { missionsHeading } from "@/lib/grade-labels";
 import { Lock, Shield, Target, Users } from "lucide-react";
 
 const BRANCH_LABELS: Record<RpBranch, string> = {
@@ -123,7 +124,8 @@ export function FactionGradesPanel({ playerGrade }: Props) {
               {grade.objectives.length > 0 && (
                 <div className="mb-2">
                   <p className="mb-1 flex items-center gap-1 font-mono text-xs text-redlake-glow">
-                    <Target className="h-3 w-3" /> Missions
+                    <Target className="h-3 w-3" />{" "}
+                    {missionsHeading(grade.objectives)}
                   </p>
                   <ul className="space-y-1 text-xs text-gray-500">
                     {grade.objectives.slice(0, 5).map((o) => (

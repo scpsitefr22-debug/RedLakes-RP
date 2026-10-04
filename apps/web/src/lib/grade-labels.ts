@@ -51,6 +51,18 @@ export const TIER_LABELS: Record<string, string> = {
   class: "Classe",
 };
 
+const INFINITIVE = /^\p{L}+(er|ir|re)$/u;
+
+/**
+ * Intitulé d'une liste de « missions » : de vrais verbes d'action (Décider,
+ * Diriger, Auditer…) restent des « Missions » ; dans le tableau d'origine la
+ * même colonne liste aussi, pour d'autres grades, les postes encadrés
+ * (« Technicien », « Directeur Maintenance »…) qu'on n'affiche pas comme des missions.
+ */
+export function missionsHeading(items: string[]): "Missions" | "Postes associés" {
+  return items.every((item) => INFINITIVE.test(item.trim())) ? "Missions" : "Postes associés";
+}
+
 const ACCESS_ZONE_MAP = new Map<string, { label: string; description: string }>(
   accessZones.map((z) => [z.id, z]),
 );
