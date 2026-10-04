@@ -8,11 +8,14 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { StaffRank, UserRole } from '@prisma/client';
+import type { Request } from 'express';
 import { GradesService } from './grades.service';
 import { CreateGradeDto, UpdateGradeDto } from './dto/grade.dto';
+import { UpdateGradeAccessDto } from './dto/grade-access.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -49,6 +52,20 @@ export class GradesController {
   @MinRank(StaffRank.COORDINATEUR_GENERAL)
   create(@Body() dto: CreateGradeDto) {
     return this.grades.create(dto);
+  }
+
+  /** Grille des accès : plusieurs grades d'un coup. Déclaré avant `:id`. */
+  @Patch('access')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
+  updateAccess(
+    @Req() req: Request & { user: { id: string; minecraftUsername?: string; discordUsername?: string; username?: string } },
+    @Body() dto: UpdateGradeAccessDto,
+  ) {
+    const actorLabel =
+      req.user.discordUsername ?? req.user.minecraftUsername ?? req.user.username ?? 'Staff';
+    return this.grades.updateAccess(dto.changes, { id: req.user.id, label: actorLabel });
   }
 
   @Patch(':id')

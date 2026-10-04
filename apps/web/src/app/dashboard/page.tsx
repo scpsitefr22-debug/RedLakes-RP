@@ -22,6 +22,7 @@ import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
 import { siteConfig } from "@/config/site";
 import { findGradeMeta } from "@/data/rp-grades";
 import { SITE_SECTION_LABELS, type SiteSection } from "@/lib/grade-access";
+import { getAccessZoneLabel } from "@/lib/grade-labels";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { JargonTooltip } from "@/components/ui/JargonTooltip";
 import { CareerTimeline } from "@/components/dashboard/CareerTimeline";
@@ -31,6 +32,12 @@ import { getFactionTheme } from "@/lib/faction-theme";
 
 interface PlayerData {
   grade: string;
+  /** Grade en base : ses accès sont réglés dans la grille staff et priment sur le catalogue figé. */
+  gradeInfo?: {
+    description: string | null;
+    siteSections: string[];
+    accessZones: string[];
+  } | null;
   faction: string;
   factionInfo?: { slug: string } | null;
   teamName?: string | null;
@@ -338,11 +345,10 @@ export default function DashboardPage() {
             )}
 
             {(() => {
-              const meta = findGradeMeta(player.grade);
-              if (!meta) return null;
-              return (
-                <p className="mt-2 text-xs text-gray-500">{meta.description}</p>
-              );
+              const description =
+                player.gradeInfo?.description ?? findGradeMeta(player.grade)?.description;
+              if (!description) return null;
+              return <p className="mt-2 text-xs text-gray-500">{description}</p>;
             })()}
 
             <div className="mt-4 flex flex-wrap items-center gap-4">
@@ -370,7 +376,7 @@ export default function DashboardPage() {
       />
 
       {(() => {
-        const meta = findGradeMeta(player.grade);
+        const meta = player.gradeInfo ?? findGradeMeta(player.grade);
         if (!meta?.siteSections.length) return null;
         return (
           <section className="mb-8 panel-flat rounded-lg p-6">
@@ -387,7 +393,7 @@ export default function DashboardPage() {
             </div>
             {meta.accessZones.length > 0 && (
               <p className="mt-4 font-mono text-xs text-gray-600">
-                Zones in-game : {meta.accessZones.join(", ").toUpperCase()}
+                Zones du site : {meta.accessZones.map(getAccessZoneLabel).join(", ")}
               </p>
             )}
           </section>

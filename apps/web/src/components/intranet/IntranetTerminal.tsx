@@ -37,7 +37,7 @@ interface PlayerProfile {
   grade: string;
   faction: string;
   factionInfo?: { slug: string; name: string; color: string | null } | null;
-  gradeInfo?: { departmentRef?: { name: string } | null } | null;
+  gradeInfo?: { siteSections?: string[]; departmentRef?: { name: string } | null } | null;
   rpFirstName?: string | null;
   rpLastName?: string | null;
   user: { minecraftUsername: string; role: string };
@@ -201,7 +201,11 @@ export function IntranetTerminal() {
   }
 
   const departmentName = player.gradeInfo?.departmentRef?.name ?? null;
-  const sections = getAccessibleSectionsForAccount(player.grade, player.user.role);
+  const sections = getAccessibleSectionsForAccount(
+    player.grade,
+    player.user.role,
+    player.gradeInfo?.siteSections,
+  );
   const rpName = [player.rpFirstName, player.rpLastName].filter(Boolean).join(" ");
   const factionSlug = player.factionInfo?.slug ?? null;
   const theme = getFactionTheme(factionSlug);

@@ -1,23 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import {
-  getFactionRoleCategories,
-  type FactionRoleEntry,
-} from "@/data/faction-role-catalog";
+import { useState } from "react";
+import { type FactionRoleCategory, type FactionRoleEntry } from "@/data/faction-role-catalog";
 import { Badge } from "@/components/ui/Badge";
 import { CLEARANCE_LABELS } from "@/lib/clearance";
 import { missionsHeading } from "@/lib/grade-labels";
 import { Shield, Target, Globe } from "lucide-react";
 
 interface Props {
-  factionId: string;
+  /** Construites côté serveur, avec les valeurs en base (grille des accès) pour la Fondation. */
+  categories: FactionRoleCategory[];
   /** Couleur d'accent de la faction (thème API) — repli sur la couleur de catégorie si absente. */
   accentColor?: string;
 }
 
-export function FactionRoleCategoriesPanel({ factionId, accentColor }: Props) {
-  const categories = useMemo(() => getFactionRoleCategories(factionId), [factionId]);
+export function FactionRoleCategoriesPanel({ categories, accentColor }: Props) {
   const [activeId, setActiveId] = useState(categories[0]?.id ?? "");
 
   if (!categories.length) {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
-import { Plus, Shield } from "lucide-react";
+import { LayoutGrid, Plus, Shield } from "lucide-react";
 import { BRANCH_LABELS } from "@/lib/grade-labels";
 
 interface StaffGrade {
@@ -47,12 +47,20 @@ export default function StaffGradesPage() {
             Créez, modifiez et supprimez les grades du catalogue public.
           </p>
         </div>
-        <Link
-          href="/staff/grades/nouveau"
-          className="flex items-center gap-2 rounded border border-redlake bg-redlake/20 px-4 py-2 font-mono text-sm text-white hover:bg-redlake/30"
-        >
-          <Plus className="h-4 w-4" /> Nouveau grade
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/staff/grades/acces"
+            className="flex items-center gap-2 rounded border border-redlake bg-redlake/20 px-4 py-2 font-mono text-sm text-white hover:bg-redlake/30"
+          >
+            <LayoutGrid className="h-4 w-4" /> Accès par grade
+          </Link>
+          <Link
+            href="/staff/grades/nouveau"
+            className="flex items-center gap-2 rounded border border-metal px-4 py-2 font-mono text-sm text-gray-300 hover:border-redlake hover:text-white"
+          >
+            <Plus className="h-4 w-4" /> Nouveau grade
+          </Link>
+        </div>
       </div>
 
       {error && (

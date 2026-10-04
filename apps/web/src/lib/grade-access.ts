@@ -75,12 +75,22 @@ export function getAccessibleSections(grade: string | null | undefined): SiteSec
   return meta.siteSections as SiteSection[];
 }
 
-/** Le compte Fondateur (rôle ADMIN) voit toutes les sections, quel que soit le grade de son personnage. */
+function isSiteSection(value: string): value is SiteSection {
+  return value in SITE_SECTION_LABELS;
+}
+
+/**
+ * Le compte Fondateur (rôle ADMIN) voit toutes les sections, quel que soit le grade de son personnage.
+ * `liveSections` = sections du grade en base, réglées dans la grille des accès (/staff/grades/acces) :
+ * elles priment sur le catalogue figé, qui ne sert plus que de repli (grade hors base).
+ */
 export function getAccessibleSectionsForAccount(
   grade: string | null | undefined,
   role: string | null | undefined,
+  liveSections?: string[] | null,
 ): SiteSection[] {
   if (role === "ADMIN") return Object.keys(SITE_SECTION_LABELS) as SiteSection[];
+  if (liveSections) return liveSections.filter(isSiteSection);
   return getAccessibleSections(grade);
 }
 

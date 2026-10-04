@@ -7,19 +7,10 @@ export async function seedGrades() {
   for (const grade of rpGrades) {
     await prisma.grade.upsert({
       where: { slug: grade.id },
-      update: {
-        name: grade.name,
-        branch: grade.branch,
-        tier: grade.tier,
-        departmentId: grade.departmentId,
-        pay: grade.pay,
-        quota: grade.quota,
-        description: grade.description,
-        objectives: grade.objectives,
-        utilities: grade.utilities,
-        accessZones: grade.accessZones,
-        siteSections: grade.siteSections,
-      },
+      // Grade deja en base : on n'y touche pas. Ses acces, salaire et
+      // habilitation se reglent dans la grille du site (/staff/grades/acces) ;
+      // relancer le seed ne doit jamais ecraser ces reglages.
+      update: {},
       create: {
         slug: grade.id,
         name: grade.name,

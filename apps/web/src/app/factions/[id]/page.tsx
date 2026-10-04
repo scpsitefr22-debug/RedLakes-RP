@@ -12,7 +12,7 @@ import {
 } from "@/lib/faction-api";
 import type { ClassifiedDocumentSummary } from "@/lib/classified-documents-api";
 import { getFactionTheme } from "@/lib/faction-themes";
-import { getFactionRoleCategories } from "@/data/faction-role-catalog";
+import { getFactionRoleCategories, type LiveGradeValues } from "@/data/faction-role-catalog";
 import { API_URL } from "@/lib/api";
 import { FactionThemeScope } from "@/components/factions/FactionThemeScope";
 import { FactionHero } from "@/components/factions/FactionHero";
@@ -58,6 +58,17 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
  * standard, sans cookie) ne montrerait jamais les evenements reserves aux
  * membres habilites de la faction elle-meme.
  */
+/** Grades en base : salaires, habilitations et accès tels que réglés par le staff. */
+async function getLiveGrades(): Promise<LiveGradeValues[]> {
+  try {
+    const res = await fetch(`${API_URL}/grades`, { cache: "no-store" });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
 async function getFactionEvents(slug: string): Promise<FactionEvent[]> {
   const cookieStore = await cookies();
   const token = cookieStore.get("redlakes_token")?.value;
@@ -136,15 +147,16 @@ export default async function FactionDetailPage({ params }: Props) {
 
   const theme = getFactionTheme(faction.slug);
   const { icon: Icon, ...heroTheme } = theme;
-  const roleCategories = getFactionRoleCategories(faction.slug);
-  const totalRoles = roleCategories.reduce((n, c) => n + c.roles.length, 0);
-  const [relations, members, allDocuments, events, scpObjects] = await Promise.all([
+  const [relations, members, allDocuments, events, scpObjects, liveGrades] = await Promise.all([
     getFactionRelations(faction.id),
     getFactionMembers(faction.slug),
     getFactionDocuments(),
     getFactionEvents(faction.slug),
     getFactionScpObjects(faction.slug),
+    faction.slug === "fondation" ? getLiveGrades() : Promise.resolve([]),
   ]);
+  const roleCategories = getFactionRoleCategories(faction.slug, liveGrades);
+  const totalRoles = roleCategories.reduce((n, c) => n + c.roles.length, 0);
   const documents = allDocuments.filter((d) => d.faction?.slug === faction.slug);
   const allyCount = relations.filter((r) => r.status === "ALLIE").length;
   const hostileCount = relations.filter((r) => r.status === "HOSTILE").length;
@@ -212,7 +224,7 @@ export default async function FactionDetailPage({ params }: Props) {
                   ? "Organisations illégales créées librement par les joueurs (gang, mafia, MC, cartel…). Pas de rôles fixes à prendre."
                   : "Hiérarchie et rôles de cette faction, avec missions et accès site."}
             </p>
-            <FactionRoleCategoriesPanel factionId={faction.slug} accentColor={theme.colors.primary} />
+            <FactionRoleCategoriesPanel categories={roleCategories} accentColor={theme.colors.primary} />
           </section>
         )}
 

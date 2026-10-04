@@ -90,9 +90,62 @@ const SITE_LABELS: Record<string, string> = {
   "transmissions-classified": "Transmissions classifiées",
 };
 
-function buildFondationCategories(): FactionRoleCategory[] {
-  const byBranch = new Map<RpBranch, typeof rpGrades>();
-  for (const g of rpGrades) {
+/** Valeurs d'un grade en base, réglées par le staff (grille des accès, fiche du grade). */
+export interface LiveGradeValues {
+  slug: string;
+  name: string;
+  branch: string;
+  description: string | null;
+  objectives: string[];
+  clearanceLevel: number;
+  siteSections: string[];
+  pay: number | null;
+  quota: number | null;
+}
+
+interface RoleSource {
+  name: string;
+  branch: string;
+  description: string;
+  objectives: string[];
+  clearance: 1 | 2 | 3 | 4 | 5;
+  siteSections: string[];
+  pay: number | null;
+  quota: number | null;
+}
+
+function fromLive(g: LiveGradeValues): RoleSource {
+  return {
+    name: g.name,
+    branch: g.branch,
+    description: g.description ?? "",
+    objectives: g.objectives,
+    clearance: Math.min(5, Math.max(1, Math.round(g.clearanceLevel))) as RoleSource["clearance"],
+    siteSections: g.siteSections,
+    pay: g.pay,
+    quota: g.quota,
+  };
+}
+
+/**
+ * Grades Fondation à afficher : la base prime (ce que le staff a réglé),
+ * le catalogue figé ne sert que si l'API n'a rien renvoyé pour ce grade.
+ */
+function fondationRoleSources(live: LiveGradeValues[]): RoleSource[] {
+  const liveBySlug = new Map(live.map((g) => [g.slug, g]));
+  const staticSlugs = new Set(rpGrades.map((g) => g.id));
+  return [
+    ...rpGrades.map((g) => {
+      const fromDb = liveBySlug.get(g.id);
+      return fromDb ? fromLive(fromDb) : g;
+    }),
+    ...live.filter((g) => !staticSlugs.has(g.slug)).map(fromLive),
+  ];
+}
+
+function buildFondationCategories(live: LiveGradeValues[] = []): FactionRoleCategory[] {
+  const byBranch = new Map<string, RoleSource[]>();
+  for (const g of fondationRoleSources(live)) {
     if (isHonoraryGradeName(g.name)) continue;
     const list = byBranch.get(g.branch) ?? [];
     list.push(g);
@@ -683,14 +736,19 @@ const STATIC_CATALOG: Record<string, FactionRoleCategory[]> = {
   ],
 };
 
-export function getFactionRoleCategories(factionId: string): FactionRoleCategory[] {
-  if (factionId === "fondation") return buildFondationCategories();
+export function getFactionRoleCategories(
+  factionId: string,
+  liveGrades: LiveGradeValues[] = [],
+): FactionRoleCategory[] {
+  if (factionId === "fondation") return buildFondationCategories(liveGrades);
   return STATIC_CATALOG[factionId] ?? [];
 }
 
-export function getAllFactionRoleCategories(): Record<string, FactionRoleCategory[]> {
+export function getAllFactionRoleCategories(
+  liveGrades: LiveGradeValues[] = [],
+): Record<string, FactionRoleCategory[]> {
   const out: Record<string, FactionRoleCategory[]> = {
-    fondation: buildFondationCategories(),
+    fondation: buildFondationCategories(liveGrades),
   };
   for (const [id, cats] of Object.entries(STATIC_CATALOG)) {
     out[id] = cats;

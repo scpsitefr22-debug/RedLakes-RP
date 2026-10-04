@@ -38,7 +38,8 @@ export default async function JoueurProfilePage({
   if (!player) notFound();
 
   const rpName = [player.rpFirstName, player.rpLastName].filter(Boolean).join(" ");
-  const meta = findGradeMeta(player.grade);
+  const gradeDescription: string | undefined =
+    player.gradeInfo?.description ?? findGradeMeta(player.grade)?.description;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
@@ -112,9 +113,9 @@ export default async function JoueurProfilePage({
           </div>
         </div>
 
-        {meta?.description && (
+        {gradeDescription && (
           <p className="mt-6 border-t border-metal/30 pt-4 text-sm text-gray-500">
-            {meta.description}
+            {gradeDescription}
           </p>
         )}
 

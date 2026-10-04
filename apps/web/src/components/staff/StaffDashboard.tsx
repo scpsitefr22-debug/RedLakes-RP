@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   Siren,
   KeyRound,
+  LayoutGrid,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -41,6 +42,7 @@ import { cn } from "@/lib/utils";
 
 const MANAGEMENT_LINKS = [
   { icon: Shield, label: "Gestion des grades", caption: "Catalogue de grades", href: "/staff/grades" },
+  { icon: LayoutGrid, label: "Accès par grade", caption: "Qui ouvre quoi, branche par branche", href: "/staff/grades/acces" },
   { icon: Landmark, label: "Gestion des factions", caption: "Catalogue de factions", href: "/staff/factions" },
   { icon: Building2, label: "Gestion des départements", caption: "Catalogue de départements", href: "/staff/departements" },
   { icon: Users, label: "Gestion des équipes", caption: "Équipes de terrain, FIM", href: "/staff/teams" },

@@ -221,6 +221,10 @@ export default function StaffAccessPage() {
         <Link href="/staff/joueurs" className="text-redlake-glow hover:underline">
           Gestion des joueurs
         </Link>
+        . Ce que chaque grade ouvre se règle dans la{" "}
+        <Link href="/staff/grades/acces" className="text-redlake-glow hover:underline">
+          grille des accès par grade
+        </Link>
         .
       </p>
 

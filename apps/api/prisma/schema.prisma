@@ -527,6 +527,7 @@ enum PlatformEntityType {
   SYSTEM_STATE
   CORE_DM
   RP_EVENT
+  GRADE
 }
 
 enum AuditAction {
