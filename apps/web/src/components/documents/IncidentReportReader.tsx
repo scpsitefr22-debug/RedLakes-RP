@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Lock, ArrowLeft, AlertTriangle, Eye } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { DiscordMarkdown, ScpRefText } from "@/components/ui/DiscordMarkdown";
 
 interface PersonnelRow {
   unite: string;
@@ -98,6 +99,26 @@ function SectionHeader({ title, tag, accent }: { title: string; tag?: string | n
   );
 }
 
+/** Texte de rapport rédigé sur Discord : formatage rendu, paragraphes conservés, mentions « SCP-XXX » cliquables vers le wiki. */
+function ReportText({ text }: { text: string }) {
+  return (
+    <div className="space-y-3">
+      {text
+        .split(/\n{2,}/)
+        .filter((p) => p.trim())
+        .map((p, i) => (
+          <DiscordMarkdown
+            key={i}
+            text={p}
+            tone="light"
+            scpRefsSlug=""
+            className="whitespace-pre-wrap text-slate-700"
+          />
+        ))}
+    </div>
+  );
+}
+
 export function IncidentReportReader({ slug }: { slug: string }) {
   const [report, setReport] = useState<IncidentReportFull | null | undefined>(undefined);
 
@@ -188,7 +209,9 @@ export function IncidentReportReader({ slug }: { slug: string }) {
           ].map(([label, value]) => (
             <div key={label} className="bg-slate-50 p-4" style={{ borderLeft: `3px solid ${accent}` }}>
               <p className="font-mono text-[10px] uppercase tracking-wide text-slate-500">{label}</p>
-              <p className="mt-1 font-bold text-slate-900">{value}</p>
+              <p className="mt-1 font-bold text-slate-900">
+                {label === "Anomalie & lieu" ? <ScpRefText text={value} tone="light" /> : value}
+              </p>
             </div>
           ))}
         </div>
@@ -199,7 +222,7 @@ export function IncidentReportReader({ slug }: { slug: string }) {
             tag={report.factsTag}
             accent={accent}
           />
-          <p className="whitespace-pre-wrap text-slate-700">{report.narrative}</p>
+          <ReportText text={report.narrative} />
         </div>
 
         {isAegis ? (
@@ -207,18 +230,23 @@ export function IncidentReportReader({ slug }: { slug: string }) {
             {report.conclusion && (
               <div className="border-t border-slate-200 p-6">
                 <SectionHeader title="2. Conclusion" accent={accent} />
-                <p className="whitespace-pre-wrap text-slate-700">{report.conclusion}</p>
+                <ReportText text={report.conclusion} />
               </div>
             )}
             {report.recommendation && (
               <div className="border-t border-slate-200 p-6">
                 <SectionHeader title="3. Recommandation" accent={accent} />
-                <p
+                <div
                   className="rounded p-3 font-mono text-sm text-slate-800"
                   style={{ background: `${accent}14`, borderLeft: `4px solid ${accent}` }}
                 >
-                  {report.recommendation}
-                </p>
+                  <DiscordMarkdown
+                    text={report.recommendation}
+                    tone="light"
+                    scpRefsSlug=""
+                    className="whitespace-pre-wrap"
+                  />
+                </div>
               </div>
             )}
           </>

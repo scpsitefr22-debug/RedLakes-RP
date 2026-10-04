@@ -25,6 +25,8 @@ interface EditableTextProps {
   wrapperClassName?: string;
   /** Liens SCP internes du Markdown (page Wiki uniquement) — voir DiscordMarkdown. */
   scpRefsSlug?: string;
+  /** Palette du rendu Markdown : "light" pour un fond blanc (documents papier). */
+  tone?: "dark" | "light";
 }
 
 /**
@@ -62,6 +64,7 @@ export function EditableText({
   paragraphs = false,
   wrapperClassName = "",
   scpRefsSlug,
+  tone = "dark",
 }: EditableTextProps) {
   const { editMode } = useEditMode();
   const router = useRouter();
@@ -87,13 +90,13 @@ export function EditableText({
       return (
         <div className={wrapperClassName}>
           {v.split("\n\n").filter(Boolean).map((p, i) => (
-            <DiscordMarkdown key={i} text={p} className={className} scpRefsSlug={scpRefsSlug} />
+            <DiscordMarkdown key={i} text={p} className={className} scpRefsSlug={scpRefsSlug} tone={tone} />
           ))}
         </div>
       );
     }
     if (markdown) {
-      return <DiscordMarkdown text={v} className={className} scpRefsSlug={scpRefsSlug} />;
+      return <DiscordMarkdown text={v} className={className} scpRefsSlug={scpRefsSlug} tone={tone} />;
     }
     return <Tag className={className}>{v}</Tag>;
   };

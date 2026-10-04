@@ -108,6 +108,8 @@ export function ClassifiedDocumentReader({ slug }: { slug: string }) {
             paragraphs
             wrapperClassName="space-y-6"
             className="text-slate-700 leading-relaxed"
+            tone="light"
+            scpRefsSlug=""
           />
         </div>
 
