@@ -656,6 +656,18 @@ GRADE_OVERRIDES: dict[str, dict] = {
 # Le tableau écrit "Sécuriter" : on accepte les deux orthographes.
 GRADE_OVERRIDES["directeur-securite"] = GRADE_OVERRIDES["directeur-securiter"]
 
+# Rémunération fixée par la direction du serveur : 8 800 par Directeur de
+# branche, 7 500 par Directeur adjoint (le Directeur du Site et son adjoint
+# gardent leurs montants). Les deux orthographes du tableau sont couvertes.
+BRANCH_DIRECTOR_PAY = 8800
+BRANCH_DEPUTY_PAY = 7500
+for _key in ("directeur-securiter", "directeur-scientifique", "directeur-maintenance",
+             "directeur-generale", "directeur-general"):
+    GRADE_OVERRIDES.setdefault(_key, {})["pay"] = BRANCH_DIRECTOR_PAY
+for _key in ("adjoint-directeur-se.", "adjoint-directeur-sc.", "adjoint-directeur-maint.",
+             "adjoint-directeur-generale", "adjoint-directeur-general", "directeur-adjoint-medical"):
+    GRADE_OVERRIDES.setdefault(_key, {})["pay"] = BRANCH_DEPUTY_PAY
+
 
 def apply_grade_overrides(grades: dict[str, dict]) -> None:
     for entry in grades.values():
