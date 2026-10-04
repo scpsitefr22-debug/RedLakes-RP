@@ -11,6 +11,7 @@ import {
   TIER_LABELS,
   getAccessZoneDescription,
   getAccessZoneLabel,
+  missionsHeading,
   type ApiGrade,
 } from "@/lib/grade-labels";
 
@@ -128,7 +129,7 @@ export default async function GradeDetailPage({ params }: Props) {
         <section className="mt-6 hologram-border rounded-lg p-6">
           <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
             <ShieldCheck className="h-5 w-5 text-redlake-glow" />
-            Missions & objectifs
+            {missionsHeading(grade.objectives) === "Missions" ? "Missions & objectifs" : "Postes associés"}
           </h2>
           <ul className="space-y-2">
             {grade.objectives.map((o) => (

@@ -210,6 +210,10 @@ def detect_tier(name: str, branch: str) -> str:
         if re.search(r"secretaire|com\.|superviseur", n):
             return "admin"
         return "admin"
+    # Directeur/adjoint de branche Sécurité : sans cette règle ils tombaient en
+    # "troupe" (niveau 1), sous leurs propres sergents.
+    if re.search(r"^(directeur|adjoint-directeur|adjoint directeur)", n):
+        return "officier"
     if re.search(r"commandant|lieutenant|superviseur|responsable|general", n):
         return "officier"
     if re.search(r"sergent|caporal", n):
@@ -613,6 +617,44 @@ def render_web_ts(grades: dict[str, dict], source: str) -> str:
     return "\n".join(lines)
 
 
+# Décisions de jeu qui ne figurent pas dans le tableau (ou y sont fausses) —
+# appliquées après l'import pour qu'une régénération ne les écrase pas.
+SECURITY_ZONES = ["gates", "n5", "keter", "a5", "a4", "euclid", "a3", "a2", "safe", "a1",
+                  "n4", "n3", "n2", "n1", "check", "inter"]
+SECURITY_SECTIONS = ["access-matrix", "armory", "fondation", "overview", "securite", "teams",
+                     "transmissions-restricted"]
+GRADE_OVERRIDES: dict[str, dict] = {
+    # Le Directeur Sécurité commande toute la sécurité du site, tête nucléaire comprise.
+    "directeur-securiter": {
+        "tier": "direction", "clearance": 4,
+        "accessZones": SECURITY_ZONES + ["arm3", "arm2", "arm1"],
+        "siteSections": SECURITY_SECTIONS,
+        "utilities": ["Sécurité", "Armements", "Nuke"],
+    },
+    "adjoint-directeur-se.": {
+        "tier": "officier", "clearance": 3,
+        "accessZones": SECURITY_ZONES, "siteSections": SECURITY_SECTIONS,
+    },
+    # N1 manquait alors que N2 à N5 étaient présents.
+    "directeur-scientifique": {"accessZones_extra": ["n1"]},
+    "adjoint-directeur-sc.": {"accessZones_extra": ["n1"]},
+    "directeur-adjoint-medical": {"accessZones_extra": ["n1"]},
+}
+# Le tableau écrit "Sécuriter" : on accepte les deux orthographes.
+GRADE_OVERRIDES["directeur-securite"] = GRADE_OVERRIDES["directeur-securiter"]
+
+
+def apply_grade_overrides(grades: dict[str, dict]) -> None:
+    for entry in grades.values():
+        override = GRADE_OVERRIDES.get(normalize(entry["name"]).replace(" ", "-"))
+        if not override:
+            continue
+        extra = override.get("accessZones_extra", [])
+        entry.update({k: v for k, v in override.items() if k != "accessZones_extra"})
+        if extra:
+            entry["accessZones"] = list(dict.fromkeys([*entry["accessZones"], *extra]))
+
+
 def main() -> None:
     from discord_catalog_gen import (
         build_discord_catalog,
@@ -622,6 +664,7 @@ def main() -> None:
 
     excel = resolve_excel_path(sys.argv)
     names, grades = from_excel(excel)
+    apply_grade_overrides(grades)
     names = dedupe_names(names)
     source = excel.name if excel.exists() else f"Google Sheets {SHEETS_ID}"
     catalog = render_catalog_ts(names, source)
