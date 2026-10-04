@@ -78,6 +78,8 @@ jobs:
             (SELECT coalesce(max("createdAt"), timestamp 'epoch') FROM "User")
           );
           SQL
+          psql "$SRC" -tA -c "SELECT 1" > /dev/null || { echo "::error title=Supabase::connexion à Supabase impossible (adresse ou mot de passe)"; exit 1; }
+          psql "$DST" -tA -c "SELECT 1" > /dev/null || { echo "::error title=Neon::connexion à Neon impossible (adresse, mot de passe ou quota)"; exit 1; }
           src_last=$(psql "$SRC" -v ON_ERROR_STOP=1 -tA -f /tmp/derniere_ecriture.sql)
           dst_last=$(psql "$DST" -tA -f /tmp/derniere_ecriture.sql 2>/dev/null || echo "1970-01-01 00:00:00")
           echo "Dernière écriture — Supabase : $src_last | Neon : $dst_last"
@@ -90,11 +92,20 @@ jobs:
       - name: Copier la base
         if: steps.config.outputs.actif == 'oui'
         run: |
-          set -euo pipefail
-          pg_dump "$SRC" --schema=public --no-owner --no-privileges --clean --if-exists > /tmp/copie.sql
-          grep -q "PostgreSQL database dump complete" /tmp/copie.sql
-          psql "$DST" --single-transaction -v ON_ERROR_STOP=1 -q -f /tmp/copie.sql
-          rm -f /tmp/copie.sql
+          set -uo pipefail
+          # Message d'erreur lisible dans l'onglet Actions : première ligne ERROR
+          # seulement (jamais les lignes DETAIL/CONTEXT, qui peuvent contenir des données).
+          fail() {
+            msg=$(grep -E 'ERROR|error:|FATAL' "$2" 2>/dev/null | grep -vE '^(DETAIL|CONTEXT)' | head -n 1 | cut -c1-300)
+            echo "::error title=Copie de secours::$1 : ${msg:-voir le journal}"
+            exit 1
+          }
+          echo "Outils : $(pg_dump --version) / $(psql --version)"
+          pg_dump "$SRC" --schema=public --no-owner --no-privileges --clean --if-exists > /tmp/copie.sql 2> /tmp/dump.err || fail "pg_dump a échoué" /tmp/dump.err
+          grep -q "PostgreSQL database dump complete" /tmp/copie.sql || fail "sauvegarde incomplète" /tmp/dump.err
+          echo "Sauvegarde Supabase : $(wc -c < /tmp/copie.sql) octets"
+          psql "$DST" --single-transaction -v ON_ERROR_STOP=1 -q -f /tmp/copie.sql > /dev/null 2> /tmp/restore.err || fail "restauration sur Neon refusée" /tmp/restore.err
+          rm -f /tmp/copie.sql /tmp/dump.err /tmp/restore.err
 
       - name: Vérifier la copie
         if: steps.config.outputs.actif == 'oui'
