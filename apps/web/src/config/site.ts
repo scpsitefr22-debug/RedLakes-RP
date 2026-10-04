@@ -8,6 +8,6 @@ export const siteConfig = {
   recruitmentOpen: true,
   /** Liaison Discord (mecanisme technique de connexion) — creation du compte REDLAKES et vecu joueur presentes comme "lier Discord d'abord", cf. /connexion et /bienvenue */
   discordOAuthEnabled: true,
-  /** Acces technique dev-login (pre-ouverture / tests locaux) */
-  devLoginEnabled: true,
+  /** Accès technique dev-login — jamais affiché en production (l'API le refuse de toute façon) */
+  devLoginEnabled: process.env.NODE_ENV !== "production",
 };

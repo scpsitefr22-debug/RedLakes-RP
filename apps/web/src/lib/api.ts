@@ -7,7 +7,7 @@ export async function checkApiAvailable(): Promise<boolean> {
   try {
     const res = await fetch(`${API_PROXY}/auth/me`, {
       credentials: "include",
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(6000),
     });
     return res.ok || res.status === 401;
   } catch {

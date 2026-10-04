@@ -18,6 +18,8 @@ import { siteConfig } from "@/config/site";
 import { authErrorMessages } from "@/lib/auth-messages";
 import { apiFetch, checkApiAvailable } from "@/lib/api";
 
+const isProd = process.env.NODE_ENV === "production";
+
 export function RpLoginTerminal() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -70,6 +72,17 @@ export function RpLoginTerminal() {
       setChecking(false);
     })();
   }, [router, redirectTo, errorCode]);
+
+  // Un démarrage à froid de l'API peut dépasser le délai de la première
+  // vérification : on réessaie tant qu'elle ne répond pas, sans obliger à
+  // recharger la page.
+  useEffect(() => {
+    if (checking || apiOnline) return;
+    const id = setInterval(async () => {
+      if (await checkApiAvailable()) setApiOnline(true);
+    }, 4000);
+    return () => clearInterval(id);
+  }, [checking, apiOnline]);
 
   const submitAccount = async () => {
     if (!rlUsername.trim() || !rlPassword) {
@@ -176,7 +189,7 @@ export function RpLoginTerminal() {
           <Shield className="h-8 w-8 text-redlake-glow" />
         </div>
         <p className="font-mono text-xs tracking-[0.3em] text-redlake-glow">
-          SITE-12 // ACCES SECURISE
+          SITE-12 // ACCÈS SÉCURISÉ
         </p>
         <h1 className="mt-2 text-3xl font-bold text-white">
           Terminal d&apos;habilitation
@@ -191,15 +204,27 @@ export function RpLoginTerminal() {
           <div className="mb-6 flex gap-3 rounded border border-yellow-400/30 bg-yellow-400/10 p-4 text-sm text-yellow-400">
             <ServerOff className="h-5 w-5 shrink-0" />
             <div>
-              <p className="font-bold font-mono text-xs">API HORS LIGNE</p>
-              <p className="mt-1 text-yellow-400/80">
-                1. Verifiez que l&apos;API tourne : <strong>npm run dev</strong> ou{" "}
-                <strong>Lancer-HUB.bat</strong> → option <strong>2</strong> ou{" "}
-                <strong>3</strong>
-                <br />
-                2. Laissez-lui quelques secondes pour compiler, puis rechargez
-                cette page
-              </p>
+              {isProd ? (
+                <>
+                  <p className="font-bold font-mono text-xs">CONNEXION AU SERVEUR…</p>
+                  <p className="mt-1 text-yellow-400/80">
+                    Le serveur démarre, cela peut prendre quelques secondes. Nouvel
+                    essai automatique — inutile de recharger la page.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-bold font-mono text-xs">API HORS LIGNE</p>
+                  <p className="mt-1 text-yellow-400/80">
+                    1. Verifiez que l&apos;API tourne : <strong>npm run dev</strong> ou{" "}
+                    <strong>Lancer-HUB.bat</strong> → option <strong>2</strong> ou{" "}
+                    <strong>3</strong>
+                    <br />
+                    2. Laissez-lui quelques secondes pour compiler, puis rechargez
+                    cette page
+                  </p>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -470,7 +495,7 @@ export function RpLoginTerminal() {
           href="/"
           className="font-mono text-xs text-gray-600 hover:text-redlake-glow"
         >
-          Retour a l&apos;encyclopedie
+          Retour à l&apos;encyclopédie
         </Link>
       </p>
     </div>
