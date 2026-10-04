@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Body,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -66,6 +67,30 @@ export class PlayersController {
   @Roles(UserRole.STAFF, UserRole.ADMIN)
   getPermissionsReport() {
     return this.players.compareGradePermissions();
+  }
+
+  /**
+   * Tous les comptes (même sans personnage) pour l'écran « Accès & rôles ».
+   * Déclaré avant `@Get(':username')` pour ne pas être pris pour un pseudo.
+   */
+  @Get('accounts')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  listAccounts(@Query('q') q?: string) {
+    return this.players.listAccounts(q);
+  }
+
+  @Patch('accounts/:id/role')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateAccountRole(
+    @Req() req: Request & { user: { id: string; minecraftUsername?: string; discordUsername?: string; username?: string } },
+    @Param('id') id: string,
+    @Body() dto: UpdateUserRoleDto,
+  ) {
+    const actorLabel =
+      req.user.discordUsername ?? req.user.minecraftUsername ?? req.user.username ?? 'Admin';
+    return this.players.updateRoleByUserId(id, dto.role, dto.staffRank, req.user.id, actorLabel);
   }
 
   @Get('me/characters')

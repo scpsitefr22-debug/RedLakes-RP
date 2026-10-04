@@ -27,6 +27,7 @@ import {
   Scale,
   AlertTriangle,
   Siren,
+  KeyRound,
 } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { type PaginatedResult, buildQueryString } from "@/lib/platform-types";
@@ -43,6 +44,7 @@ const MANAGEMENT_LINKS = [
   { icon: Landmark, label: "Gestion des factions", caption: "Catalogue de factions", href: "/staff/factions" },
   { icon: Building2, label: "Gestion des départements", caption: "Catalogue de départements", href: "/staff/departements" },
   { icon: Users, label: "Gestion des équipes", caption: "Équipes de terrain, FIM", href: "/staff/teams" },
+  { icon: KeyRound, label: "Accès & rôles", caption: "Donner un accès à un compte (admin)", href: "/staff/acces" },
   { icon: UserCog, label: "Gestion des joueurs", caption: "Sanctions, affectations", href: "/staff/joueurs" },
   { icon: Scale, label: "Permissions dérivées du Grade", caption: "Outil de preuve, lecture seule", href: "/staff/permissions" },
   { icon: Target, label: "Missions", caption: "Objectifs joueurs et équipes", href: "/staff/missions" },

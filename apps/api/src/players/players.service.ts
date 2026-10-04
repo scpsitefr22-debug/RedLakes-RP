@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Grade, Faction, Team, UserRole, StaffRank, PlatformEntityType } from '@prisma/client';
+import { Grade, Faction, Team, User, UserRole, StaffRank, PlatformEntityType } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../platform/audit.service';
@@ -719,6 +719,92 @@ export class PlayersService {
       where: { OR: [{ minecraftUsername: username }, { username }] },
     });
     if (!user) throw new NotFoundException('Utilisateur introuvable');
+    return this.applyRoleChange(user, role, staffRank, actorId, actorLabel);
+  }
+
+  /**
+   * Même changement de rôle, mais par id de compte : l'écran « Accès & rôles »
+   * doit aussi atteindre les comptes sans pseudo Minecraft ni personnage
+   * (inscription pas terminée, recrue pas encore créée en jeu).
+   */
+  async updateRoleByUserId(
+    userId: string,
+    role: UserRole,
+    staffRank: StaffRank | undefined,
+    actorId: string,
+    actorLabel: string,
+  ) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+    return this.applyRoleChange(user, role, staffRank, actorId, actorLabel);
+  }
+
+  /**
+   * Tous les comptes, y compris ceux sans personnage actif (contrairement à
+   * findAll, qui ne liste que les personnages) — base de l'écran
+   * « Accès & rôles ». Aucun secret n'est renvoyé (ni hash, ni jeton).
+   */
+  async listAccounts(search?: string) {
+    const q = search?.trim();
+    const users = await this.prisma.user.findMany({
+      where: q
+        ? {
+            OR: [
+              { username: { contains: q, mode: 'insensitive' } },
+              { minecraftUsername: { contains: q, mode: 'insensitive' } },
+              { discordUsername: { contains: q, mode: 'insensitive' } },
+            ],
+          }
+        : undefined,
+      select: {
+        id: true,
+        username: true,
+        minecraftUsername: true,
+        discordUsername: true,
+        role: true,
+        staffRank: true,
+        onboardedAt: true,
+        createdAt: true,
+        activeCharacter: {
+          select: { grade: true, rpFirstName: true, rpLastName: true },
+        },
+      },
+      orderBy: [{ role: 'desc' }, { createdAt: 'asc' }],
+      take: 200,
+    });
+
+    return users.map((u) => ({
+      id: u.id,
+      username: u.username,
+      minecraftUsername: u.minecraftUsername,
+      discordUsername: u.discordUsername,
+      role: u.role,
+      staffRank: u.staffRank,
+      onboarded: u.onboardedAt !== null,
+      characterName:
+        [u.activeCharacter?.rpFirstName, u.activeCharacter?.rpLastName]
+          .filter(Boolean)
+          .join(' ') || null,
+      grade: u.activeCharacter?.grade ?? null,
+      createdAt: u.createdAt,
+    }));
+  }
+
+  private async applyRoleChange(
+    user: User,
+    role: UserRole,
+    staffRank: StaffRank | undefined,
+    actorId: string,
+    actorLabel: string,
+  ) {
+    const username =
+      user.username ?? user.minecraftUsername ?? user.discordUsername ?? user.id;
+
+    if (user.id === actorId && user.role === UserRole.ADMIN && role !== UserRole.ADMIN) {
+      throw new BadRequestException(
+        "Tu ne peux pas retirer ton propre accès administrateur — demande à un autre administrateur.",
+      );
+    }
 
     const previousRole = user.role;
     const previousRank = user.staffRank;

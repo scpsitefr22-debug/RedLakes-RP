@@ -74,6 +74,7 @@ const navItems: NavItem[] = [
       { label: "Gestion Factions (Staff)", href: "/staff/factions", staffOnly: true },
       { label: "Gestion Départements (Staff)", href: "/staff/departements", staffOnly: true },
       { label: "Gestion Équipes (Staff)", href: "/staff/teams", staffOnly: true },
+      { label: "Accès & rôles (Admin)", href: "/staff/acces", staffOnly: true },
       { label: "Gestion Joueurs (Staff)", href: "/staff/joueurs", staffOnly: true },
       { label: "Gestion Wiki SCP (Staff)", href: "/staff/scp", staffOnly: true },
       { label: "Gestion Personnages (Staff)", href: "/staff/personnages", staffOnly: true },
