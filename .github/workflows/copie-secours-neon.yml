@@ -1,0 +1,111 @@
+name: Copie de secours Supabase vers Neon
+
+# Supabase est la base de production. Chaque nuit, Neon (gratuit, autre
+# fournisseur) en reçoit une copie complète : si Supabase tombe un jour, on
+# remplace DATABASE_URL sur Render par l'adresse de Neon (2 minutes) et le
+# site repart avec les données de la veille.
+#
+# Garde-fous :
+# - rien ne tourne tant que les deux secrets ne sont pas créés (le workflow
+#   se contente de le dire) ;
+# - refuse de tourner si la "source" n'est pas Supabase ou la "cible" pas
+#   Neon : même avec des secrets inversés, la production n'est jamais écrasée ;
+# - refuse d'écraser Neon s'il contient des données plus récentes que
+#   Supabase (cas où la production serait encore branchée dessus) ;
+# - copie en UNE seule transaction : en cas d'erreur, Neon garde la copie de
+#   la veille intacte ;
+# - le fichier de copie reste sur la machine éphémère du job et n'est jamais
+#   publié (la base contient des comptes et des sessions).
+#
+# Secrets à créer (Settings > Secrets and variables > Actions) :
+#   SUPABASE_DATABASE_URL  adresse "Session pooler" de Supabase
+#   NEON_DATABASE_URL      adresse de Neon (avec ?sslmode=require)
+#
+# Bascule de secours : Render > redlakes-api > Environment > DATABASE_URL =
+# valeur de NEON_DATABASE_URL > Save. Tant que la production tourne sur Neon,
+# ce workflow s'arrête de lui-même (garde-fou ci-dessus).
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: copie-de-secours-base
+  cancel-in-progress: false
+
+jobs:
+  copie:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SRC: ${{ secrets.SUPABASE_DATABASE_URL }}
+      DST: ${{ secrets.NEON_DATABASE_URL }}
+      PGCONNECT_TIMEOUT: "60"
+    steps:
+      - name: Vérifier la configuration
+        id: config
+        run: |
+          if [ -z "$SRC" ] || [ -z "$DST" ]; then
+            echo "Secrets absents : la copie de secours n'est pas encore activée."
+            echo "actif=non" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          case "$SRC" in *supabase.com*) ;; *) echo "SUPABASE_DATABASE_URL ne pointe pas sur Supabase : arrêt."; exit 1;; esac
+          case "$DST" in *neon.tech*) ;; *) echo "NEON_DATABASE_URL ne pointe pas sur Neon : arrêt."; exit 1;; esac
+          echo "actif=oui" >> "$GITHUB_OUTPUT"
+
+      - name: Installer le client PostgreSQL 18
+        if: steps.config.outputs.actif == 'oui'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-18
+
+      - name: Refuser d'écraser des données plus récentes
+        if: steps.config.outputs.actif == 'oui'
+        run: |
+          cat > /tmp/derniere_ecriture.sql <<'SQL'
+          SELECT greatest(
+            (SELECT coalesce(max("createdAt"), timestamp 'epoch') FROM "Session"),
+            (SELECT coalesce(max("createdAt"), timestamp 'epoch') FROM "AuditLog"),
+            (SELECT coalesce(max("createdAt"), timestamp 'epoch') FROM "PlatformNotification"),
+            (SELECT coalesce(max("createdAt"), timestamp 'epoch') FROM "CoreDirectMessage"),
+            (SELECT coalesce(max("createdAt"), timestamp 'epoch') FROM "User")
+          );
+          SQL
+          src_last=$(psql "$SRC" -v ON_ERROR_STOP=1 -tA -f /tmp/derniere_ecriture.sql)
+          dst_last=$(psql "$DST" -tA -f /tmp/derniere_ecriture.sql 2>/dev/null || echo "1970-01-01 00:00:00")
+          echo "Dernière écriture — Supabase : $src_last | Neon : $dst_last"
+          newer=$(psql "$SRC" -tA -c "SELECT '$dst_last'::timestamp > '$src_last'::timestamp")
+          if [ "$newer" = "t" ]; then
+            echo "Neon contient des données plus récentes que Supabase : la production est peut-être encore sur Neon. Copie annulée."
+            exit 1
+          fi
+
+      - name: Copier la base
+        if: steps.config.outputs.actif == 'oui'
+        run: |
+          set -euo pipefail
+          pg_dump "$SRC" --schema=public --no-owner --no-privileges --clean --if-exists > /tmp/copie.sql
+          grep -q "PostgreSQL database dump complete" /tmp/copie.sql
+          psql "$DST" --single-transaction -v ON_ERROR_STOP=1 -q -f /tmp/copie.sql
+          rm -f /tmp/copie.sql
+
+      - name: Vérifier la copie
+        if: steps.config.outputs.actif == 'oui'
+        run: |
+          set -euo pipefail
+          for t in Grade Faction Department; do
+            a=$(psql "$SRC" -tAc "SELECT count(*) FROM \"$t\"")
+            b=$(psql "$DST" -tAc "SELECT count(*) FROM \"$t\"")
+            echo "$t : Supabase $a — Neon $b"
+            [ "$a" = "$b" ] || { echo "Écart sur $t"; exit 1; }
+          done
+          users=$(psql "$DST" -tAc 'SELECT count(*) FROM "User"')
+          echo "Comptes copiés sur Neon : $users"
+          [ "$users" -gt 0 ]
