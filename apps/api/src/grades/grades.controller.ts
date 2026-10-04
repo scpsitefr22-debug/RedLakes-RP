@@ -30,6 +30,15 @@ export class GradesController {
     return this.grades.findAll(branch);
   }
 
+  /** Grille staff : tous les grades, retirés compris, avec leur nombre de personnages. */
+  @Get('manage')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
+  @MinRank(StaffRank.COORDINATEUR_GENERAL)
+  findForManagement() {
+    return this.grades.findForManagement();
+  }
+
   @Get('by-id/:id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.STAFF, UserRole.ADMIN)

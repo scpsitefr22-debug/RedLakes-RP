@@ -1,4 +1,4 @@
-import { describeGradeChanges, GradeAccessFields } from './grade-changes';
+import { describeGradeChanges, GradeAccessFields, movedInOrder } from './grade-changes';
 import { sortCodes, ACCESS_ZONE_CODES } from './grade-access-codes';
 
 const base: GradeAccessFields = {
@@ -8,6 +8,8 @@ const base: GradeAccessFields = {
   clearanceLevel: 2,
   pay: 1600,
   quota: 39,
+  branch: 'securite',
+  archivedAt: null,
 };
 
 describe('describeGradeChanges', () => {
@@ -37,6 +39,29 @@ describe('describeGradeChanges', () => {
       'Salaire : 1600 → aucun',
       'Quota : 39 → 2',
     ]);
+  });
+
+  it('describes a move to another branch and a retirement', () => {
+    expect(
+      describeGradeChanges(base, { ...base, branch: 'scientifique', archivedAt: new Date() }),
+    ).toEqual(['Retiré du site', 'Branche : Sécurité → Scientifique']);
+    expect(describeGradeChanges({ ...base, archivedAt: new Date() }, base)).toEqual([
+      'Remis sur le site',
+    ]);
+  });
+});
+
+describe('movedInOrder', () => {
+  it('reports only the dragged grade, not the ones it pushed down', () => {
+    expect(movedInOrder(['a', 'b', 'c', 'd', 'e'], ['a', 'e', 'b', 'c', 'd'])).toEqual(['e']);
+  });
+
+  it('reports nothing when the order is unchanged', () => {
+    expect(movedInOrder(['a', 'b', 'c'], ['a', 'b', 'c'])).toEqual([]);
+  });
+
+  it('ignores grades that joined or left the branch', () => {
+    expect(movedInOrder(['a', 'b', 'c'], ['x', 'a', 'c'])).toEqual([]);
   });
 });
 

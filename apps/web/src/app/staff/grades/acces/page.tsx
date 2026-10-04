@@ -2,14 +2,31 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Check, Copy, ExternalLink, RotateCcw, Save, X } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowUp,
+  Check,
+  Copy,
+  ExternalLink,
+  GripVertical,
+  RotateCcw,
+  Save,
+  Undo2,
+  X,
+} from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { accessZones } from "@/data/site12";
 import { SITE_SECTION_LABELS } from "@/lib/grade-access";
 import { CLEARANCE_LABELS } from "@/lib/clearance";
 import { BRANCH_LABELS, BRANCH_ORDER, type ApiGrade } from "@/lib/grade-labels";
 
-type Grade = ApiGrade & { updatedAt: string };
+type Grade = ApiGrade & {
+  updatedAt: string;
+  sortOrder: number;
+  archivedAt: string | null;
+  _count?: { players: number };
+};
 
 interface Draft {
   accessZones: string[];
@@ -18,10 +35,13 @@ interface Draft {
   clearanceLevel: number;
   pay: number | null;
   quota: number | null;
+  branch: string;
+  sortOrder: number;
+  archived: boolean;
 }
 
 type ListField = "accessZones" | "siteSections";
-type View = "zones" | "sections" | "fiche";
+type View = "hierarchie" | "zones" | "sections" | "fiche";
 
 interface Column {
   id: string;
@@ -54,6 +74,11 @@ const ZONE_ALIASES = new Map<string, string>(
 
 const VIEWS: { id: View; label: string; help: string }[] = [
   {
+    id: "hierarchie",
+    label: "Hiérarchie & métiers",
+    help: "Glisse un grade, ou utilise les flèches, pour changer sa place : le plus haut est le plus gradé. « Déplacer vers… » l'envoie dans une autre branche, avec le département de celle-ci. « Retirer » enlève un métier du site sans rien effacer : tu peux le remettre quand tu veux.",
+  },
+  {
     id: "zones",
     label: "Zones du site",
     help: "La référence de qui entre où sur le Site-12 (les colonnes de ton tableau, de W.H. à Maint.). Affichées sur le site et envoyées au serveur Minecraft. En jeu, les portes restent gérées par les cartes d'accès du mod SCP.",
@@ -83,6 +108,9 @@ function baselineOf(g: Grade): Draft {
     clearanceLevel: g.clearanceLevel,
     pay: g.pay,
     quota: g.quota,
+    branch: g.branch,
+    sortOrder: g.sortOrder,
+    archived: Boolean(g.archivedAt),
   };
 }
 
@@ -94,20 +122,53 @@ function listDiff(label: string, before: string[], after: string[], names?: Map<
   return `${label} : ${[...added.map((x) => `+${name(x)}`), ...removed.map((x) => `−${name(x)}`)].join(", ")}`;
 }
 
-/** Même lecture que le journal d'audit côté API (grade-changes.ts). */
-function describeDraft(before: Draft, after: Draft): string[] {
-  const amount = (v: number | null) => (v === null ? "aucun" : v.toLocaleString("fr-FR"));
-  return [
-    listDiff("Zones", before.accessZones, after.accessZones, ZONE_LABEL),
-    listDiff("Sections", before.siteSections, after.siteSections, SECTION_LABEL),
-    listDiff("Domaines", before.utilities, after.utilities),
-    before.clearanceLevel !== after.clearanceLevel
-      ? `Habilitation : ${before.clearanceLevel} → ${after.clearanceLevel}`
-      : null,
-    before.pay !== after.pay ? `Salaire : ${amount(before.pay)} → ${amount(after.pay)}` : null,
-    before.quota !== after.quota ? `Quota : ${amount(before.quota)} → ${amount(after.quota)}` : null,
-  ].filter((line): line is string => line !== null);
+const sameList = (a: string[], b: string[]) => a.length === b.length && a.every((x, i) => x === b[i]);
+const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((x) => b.includes(x));
+
+/** Le grade a-t-il quelque chose à enregistrer (y compris sa place) ? */
+function differs(a: Draft, b: Draft): boolean {
+  return (
+    !sameList(a.accessZones, b.accessZones) ||
+    !sameList(a.siteSections, b.siteSections) ||
+    !sameSet(a.utilities, b.utilities) ||
+    a.clearanceLevel !== b.clearanceLevel ||
+    a.pay !== b.pay ||
+    a.quota !== b.quota ||
+    a.branch !== b.branch ||
+    a.sortOrder !== b.sortOrder ||
+    a.archived !== b.archived
+  );
 }
+
+/**
+ * Grades vraiment déplacés entre deux ordres : ceux qui sortent de la plus
+ * longue suite restée dans le même ordre (même règle que le journal côté API).
+ */
+function movedInOrder(before: string[], after: string[]): string[] {
+  const common = after.filter((id) => before.includes(id));
+  const positions = common.map((id) => before.indexOf(id));
+  const length = positions.map(() => 1);
+  const previous = positions.map(() => -1);
+  for (let i = 0; i < positions.length; i++) {
+    for (let j = 0; j < i; j++) {
+      if (positions[j] < positions[i] && length[j] + 1 > length[i]) {
+        length[i] = length[j] + 1;
+        previous[i] = j;
+      }
+    }
+  }
+  const kept = new Set<string>();
+  let k = length.indexOf(Math.max(0, ...length));
+  while (k !== -1) {
+    kept.add(common[k]);
+    k = previous[k];
+  }
+  return common.filter((id) => !kept.has(id));
+}
+
+const rank = (n: number) => (n === 1 ? "1er" : `${n}e`);
+const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
+const holdersLabel = (n: number) => (n === 0 ? "aucun personnage" : plural(n, "personnage"));
 
 function withCode(list: string[], code: string, ids: string[], on: boolean): string[] {
   if (list.includes(code) === on) return list;
@@ -122,6 +183,8 @@ function parseAmount(raw: string): number | null | undefined {
 
 const inputClass =
   "rounded border border-metal bg-black px-2 py-1.5 text-sm text-white outline-none focus:border-redlake";
+const iconButton =
+  "flex h-8 w-8 items-center justify-center rounded border border-metal/60 text-gray-400 hover:border-gray-400 hover:text-white disabled:opacity-30";
 
 function AccessMatrix({
   rows,
@@ -279,26 +342,32 @@ export default function GradeAccessGridPage() {
   const [factionNames, setFactionNames] = useState<Record<string, string>>({});
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [branch, setBranch] = useState("securite");
-  const [view, setView] = useState<View>("zones");
+  const [view, setView] = useState<View>("hierarchie");
   const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [copyFrom, setCopyFrom] = useState("");
   const [copyTo, setCopyTo] = useState("");
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
       const [list, factions] = await Promise.all([
-        apiFetch<Grade[]>("/grades"),
+        apiFetch<Grade[]>("/grades/manage"),
         apiFetch<{ slug: string; name: string }[]>("/factions").catch(() => []),
       ]);
       setLoadError("");
       setGrades(list);
       setFactionNames(Object.fromEntries(factions.map((f) => [f.slug, f.name])));
       setDrafts({});
-    } catch {
-      setLoadError("Impossible de charger les grades : l'API ne répond pas. Réessaie dans quelques secondes.");
+    } catch (err) {
+      setLoadError(
+        err instanceof Error && /refus|rang|autoris/i.test(err.message)
+          ? `${err.message} — cette page est réservée au Fondateur et aux Coordinateurs généraux.`
+          : "Impossible de charger les grades : l'API ne répond pas. Réessaie dans quelques secondes.",
+      );
     }
   }, []);
 
@@ -311,6 +380,7 @@ export default function GradeAccessGridPage() {
     [factionNames],
   );
 
+  const byId = useMemo(() => new Map((grades ?? []).map((g) => [g.id, g])), [grades]);
   const baselines = useMemo(
     () => new Map((grades ?? []).map((g) => [g.id, baselineOf(g)])),
     [grades],
@@ -325,38 +395,144 @@ export default function GradeAccessGridPage() {
     [baselines],
   );
 
-  const { siteBranches, otherBranches, counts } = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const g of grades ?? []) counts.set(g.branch, (counts.get(g.branch) ?? 0) + 1);
-    const siteBranches = BRANCH_ORDER.filter((b) => counts.has(b));
-    const otherBranches = [...counts.keys()]
+  /** Grades en service d'une branche, du plus haut au plus bas (version enregistrée ou en cours). */
+  const sequence = useCallback(
+    (b: string, state: "saved" | "draft"): Grade[] =>
+      (grades ?? [])
+        .map((g) => ({ g, d: state === "saved" ? baselines.get(g.id)! : current(g) }))
+        .filter(({ d }) => d.branch === b && !d.archived)
+        .sort((x, y) => x.d.sortOrder - y.d.sortOrder || x.g.name.localeCompare(y.g.name, "fr"))
+        .map(({ g }) => g),
+    [grades, baselines, current],
+  );
+
+  const allBranches = useMemo(() => {
+    const present = new Set<string>();
+    for (const g of grades ?? []) present.add(current(g).branch);
+    const site = BRANCH_ORDER.filter((b) => present.has(b));
+    const others = [...present]
       .filter((b) => !BRANCH_ORDER.includes(b))
       .sort((a, b) => branchLabel(a).localeCompare(branchLabel(b), "fr"));
-    return { siteBranches, otherBranches, counts };
-  }, [grades, branchLabel]);
+    return { site, others, all: [...site, ...others] };
+  }, [grades, current, branchLabel]);
 
-  const rows = useMemo(() => (grades ?? []).filter((g) => g.branch === branch), [grades, branch]);
+  const rows = useMemo(() => sequence(branch, "draft"), [sequence, branch]);
+  const retiredRows = useMemo(
+    () => (grades ?? []).filter((g) => current(g).branch === branch && current(g).archived),
+    [grades, current, branch],
+  );
+  const activeCount = useCallback((b: string) => sequence(b, "draft").length, [sequence]);
 
-  const pending = useMemo(
-    () =>
-      (grades ?? []).flatMap((g) => {
-        const draft = drafts[g.id];
-        const before = baselines.get(g.id);
-        if (!draft || !before) return [];
-        const lines = describeDraft(before, draft);
-        return lines.length ? [{ grade: g, draft, lines }] : [];
-      }),
+  // Ce qui partira à l'enregistrement, et sa lecture en clair.
+  const dirty = useMemo(
+    () => (grades ?? []).filter((g) => drafts[g.id] && differs(baselines.get(g.id)!, drafts[g.id])),
     [grades, drafts, baselines],
   );
-  const pendingBranches = useMemo(() => new Set(pending.map((p) => p.grade.branch)), [pending]);
+  const pendingLines = useMemo(() => {
+    const lines: { key: string; branch: string; title: string; text: string }[] = [];
+    for (const g of dirty) {
+      const before = baselines.get(g.id)!;
+      const after = current(g);
+      const holders = g._count?.players ?? 0;
+      const amount = (v: number | null) => (v === null ? "aucun" : v.toLocaleString("fr-FR"));
+      const parts = [
+        !before.archived && after.archived
+          ? `Retiré du site${holders ? ` (${plural(holders, "personnage")} le ${holders > 1 ? "gardent" : "garde"})` : ""}`
+          : null,
+        before.archived && !after.archived ? "Remis sur le site" : null,
+        before.branch !== after.branch
+          ? `Branche : ${branchLabel(before.branch)} → ${branchLabel(after.branch)}`
+          : null,
+        listDiff("Zones", before.accessZones, after.accessZones, ZONE_LABEL),
+        listDiff("Sections", before.siteSections, after.siteSections, SECTION_LABEL),
+        listDiff("Domaines", before.utilities, after.utilities),
+        before.clearanceLevel !== after.clearanceLevel
+          ? `Habilitation : ${before.clearanceLevel} → ${after.clearanceLevel}`
+          : null,
+        before.pay !== after.pay ? `Salaire : ${amount(before.pay)} → ${amount(after.pay)}` : null,
+        before.quota !== after.quota ? `Quota : ${amount(before.quota)} → ${amount(after.quota)}` : null,
+      ].filter((p): p is string => p !== null);
+      if (parts.length) {
+        lines.push({ key: g.id, branch: after.branch, title: g.name, text: parts.join(" ; ") });
+      }
+    }
+    for (const b of allBranches.all) {
+      const before = sequence(b, "saved").map((g) => g.id);
+      const after = sequence(b, "draft").map((g) => g.id);
+      for (const id of movedInOrder(before, after)) {
+        lines.push({
+          key: `${b}:${id}`,
+          branch: b,
+          title: `Hiérarchie ${branchLabel(b)}`,
+          text: `${byId.get(id)!.name} : ${rank(before.indexOf(id) + 1)} → ${rank(after.indexOf(id) + 1)}`,
+        });
+      }
+    }
+    return lines;
+  }, [dirty, baselines, current, branchLabel, allBranches, sequence, byId]);
+  const pendingBranches = useMemo(() => new Set(pendingLines.map((l) => l.branch)), [pendingLines]);
+  const movedHere = useMemo(() => {
+    const before = sequence(branch, "saved").map((g) => g.id);
+    return new Set(movedInOrder(before, rows.map((g) => g.id)));
+  }, [sequence, branch, rows]);
 
   useEffect(() => {
-    if (!pending.length) return;
+    if (!dirty.length) return;
     const warn = (e: BeforeUnloadEvent) => e.preventDefault();
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [pending.length]);
+  }, [dirty.length]);
 
+  // ── Hiérarchie ────────────────────────────────────────────────────────
+  const applyOrder = (b: string, ids: string[]) => {
+    const saved = sequence(b, "saved").map((g) => g.id);
+    const backToSaved = sameList(ids, saved);
+    setDrafts((prev) => {
+      const next = { ...prev };
+      ids.forEach((id, i) => {
+        const base = baselines.get(id)!;
+        const d = next[id] ?? base;
+        next[id] = { ...d, sortOrder: backToSaved ? base.sortOrder : i + 1 };
+      });
+      return next;
+    });
+  };
+
+  /** Place le grade `id` à l'index `target` de la liste actuelle (avant retrait). */
+  const moveTo = (id: string, target: number) => {
+    const ids = rows.map((g) => g.id);
+    const from = ids.indexOf(id);
+    if (from === -1) return;
+    ids.splice(from, 1);
+    const at = Math.max(0, Math.min(ids.length, target > from ? target - 1 : target));
+    ids.splice(at, 0, id);
+    applyOrder(branch, ids);
+  };
+
+  const bottomOf = (b: string) =>
+    Math.max(0, ...sequence(b, "draft").map((g) => current(g).sortOrder)) + 1;
+
+  const moveToBranch = (g: Grade, target: string) => {
+    if (!target) return;
+    const base = baselines.get(g.id)!;
+    edit(g, (d) => ({
+      ...d,
+      branch: target,
+      sortOrder: target === base.branch && !base.archived ? base.sortOrder : bottomOf(target),
+    }));
+  };
+
+  const retire = (g: Grade) => edit(g, (d) => ({ ...d, archived: true }));
+  const restore = (g: Grade) => {
+    const base = baselines.get(g.id)!;
+    edit(g, (d) => ({
+      ...d,
+      archived: false,
+      sortOrder: !base.archived && d.branch === base.branch ? base.sortOrder : bottomOf(d.branch),
+    }));
+  };
+
+  // ── Grilles ───────────────────────────────────────────────────────────
   const field: ListField = view === "sections" ? "siteSections" : "accessZones";
   const ids = field === "accessZones" ? ZONE_IDS : SECTION_IDS;
 
@@ -379,15 +555,17 @@ export default function GradeAccessGridPage() {
   const save = async () => {
     setSaving(true);
     setNotice(null);
+    // Une place changée renumérote toute la branche : on annonce les changements, pas les lignes écrites.
+    const changeCount = Math.max(pendingLines.length, 1);
     try {
       const updated = await apiFetch<Grade[]>("/grades/access", {
         method: "PATCH",
         body: JSON.stringify({
-          changes: pending.map(({ grade, draft }) => ({ id: grade.id, updatedAt: grade.updatedAt, ...draft })),
+          changes: dirty.map((g) => ({ id: g.id, updatedAt: g.updatedAt, ...current(g) })),
         }),
       });
-      const byId = new Map(updated.map((g) => [g.id, g]));
-      setGrades((prev) => prev?.map((g) => (byId.has(g.id) ? { ...g, ...byId.get(g.id)! } : g)) ?? prev);
+      const fresh = new Map(updated.map((g) => [g.id, g]));
+      setGrades((prev) => prev?.map((g) => (fresh.has(g.id) ? { ...g, ...fresh.get(g.id)! } : g)) ?? prev);
       setDrafts((prev) => {
         const next = { ...prev };
         for (const g of updated) delete next[g.id];
@@ -396,7 +574,7 @@ export default function GradeAccessGridPage() {
       setShowDetail(false);
       setNotice({
         ok: true,
-        text: `Enregistré : ${updated.length} grade${updated.length > 1 ? "s" : ""} mis à jour. Les joueurs concernés voient leurs nouveaux accès dès leur prochain chargement de page.`,
+        text: `Enregistré : ${plural(changeCount, "changement")}. Les joueurs les voient dès leur prochain chargement de page.`,
       });
     } catch (err) {
       setNotice({ ok: false, text: err instanceof Error ? err.message : "L'enregistrement a échoué." });
@@ -422,7 +600,7 @@ export default function GradeAccessGridPage() {
 
   const branchTab = (b: string) => (
     <button key={b} type="button" aria-pressed={branch === b} onClick={() => setBranch(b)} className={tabClass(branch === b)}>
-      {branchLabel(b)} <span className="text-gray-500">({counts.get(b)})</span>
+      {branchLabel(b)} <span className="text-gray-500">({activeCount(b)})</span>
       {pendingBranches.has(b) && (
         <span className="ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-400 align-middle" title="Changements non enregistrés" />
       )}
@@ -434,7 +612,7 @@ export default function GradeAccessGridPage() {
       <Link
         href="/staff/grades"
         onClick={(e) => {
-          if (pending.length && !confirm("Tes changements non enregistrés seront perdus. Quitter quand même ?")) {
+          if (dirty.length && !confirm("Tes changements non enregistrés seront perdus. Quitter quand même ?")) {
             e.preventDefault();
           }
         }}
@@ -443,12 +621,12 @@ export default function GradeAccessGridPage() {
         <ArrowLeft className="h-4 w-4" /> Gestion des grades
       </Link>
 
-      <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">ADMINISTRATION SITE-12 — GRILLE DES ACCÈS</p>
-      <h1 className="text-4xl font-bold text-white">Accès par grade</h1>
+      <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">ADMINISTRATION SITE-12 — HIÉRARCHIE ET ACCÈS</p>
+      <h1 className="text-4xl font-bold text-white">Grades &amp; accès</h1>
       <p className="mt-3 max-w-3xl text-gray-400">
-        Choisis une branche, puis décide pour chaque grade ce qu&apos;il peut ouvrir. Clique sur une case pour
-        donner ou retirer un accès, ou sur le titre d&apos;une colonne pour toute la branche. Rien n&apos;est
-        appliqué tant que tu n&apos;as pas cliqué sur « Enregistrer ».
+        Choisis une branche. Range ses grades dans l&apos;ordre de la hiérarchie, retire les métiers qui ne
+        servent à rien, puis décide ce que chaque grade peut ouvrir. Rien n&apos;est appliqué tant que tu
+        n&apos;as pas cliqué sur « Enregistrer ».
       </p>
 
       {loadError && (
@@ -473,12 +651,12 @@ export default function GradeAccessGridPage() {
           <div className="mt-8 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="w-24 font-mono text-[10px] uppercase tracking-widest text-gray-500">Site-12</span>
-              {siteBranches.map(branchTab)}
+              {allBranches.site.map(branchTab)}
             </div>
-            {otherBranches.length > 0 && (
+            {allBranches.others.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="w-24 font-mono text-[10px] uppercase tracking-widest text-gray-500">Autres factions</span>
-                {otherBranches.map(branchTab)}
+                {allBranches.others.map(branchTab)}
               </div>
             )}
           </div>
@@ -498,27 +676,184 @@ export default function GradeAccessGridPage() {
           </div>
           <p className="mt-3 max-w-4xl text-sm text-gray-500">{activeView.help}</p>
 
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-gray-500">
-            {view !== "fiche" && (
-              <>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-flex h-4 w-4 items-center justify-center bg-emerald-500/20 text-emerald-300">
-                    <Check className="h-3 w-3" />
+          {view !== "hierarchie" && (
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-gray-500">
+              {view !== "fiche" && (
+                <>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-flex h-4 w-4 items-center justify-center bg-emerald-500/20 text-emerald-300">
+                      <Check className="h-3 w-3" />
+                    </span>
+                    Accès
                   </span>
-                  Accès
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <span className="inline-block h-4 w-4 bg-red-950/40" /> Pas d&apos;accès
-                </span>
-              </>
-            )}
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block h-4 w-4 ring-2 ring-inset ring-amber-400" /> Modifié, pas encore enregistré
-            </span>
-          </div>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block h-4 w-4 bg-red-950/40" /> Pas d&apos;accès
+                  </span>
+                </>
+              )}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="inline-block h-4 w-4 ring-2 ring-inset ring-amber-400" /> Modifié, pas encore enregistré
+              </span>
+            </div>
+          )}
 
-          {rows.length === 0 ? (
-            <p className="mt-6 text-gray-500">Aucun grade dans cette branche.</p>
+          {view === "hierarchie" ? (
+            <div className="mt-4">
+              {rows.length === 0 ? (
+                <p className="text-gray-500">Aucun grade en service dans cette branche.</p>
+              ) : (
+                <ol className="divide-y divide-metal/40 rounded-lg border border-metal/60">
+                  {rows.map((g, index) => {
+                    const base = baselines.get(g.id)!;
+                    const holders = g._count?.players ?? 0;
+                    const changed = movedHere.has(g.id) || base.branch !== branch || base.archived;
+                    return (
+                      <li
+                        key={g.id}
+                        draggable
+                        onDragStart={(e) => {
+                          setDragId(g.id);
+                          e.dataTransfer.effectAllowed = "move";
+                          e.dataTransfer.setData("text/plain", g.id);
+                        }}
+                        onDragOver={(e) => {
+                          if (!dragId) return;
+                          e.preventDefault();
+                          const box = e.currentTarget.getBoundingClientRect();
+                          setDropIndex(index + (e.clientY > box.top + box.height / 2 ? 1 : 0));
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (dragId && dropIndex !== null) moveTo(dragId, dropIndex);
+                          setDragId(null);
+                          setDropIndex(null);
+                        }}
+                        onDragEnd={() => {
+                          setDragId(null);
+                          setDropIndex(null);
+                        }}
+                        className={`relative flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2 ${
+                          dragId === g.id ? "opacity-40" : ""
+                        } ${changed ? "bg-amber-400/5 ring-2 ring-inset ring-amber-400" : ""}`}
+                      >
+                        {dropIndex === index && (
+                          <span className="pointer-events-none absolute inset-x-0 -top-px h-0.5 bg-redlake-glow" />
+                        )}
+                        {dropIndex === index + 1 && index === rows.length - 1 && (
+                          <span className="pointer-events-none absolute inset-x-0 -bottom-px h-0.5 bg-redlake-glow" />
+                        )}
+                        <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-gray-600" aria-hidden />
+                        <span className="w-8 shrink-0 text-right font-mono text-xs tabular-nums text-gray-500">
+                          {rank(index + 1)}
+                        </span>
+                        <span className="min-w-40 flex-1 text-sm text-white">
+                          {g.name}
+                          {base.branch !== branch && (
+                            <span className="ml-2 font-mono text-[10px] text-amber-300">
+                              vient de {branchLabel(base.branch)}
+                            </span>
+                          )}
+                        </span>
+                        <span className="font-mono text-[11px] text-gray-500" title="Personnages qui ont ce grade">
+                          {holdersLabel(holders)}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            className={iconButton}
+                            disabled={index === 0}
+                            onClick={() => moveTo(g.id, index - 1)}
+                            aria-label={`Monter ${g.name}`}
+                            title="Monter d'un cran"
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            className={iconButton}
+                            disabled={index === rows.length - 1}
+                            onClick={() => moveTo(g.id, index + 2)}
+                            aria-label={`Descendre ${g.name}`}
+                            title="Descendre d'un cran"
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </button>
+                          <select
+                            value=""
+                            onChange={(e) => moveToBranch(g, e.target.value)}
+                            aria-label={`Déplacer ${g.name} vers une autre branche`}
+                            className={`${inputClass} max-w-44 py-1 text-xs`}
+                          >
+                            <option value="">Déplacer vers…</option>
+                            {allBranches.all
+                              .filter((b) => b !== branch)
+                              .map((b) => (
+                                <option key={b} value={b}>
+                                  {branchLabel(b)}
+                                </option>
+                              ))}
+                          </select>
+                          <button
+                            type="button"
+                            onClick={() => retire(g)}
+                            aria-label={`Retirer ${g.name} du site`}
+                            className="rounded border border-red-400/40 px-2.5 py-1 text-xs text-red-300 hover:bg-red-400/10"
+                            title={
+                              holders
+                                ? `${plural(holders, "personnage")} ${holders > 1 ? "ont" : "a"} ce grade et le garderont`
+                                : "Enlever ce métier du site (réversible)"
+                            }
+                          >
+                            Retirer
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+
+              {retiredRows.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="font-mono text-xs uppercase tracking-widest text-gray-500">
+                    Métiers retirés ({retiredRows.length})
+                  </h2>
+                  <p className="mt-1 max-w-3xl text-xs text-gray-600">
+                    Ils n&apos;apparaissent plus sur le site ni dans les listes de grades. Les personnages qui les
+                    ont les gardent, avec leurs accès, jusqu&apos;à ce que tu leur en donnes un autre dans Gestion des
+                    joueurs.
+                  </p>
+                  <ul className="mt-3 divide-y divide-metal/30 rounded-lg border border-metal/40">
+                    {retiredRows.map((g) => {
+                      const holders = g._count?.players ?? 0;
+                      const pending = !baselines.get(g.id)!.archived;
+                      return (
+                        <li
+                          key={g.id}
+                          className={`flex flex-wrap items-center gap-3 px-3 py-2 ${pending ? "ring-2 ring-inset ring-amber-400" : ""}`}
+                        >
+                          <span className="min-w-40 flex-1 text-sm text-gray-400 line-through decoration-gray-600">
+                            {g.name}
+                          </span>
+                          {pending && <span className="font-mono text-[10px] text-amber-300">à enregistrer</span>}
+                          <span className="font-mono text-[11px] text-gray-500">{holdersLabel(holders)}</span>
+                          <button
+                            type="button"
+                            onClick={() => restore(g)}
+                            aria-label={`Remettre ${g.name} sur le site`}
+                            className="flex items-center gap-1 rounded border border-metal px-2.5 py-1 text-xs text-gray-200 hover:border-gray-400 hover:text-white"
+                          >
+                            <Undo2 className="h-3.5 w-3.5" /> Remettre
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ) : rows.length === 0 ? (
+            <p className="mt-6 text-gray-500">Aucun grade en service dans cette branche.</p>
           ) : view === "fiche" ? (
             <div className="mt-4 overflow-x-auto rounded-lg border border-metal/60">
               <table className="w-full border-collapse text-sm">
@@ -589,7 +924,7 @@ export default function GradeAccessGridPage() {
                           <DomainsEditor
                             value={d.utilities}
                             label={g.name}
-                            changed={listDiff("", b.utilities, d.utilities) !== null}
+                            changed={!sameSet(b.utilities, d.utilities)}
                             onChange={(utilities) => edit(g, (x) => ({ ...x, utilities }))}
                           />
                         </td>
@@ -616,15 +951,13 @@ export default function GradeAccessGridPage() {
                   className={`${inputClass} max-w-64`}
                 >
                   <option value="">— choisir un grade —</option>
-                  {[...siteBranches, ...otherBranches].map((b) => (
+                  {allBranches.all.map((b) => (
                     <optgroup key={b} label={branchLabel(b)}>
-                      {grades
-                        .filter((g) => g.branch === b)
-                        .map((g) => (
-                          <option key={g.id} value={g.id}>
-                            {g.name}
-                          </option>
-                        ))}
+                      {sequence(b, "draft").map((g) => (
+                        <option key={g.id} value={g.id}>
+                          {g.name}
+                        </option>
+                      ))}
                     </optgroup>
                   ))}
                 </select>
@@ -693,24 +1026,23 @@ export default function GradeAccessGridPage() {
         </>
       )}
 
-      {pending.length > 0 && (
+      {dirty.length > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-amber-400/40 bg-background/95 backdrop-blur">
           {/* pr-24 : laisse la place à la bulle de messagerie (fixe, en bas à droite). */}
           <div className="mx-auto max-w-7xl py-3 pl-4 pr-24">
             {showDetail && (
               <ul className="mb-3 max-h-48 space-y-1 overflow-y-auto font-mono text-xs text-gray-300">
-                {pending.map(({ grade, lines }) => (
-                  <li key={grade.id}>
-                    <span className="text-white">{grade.name}</span>{" "}
-                    <span className="text-gray-500">({branchLabel(grade.branch)})</span> — {lines.join(" ; ")}
+                {pendingLines.map((line) => (
+                  <li key={line.key}>
+                    <span className="text-white">{line.title}</span> — {line.text}
                   </li>
                 ))}
               </ul>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-amber-200">
-                {pending.length} grade{pending.length > 1 ? "s" : ""} modifié{pending.length > 1 ? "s" : ""}, pas encore
-                enregistré{pending.length > 1 ? "s" : ""}{" "}
+                {plural(Math.max(pendingLines.length, 1), "changement")} pas encore enregistré
+                {pendingLines.length > 1 ? "s" : ""}{" "}
                 <button
                   type="button"
                   onClick={() => setShowDetail((v) => !v)}

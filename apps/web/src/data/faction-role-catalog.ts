@@ -128,19 +128,13 @@ function fromLive(g: LiveGradeValues): RoleSource {
 }
 
 /**
- * Grades Fondation à afficher : la base prime (ce que le staff a réglé),
- * le catalogue figé ne sert que si l'API n'a rien renvoyé pour ce grade.
+ * Grades Fondation à afficher : ceux de la base, tels que le staff les a
+ * réglés (hiérarchie, métiers retirés, accès) — l'API ne renvoie que les
+ * grades en service, déjà dans l'ordre. Le catalogue figé ne sert que si
+ * l'API n'a pas répondu.
  */
 function fondationRoleSources(live: LiveGradeValues[]): RoleSource[] {
-  const liveBySlug = new Map(live.map((g) => [g.slug, g]));
-  const staticSlugs = new Set(rpGrades.map((g) => g.id));
-  return [
-    ...rpGrades.map((g) => {
-      const fromDb = liveBySlug.get(g.id);
-      return fromDb ? fromLive(fromDb) : g;
-    }),
-    ...live.filter((g) => !staticSlugs.has(g.slug)).map(fromLive),
-  ];
+  return live.length > 0 ? live.map(fromLive) : rpGrades;
 }
 
 function buildFondationCategories(live: LiveGradeValues[] = []): FactionRoleCategory[] {

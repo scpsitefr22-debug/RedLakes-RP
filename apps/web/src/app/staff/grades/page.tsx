@@ -13,6 +13,7 @@ interface StaffGrade {
   branch: string;
   tier: string;
   clearanceLevel: number;
+  archivedAt?: string | null;
 }
 
 const CLEARANCE_COLORS: Record<number, string> = {
@@ -29,7 +30,10 @@ export default function StaffGradesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch<StaffGrade[]>("/grades")
+    // Liste complète (métiers retirés compris) pour qui peut gérer les grades,
+    // sinon la liste publique des grades en service.
+    apiFetch<StaffGrade[]>("/grades/manage")
+      .catch(() => apiFetch<StaffGrade[]>("/grades"))
       .then(setGrades)
       .catch(() => setError("Impossible de charger les grades — API indisponible."))
       .finally(() => setLoading(false));
@@ -52,7 +56,7 @@ export default function StaffGradesPage() {
             href="/staff/grades/acces"
             className="flex items-center gap-2 rounded border border-redlake bg-redlake/20 px-4 py-2 font-mono text-sm text-white hover:bg-redlake/30"
           >
-            <LayoutGrid className="h-4 w-4" /> Accès par grade
+            <LayoutGrid className="h-4 w-4" /> Grades &amp; accès
           </Link>
           <Link
             href="/staff/grades/nouveau"
@@ -80,12 +84,19 @@ export default function StaffGradesPage() {
           <Link
             key={grade.id}
             href={`/staff/grades/${grade.id}`}
-            className="flex items-center justify-between hologram-border rounded-lg p-4 transition-colors hover:border-redlake/40"
+            className={`flex items-center justify-between hologram-border rounded-lg p-4 transition-colors hover:border-redlake/40 ${grade.archivedAt ? "opacity-60" : ""}`}
           >
             <div className="flex items-center gap-3">
               <Shield className="h-5 w-5 text-redlake-glow" />
               <div>
-                <h3 className="font-bold text-white">{grade.name}</h3>
+                <h3 className="font-bold text-white">
+                  {grade.name}
+                  {grade.archivedAt && (
+                    <span className="ml-2 rounded border border-yellow-500/40 px-1.5 py-0.5 align-middle font-mono text-[10px] font-normal text-yellow-500/90">
+                      Retiré
+                    </span>
+                  )}
+                </h3>
                 <p className="font-mono text-xs text-gray-600">
                   /{grade.slug} — {BRANCH_LABELS[grade.branch] ?? grade.branch} — {grade.tier}
                 </p>

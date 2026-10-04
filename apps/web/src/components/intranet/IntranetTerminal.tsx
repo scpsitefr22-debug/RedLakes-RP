@@ -151,12 +151,11 @@ export function IntranetTerminal() {
       const factionSlug = profile.factionInfo?.slug;
       if (factionSlug && factionSlug !== "fondation") {
         try {
+          // Déjà dans l'ordre de la hiérarchie réglée par le staff (Grades & accès).
           const grades = await apiFetch<FactionGrade[]>(
             `/grades?branch=${factionSlug}`,
           );
-          setFactionGrades(
-            [...grades].sort((a, b) => Number(a.tier) - Number(b.tier)),
-          );
+          setFactionGrades(grades);
         } catch {
           setFactionGrades([]);
         }

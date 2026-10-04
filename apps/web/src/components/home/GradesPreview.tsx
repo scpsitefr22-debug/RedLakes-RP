@@ -14,8 +14,8 @@ async function getOmegaCouncil(): Promise<ApiGrade[]> {
       cache: "no-store",
     });
     if (!res.ok) return [];
-    const grades: ApiGrade[] = await res.json();
-    return grades.sort((a, b) => (b.pay ?? 0) - (a.pay ?? 0));
+    // Déjà dans l'ordre de la hiérarchie réglée par le staff (Grades & accès).
+    return (await res.json()) as ApiGrade[];
   } catch {
     return [];
   }

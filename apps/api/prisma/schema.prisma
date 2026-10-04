@@ -643,12 +643,19 @@ model Grade {
   utilities       String[]    @default([])
   accessZones     String[]    @default([])
   siteSections    String[]    @default([])
+  /// Place dans la hierarchie de sa branche (1 = le plus haut), reglee dans
+  /// la grille staff /staff/grades/acces.
+  sortOrder       Int         @default(0)
+  /// Metier retire du site (reversible) : n'apparait plus dans les listes,
+  /// les joueurs qui l'ont le gardent jusqu'a ce qu'on leur en donne un autre.
+  archivedAt      DateTime?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
   players Player[]
 
   @@index([branch])
+  @@index([branch, sortOrder])
   @@index([departmentId])
   @@index([departmentRefId])
 }

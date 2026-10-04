@@ -59,6 +59,12 @@ export default async function GradeDetailPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
+      {grade.archivedAt && (
+        <p className="mb-4 rounded border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-200">
+          Ce métier a été retiré du Site-12 : on ne le donne plus. Les personnels qui l&apos;occupent encore le
+          gardent jusqu&apos;à leur réaffectation.
+        </p>
+      )}
       <div className="mb-8 hologram-border rounded-lg p-8">
         <p className="mb-2 font-mono text-xs tracking-widest text-redlake-glow">
           {BRANCH_LABELS[grade.branch] ?? grade.branch}

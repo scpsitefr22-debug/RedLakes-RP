@@ -56,6 +56,19 @@ export const SITE_SECTION_LABELS: Record<string, string> = {
   'transmissions-classified': 'Transmissions (classifié)',
 };
 
+/** Branches du Site-12 (miroir de BRANCH_LABELS cote site) ; les autres branches = slug de faction. */
+export const FOUNDATION_BRANCH_LABELS: Record<string, string> = {
+  omega: 'Conseil Oméga',
+  direction: 'Direction',
+  securite: 'Sécurité',
+  scientifique: 'Scientifique',
+  maintenance: 'Maintenance',
+  general: 'Général',
+  classes: 'Personnel détenu',
+};
+
+export const branchLabel = (branch: string) => FOUNDATION_BRANCH_LABELS[branch] ?? branch;
+
 export const ACCESS_ZONE_CODES = Object.keys(ACCESS_ZONE_LABELS);
 export const SITE_SECTION_CODES = Object.keys(SITE_SECTION_LABELS);
 

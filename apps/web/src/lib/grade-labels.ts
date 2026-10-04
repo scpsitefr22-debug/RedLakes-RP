@@ -15,6 +15,8 @@ export interface ApiGrade {
   utilities: string[];
   accessZones: string[];
   siteSections: string[];
+  /** Métier retiré du site (réglé dans Grades & accès) — null = en service. */
+  archivedAt?: string | null;
   departmentRef?: { id: string; slug: string; name: string } | null;
 }
 

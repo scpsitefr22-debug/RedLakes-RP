@@ -4,11 +4,13 @@ import {
   ArrayMinSize,
   ArrayUnique,
   IsArray,
+  IsBoolean,
   IsIn,
   IsInt,
   IsISO8601,
   IsOptional,
   IsString,
+  Matches,
   Max,
   MaxLength,
   Min,
@@ -66,6 +68,24 @@ export class GradeAccessChangeDto {
   @Min(0)
   @Max(10_000)
   quota?: number | null;
+
+  /** Branche ou faction du grade (doit deja exister). */
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-z0-9-]{2,40}$/)
+  branch?: string;
+
+  /** Place dans la hierarchie de la branche (1 = le plus haut). */
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(100_000)
+  sortOrder?: number;
+
+  /** true = metier retire du site (reversible), false = remis. */
+  @IsOptional()
+  @IsBoolean()
+  archived?: boolean;
 }
 
 export class UpdateGradeAccessDto {
