@@ -257,8 +257,33 @@ def clearance_for(tier: str) -> int:
     }.get(tier, 1)
 
 
+# Fautes du tableau d'origine — corrigées à l'import pour ne plus jamais
+# atteindre le site (ex. "Employé" dans une liste de verbes d'action).
+TYPO_FIXES = {
+    "Employé": "Employer",
+    "Etudier": "Étudier",
+    "Eviter": "Éviter",
+    "Controler": "Contrôler",
+    "Surperviser": "Superviser",
+    "Secretairiat": "Secrétariat",
+}
+
+
+def clean_items(items: list[str]) -> list[str]:
+    """Corrige les fautes connues et retire les doublons (ordre conservé)."""
+    seen: set[str] = set()
+    out: list[str] = []
+    for item in items:
+        item = TYPO_FIXES.get(item, item)
+        if item not in seen:
+            seen.add(item)
+            out.append(item)
+    return out
+
+
 def build_description(entry: dict) -> str:
-    parts = []
+    # Missions, domaines, salaire et quota sont affichés par le site dans des
+    # champs dédiés : les répéter ici en phrase générée faisait doublon.
     branch = entry["branch"]
     dept_labels = {
         "omega": "Conseil Oméga",
@@ -269,16 +294,7 @@ def build_description(entry: dict) -> str:
         "general": "Département Général",
         "classes": "Personnel détenu (Class-D/B/S)",
     }
-    parts.append(f"Grade RP Site-12 — {dept_labels.get(branch, branch)}.")
-    if entry.get("objectives"):
-        parts.append("Missions : " + ", ".join(entry["objectives"][:6]) + ".")
-    if entry.get("utilities"):
-        parts.append("Domaines : " + ", ".join(entry["utilities"][:6]) + ".")
-    if entry.get("pay"):
-        parts.append(f"Rémunération hebdomadaire : {entry['pay']:,} $.".replace(",", " "))
-    if entry.get("quota"):
-        parts.append(f"Quota d'effectif : {entry['quota']}.")
-    return " ".join(parts)
+    return f"Grade RP Site-12 — {dept_labels.get(branch, branch)}."
 
 
 def parse_foundation_sheet(ws) -> dict[str, dict]:
@@ -314,8 +330,8 @@ def parse_foundation_sheet(ws) -> dict[str, dict]:
             "name": name,
             "pay": safe_int(pay),
             "quota": safe_int(quota),
-            "objectives": objectives,
-            "utilities": utilities,
+            "objectives": clean_items(objectives),
+            "utilities": clean_items(utilities),
             "accessZones": computed_access,
             "branch": branch,
             "tier": tier,
