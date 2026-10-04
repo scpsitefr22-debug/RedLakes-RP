@@ -635,6 +635,19 @@ GRADE_OVERRIDES: dict[str, dict] = {
         "tier": "officier", "clearance": 3,
         "accessZones": SECURITY_ZONES, "siteSections": SECURITY_SECTIONS,
     },
+    # Le Directeur Maintenance intervient partout sur le site (sauf Keter) :
+    # au-dessus de ses équipes, qui restent en N1-N3 + Maintenance.
+    "directeur-maintenance": {
+        "tier": "direction", "clearance": 3,
+        "accessZones": ["n4", "n3", "n2", "n1", "maint", "check", "gates", "safe", "euclid"],
+        "siteSections": ["access-matrix", "fondation", "maintenance", "overview", "teams",
+                         "transmissions-restricted"],
+    },
+    "adjoint-directeur-maint.": {
+        "accessZones": ["n4", "n3", "n2", "n1", "maint", "check"],
+        "siteSections": ["access-matrix", "fondation", "maintenance", "overview", "teams",
+                         "transmissions-restricted"],
+    },
     # N1 manquait alors que N2 à N5 étaient présents.
     "directeur-scientifique": {"accessZones_extra": ["n1"]},
     "adjoint-directeur-sc.": {"accessZones_extra": ["n1"]},
