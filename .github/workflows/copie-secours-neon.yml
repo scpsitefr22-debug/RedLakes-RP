@@ -65,6 +65,10 @@ jobs:
           sudo apt-get install -y -qq postgresql-common
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get install -y -qq postgresql-client-18
+          # Le runner embarque aussi un client 16 que le "wrapper" Ubuntu choisit
+          # parfois pour pg_dump (refuse de sauvegarder un serveur 17+) : on
+          # impose explicitement le dossier des outils 18 aux étapes suivantes.
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
 
       - name: Refuser d'écraser des données plus récentes
         if: steps.config.outputs.actif == 'oui'
