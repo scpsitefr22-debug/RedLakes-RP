@@ -1,14 +1,19 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Pencil, PencilOff } from "lucide-react";
 import { usePlayerSession } from "@/hooks/usePlayerSession";
 import { useEditMode } from "./EditModeProvider";
 
 export function EditModeToggle() {
+  const pathname = usePathname();
   const { authenticated, role } = usePlayerSession();
   const { editMode, setEditMode } = useEditMode();
 
   if (!authenticated || (role !== "STAFF" && role !== "ADMIN")) return null;
+  // Les pages /staff sont déjà des outils d'édition, sans texte modifiable en
+  // place : le bouton flottant n'y servait à rien et masquait les tableaux.
+  if (pathname?.startsWith("/staff")) return null;
 
   return (
     <button

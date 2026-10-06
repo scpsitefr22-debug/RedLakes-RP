@@ -6,6 +6,7 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  AlertTriangle,
   Check,
   Copy,
   ExternalLink,
@@ -18,7 +19,7 @@ import {
 import { apiFetch } from "@/lib/api";
 import { accessZones } from "@/data/site12";
 import { SITE_SECTION_LABELS } from "@/lib/grade-access";
-import { CLEARANCE_LABELS } from "@/lib/clearance";
+import { CLEARANCE_LABELS, clearanceBadgeClass } from "@/lib/clearance";
 import { BRANCH_LABELS, BRANCH_ORDER, type ApiGrade } from "@/lib/grade-labels";
 
 type Grade = ApiGrade & {
@@ -168,6 +169,9 @@ function movedInOrder(before: string[], after: string[]): string[] {
 
 const rank = (n: number) => (n === 1 ? "1er" : `${n}e`);
 const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
+// Espace fine insécable de toLocaleString remplacée par une espace insécable classique,
+// que toutes les polices du site affichent.
+const formatPay = (n: number) => n.toLocaleString("fr-FR").replace(/\u202f/g, "\u00a0");
 const holdersLabel = (n: number) => (n === 0 ? "aucun personnage" : plural(n, "personnage"));
 
 function withCode(list: string[], code: string, ids: string[], on: boolean): string[] {
@@ -186,10 +190,43 @@ const inputClass =
 const iconButton =
   "flex h-8 w-8 items-center justify-center rounded border border-metal/60 text-gray-400 hover:border-gray-400 hover:text-white disabled:opacity-30";
 
+/** Le grade tel qu'on le lit dans toutes les vues : rang dans la branche, nom, niveau d'habilitation. */
+function RowLabel({ grade, position, clearance }: { grade: Grade; position: number; clearance: number }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className="w-9 shrink-0 text-right font-mono text-xs tabular-nums text-gray-500">{rank(position)}</span>
+      <span className="min-w-0 flex-1 text-sm font-medium leading-tight text-white">
+        {grade.name}
+        <Link
+          href={`/staff/grades/${grade.id}`}
+          target="_blank"
+          title="Ouvrir la fiche complète (nom, description, missions) dans un nouvel onglet"
+          className="ml-1.5 inline-block align-middle text-gray-600 hover:text-redlake-glow"
+        >
+          <ExternalLink className="h-3 w-3" />
+        </Link>
+      </span>
+      <span
+        className={`shrink-0 rounded border px-1.5 py-px font-mono text-[10px] ${clearanceBadgeClass(clearance)}`}
+        title={CLEARANCE_LABELS[Math.min(5, Math.max(1, clearance)) as keyof typeof CLEARANCE_LABELS]}
+      >
+        Hab. {clearance}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Grille grade × colonne. Les titres de colonnes et les noms de grades
+ * restent visibles pendant le défilement (le tableau défile dans son propre
+ * cadre), une ligne sur deux est teintée comme dans le tableau Excel, et la
+ * ligne et la colonne survolées s'éclairent pour suivre une case du regard.
+ */
 function AccessMatrix({
   rows,
   columns,
   vertical,
+  clearanceOf,
   isOn,
   isChanged,
   onToggle,
@@ -198,29 +235,39 @@ function AccessMatrix({
   rows: Grade[];
   columns: Column[];
   vertical?: boolean;
+  clearanceOf: (g: Grade) => number;
   isOn: (g: Grade, col: string) => boolean;
   isChanged: (g: Grade, col: string) => boolean;
   onToggle: (g: Grade, col: string) => void;
   onToggleColumn: (col: string) => void;
 }) {
+  const [hoverCol, setHoverCol] = useState<string | null>(null);
   return (
-    <div className="overflow-x-auto rounded-lg border border-metal/60">
-      <table className="border-collapse text-sm">
+    <div
+      className="max-h-[72vh] overflow-auto rounded-lg border border-metal/60"
+      onMouseLeave={() => setHoverCol(null)}
+    >
+      <table className="border-separate border-spacing-0 text-sm">
         <thead>
           <tr>
-            <th className="sticky left-0 z-20 min-w-52 border-b border-r border-metal/60 bg-background px-3 py-2 text-left align-bottom font-mono text-[10px] font-normal uppercase tracking-widest text-gray-500">
+            <th className="sticky left-0 top-0 z-30 min-w-72 border-b border-r border-metal/60 bg-background px-3 py-2 text-left align-bottom font-mono text-[11px] font-normal uppercase tracking-widest text-gray-400">
               Grade
             </th>
             {columns.map((col) => (
               <th
                 key={col.id}
-                className={`border-b border-l border-metal/40 p-0 align-bottom ${vertical ? "h-40" : ""}`}
+                className={`sticky top-0 z-20 border-b border-r border-metal/40 p-0 align-bottom ${
+                  hoverCol === col.id ? "bg-[#1a1a1d]" : "bg-background"
+                } ${vertical ? "h-40" : ""}`}
               >
                 <button
                   type="button"
                   onClick={() => onToggleColumn(col.id)}
+                  onMouseEnter={() => setHoverCol(col.id)}
                   title={`${col.title} — cliquer pour donner ou retirer à toute la branche`}
-                  className="flex h-full w-full items-end justify-center px-1.5 py-2 font-mono text-[11px] text-gray-300 hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-redlake-glow"
+                  className={`flex h-full w-full items-end justify-center px-1.5 py-2 font-mono text-xs hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-redlake-glow ${
+                    hoverCol === col.id ? "text-white" : "text-gray-300"
+                  }`}
                 >
                   <span
                     className="whitespace-nowrap"
@@ -234,48 +281,50 @@ function AccessMatrix({
           </tr>
         </thead>
         <tbody>
-          {rows.map((g) => (
-            <tr key={g.id} className="group">
-              <th
-                scope="row"
-                className="sticky left-0 z-10 border-r border-t border-metal/60 bg-background px-3 py-1.5 text-left font-normal group-hover:bg-[#0d0d0f]"
-              >
-                <span className="flex items-center gap-1.5 text-sm text-white">
-                  {g.name}
-                  <Link
-                    href={`/staff/grades/${g.id}`}
-                    target="_blank"
-                    title="Ouvrir la fiche complète (nom, description, missions) dans un nouvel onglet"
-                    className="text-gray-600 hover:text-redlake-glow"
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                  </Link>
-                </span>
-              </th>
-              {columns.map((col) => {
-                const on = isOn(g, col.id);
-                const changed = isChanged(g, col.id);
-                return (
-                  <td key={col.id} className="border-l border-t border-metal/40 p-0">
-                    <button
-                      type="button"
-                      aria-pressed={on}
-                      aria-label={`${g.name} — ${col.label} : ${on ? "accès" : "pas d'accès"}`}
-                      title={`${g.name} — ${col.title} : ${on ? "accès" : "pas d'accès"}${changed ? " (modifié, pas encore enregistré)" : ""}`}
-                      onClick={() => onToggle(g, col.id)}
-                      className={`flex h-9 w-full min-w-10 items-center justify-center transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-redlake-glow ${
-                        on
-                          ? "bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30"
-                          : "bg-red-950/25 hover:bg-red-900/30"
-                      } ${changed ? "ring-2 ring-inset ring-amber-400" : ""}`}
+          {rows.map((g, index) => {
+            const striped = index % 2 === 1;
+            return (
+              <tr key={g.id} className="group">
+                <th
+                  scope="row"
+                  className={`sticky left-0 z-10 border-b border-r border-metal/60 px-2 py-1.5 text-left font-normal group-hover:bg-[#1a1a1d] ${
+                    striped ? "bg-[#111114]" : "bg-background"
+                  }`}
+                >
+                  <RowLabel grade={g} position={index + 1} clearance={clearanceOf(g)} />
+                </th>
+                {columns.map((col) => {
+                  const on = isOn(g, col.id);
+                  const changed = isChanged(g, col.id);
+                  const lit = hoverCol === col.id;
+                  return (
+                    <td
+                      key={col.id}
+                      className="border-b border-r border-metal/30 p-0"
+                      onMouseEnter={() => setHoverCol(col.id)}
                     >
-                      {on && <Check className="h-4 w-4" />}
-                    </button>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+                      <button
+                        type="button"
+                        aria-pressed={on}
+                        aria-label={`${g.name} — ${col.label} : ${on ? "accès" : "pas d'accès"}`}
+                        title={`${g.name} — ${col.title} : ${on ? "accès" : "pas d'accès"}${changed ? " (modifié, pas encore enregistré)" : ""}`}
+                        onClick={() => onToggle(g, col.id)}
+                        className={`flex h-9 w-full min-w-10 items-center justify-center transition-[filter,background-color] group-hover:brightness-150 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-redlake-glow ${
+                          on
+                            ? `${striped ? "bg-emerald-500/25" : "bg-emerald-500/20"} text-emerald-300`
+                            : striped
+                              ? "bg-red-950/45"
+                              : "bg-red-950/25"
+                        } ${lit ? "brightness-150" : ""} ${changed ? "ring-2 ring-inset ring-amber-400" : ""}`}
+                      >
+                        {on && <Check className="h-4 w-4" />}
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -434,7 +483,7 @@ export default function GradeAccessGridPage() {
       const before = baselines.get(g.id)!;
       const after = current(g);
       const holders = g._count?.players ?? 0;
-      const amount = (v: number | null) => (v === null ? "aucun" : v.toLocaleString("fr-FR"));
+      const amount = (v: number | null) => (v === null ? "aucun" : formatPay(v));
       const parts = [
         !before.archived && after.archived
           ? `Retiré du site${holders ? ` (${plural(holders, "personnage")} le ${holders > 1 ? "gardent" : "garde"})` : ""}`
@@ -475,6 +524,21 @@ export default function GradeAccessGridPage() {
     const before = sequence(branch, "saved").map((g) => g.id);
     return new Set(movedInOrder(before, rows.map((g) => g.id)));
   }, [sequence, branch, rows]);
+
+  /** Un grade qui gagne plus que celui placé juste au-dessus de lui : souvent un oubli ou une erreur d'import. */
+  const payNotes = useMemo(() => {
+    const notes = new Map<string, string>();
+    let above: { name: string; pay: number } | null = null;
+    for (const g of rows) {
+      const pay = current(g).pay;
+      if (pay === null) continue;
+      if (above && pay > above.pay) {
+        notes.set(g.id, `Gagne plus que ${above.name} (${formatPay(above.pay)}), placé au-dessus`);
+      }
+      above = { name: g.name, pay };
+    }
+    return notes;
+  }, [rows, current]);
 
   useEffect(() => {
     if (!dirty.length) return;
@@ -674,7 +738,7 @@ export default function GradeAccessGridPage() {
               </button>
             ))}
           </div>
-          <p className="mt-3 max-w-4xl text-sm text-gray-500">{activeView.help}</p>
+          <p className="mt-3 max-w-4xl text-sm leading-relaxed text-gray-400">{activeView.help}</p>
 
           {view !== "hierarchie" && (
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-gray-500">
@@ -702,11 +766,13 @@ export default function GradeAccessGridPage() {
               {rows.length === 0 ? (
                 <p className="text-gray-500">Aucun grade en service dans cette branche.</p>
               ) : (
-                <ol className="divide-y divide-metal/40 rounded-lg border border-metal/60">
+                <ol className="overflow-hidden rounded-lg border border-metal/60">
                   {rows.map((g, index) => {
                     const base = baselines.get(g.id)!;
+                    const d = current(g);
                     const holders = g._count?.players ?? 0;
                     const changed = movedHere.has(g.id) || base.branch !== branch || base.archived;
+                    const note = payNotes.get(g.id);
                     return (
                       <li
                         key={g.id}
@@ -732,9 +798,11 @@ export default function GradeAccessGridPage() {
                           setDragId(null);
                           setDropIndex(null);
                         }}
-                        className={`relative flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2 ${
-                          dragId === g.id ? "opacity-40" : ""
-                        } ${changed ? "bg-amber-400/5 ring-2 ring-inset ring-amber-400" : ""}`}
+                        className={`group relative flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b border-metal/30 px-3 py-2.5 last:border-b-0 hover:bg-[#1a1a1d] ${
+                          index % 2 === 1 ? "bg-[#111114]" : ""
+                        } ${dragId === g.id ? "opacity-40" : ""} ${
+                          changed ? "bg-amber-400/5 ring-2 ring-inset ring-amber-400" : ""
+                        }`}
                       >
                         {dropIndex === index && (
                           <span className="pointer-events-none absolute inset-x-0 -top-px h-0.5 bg-redlake-glow" />
@@ -742,22 +810,30 @@ export default function GradeAccessGridPage() {
                         {dropIndex === index + 1 && index === rows.length - 1 && (
                           <span className="pointer-events-none absolute inset-x-0 -bottom-px h-0.5 bg-redlake-glow" />
                         )}
-                        <GripVertical className="h-4 w-4 shrink-0 cursor-grab text-gray-600" aria-hidden />
-                        <span className="w-8 shrink-0 text-right font-mono text-xs tabular-nums text-gray-500">
-                          {rank(index + 1)}
-                        </span>
-                        <span className="min-w-40 flex-1 text-sm text-white">
-                          {g.name}
+                        <GripVertical
+                          className="h-4 w-4 shrink-0 cursor-grab text-gray-600 group-hover:text-gray-300"
+                          aria-hidden
+                        />
+                        <div className="min-w-56 flex-1">
+                          <RowLabel grade={g} position={index + 1} clearance={d.clearanceLevel} />
                           {base.branch !== branch && (
-                            <span className="ml-2 font-mono text-[10px] text-amber-300">
+                            <p className="ml-11 mt-0.5 font-mono text-[10px] text-amber-300">
                               vient de {branchLabel(base.branch)}
-                            </span>
+                            </p>
                           )}
-                        </span>
-                        <span className="font-mono text-[11px] text-gray-500" title="Personnages qui ont ce grade">
-                          {holdersLabel(holders)}
-                        </span>
-                        <div className="flex items-center gap-1.5">
+                        </div>
+                        <div className="flex shrink-0 items-center gap-4 font-mono text-xs tabular-nums">
+                          <span
+                            className={`w-28 text-right ${d.pay === null ? "text-gray-600" : "text-gray-200"}`}
+                            title="Salaire par semaine"
+                          >
+                            {d.pay === null ? "pas de salaire" : `${formatPay(d.pay)} / sem.`}
+                          </span>
+                          <span className="w-32 text-gray-500" title="Personnages qui ont ce grade">
+                            {holdersLabel(holders)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 opacity-60 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                           <button
                             type="button"
                             className={iconButton}
@@ -782,7 +858,7 @@ export default function GradeAccessGridPage() {
                             value=""
                             onChange={(e) => moveToBranch(g, e.target.value)}
                             aria-label={`Déplacer ${g.name} vers une autre branche`}
-                            className={`${inputClass} max-w-44 py-1 text-xs`}
+                            className={`${inputClass} max-w-40 py-1 text-xs`}
                           >
                             <option value="">Déplacer vers…</option>
                             {allBranches.all
@@ -797,7 +873,7 @@ export default function GradeAccessGridPage() {
                             type="button"
                             onClick={() => retire(g)}
                             aria-label={`Retirer ${g.name} du site`}
-                            className="rounded border border-red-400/40 px-2.5 py-1 text-xs text-red-300 hover:bg-red-400/10"
+                            className="rounded border border-metal/60 px-2.5 py-1 text-xs text-gray-400 hover:border-red-400/50 hover:bg-red-400/10 hover:text-red-300"
                             title={
                               holders
                                 ? `${plural(holders, "personnage")} ${holders > 1 ? "ont" : "a"} ce grade et le garderont`
@@ -807,6 +883,12 @@ export default function GradeAccessGridPage() {
                             Retirer
                           </button>
                         </div>
+                        {note && (
+                          <p className="basis-full pl-[4.25rem] text-xs text-amber-300">
+                            <AlertTriangle className="mr-1 inline h-3.5 w-3.5 align-[-2px]" aria-hidden />
+                            {note}
+                          </p>
+                        )}
                       </li>
                     );
                   })}
@@ -855,28 +937,38 @@ export default function GradeAccessGridPage() {
           ) : rows.length === 0 ? (
             <p className="mt-6 text-gray-500">Aucun grade en service dans cette branche.</p>
           ) : view === "fiche" ? (
-            <div className="mt-4 overflow-x-auto rounded-lg border border-metal/60">
-              <table className="w-full border-collapse text-sm">
+            <div className="mt-4 max-h-[72vh] overflow-auto rounded-lg border border-metal/60">
+              <table className="w-full border-separate border-spacing-0 text-sm">
                 <thead>
-                  <tr className="text-left font-mono text-[10px] uppercase tracking-widest text-gray-500">
-                    <th className="border-b border-metal/60 px-3 py-2 font-normal">Grade</th>
-                    <th className="border-b border-metal/60 px-3 py-2 font-normal">Habilitation</th>
-                    <th className="border-b border-metal/60 px-3 py-2 font-normal">Salaire / sem.</th>
-                    <th className="border-b border-metal/60 px-3 py-2 font-normal">Quota</th>
-                    <th className="border-b border-metal/60 px-3 py-2 font-normal">Domaines</th>
+                  <tr className="text-left font-mono text-[11px] uppercase tracking-widest text-gray-400">
+                    <th className="sticky left-0 top-0 z-30 min-w-72 border-b border-r border-metal/60 bg-background px-3 py-2 font-normal">
+                      Grade
+                    </th>
+                    <th className="sticky top-0 z-20 border-b border-metal/60 bg-background px-3 py-2 font-normal">Habilitation</th>
+                    <th className="sticky top-0 z-20 border-b border-metal/60 bg-background px-3 py-2 font-normal">Salaire / sem.</th>
+                    <th className="sticky top-0 z-20 border-b border-metal/60 bg-background px-3 py-2 font-normal">Quota</th>
+                    <th className="sticky top-0 z-20 border-b border-metal/60 bg-background px-3 py-2 font-normal">Domaines</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((g) => {
+                  {rows.map((g, index) => {
                     const d = current(g);
                     const b = baselines.get(g.id)!;
                     const ring = (changed: boolean) => (changed ? "ring-2 ring-amber-400" : "");
+                    const striped = index % 2 === 1;
+                    const note = payNotes.get(g.id);
+                    const cell = `border-b border-metal/30 px-3 py-2 align-top group-hover:bg-[#1a1a1d] ${striped ? "bg-[#111114]" : ""}`;
                     return (
-                      <tr key={g.id} className="border-t border-metal/40 align-top">
-                        <th scope="row" className="px-3 py-2 text-left font-normal text-white">
-                          {g.name}
+                      <tr key={g.id} className="group">
+                        <th
+                          scope="row"
+                          className={`sticky left-0 z-10 border-b border-r border-metal/60 px-2 py-2 text-left align-top font-normal group-hover:bg-[#1a1a1d] ${
+                            striped ? "bg-[#111114]" : "bg-background"
+                          }`}
+                        >
+                          <RowLabel grade={g} position={index + 1} clearance={d.clearanceLevel} />
                         </th>
-                        <td className="px-3 py-2">
+                        <td className={cell}>
                           <select
                             value={d.clearanceLevel}
                             onChange={(e) => edit(g, (x) => ({ ...x, clearanceLevel: Number(e.target.value) }))}
@@ -890,7 +982,7 @@ export default function GradeAccessGridPage() {
                             ))}
                           </select>
                         </td>
-                        <td className="px-3 py-2">
+                        <td className={cell}>
                           <input
                             type="number"
                             min={0}
@@ -902,10 +994,16 @@ export default function GradeAccessGridPage() {
                               if (pay !== undefined) edit(g, (x) => ({ ...x, pay }));
                             }}
                             aria-label={`Salaire de ${g.name}`}
-                            className={`${inputClass} w-28 tabular-nums ${ring(d.pay !== b.pay)}`}
+                            className={`${inputClass} w-28 text-right tabular-nums ${ring(d.pay !== b.pay)} ${note ? "border-amber-400/60" : ""}`}
                           />
+                          {note && (
+                            <p className="mt-1 max-w-48 text-[11px] leading-snug text-amber-300">
+                              <AlertTriangle className="mr-1 inline h-3 w-3 align-[-2px]" aria-hidden />
+                              {note}
+                            </p>
+                          )}
                         </td>
-                        <td className="px-3 py-2">
+                        <td className={cell}>
                           <input
                             type="number"
                             min={0}
@@ -917,10 +1015,10 @@ export default function GradeAccessGridPage() {
                               if (quota !== undefined) edit(g, (x) => ({ ...x, quota }));
                             }}
                             aria-label={`Quota de ${g.name}`}
-                            className={`${inputClass} w-20 tabular-nums ${ring(d.quota !== b.quota)}`}
+                            className={`${inputClass} w-20 text-right tabular-nums ${ring(d.quota !== b.quota)}`}
                           />
                         </td>
-                        <td className="min-w-64 px-3 py-2">
+                        <td className={`${cell} min-w-64`}>
                           <DomainsEditor
                             value={d.utilities}
                             label={g.name}
@@ -990,6 +1088,7 @@ export default function GradeAccessGridPage() {
                   rows={rows}
                   columns={view === "zones" ? ZONE_COLUMNS : SECTION_COLUMNS}
                   vertical={view === "sections"}
+                  clearanceOf={(g) => current(g).clearanceLevel}
                   isOn={(g, col) => current(g)[field].includes(col)}
                   isChanged={(g, col) =>
                     current(g)[field].includes(col) !== (baselines.get(g.id)?.[field].includes(col) ?? false)

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 import { LayoutGrid, Plus, Shield } from "lucide-react";
 import { BRANCH_LABELS } from "@/lib/grade-labels";
+import { clearanceBadgeClass } from "@/lib/clearance";
 
 interface StaffGrade {
   id: string;
@@ -15,14 +16,6 @@ interface StaffGrade {
   clearanceLevel: number;
   archivedAt?: string | null;
 }
-
-const CLEARANCE_COLORS: Record<number, string> = {
-  1: "border-metal text-gray-500",
-  2: "border-blue-400/40 text-blue-400",
-  3: "border-yellow-400/40 text-yellow-400",
-  4: "border-orange-400/40 text-orange-400",
-  5: "border-redlake/60 text-redlake-glow",
-};
 
 export default function StaffGradesPage() {
   const [grades, setGrades] = useState<StaffGrade[]>([]);
@@ -103,7 +96,7 @@ export default function StaffGradesPage() {
               </div>
             </div>
             <span
-              className={`shrink-0 rounded border px-2 py-1 font-mono text-[10px] uppercase ${CLEARANCE_COLORS[grade.clearanceLevel] ?? CLEARANCE_COLORS[1]}`}
+              className={`shrink-0 rounded border px-2 py-1 font-mono text-[10px] uppercase ${clearanceBadgeClass(grade.clearanceLevel)}`}
               title="Niveau d'habilitation"
             >
               Hab. {grade.clearanceLevel}
