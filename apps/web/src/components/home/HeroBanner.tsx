@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { useSystemStatus, type AlertLevel } from "@/hooks/useSystemStatus";
+import { apiFetch } from "@/lib/api";
 
 const ALERT: Record<AlertLevel, { label: string; color: string }> = {
   NORMAL: { label: "Normal", color: "#34d399" },
@@ -33,14 +34,57 @@ function useClock() {
   return now;
 }
 
+interface MapPoint {
+  id: string;
+  name: string;
+  type: string;
+  x: number;
+  y: number;
+}
+
+/** Couleur d'un lieu selon son type — mêmes familles que la carte interactive (/carte). */
+const POINT_COLORS: Record<string, string> = {
+  site: "#e5392f",
+  surface: "#60a5fa",
+  ville: "#4ade80",
+  egouts: "#c084fc",
+  criminel: "#fb923c",
+  labo: "#facc15",
+  scp: "#f87171",
+  portail: "#f472b6",
+  ennemi: "#9ca3af",
+  village: "#a3e635",
+  nature: "#34d399",
+  incident: "#ef4444",
+  ferme: "#ca8a04",
+};
+
 /**
- * Moniteur de confinement : plan schématique du Site-12 vu par une caméra de
- * sécurité, balayage radar, heure et niveau d'alerte réels.
+ * Moniteur de confinement : la vraie carte de REDLAKES (celle de /carte) vue
+ * par une caméra de sécurité. Les lieux sont ceux de la carte interactive, à
+ * leur place exacte ; la caméra cible chacun à tour de rôle.
  */
 function ContainmentMonitor({ alert }: { alert: AlertLevel }) {
   const now = useClock();
   const reduce = useReducedMotion();
   const level = ALERT[alert];
+  const [points, setPoints] = useState<MapPoint[]>([]);
+  const [focus, setFocus] = useState(0);
+
+  useEffect(() => {
+    apiFetch<MapPoint[]>("/map")
+      .then(setPoints)
+      .catch(() => setPoints([]));
+  }, []);
+
+  useEffect(() => {
+    if (points.length < 2 || reduce) return;
+    const id = setInterval(() => setFocus((i) => (i + 1) % points.length), 2800);
+    return () => clearInterval(id);
+  }, [points.length, reduce]);
+
+  const target = points.length ? points[focus % points.length] : null;
+  const hub = points.find((p) => p.type === "site") ?? { x: 50, y: 50 };
   const time = now
     ? now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
     : "--:--:--";
@@ -50,68 +94,91 @@ function ContainmentMonitor({ alert }: { alert: AlertLevel }) {
       <div className="flex items-center justify-between gap-3">
         <p className="label-mono text-[10px] text-gray-400">
           <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-redlake-glow align-middle motion-reduce:animate-none" />
-          CAM-07 // Plan du Site-12
+          CAM-07 // Carte de Redlakes
         </p>
         <p className="font-mono text-xs tabular-nums text-gray-300">{time}</p>
       </div>
 
-      <div className="relative mt-4 aspect-[4/3] overflow-hidden border border-line bg-[#05080b]">
-        <svg viewBox="0 0 400 300" className="absolute inset-0 h-full w-full" aria-hidden>
-          <defs>
-            <pattern id="hero-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M20 0H0V20" fill="none" stroke="rgba(150,170,200,0.08)" strokeWidth="1" />
-            </pattern>
-            <radialGradient id="hero-sweep" gradientUnits="userSpaceOnUse" cx="200" cy="150" r="175">
-              <stop offset="0" stopColor="rgba(229,57,47,0.35)" />
-              <stop offset="1" stopColor="rgba(229,57,47,0)" />
-            </radialGradient>
-          </defs>
-          <rect width="400" height="300" fill="url(#hero-grid)" />
+      <Link
+        href="/carte"
+        className="group relative mt-4 block aspect-[1126/923] overflow-hidden border border-line bg-black"
+        aria-label="Ouvrir la carte interactive"
+      >
+        {/* La carte de base, passée en « image de caméra » : désaturée, assombrie, grain. */}
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-[filter] duration-500 group-hover:saturate-100"
+          style={{
+            backgroundImage: "url(/carte/redlakes-map.png)",
+            filter: "saturate(0.45) brightness(0.72) contrast(1.08)",
+          }}
+          aria-hidden
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(rgba(10,20,30,0.25), rgba(10,20,30,0.25)), radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0,0,0,0.65) 100%)",
+          }}
+          aria-hidden
+        />
+        <div
+          className="absolute inset-0 opacity-30 mix-blend-overlay"
+          style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 3px)" }}
+          aria-hidden
+        />
 
-          {/* Ailes du site */}
-          <g fill="rgba(18,24,33,0.85)" stroke="rgba(150,170,200,0.35)" strokeWidth="1">
-            <rect x="30" y="30" width="120" height="80" />
-            <rect x="250" y="30" width="120" height="80" />
-            <rect x="30" y="190" width="120" height="80" />
-            <rect x="250" y="190" width="120" height="80" />
-            <rect x="160" y="120" width="80" height="60" />
-          </g>
-          {/* Couloirs */}
-          <g stroke="rgba(150,170,200,0.25)" strokeWidth="6" strokeLinecap="square">
-            <line x1="150" y1="70" x2="250" y2="70" />
-            <line x1="150" y1="230" x2="250" y2="230" />
-            <line x1="200" y1="110" x2="200" y2="120" />
-            <line x1="200" y1="180" x2="200" y2="190" />
-            <line x1="90" y1="110" x2="90" y2="190" />
-            <line x1="310" y1="110" x2="310" y2="190" />
-          </g>
-          {/* Cellule Keter au centre */}
-          <rect x="182" y="137" width="36" height="26" fill="rgba(229,57,47,0.18)" stroke="#e5392f" strokeWidth="1.5" />
-          <circle cx="200" cy="150" r="3" fill="#e5392f" />
+        {/* Balayage radar centré sur le complexe du Site-12. */}
+        {!reduce && (
+          <span
+            className="pointer-events-none absolute aspect-square w-[85%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ left: `${hub.x}%`, top: `${hub.y}%` }}
+            aria-hidden
+          >
+            <span
+              className="absolute inset-0 animate-[hero-sweep_6s_linear_infinite] rounded-full"
+              style={{ background: "conic-gradient(from 0deg, rgba(229,57,47,0.32), rgba(229,57,47,0) 16%, transparent 100%)" }}
+            />
+          </span>
+        )}
 
-          <g fontFamily="var(--font-code), monospace" fontSize="9" letterSpacing="1.5" fill="rgba(200,210,222,0.75)">
-            <text x="38" y="46">AILE A — SAFE</text>
-            <text x="258" y="46">AILE B — EUCLID</text>
-            <text x="38" y="206">ARMURERIE</text>
-            <text x="258" y="206">LABORATOIRES</text>
-            <text x="168" y="133" fill="#e5392f">KETER</text>
-          </g>
+        {points.map((p) => {
+          const color = POINT_COLORS[p.type] ?? "#e6eaf0";
+          const isTarget = target?.id === p.id;
+          return (
+            <span
+              key={p.id}
+              className="absolute -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${p.x}%`, top: `${p.y}%` }}
+              title={p.name}
+            >
+              <span
+                className="block h-2.5 w-2.5 rounded-full ring-2 ring-black/70"
+                style={{ background: color, boxShadow: `0 0 10px ${color}` }}
+              />
+              {isTarget && (
+                <>
+                  <span className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2" aria-hidden>
+                    <span className="absolute left-0 top-0 h-2 w-2 border-l-2 border-t-2 border-white" />
+                    <span className="absolute right-0 top-0 h-2 w-2 border-r-2 border-t-2 border-white" />
+                    <span className="absolute bottom-0 left-0 h-2 w-2 border-b-2 border-l-2 border-white" />
+                    <span className="absolute bottom-0 right-0 h-2 w-2 border-b-2 border-r-2 border-white" />
+                  </span>
+                  <span className="label-mono absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap bg-black/80 px-1.5 py-0.5 text-[9px] text-white">
+                    {p.name}
+                  </span>
+                </>
+              )}
+            </span>
+          );
+        })}
 
-          {/* Balayage radar autour de la cellule centrale */}
-          {!reduce && (
-            <g className="animate-[hero-sweep_6s_linear_infinite]" style={{ transformOrigin: "200px 150px", transformBox: "view-box" }}>
-              <path d="M200 150 L370 110 A175 175 0 0 1 370 190 Z" fill="url(#hero-sweep)" opacity="0.9" />
-            </g>
-          )}
-          <g fill="none" stroke="rgba(229,57,47,0.25)">
-            <circle cx="200" cy="150" r="60" />
-            <circle cx="200" cy="150" r="115" strokeDasharray="2 6" />
-          </g>
-        </svg>
         <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-redlake-glow/60 shadow-[0_0_12px_2px_rgba(229,57,47,0.45)] motion-safe:animate-[hero-scan_5s_linear_infinite]" />
-      </div>
+        <span className="label-mono absolute bottom-2 right-2 bg-black/70 px-1.5 py-0.5 text-[9px] text-gray-300 opacity-0 transition-opacity group-hover:opacity-100">
+          Ouvrir la carte →
+        </span>
+      </Link>
 
-      <dl className="mt-4 grid grid-cols-3 gap-3 text-left">
+      <dl className="mt-4 grid grid-cols-[auto_auto_1fr] gap-x-5 gap-y-1 text-left">
         <div className="border-l-2 pl-3" style={{ borderColor: level.color }}>
           <dt className="label-mono text-[9px] text-gray-500">Alerte</dt>
           <dd className="font-display text-lg font-bold uppercase" style={{ color: level.color }}>
@@ -119,12 +186,12 @@ function ContainmentMonitor({ alert }: { alert: AlertLevel }) {
           </dd>
         </div>
         <div className="border-l-2 border-line pl-3">
-          <dt className="label-mono text-[9px] text-gray-500">Confinement</dt>
-          <dd className="font-display text-lg font-bold uppercase text-white">Stable</dd>
+          <dt className="label-mono text-[9px] text-gray-500">Lieux suivis</dt>
+          <dd className="font-display text-lg font-bold uppercase text-white">{points.length || "—"}</dd>
         </div>
-        <div className="border-l-2 border-line pl-3">
-          <dt className="label-mono text-[9px] text-gray-500">Réseau</dt>
-          <dd className="font-display text-lg font-bold uppercase text-white">Chiffré</dd>
+        <div className="min-w-0 border-l-2 border-line pl-3">
+          <dt className="label-mono text-[9px] text-gray-500">Cible caméra</dt>
+          <dd className="font-display truncate text-lg font-bold uppercase text-white">{target?.name ?? "—"}</dd>
         </div>
       </dl>
     </div>
