@@ -55,7 +55,7 @@ export function FactionRoleCategoriesPanel({ categories, accentColor }: Props) {
 
       <p className="text-sm text-gray-500">{active.summary}</p>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {active.roles.map((role) => (
           <RoleCard key={role.name} role={role} color={active.color} accent={accent} />
         ))}

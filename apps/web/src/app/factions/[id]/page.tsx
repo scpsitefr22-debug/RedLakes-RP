@@ -162,7 +162,7 @@ export default async function FactionDetailPage({ params }: Props) {
   const hostileCount = relations.filter((r) => r.status === "HOSTILE").length;
 
   return (
-    <FactionThemeScope theme={theme} as="section" className="mx-auto max-w-4xl px-4 py-12">
+    <FactionThemeScope theme={theme} as="section" className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <FactionHero
         faction={faction}
         theme={heroTheme}
