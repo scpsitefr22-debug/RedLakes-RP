@@ -257,7 +257,7 @@ export default async function SCPDetailPage({ params }: Props) {
         </div>
 
         {/* Fiche signalétique */}
-        <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
+        <aside className="order-first space-y-6 lg:sticky lg:top-28 lg:order-none lg:self-start">
           <div className="hologram-border p-5">
             <p className="label-mono text-[10px] text-gray-500">Classe d&apos;objet</p>
             <p className={cn("font-display mt-1 text-5xl font-extrabold uppercase leading-none", classText)}>
