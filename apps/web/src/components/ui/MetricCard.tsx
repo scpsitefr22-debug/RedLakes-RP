@@ -26,8 +26,8 @@ export function MetricCard({ icon: Icon, value, label, href, live, className, to
           </span>
         )}
       </div>
-      <p className="font-mono text-2xl font-bold text-white">{value}</p>
-      <p className="text-xs text-gray-600">
+      <p className="font-display text-4xl font-extrabold leading-none text-white">{value}</p>
+      <p className="label-mono mt-2 text-[10px] text-gray-500">
         {label}
         {tooltip && <JargonTooltip term={tooltip} />}
       </p>

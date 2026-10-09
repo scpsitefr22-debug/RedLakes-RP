@@ -305,7 +305,7 @@ export function RpLoginTerminal() {
                 type="button"
                 onClick={requestReset}
                 disabled={fpLoading || !apiOnline}
-                className="flex w-full items-center justify-center gap-2 rounded border border-redlake bg-redlake/20 py-3 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-redlake/30 disabled:opacity-50"
+                className="font-display flex w-full items-center justify-center gap-2 bg-redlake-glow py-3.5 text-base font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#ff4a3f] disabled:opacity-50"
               >
                 <KeyRound className="h-4 w-4" />
                 {fpLoading ? "Envoi..." : "Envoyer le code"}
@@ -340,7 +340,7 @@ export function RpLoginTerminal() {
                 type="button"
                 onClick={submitReset}
                 disabled={fpLoading || !apiOnline}
-                className="w-full rounded border border-redlake bg-redlake/20 py-3 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-redlake/30 disabled:opacity-50"
+                className="font-display w-full bg-redlake-glow py-3.5 text-base font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#ff4a3f] disabled:opacity-50"
               >
                 {fpLoading ? "Vérification..." : "Réinitialiser le mot de passe"}
               </button>
@@ -415,7 +415,7 @@ export function RpLoginTerminal() {
           type="button"
           onClick={submitAccount}
           disabled={rlLoading || !apiOnline}
-          className="w-full rounded border border-redlake bg-redlake/20 py-3 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-redlake/30 disabled:opacity-50"
+          className="font-display w-full bg-redlake-glow py-3.5 text-base font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#ff4a3f] disabled:opacity-50"
         >
           {rlLoading
             ? "Vérification..."

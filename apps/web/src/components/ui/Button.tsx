@@ -15,12 +15,11 @@ export function Button({
   ...props
 }: ButtonProps) {
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded px-6 py-3 font-mono text-sm uppercase tracking-wider transition-all",
-    variant === "primary" &&
-      "border border-redlake bg-redlake/20 text-white hover:bg-redlake/40 pulse-glow",
+    "font-display inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-bold uppercase tracking-[0.12em] transition-colors",
+    variant === "primary" && "bg-redlake-glow text-white hover:bg-[#ff4a3f]",
     variant === "secondary" &&
-      "border border-metal bg-metal/20 text-gray-300 hover:border-redlake hover:text-white",
-    variant === "ghost" && "text-gray-400 hover:text-redlake-glow",
+      "border border-line-strong text-gray-200 hover:border-white hover:text-white",
+    variant === "ghost" && "text-gray-400 hover:text-white",
     className
   );
 

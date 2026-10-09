@@ -32,6 +32,8 @@ import { getFactionTheme } from "@/lib/faction-theme";
 
 interface PlayerData {
   grade: string;
+  /** Habilitation réelle calculée par l'API (grade en base). */
+  clearanceLevel?: number;
   /** Grade en base : ses accès sont réglés dans la grille staff et priment sur le catalogue figé. */
   gradeInfo?: {
     description: string | null;
@@ -269,106 +271,121 @@ export default function DashboardPage() {
   const theme = getFactionTheme(player.factionInfo?.slug);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto max-w-5xl px-4 py-12">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p
-            className="mb-2 font-mono text-xs tracking-widest"
-            style={{ color: theme.color }}
-          >
-            DOSSIER PERSONNEL // {theme.label.toUpperCase()}
+          <p className="label-mono mb-3 flex items-center gap-2" style={{ color: theme.color }}>
+            <span className="h-px w-8" style={{ background: theme.color }} aria-hidden />
+            Dossier personnel — {theme.label}
           </p>
-          <h1 className="text-4xl font-bold text-white">Tableau de bord</h1>
+          <h1 className="font-display text-5xl font-extrabold text-white">Tableau de bord</h1>
         </div>
         <button
           onClick={logout}
-          className="flex items-center gap-2 rounded border border-metal px-4 py-2 font-mono text-xs text-gray-400 hover:text-white"
+          className="label-mono flex items-center gap-2 border border-line px-4 py-2.5 text-[10px] text-gray-400 transition-colors hover:border-line-strong hover:text-white"
         >
-          <LogOut className="h-4 w-4" /> Cloturer la session
+          <LogOut className="h-4 w-4" /> Clôturer la session
         </button>
       </div>
 
-      <div className="mb-8 panel-elevated rounded-lg p-6">
-        <div className="flex flex-wrap items-start gap-5 sm:flex-nowrap">
-          <Image
-            src={player.user.avatarUrl}
-            alt={player.user.minecraftUsername}
-            width={80}
-            height={80}
-            className="shrink-0 rounded-full border border-redlake/30"
-          />
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  {player.user.discordUsername ?? player.user.minecraftUsername}
-                </h2>
-                {player.user.discordUsername &&
-                  player.user.minecraftUsername &&
-                  player.user.discordUsername !== player.user.minecraftUsername && (
-                    <p className="font-mono text-xs text-gray-600">
-                      Dossier : {player.user.minecraftUsername}
-                    </p>
-                  )}
+      {/* Carte d'accès du Site-12 */}
+      {(() => {
+        const rpName = [player.rpFirstName, player.rpLastName].filter(Boolean).join(" ");
+        const displayName = rpName || player.user.discordUsername || player.user.minecraftUsername;
+        const level = Math.min(5, Math.max(1, player.clearanceLevel ?? 1));
+        const levelColor = ["#9ca3af", "#60a5fa", "#fcd34d", "#fb923c", "#ef4444"][level - 1];
+        const matricule = (player.user.minecraftUuid ?? "").replace(/[^a-z0-9]/gi, "").slice(-6).toUpperCase() || "------";
+        const description = player.gradeInfo?.description ?? findGradeMeta(player.grade)?.description;
+        const fields = [
+          { label: "Grade", value: player.grade, term: "grade" as const },
+          { label: "Faction", value: player.faction, term: "faction" as const },
+          ...(player.teamName ? [{ label: "Équipe", value: player.teamName, term: "equipe" as const }] : []),
+        ];
+        return (
+          <section className="relative mb-8 overflow-hidden border border-line-strong bg-gradient-to-br from-[#121821] to-[#0a0e13] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9)]">
+            <div className="h-1.5" style={{ background: theme.color }} aria-hidden />
+            <div className="flex items-center justify-between border-b border-line px-6 py-2.5">
+              <p className="label-mono text-[10px] text-gray-400">Fondation SCP — Carte d&apos;accès — Site-12</p>
+              <p className="label-mono text-[10px] text-gray-500">Matricule {matricule}</p>
+            </div>
+
+            <div className="grid gap-6 p-6 sm:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_auto]">
+              <div className="relative h-28 w-28 shrink-0 border border-line-strong bg-black/50 p-1.5">
+                <Image
+                  src={player.user.avatarUrl}
+                  alt={player.user.minecraftUsername}
+                  width={112}
+                  height={112}
+                  className="h-full w-full object-cover [image-rendering:pixelated]"
+                />
+                <span className="absolute -left-px -top-px h-3 w-3 border-l-2 border-t-2" style={{ borderColor: theme.color }} />
+                <span className="absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2" style={{ borderColor: theme.color }} />
               </div>
-              {player.user.discordLinked && (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded border border-[#5865F2]/30 bg-[#5865F2]/10 px-2 py-0.5 font-mono text-[10px] text-[#aab1ff]">
-                  <MessageCircle className="h-3 w-3" />
-                  {player.user.discordUsername ?? "Discord vérifié"}
-                </span>
-              )}
-            </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="rounded border border-redlake/30 bg-redlake/10 px-2.5 py-1 font-mono text-xs text-redlake-glow">
-                {player.grade}
-              </span>
-              <JargonTooltip term="grade" />
-              <span className="rounded border border-metal/50 px-2.5 py-1 font-mono text-xs text-gray-400">
-                {player.faction}
-              </span>
-              <JargonTooltip term="faction" />
-              {player.teamName && (
-                <>
-                  <span className="rounded border border-metal/50 px-2.5 py-1 font-mono text-xs text-gray-400">
-                    {player.teamName}
+              <div className="min-w-0">
+                <p className="font-display truncate text-4xl font-extrabold uppercase leading-none text-white">
+                  {displayName}
+                </p>
+                <p className="label-mono mt-2 text-[10px] text-gray-500">
+                  {player.user.minecraftUsername}
+                  {player.user.discordLinked && (
+                    <span className="ml-3 inline-flex items-center gap-1 text-[#aab1ff]">
+                      <MessageCircle className="h-3 w-3" />
+                      {player.user.discordUsername ?? "Discord vérifié"}
+                    </span>
+                  )}
+                </p>
+                <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
+                  {fields.map((f) => (
+                    <div key={f.label} className="min-w-0">
+                      <dt className="label-mono flex items-center gap-1 text-[9px] text-gray-500">
+                        {f.label} <JargonTooltip term={f.term} />
+                      </dt>
+                      <dd className="mt-0.5 truncate text-sm font-semibold text-gray-100">{f.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {description && <p className="mt-4 max-w-xl text-xs leading-relaxed text-gray-500">{description}</p>}
+              </div>
+
+              <div className="flex items-stretch gap-4 sm:col-span-2 lg:col-span-1 lg:flex-col lg:items-end">
+                <div className="flex min-w-[8.5rem] flex-col justify-center border px-4 py-3 text-center" style={{ borderColor: levelColor }}>
+                  <span className="label-mono text-[9px] text-gray-400">Habilitation</span>
+                  <span className="font-display text-5xl font-extrabold leading-none" style={{ color: levelColor }}>
+                    {level}
                   </span>
-                  <JargonTooltip term="equipe" />
-                </>
-              )}
+                  <span className="label-mono text-[9px]" style={{ color: levelColor }}>
+                    sur 5
+                  </span>
+                </div>
+                <div
+                  className="h-12 flex-1 opacity-70 lg:w-[8.5rem] lg:flex-none"
+                  style={{
+                    background:
+                      "repeating-linear-gradient(90deg, #cfd6df 0 2px, transparent 2px 4px, #cfd6df 4px 5px, transparent 5px 9px, #cfd6df 9px 12px, transparent 12px 14px)",
+                  }}
+                  aria-hidden
+                />
+              </div>
             </div>
 
-            {(player.rpFirstName || player.rpLastName) && (
-              <p className="mt-3 text-sm text-gray-300">
-                Identité RP : {[player.rpFirstName, player.rpLastName].filter(Boolean).join(" ")}
-              </p>
-            )}
-
-            {(() => {
-              const description =
-                player.gradeInfo?.description ?? findGradeMeta(player.grade)?.description;
-              if (!description) return null;
-              return <p className="mt-2 text-xs text-gray-500">{description}</p>;
-            })()}
-
-            <div className="mt-4 flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-6 py-3">
               <Link
                 href="/intranet"
-                className="inline-flex items-center gap-2 rounded border border-redlake/40 bg-redlake/10 px-4 py-2 font-mono text-xs text-redlake-glow hover:text-white"
+                className="font-display inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.12em] text-white transition-colors hover:text-redlake-glow"
               >
-                <Terminal className="h-4 w-4" />
-                Ouvrir le terminal intranet
+                <Terminal className="h-4 w-4 text-redlake-glow" />
+                Ouvrir le terminal intranet →
               </Link>
               {player.roleUpdatedAt && (
-                <p className="font-mono text-[10px] text-gray-600">
-                  Dernière mise à jour du grade :{" "}
-                  {new Date(player.roleUpdatedAt).toLocaleString("fr-FR")}
+                <p className="label-mono text-[9px] text-gray-600">
+                  Grade mis à jour le {new Date(player.roleUpdatedAt).toLocaleString("fr-FR")}
                 </p>
               )}
             </div>
-          </div>
-        </div>
-      </div>
+          </section>
+        );
+      })()}
 
       <CharacterSwitcher
         onSwitched={refreshProfile}
