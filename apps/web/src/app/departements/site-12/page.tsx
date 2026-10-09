@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { accessZones, site12Departments, site12Meta } from "@/data/site12";
 import { API_URL } from "@/lib/api";
 
@@ -39,16 +40,30 @@ interface ApiDepartmentListItem {
 }
 
 async function getDepartments(): Promise<ApiDepartmentFull[]> {
+  // La direction d'un département n'est envoyée qu'à un agent connecté : on
+  // relaie sa session, sinon l'API la retire et la page n'a rien à afficher.
+  const token = (await cookies()).get("redlakes_token")?.value;
+  const headers = token ? { Cookie: `redlakes_token=${token}` } : undefined;
   try {
-    const listRes = await fetch(`${API_URL}/departments`, { cache: "no-store" });
+    const listRes = await fetch(`${API_URL}/departments`, { cache: "no-store", headers });
     if (!listRes.ok) return [];
     const list: ApiDepartmentListItem[] = await listRes.json();
 
     const full = await Promise.all(
       list.map(async (d) => {
-        const res = await fetch(`${API_URL}/departments/${d.slug}`, { cache: "no-store" });
+        const res = await fetch(`${API_URL}/departments/${d.slug}`, { cache: "no-store", headers });
         if (!res.ok) return null;
-        return res.json() as Promise<ApiDepartmentFull>;
+        const dept = (await res.json()) as Partial<ApiDepartmentFull> & { id: string; slug: string; name: string };
+        return {
+          omegaTier: null,
+          directorGradeName: null,
+          color: null,
+          utilities: [],
+          ...dept,
+          leadership: dept.leadership ?? [],
+          grades: dept.grades ?? [],
+          teams: dept.teams ?? [],
+        } as ApiDepartmentFull;
       }),
     );
     return full.filter((d): d is ApiDepartmentFull => d !== null);

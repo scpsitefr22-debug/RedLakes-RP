@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Unlock, FileText } from "lucide-react";
+import { Archive, Unlock, FileText } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface ClassifiedItem {
   id: string;
@@ -118,9 +119,11 @@ export function ArchivesClassified() {
       </div>
 
       {allItems.length === 0 ? (
-        <p className="text-gray-500">
-          Aucun dossier classifié accessible à votre département pour le moment.
-        </p>
+        <EmptyState
+          icon={Archive}
+          title="Aucun dossier classifié"
+          hint="Les dossiers de votre département apparaîtront ici, selon votre niveau d'habilitation."
+        />
       ) : (
         <div className="space-y-4">
           {allItems.map((item) => (

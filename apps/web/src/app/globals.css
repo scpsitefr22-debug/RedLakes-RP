@@ -344,9 +344,9 @@ body {
   letter-spacing: 0.04em;
 }
 
-.prose-redlake h2::before {
-  content: "■ ";
-  color: var(--redlake-red-glow);
+/* Un titre en tête de carte n'a pas besoin de marge au-dessus. */
+.prose-redlake h2:first-child {
+  margin-top: 0;
 }
 
 .prose-redlake p {

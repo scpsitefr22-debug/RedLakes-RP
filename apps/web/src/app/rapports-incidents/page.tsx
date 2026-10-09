@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, Eye } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface ApiIncidentReport {
   slug: string;
@@ -60,9 +61,11 @@ export default function RapportsIncidentsPage() {
       {reports === null ? (
         <p className="text-gray-500">Chargement…</p>
       ) : reports.length === 0 ? (
-        <div className="hologram-border rounded-lg p-8 text-center text-gray-500">
-          Aucun rapport accessible pour le moment.
-        </div>
+        <EmptyState
+          icon={AlertTriangle}
+          title="Aucun rapport à afficher"
+          hint="Les rapports d'incident de votre département et de votre niveau d'habilitation apparaîtront ici dès qu'ils seront publiés."
+        />
       ) : (
         <div className="space-y-3">
           {reports.map((r) => {

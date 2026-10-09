@@ -19,6 +19,7 @@ import {
   TRANSMISSION_TYPE_LABELS,
   foundationTimestamp,
 } from "@/lib/transmissions";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const TYPE_ICONS: Record<TransmissionType, typeof Radio> = {
   MESSAGE: Radio,
@@ -95,13 +96,11 @@ export function TransmissionsFeed({
       </div>
 
       {transmissions.length === 0 ? (
-        <div className="hologram-border rounded-lg p-8 text-center text-gray-500">
-          <Radio className="mx-auto mb-3 h-6 w-6 text-redlake-glow" />
-          <p>
-            Aucune transmission enregistrée pour le moment. Le relais s&apos;active
-            dès que le bot du Site-12 capte une activité sur les canaux surveillés.
-          </p>
-        </div>
+        <EmptyState
+          icon={Radio}
+          title="Aucune transmission captée"
+          hint="Le relais s'active dès que le bot du Site-12 capte une activité sur les canaux surveillés."
+        />
       ) : (
         <ol className="relative space-y-4 border-l border-redlake/20 pl-6">
           {transmissions.map((t) => {

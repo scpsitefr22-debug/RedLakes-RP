@@ -7,6 +7,7 @@ import {
   getClassifiedDocuments,
   type ClassifiedDocumentSummary,
 } from "@/lib/classified-documents-api";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 export function ClassifiedDocumentsCatalog() {
   const [documents, setDocuments] = useState<ClassifiedDocumentSummary[]>([]);
@@ -25,9 +26,11 @@ export function ClassifiedDocumentsCatalog() {
 
   if (documents.length === 0) {
     return (
-      <p className="text-gray-500">
-        Aucun document accessible à votre habilitation pour le moment.
-      </p>
+      <EmptyState
+        icon={FileLock2}
+        title="Aucun document accessible"
+        hint="Les documents classifiés s'ouvrent selon votre grade et votre département. Ceux auxquels vous avez droit apparaîtront ici."
+      />
     );
   }
 
