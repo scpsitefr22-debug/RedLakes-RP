@@ -37,8 +37,8 @@ export function StaffAuditFeed() {
   }, [page]);
 
   return (
-    <section className="hologram-border rounded-lg p-6">
-      <h2 className="mb-4 flex items-center gap-2 font-bold text-white">
+    <section className="hologram-border p-6">
+      <h2 className="font-display mb-4 flex items-center gap-2 text-xl font-bold uppercase tracking-wide text-white">
         <History className="h-5 w-5 text-redlake-glow" />
         Journal d&apos;activité plateforme
       </h2>

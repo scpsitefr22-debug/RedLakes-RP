@@ -40,26 +40,51 @@ import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { cn } from "@/lib/utils";
 
-const MANAGEMENT_LINKS = [
-  { icon: Shield, label: "Gestion des grades", caption: "Créer un grade, modifier sa fiche", href: "/staff/grades" },
-  { icon: LayoutGrid, label: "Grades & accès", caption: "Hiérarchie, métiers et accès par branche", href: "/staff/grades/acces" },
-  { icon: Landmark, label: "Gestion des factions", caption: "Catalogue de factions", href: "/staff/factions" },
-  { icon: Building2, label: "Gestion des départements", caption: "Catalogue de départements", href: "/staff/departements" },
-  { icon: Users, label: "Gestion des équipes", caption: "Équipes de terrain, FIM", href: "/staff/teams" },
-  { icon: KeyRound, label: "Accès & rôles", caption: "Donner un accès à un compte (admin)", href: "/staff/acces" },
-  { icon: UserCog, label: "Gestion des joueurs", caption: "Sanctions, affectations", href: "/staff/joueurs" },
-  { icon: Scale, label: "Permissions dérivées du Grade", caption: "Outil de preuve, lecture seule", href: "/staff/permissions" },
-  { icon: Target, label: "Missions", caption: "Objectifs joueurs et équipes", href: "/staff/missions" },
-  { icon: Siren, label: "Opérations en direct", caption: "Affectations temporaires en jeu", href: "/staff/operations" },
-  { icon: FlaskConical, label: "Gestion du wiki SCP", caption: "Objets, classes, incidents", href: "/staff/scp" },
-  { icon: User, label: "Gestion des personnages", caption: "Fiches narratives", href: "/staff/personnages" },
-  { icon: Zap, label: "Gestion des événements", caption: "Brèches, invasions, crises", href: "/staff/evenements" },
-  { icon: Newspaper, label: "Gestion des actualités", caption: "Articles, mises à jour", href: "/staff/actualites" },
-  { icon: FileLock2, label: "Documents classifiés", caption: "Dossiers restreints par département", href: "/staff/documents" },
-  { icon: AlertTriangle, label: "Rapports d'incident", caption: "Journal de sécurité du site", href: "/staff/rapports-incidents" },
-  { icon: MapPin, label: "Gestion de la carte", caption: "Emplacements, coordonnées", href: "/staff/carte" },
-  { icon: Radio, label: "Système", caption: "Niveau d'alerte, statut (Fondateur)", href: "/staff/systeme" },
+// Raccourcis rangés par thème : 19 tuiles en vrac se lisaient mal.
+const MANAGEMENT_GROUPS = [
+  {
+    title: "Personnel & hiérarchie",
+    links: [
+      { icon: Users, label: "Registre personnel", caption: "Base joueurs", href: "/joueurs" },
+      { icon: UserCog, label: "Gestion des joueurs", caption: "Sanctions, affectations", href: "/staff/joueurs" },
+      { icon: LayoutGrid, label: "Grades & accès", caption: "Hiérarchie, métiers et accès par branche", href: "/staff/grades/acces" },
+      { icon: Shield, label: "Gestion des grades", caption: "Créer un grade, modifier sa fiche", href: "/staff/grades" },
+      { icon: KeyRound, label: "Accès & rôles", caption: "Donner un accès à un compte (admin)", href: "/staff/acces" },
+      { icon: Scale, label: "Permissions dérivées du Grade", caption: "Outil de preuve, lecture seule", href: "/staff/permissions" },
+      { icon: User, label: "Gestion des personnages", caption: "Fiches narratives", href: "/staff/personnages" },
+    ],
+  },
+  {
+    title: "Organisation",
+    links: [
+      { icon: Landmark, label: "Gestion des factions", caption: "Catalogue de factions", href: "/staff/factions" },
+      { icon: Building2, label: "Gestion des départements", caption: "Catalogue de départements", href: "/staff/departements" },
+      { icon: Users, label: "Gestion des équipes", caption: "Équipes de terrain, FIM", href: "/staff/teams" },
+    ],
+  },
+  {
+    title: "Terrain",
+    links: [
+      { icon: Siren, label: "Opérations en direct", caption: "Affectations temporaires en jeu", href: "/staff/operations" },
+      { icon: Target, label: "Missions", caption: "Objectifs joueurs et équipes", href: "/staff/missions" },
+      { icon: Zap, label: "Gestion des événements", caption: "Brèches, invasions, crises", href: "/staff/evenements" },
+      { icon: AlertTriangle, label: "Rapports d'incident", caption: "Journal de sécurité du site", href: "/staff/rapports-incidents" },
+      { icon: MapPin, label: "Gestion de la carte", caption: "Emplacements, coordonnées", href: "/staff/carte" },
+    ],
+  },
+  {
+    title: "Contenu & système",
+    links: [
+      { icon: FlaskConical, label: "Gestion du wiki SCP", caption: "Objets, classes, incidents", href: "/staff/scp" },
+      { icon: Newspaper, label: "Gestion des actualités", caption: "Articles, mises à jour", href: "/staff/actualites" },
+      { icon: FileLock2, label: "Documents classifiés", caption: "Dossiers restreints par département", href: "/staff/documents" },
+      { icon: Radio, label: "Système", caption: "Niveau d'alerte, statut (Fondateur)", href: "/staff/systeme" },
+    ],
+  },
 ];
+
+const SECTION_TITLE =
+  "font-display mb-4 flex items-center gap-2 text-xl font-bold uppercase tracking-wide text-white";
 
 interface Application {
   id: string;
@@ -179,7 +204,7 @@ export function StaffDashboard() {
 
   if (error) {
     return (
-      <div className="hologram-border rounded-lg p-8 text-center">
+      <div className="hologram-border p-8 text-center">
         <p className="text-red-400">{error}</p>
         <Link href="/dashboard" className="mt-4 inline-block font-mono text-xs text-gray-500 hover:text-white">
           Retour au dossier agent
@@ -195,36 +220,49 @@ export function StaffDashboard() {
           {actionError}
         </p>
       )}
-      <div className="hologram-border rounded-lg p-4">
-        <label className="mb-1 block font-mono text-xs text-gray-500">
-          Note staff (candidatures & rapports)
-        </label>
-        <input
-          value={staffNote}
-          onChange={(e) => setStaffNote(e.target.value)}
-          placeholder="Réponse visible par l'agent…"
-          className="w-full rounded border border-metal bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-redlake/50"
-        />
-      </div>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         <MetricCard icon={ClipboardList} value={applications.length} label="Candidatures en attente" />
         <MetricCard icon={FileText} value={reports.length} label="Rapports RP à traiter" />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-        <NavTile icon={Users} label="Registre personnel" caption="Base joueurs" href="/joueurs" />
-        {MANAGEMENT_LINKS.map((link) => (
-          <NavTile key={link.href} {...link} />
+      <div className="space-y-6">
+        {MANAGEMENT_GROUPS.map((group) => (
+          <section key={group.title}>
+            <h2 className="label-mono mb-3 flex items-center gap-3 text-[11px] text-gray-400">
+              {group.title}
+              <span className="h-px flex-1 bg-line" aria-hidden />
+            </h2>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+              {group.links.map((link) => (
+                <NavTile key={link.href} {...link} />
+              ))}
+            </div>
+          </section>
         ))}
       </div>
 
-      <section className="hologram-border rounded-lg p-6">
-        <h2 className="mb-4 flex items-center gap-2 font-bold text-white">
+      {(applications.length > 0 || reports.length > 0) && (
+        <div className="panel-elevated p-4">
+          <label htmlFor="staff-note" className="label-mono mb-1.5 block text-[10px] text-gray-400">
+            Note jointe à la prochaine décision (candidature ou rapport)
+          </label>
+          <input
+            id="staff-note"
+            value={staffNote}
+            onChange={(e) => setStaffNote(e.target.value)}
+            placeholder="Réponse visible par l'agent…"
+            className="w-full border border-line bg-black/40 px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-gray-600 focus:border-redlake-glow"
+          />
+        </div>
+      )}
+
+      <section className="hologram-border p-6">
+        <h2 className={SECTION_TITLE}>
           <ClipboardList className="h-5 w-5 text-redlake-glow" />
           Candidatures en attente
         </h2>
         {applications.length === 0 ? (
-          <p className="text-sm text-gray-500">Aucune candidature en attente.</p>
+          <p className="text-sm text-gray-400">Aucune candidature en attente.</p>
         ) : (
           <div className="space-y-4">
             {applications.map((app) => (
@@ -274,13 +312,13 @@ export function StaffDashboard() {
         )}
       </section>
 
-      <section className="hologram-border rounded-lg p-6">
-        <h2 className="mb-4 flex items-center gap-2 font-bold text-white">
+      <section className="hologram-border p-6">
+        <h2 className={SECTION_TITLE}>
           <FileText className="h-5 w-5 text-redlake-glow" />
           Rapports RP en attente
         </h2>
         {reports.length === 0 ? (
-          <p className="text-sm text-gray-500">Aucun rapport à traiter.</p>
+          <p className="text-sm text-gray-400">Aucun rapport à traiter.</p>
         ) : (
           <div className="space-y-4">
             {reports.map((r) => {
