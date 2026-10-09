@@ -93,6 +93,37 @@ function formatSeniority(iso?: string) {
   return remMonths > 0 ? `${years} an${years > 1 ? "s" : ""} ${remMonths} mois` : `${years} an${years > 1 ? "s" : ""}`;
 }
 
+/**
+ * Photo de la carte d'accès : la tête du personnage Minecraft (style pixel,
+ * toujours à jour), puis l'avatar du compte, puis une silhouette si aucune
+ * image ne répond (ex. avatar Discord périmé).
+ */
+function AgentPhoto({ minecraftUsername, fallbackUrl }: { minecraftUsername: string; fallbackUrl?: string | null }) {
+  const sources = [
+    minecraftUsername ? `https://mc-heads.net/avatar/${encodeURIComponent(minecraftUsername)}/128` : null,
+    fallbackUrl || null,
+  ].filter((src): src is string => Boolean(src));
+  const [index, setIndex] = useState(0);
+  if (index >= sources.length) {
+    return (
+      <span className="flex h-full w-full items-center justify-center bg-black/40 text-gray-600">
+        <User className="h-10 w-10" />
+      </span>
+    );
+  }
+  return (
+    <Image
+      src={sources[index]}
+      alt={minecraftUsername}
+      width={112}
+      height={112}
+      unoptimized
+      onError={() => setIndex((i) => i + 1)}
+      className="h-full w-full object-cover [image-rendering:pixelated]"
+    />
+  );
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [player, setPlayer] = useState<PlayerData | null>(null);
@@ -311,13 +342,7 @@ export default function DashboardPage() {
 
             <div className="grid gap-6 p-6 sm:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_auto]">
               <div className="relative h-28 w-28 shrink-0 border border-line-strong bg-black/50 p-1.5">
-                <Image
-                  src={player.user.avatarUrl}
-                  alt={player.user.minecraftUsername}
-                  width={112}
-                  height={112}
-                  className="h-full w-full object-cover [image-rendering:pixelated]"
-                />
+                <AgentPhoto minecraftUsername={player.user.minecraftUsername} fallbackUrl={player.user.avatarUrl} />
                 <span className="absolute -left-px -top-px h-3 w-3 border-l-2 border-t-2" style={{ borderColor: theme.color }} />
                 <span className="absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2" style={{ borderColor: theme.color }} />
               </div>
