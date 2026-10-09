@@ -120,6 +120,12 @@ const SECTION_LINKS: Partial<Record<SiteSection, string>> = {
   overview: "/departements/site-12",
 };
 
+const SECTION_TITLE =
+  "font-display mb-4 flex items-center gap-2 text-xl font-bold uppercase tracking-wide text-white";
+
+const FIELD =
+  "w-full border border-line bg-black/40 px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-gray-600 focus:border-redlake-glow";
+
 interface FactionGrade {
   slug: string;
   name: string;
@@ -212,81 +218,83 @@ export function IntranetTerminal() {
 
   return (
     <div className="space-y-8">
-      <div
-        className="rounded-lg border p-6"
-        style={{ borderColor: `${theme.color}66`, background: `${theme.color}0d` }}
-      >
-        <p
-          className="mb-2 flex items-center gap-2 font-mono text-xs tracking-widest"
-          style={{ color: theme.color }}
-        >
-          <Terminal className="h-3 w-3" />
-          {theme.network}
-        </p>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-bold text-white">
+      <div className="panel-elevated overflow-hidden">
+        <div className="h-1" style={{ background: theme.color }} aria-hidden />
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-6 py-2.5">
+          <p className="label-mono flex items-center gap-2 text-[10px]" style={{ color: theme.color }}>
+            <Terminal className="h-3 w-3" />
+            {theme.network}
+          </p>
+          <p className="label-mono text-[10px] text-gray-500">Session ouverte</p>
+        </div>
+        <div className="grid gap-6 p-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+          <div className="min-w-0">
+            <h2 className="font-display truncate text-4xl font-extrabold uppercase leading-none text-white">
               {rpName || player.user.minecraftUsername}
             </h2>
-            <p className="text-sm text-gray-400">
-              {player.grade} — {theme.label}
+            <p className="mt-2 text-gray-300">
+              {player.grade} <span className="text-gray-500">— {theme.label}</span>
             </p>
-            <p className="mt-2 max-w-md text-xs text-gray-500">{theme.tagline}</p>
+            <p className="mt-2 max-w-md text-sm text-gray-500">{theme.tagline}</p>
           </div>
           {departmentName && (
-            <div
-              className="rounded border px-4 py-2 text-center"
-              style={{ borderColor: `${theme.color}4d`, background: `${theme.color}1a` }}
-            >
-              <p className="font-mono text-[10px] text-gray-500">DÉPARTEMENT</p>
-              <p className="font-mono text-lg font-bold" style={{ color: theme.color }}>
+            <div className="border-l-2 pl-4" style={{ borderColor: theme.color }}>
+              <p className="label-mono text-[9px] text-gray-500">Département</p>
+              <p className="font-display text-2xl font-bold uppercase leading-tight text-white">
                 {departmentName}
               </p>
             </div>
           )}
         </div>
-        <Link
-          href="/messagerie"
-          className="mt-4 inline-flex items-center gap-2 rounded border px-4 py-2 font-mono text-xs transition-colors hover:text-white"
-          style={{ borderColor: `${theme.color}66`, color: theme.color }}
-        >
-          <MessageCircle className="h-4 w-4" />
-          Ouvrir la messagerie
-        </Link>
+        <div className="border-t border-line px-6 py-3">
+          <Link
+            href="/messagerie"
+            className="font-display inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.12em] text-white transition-colors hover:text-redlake-glow"
+          >
+            <MessageCircle className="h-4 w-4" style={{ color: theme.color }} />
+            Ouvrir la messagerie →
+          </Link>
+        </div>
       </div>
 
       {isFondation && (
-        <section className="hologram-border rounded-lg p-6">
-          <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
+        <section className="hologram-border p-6">
+          <h3 className={SECTION_TITLE}>
             <Shield className="h-5 w-5 text-redlake-glow" />
-            Secteurs accessibles (selon grade)
+            Secteurs accessibles
+            <span className="label-mono ml-auto text-[10px] font-normal text-gray-500">
+              {sections.length} ouverts
+            </span>
           </h3>
+          {/* Tous ces secteurs sont ouverts : la flèche signale seulement ceux qui ont une page. */}
           <div className="flex flex-wrap gap-2">
             {sections.map((s) => {
               const href = SECTION_LINKS[s];
               const label = SITE_SECTION_LABELS[s] ?? s;
+              const chip =
+                "inline-flex items-center gap-1.5 border border-line bg-black/30 px-3 py-1.5 text-sm text-gray-200";
               if (href) {
                 return (
                   <Link
                     key={s}
                     href={href}
-                    className="rounded border border-redlake/30 bg-redlake/5 px-3 py-1.5 font-mono text-xs text-redlake-glow transition-colors hover:bg-redlake/15"
+                    className={cn(chip, "transition-colors hover:border-redlake-glow hover:text-white")}
                   >
+                    <span className="h-1.5 w-1.5 bg-redlake-glow" aria-hidden />
                     {label}
+                    <span className="text-gray-500" aria-hidden>→</span>
                   </Link>
                 );
               }
               return (
-                <span
-                  key={s}
-                  className="rounded border border-metal/50 px-3 py-1.5 font-mono text-xs text-gray-500"
-                >
+                <span key={s} className={chip}>
+                  <span className="h-1.5 w-1.5 bg-redlake-glow" aria-hidden />
                   {label}
                 </span>
               );
             })}
           </div>
-          <p className="mt-4 font-mono text-xs text-gray-600">
+          <p className="mt-4 text-xs text-gray-500">
             {player.user.role === "ADMIN"
               ? "Compte Fondateur : toutes les sections sont ouvertes, quel que soit votre grade in-game."
               : "Ces accès reflètent votre grade in-game. Les transmissions Discord sont filtrées selon votre habilitation réelle."}
@@ -295,30 +303,34 @@ export function IntranetTerminal() {
       )}
 
       {!isFondation && factionGrades.length > 0 && (
-        <section className="hologram-border rounded-lg p-6">
-          <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
+        <section className="hologram-border p-6">
+          <h3 className={SECTION_TITLE}>
             <Shield className="h-5 w-5" style={{ color: theme.color }} />
             Hiérarchie — {theme.label}
           </h3>
-          <div className="space-y-1.5">
+          <ol className="border-t border-line">
             {factionGrades.map((g) => {
               const isMine = g.name === player.grade;
               return (
-                <div
+                <li
                   key={g.slug}
                   className={cn(
-                    "flex items-center gap-3 rounded border px-3 py-1.5 font-mono text-xs",
-                    isMine ? "border-current" : "border-metal/40 text-gray-400",
+                    "flex items-center gap-3 border-b border-line px-3 py-2 text-sm even:bg-white/[0.02]",
+                    isMine ? "font-semibold text-white" : "text-gray-300",
                   )}
-                  style={isMine ? { color: theme.color, background: `${theme.color}14` } : undefined}
+                  style={isMine ? { background: `${theme.color}1f`, boxShadow: `inset 3px 0 0 ${theme.color}` } : undefined}
                 >
-                  <span className="w-6 text-right text-gray-600">{g.tier}</span>
+                  <span className="label-mono w-8 text-right text-[10px] text-gray-500">{g.tier}</span>
                   <span>{g.name}</span>
-                  {isMine && <span className="ml-auto text-[10px]">← vous</span>}
-                </div>
+                  {isMine && (
+                    <span className="label-mono ml-auto text-[10px]" style={{ color: theme.color }}>
+                      Votre grade
+                    </span>
+                  )}
+                </li>
               );
             })}
-          </div>
+          </ol>
         </section>
       )}
 
@@ -338,12 +350,12 @@ export function IntranetTerminal() {
       {factionSlug && <FactionLog color={theme.color} />}
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <section className="hologram-border rounded-lg p-6">
-          <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
+        <section className="hologram-border p-6">
+          <h3 className={SECTION_TITLE}>
             <Send className="h-5 w-5 text-redlake-glow" />
             Déposer un rapport RP
           </h3>
-          <p className="mb-4 text-sm text-gray-500">
+          <p className="mb-4 text-sm text-gray-400">
             Incidents, demandes d&apos;autorisation, mémos ou réquisitions — le staff traite
             ces dossiers en jeu et sur Discord.
           </p>
@@ -354,20 +366,23 @@ export function IntranetTerminal() {
                   key={t.value}
                   type="button"
                   onClick={() => setReportType(t.value)}
+                  aria-pressed={reportType === t.value}
                   className={cn(
-                    "flex items-center gap-2 rounded border px-3 py-2 font-mono text-[10px] transition-colors",
+                    "flex items-center gap-2 border px-3 py-2 text-left text-xs transition-colors",
                     reportType === t.value
-                      ? "border-redlake bg-redlake/20 text-redlake-glow"
-                      : "border-metal text-gray-500 hover:text-white",
+                      ? "border-redlake-glow bg-redlake-glow/15 text-white"
+                      : "border-line text-gray-400 hover:border-line-strong hover:text-white",
                   )}
                 >
-                  <t.icon className="h-3 w-3 shrink-0" />
+                  <t.icon
+                    className={cn("h-3.5 w-3.5 shrink-0", reportType === t.value && "text-redlake-glow")}
+                  />
                   {t.label}
                 </button>
               ))}
             </div>
             <label className="block">
-              <span className="mb-1 block font-mono text-xs text-gray-500">Objet</span>
+              <span className="label-mono mb-1.5 block text-[10px] text-gray-400">Objet</span>
               <input
                 required
                 minLength={3}
@@ -375,11 +390,11 @@ export function IntranetTerminal() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Ex. Incident zone D-4 — 14h32"
-                className="w-full rounded border border-metal bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-redlake/50"
+                className={FIELD}
               />
             </label>
             <label className="block">
-              <span className="mb-1 block font-mono text-xs text-gray-500">Contenu</span>
+              <span className="label-mono mb-1.5 block text-[10px] text-gray-400">Contenu</span>
               <textarea
                 required
                 minLength={10}
@@ -388,24 +403,25 @@ export function IntranetTerminal() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Décrivez les faits, témoins, mesures prises…"
-                className="w-full rounded border border-metal bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-redlake/50"
+                className={FIELD}
               />
             </label>
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded border border-redlake/40 bg-redlake/10 py-2 font-mono text-sm text-redlake-glow hover:text-white disabled:opacity-50"
+              className="font-display inline-flex w-full items-center justify-center gap-2 bg-redlake-glow py-3 text-base font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#ff4a3f] disabled:opacity-50"
             >
+              <Send className="h-4 w-4" />
               {submitting ? "Transmission…" : "Transmettre au secrétariat"}
             </button>
             {message && (
-              <p className="font-mono text-xs text-gray-400">{message}</p>
+              <p className="text-sm text-gray-300">{message}</p>
             )}
           </form>
         </section>
 
-        <section className="hologram-border rounded-lg p-6">
-          <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
+        <section className="hologram-border p-6">
+          <h3 className={SECTION_TITLE}>
             <ClipboardList className="h-5 w-5 text-redlake-glow" />
             Mes rapports
           </h3>
@@ -414,7 +430,7 @@ export function IntranetTerminal() {
       </div>
 
       {(player.user.role === "STAFF" || player.user.role === "ADMIN") && (
-        <p className="text-center font-mono text-xs text-gray-600">
+        <p className="label-mono text-center text-[10px] text-gray-500">
           Accès staff :{" "}
           <Link href="/staff" className="text-redlake-glow hover:underline">
             tableau de bord administration →

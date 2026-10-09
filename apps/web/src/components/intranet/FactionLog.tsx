@@ -61,13 +61,13 @@ export function FactionLog({
   if (reports === null) return null;
 
   return (
-    <section className="hologram-border rounded-lg p-6">
-      <h3 className="mb-4 flex items-center gap-2 font-bold text-white">
+    <section className="hologram-border p-6">
+      <h3 className="font-display mb-4 flex items-center gap-2 text-xl font-bold uppercase tracking-wide text-white">
         <Icon className="h-5 w-5" style={{ color }} />
         {title}
       </h3>
       {reports.length === 0 ? (
-        <p className="text-sm text-gray-500">{emptyText}</p>
+        <p className="text-sm text-gray-400">{emptyText}</p>
       ) : (
         <div className="space-y-3">
           {reports.map((r) => {
@@ -102,7 +102,7 @@ export function FactionLog({
           })}
         </div>
       )}
-      <p className="mt-4 font-mono text-xs text-gray-600">{footerText}</p>
+      <p className="label-mono mt-4 text-[10px] text-gray-500">{footerText}</p>
     </section>
   );
 }
