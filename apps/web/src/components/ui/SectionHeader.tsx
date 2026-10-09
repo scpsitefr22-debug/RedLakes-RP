@@ -30,19 +30,21 @@ export function SectionHeader({
       )}
     >
       <div className={cn(align === "center" && "max-w-2xl")}>
-        <p className="mb-2 flex items-center gap-2 font-mono text-xs tracking-widest text-redlake-glow">
-          {Icon && <Icon className="h-3.5 w-3.5" />}
+        <p className={cn("label-mono mb-3 flex items-center gap-2 text-redlake-glow", align === "center" && "justify-center")}>
+          {Icon ? <Icon className="h-3.5 w-3.5" /> : <span className="h-px w-8 bg-redlake-glow" aria-hidden />}
           {kicker}
         </p>
-        <h2 className="text-3xl font-bold text-white sm:text-4xl">{title}</h2>
+        <h2 className="font-display text-4xl font-bold uppercase leading-[0.95] tracking-[0.03em] text-white sm:text-5xl">
+          {title}
+        </h2>
         {description && (
-          <p className="mt-3 max-w-2xl text-gray-500">{description}</p>
+          <p className="mt-4 max-w-2xl leading-relaxed text-gray-400">{description}</p>
         )}
       </div>
       {action && (
         <Link
           href={action.href}
-          className="flex shrink-0 items-center gap-1 font-mono text-xs text-gray-500 transition-colors hover:text-redlake-glow"
+          className="label-mono flex shrink-0 items-center gap-1.5 border-b border-line pb-1 text-gray-400 transition-colors hover:border-redlake-glow hover:text-white"
         >
           {action.label} <ArrowRight className="h-3 w-3" />
         </Link>

@@ -10,10 +10,10 @@ const ALERT_LABELS: Record<AlertLevel, string> = {
 };
 
 const ALERT_STYLES: Record<AlertLevel, string> = {
-  NORMAL: "border-metal/50 text-gray-500",
-  VIGILANCE: "border-yellow-400/40 text-yellow-400",
-  ALERTE: "border-orange-400/50 text-orange-400",
-  CRISE: "border-red-500/60 text-red-500 animate-pulse",
+  NORMAL: "text-emerald-400/90",
+  VIGILANCE: "text-yellow-300",
+  ALERTE: "text-orange-400",
+  CRISE: "text-red-400 animate-pulse",
 };
 
 export function AlertLevelBadge() {
@@ -22,9 +22,12 @@ export function AlertLevelBadge() {
   return (
     <span
       title={status.alertNote ?? undefined}
-      className={`hidden items-center gap-1.5 rounded border px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider sm:inline-flex ${ALERT_STYLES[status.alertLevel]}`}
+      className={`label-mono hidden items-center gap-2 text-[10px] sm:inline-flex ${ALERT_STYLES[status.alertLevel]}`}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-current opacity-60 motion-reduce:animate-none" />
+        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-current" />
+      </span>
       {ALERT_LABELS[status.alertLevel]}
     </span>
   );

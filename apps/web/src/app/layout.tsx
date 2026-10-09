@@ -1,16 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow_Condensed, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { RouteChrome } from "@/components/layout/RouteChrome";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Signalétique condensée pour les titres, Plex (la typo des documents
+// techniques) pour le texte et les données : un site qui se lit comme les
+// archives internes d'un site de confinement.
+const signage = Barlow_Condensed({
+  variable: "--font-signage",
   subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const body = IBM_Plex_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const code = IBM_Plex_Mono({
+  variable: "--font-code",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${signage.variable} ${body.variable} ${code.variable} h-full antialiased`}
     >
       <body className="scanlines crt-noise min-h-full flex flex-col bg-background text-foreground">
         <RouteChrome>{children}</RouteChrome>

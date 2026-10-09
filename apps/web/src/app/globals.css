@@ -1,22 +1,39 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   IDENTITÉ « DOSSIER DE CONFINEMENT » — Site-12
+   Un noir acier froid (béton et métal de nuit), le rouge réservé à
+   l'alarme, l'ambre au danger. Cadres à coins marqués comme un viseur de
+   caméra de sécurité, titres en signalétique condensée, données en mono.
+   Le site reste volontairement sombre : un seul thème, couleurs explicites.
+   ========================================================================== */
 :root {
   color-scheme: dark;
-  --background: #050505;
-  --foreground: #e8e8e8;
-  --redlake-red: #8b0a0a;
-  --redlake-red-dark: #5c0606;
-  --redlake-red-glow: #c41e1e;
-  --metal: #3a3a3a;
-  --metal-light: #5c5c5c;
-  --classified: #1a1a1a;
+  --background: #07090c;
+  --surface: #0c1016;
+  --surface-raised: #121821;
+  --foreground: #e6eaf0;
+  --line: #232b36;
+  --line-strong: #3a4656;
+  --redlake-red: #a51d18;
+  --redlake-red-dark: #5e0f0c;
+  --redlake-red-glow: #e5392f;
+  --hazard: #f0a640;
+  --metal: #2a323d;
+  --metal-light: #7a8695;
+  --classified: #10141a;
   --terminal-green: #4ade80;
-  --hologram: rgba(139, 10, 10, 0.15);
+  --hologram: rgba(165, 29, 24, 0.15);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-hazard: var(--hazard);
   --color-redlake: var(--redlake-red);
   --color-redlake-dark: var(--redlake-red-dark);
   --color-redlake-glow: var(--redlake-red-glow);
@@ -24,8 +41,46 @@
   --color-metal-light: var(--metal-light);
   --color-classified: var(--classified);
   --color-terminal: var(--terminal-green);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-code);
+  --font-display: var(--font-signage);
+}
+
+/* Gris de Tailwind éclaircis et teintés acier : sur ce fond très sombre,
+   les gris par défaut (gray-500/600, près de 900 usages) passaient sous le
+   seuil de lisibilité. */
+@theme {
+  --color-gray-200: #e1e6ec;
+  --color-gray-300: #cdd4dd;
+  --color-gray-400: #aeb8c4;
+  --color-gray-500: #8f9aa7;
+  --color-gray-600: #707b89;
+  --color-gray-700: #4b5563;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-signage), var(--font-body), system-ui, sans-serif;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.02;
+  }
+
+  ::selection {
+    background: rgba(229, 57, 47, 0.35);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline-color: var(--redlake-red-glow);
+  }
 }
 
 * {
@@ -45,10 +100,16 @@ select option {
   color: var(--foreground);
 }
 
+/* Fond : lueur d'alarme en haut, grille de plan très discrète. */
 body {
-  background: var(--background);
+  background:
+    radial-gradient(ellipse 80% 45% at 50% -12%, rgba(229, 57, 47, 0.09), transparent 62%),
+    linear-gradient(rgba(150, 170, 200, 0.022) 1px, transparent 1px) 0 0 / 56px 56px,
+    linear-gradient(90deg, rgba(150, 170, 200, 0.022) 1px, transparent 1px) 0 0 / 56px 56px,
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
 }
 
 /* Scanlines overlay */
@@ -185,10 +246,80 @@ body {
   100% { transform: translateY(100vh); }
 }
 
-.hologram-border {
-  border: 1px solid rgba(139, 10, 10, 0.4);
-  background: linear-gradient(135deg, rgba(139, 10, 10, 0.05) 0%, transparent 50%);
-  box-shadow: inset 0 0 30px rgba(139, 10, 10, 0.05);
+/* ==========================================================================
+   CADRES — la signature du site : coins rouges en équerre façon viseur de
+   caméra de sécurité, fond acier légèrement dégradé. Dans la couche
+   « components » pour que les utilitaires d'une page (bordure au survol,
+   fond particulier) gardent la main ; seul l'arrondi est imposé (plus bas,
+   hors couche) pour que tout le site partage les mêmes angles vifs.
+   ========================================================================== */
+@layer components {
+  .hologram-border {
+    --frame-corner: var(--redlake-red-glow);
+    border: 1px solid var(--line);
+    background:
+      linear-gradient(var(--frame-corner), var(--frame-corner)) top left / 12px 2px no-repeat,
+      linear-gradient(var(--frame-corner), var(--frame-corner)) top left / 2px 12px no-repeat,
+      linear-gradient(var(--frame-corner), var(--frame-corner)) top right / 12px 2px no-repeat,
+      linear-gradient(var(--frame-corner), var(--frame-corner)) top right / 2px 12px no-repeat,
+      linear-gradient(var(--frame-corner), var(--frame-corner)) bottom left / 12px 2px no-repeat,
+      linear-gradient(var(--frame-corner), var(--frame-corner)) bottom left / 2px 12px no-repeat,
+      linear-gradient(var(--frame-corner), var(--frame-corner)) bottom right / 12px 2px no-repeat,
+      linear-gradient(var(--frame-corner), var(--frame-corner)) bottom right / 2px 12px no-repeat,
+      linear-gradient(180deg, rgba(18, 24, 33, 0.92), rgba(12, 16, 22, 0.92));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.035),
+      0 18px 40px -24px rgba(0, 0, 0, 0.9);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  a.hologram-border:hover,
+  button.hologram-border:hover {
+    border-color: var(--line-strong);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 0 0 1px rgba(229, 57, 47, 0.18),
+      0 22px 44px -22px rgba(229, 57, 47, 0.25);
+  }
+
+  .panel-flat {
+    border: 1px solid var(--line);
+    background: rgba(18, 24, 33, 0.55);
+  }
+
+  .panel-elevated {
+    border: 1px solid var(--line-strong);
+    background:
+      linear-gradient(var(--redlake-red-glow), var(--redlake-red-glow)) top left / 100% 2px no-repeat,
+      linear-gradient(180deg, rgba(22, 29, 40, 0.95), rgba(12, 16, 22, 0.95));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 24px 50px -24px rgba(0, 0, 0, 0.95);
+  }
+}
+
+/* Hors couche : prime sur rounded-lg / rounded-xl posés sur chaque carte. */
+.hologram-border,
+.panel-flat,
+.panel-elevated {
+  border-radius: 3px;
+}
+
+/* Bande « danger » : rayures rouges et noires, pour séparer une zone sensible. */
+.hazard-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--redlake-red-glow) 0 10px,
+    #0a0a0a 10px 20px
+  );
+}
+
+/* Libellé de données : petite capitale mono espacée (n° de dossier, statut…). */
+.label-mono {
+  font-family: var(--font-code), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 /* ==========================================================================
@@ -198,20 +329,6 @@ body {
    hiérarchie visuelle ne repose plus uniquement sur la taille du texte.
    ========================================================================== */
 
-.panel-flat {
-  border: 1px solid var(--metal);
-  background: rgba(255, 255, 255, 0.015);
-}
-
-.panel-elevated {
-  border: 1px solid rgba(139, 10, 10, 0.5);
-  background: linear-gradient(135deg, rgba(139, 10, 10, 0.08) 0%, transparent 55%);
-  box-shadow:
-    inset 0 0 30px rgba(139, 10, 10, 0.06),
-    0 8px 30px -8px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(139, 10, 10, 0.08);
-}
-
 .classified-stamp {
   font-family: var(--font-mono), monospace;
   letter-spacing: 0.2em;
@@ -219,14 +336,21 @@ body {
 }
 
 .prose-redlake h2 {
-  color: var(--redlake-red-glow);
-  border-bottom: 1px solid var(--metal);
+  color: var(--foreground);
+  border-bottom: 1px solid var(--line);
   padding-bottom: 0.5rem;
   margin-top: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.prose-redlake h2::before {
+  content: "■ ";
+  color: var(--redlake-red-glow);
 }
 
 .prose-redlake p {
-  color: #b0b0b0;
+  color: #c3cbd5;
   line-height: 1.75;
 }
 
@@ -454,4 +578,12 @@ body {
     opacity: 1 !important;
     transform: none !important;
   }
+}
+
+/* Ligne de balayage du moniteur de l'accueil. */
+@keyframes hero-scan {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
 }

@@ -24,7 +24,7 @@ export function HeaderAuth() {
 
   if (loading) {
     return (
-      <span className="hidden rounded border border-metal px-3 py-2 font-mono text-[10px] text-gray-600 sm:block">
+      <span className="label-mono hidden h-9 items-center border border-line px-3 text-[10px] text-gray-600 sm:flex">
         …
       </span>
     );
@@ -34,7 +34,7 @@ export function HeaderAuth() {
     return (
       <Link
         href="/connexion"
-        className="hidden rounded border border-metal p-2 text-gray-400 transition-colors hover:border-redlake hover:text-white sm:block"
+        className="hidden h-9 w-9 items-center justify-center border border-line text-gray-400 transition-colors hover:border-line-strong hover:text-white sm:flex"
         aria-label="Connexion agent"
         title="Terminal d'habilitation"
       >
@@ -47,17 +47,17 @@ export function HeaderAuth() {
     <div className="hidden items-center gap-2 sm:flex">
       <Link
         href="/dashboard"
-        className="flex max-w-[140px] items-center gap-2 rounded border border-redlake/30 bg-redlake/10 px-3 py-2 text-xs text-redlake-glow hover:bg-redlake/20"
+        className="flex h-9 max-w-[150px] items-center gap-2 border border-line bg-white/[0.03] px-3 text-xs text-gray-200 transition-colors hover:border-line-strong hover:text-white"
         title="Dossier agent"
       >
-        <User className="h-3 w-3 shrink-0" />
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-hidden />
         <span className="truncate font-mono">
           {displayName ?? username ?? "Agent"}
         </span>
       </Link>
       <Link
         href="/intranet"
-        className="rounded border border-metal p-2 text-gray-400 hover:border-redlake hover:text-white"
+        className="flex h-9 w-9 items-center justify-center border border-line text-gray-400 transition-colors hover:border-line-strong hover:text-white"
         title="Intranet Site-12"
       >
         <Terminal className="h-4 w-4" />
@@ -65,7 +65,7 @@ export function HeaderAuth() {
       {isStaff && (
         <Link
           href="/staff"
-          className="rounded border border-redlake/30 bg-redlake/10 p-2 text-redlake-glow hover:bg-redlake/20"
+          className="flex h-9 w-9 items-center justify-center border border-redlake/50 bg-redlake/15 text-redlake-glow transition-colors hover:bg-redlake/30"
           title="Tableau de bord staff"
         >
           <Lock className="h-4 w-4" />
@@ -75,7 +75,7 @@ export function HeaderAuth() {
       <button
         type="button"
         onClick={logout}
-        className="rounded border border-metal p-2 text-gray-500 hover:text-white"
+        className="flex h-9 w-9 items-center justify-center border border-line text-gray-500 transition-colors hover:border-line-strong hover:text-white"
         title="Déconnexion"
       >
         <LogOut className="h-4 w-4" />

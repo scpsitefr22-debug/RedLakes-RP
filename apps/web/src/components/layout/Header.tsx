@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   Shield,
@@ -91,7 +92,10 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const session = usePlayerSession();
+  const pathname = usePathname() ?? "/";
   const isStaff = STAFF_ROLES.has(session.role ?? "");
+  const matches = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isActive = (item: NavItem) => matches(item.href) || Boolean(item.children?.some((c) => matches(c.href)));
 
   const visibleNavItems = navItems.map((item) => ({
     ...item,
@@ -100,99 +104,123 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-redlake/30 bg-black/90 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="group flex items-center gap-3">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded border border-redlake/50 bg-redlake/10">
-                <Shield className="h-5 w-5 text-redlake-glow" />
-                <div className="absolute inset-0 rounded bg-redlake/5 opacity-0 transition-opacity group-hover:opacity-100" />
-              </div>
-              <div className="hidden sm:block">
-                <p className="font-mono text-sm font-bold tracking-widest text-white">
-                  REDLAKES RP
-                </p>
-                <p className="text-[10px] tracking-wider text-metal-light">
-                  SITE-12 // CLASSIFIÉ
-                </p>
-              </div>
-            </Link>
-            <AlertLevelBadge />
-          </div>
-
-          <nav className="hidden items-center gap-1 lg:flex">
-            {visibleNavItems.map((item) => (
-              <div
-                key={item.label}
-                className="relative"
-                onMouseEnter={() => item.children && setOpenDropdown(item.label)}
-                onMouseLeave={() => setOpenDropdown(null)}
-                onFocus={() => item.children && setOpenDropdown(item.label)}
-                onBlur={(e) => {
-                  if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-                    setOpenDropdown(null);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") setOpenDropdown(null);
-                }}
-              >
-                <Link
-                  href={item.href}
-                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-300 transition-colors hover:text-redlake-glow focus-visible:text-redlake-glow"
-                  aria-haspopup={item.children ? true : undefined}
-                  aria-expanded={item.children ? openDropdown === item.label : undefined}
+      <header className="sticky top-0 z-50 border-b border-line bg-[#07090c]/92 backdrop-blur-md">
+        {/* Bandeau d'état : où l'on est, et le niveau d'alerte du site. */}
+        <div className="hidden border-b border-line/70 bg-black/40 sm:block">
+          <div className="mx-auto flex h-7 max-w-[1440px] items-center justify-between gap-4 px-6">
+            <p className="label-mono truncate text-gray-500">
+              <span className="text-redlake-glow">■</span> Fondation SCP — Site-12 — Réseau indépendant
+            </p>
+            <div className="flex items-center gap-4">
+              <AlertLevelBadge />
+              {siteConfig.discordInvite && (
+                <a
+                  href={siteConfig.discordInvite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="label-mono flex items-center gap-1.5 text-[#aab1ff] transition-colors hover:text-white"
+                  aria-label={siteConfig.discordLabel}
                 >
-                  {item.label}
-                  {item.children && <ChevronDown className="h-3 w-3" />}
-                </Link>
-                {item.children && openDropdown === item.label && (
-                  <div className="absolute left-0 top-full min-w-[200px] border border-redlake/20 bg-black/95 py-2 shadow-xl">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className="block px-4 py-2 text-sm text-gray-400 hover:bg-redlake/10 hover:text-white"
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+                  <MessageCircle className="h-3 w-3" />
+                  Discord
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
+          <Link href="/" className="group flex shrink-0 items-center gap-3" aria-label="REDLAKES RP — accueil">
+            <span className="relative flex h-10 w-10 items-center justify-center border border-redlake/60 bg-redlake/10 transition-colors group-hover:bg-redlake/25">
+              <Shield className="h-5 w-5 text-redlake-glow" />
+              <span className="absolute -left-px -top-px h-2 w-2 border-l-2 border-t-2 border-redlake-glow" />
+              <span className="absolute -bottom-px -right-px h-2 w-2 border-b-2 border-r-2 border-redlake-glow" />
+            </span>
+            <span className="block leading-none">
+              <span className="font-display block text-2xl font-bold uppercase tracking-[0.08em] text-white">
+                Redlakes
+              </span>
+              <span className="label-mono mt-1 hidden text-[10px] text-redlake-glow sm:block">Site-12 // Classifié</span>
+            </span>
+          </Link>
+
+          <nav className="hidden items-center lg:flex" aria-label="Navigation principale">
+            {visibleNavItems.map((item) => {
+              const active = isActive(item);
+              return (
+                <div
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => item.children && setOpenDropdown(item.label)}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                  onFocus={() => item.children && setOpenDropdown(item.label)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                      setOpenDropdown(null);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") setOpenDropdown(null);
+                  }}
+                >
+                  <Link
+                    href={item.href}
+                    className={`font-display relative flex h-16 items-center gap-1 px-2 text-[15px] font-semibold uppercase tracking-[0.06em] transition-colors xl:px-3 xl:tracking-[0.1em] hover:text-white focus-visible:text-white ${
+                      active ? "text-white" : "text-gray-400"
+                    }`}
+                    aria-haspopup={item.children ? true : undefined}
+                    aria-expanded={item.children ? openDropdown === item.label : undefined}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {item.label}
+                    {item.children && <ChevronDown className="h-3.5 w-3.5 opacity-70" />}
+                    <span
+                      className={`absolute inset-x-2 bottom-0 h-0.5 bg-redlake-glow xl:inset-x-3 transition-transform duration-200 ${
+                        active ? "scale-x-100" : "scale-x-0"
+                      }`}
+                    />
+                  </Link>
+                  {item.children && openDropdown === item.label && (
+                    <div className="absolute left-0 top-full min-w-[240px] border border-line border-t-redlake-glow bg-[#0b0e13]/98 py-2 shadow-2xl shadow-black/70">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                        >
+                          <span className="h-1 w-1 bg-redlake-glow/70" />
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setSearchOpen(true)}
-              className="rounded border border-metal p-2 text-gray-400 transition-colors hover:border-redlake hover:text-white"
+              className="flex h-9 items-center gap-2 border border-line px-2.5 text-gray-400 transition-colors hover:border-line-strong hover:text-white"
               aria-label="Rechercher"
             >
               <Search className="h-4 w-4" />
+              <span className="label-mono hidden text-[10px] 2xl:inline">Rechercher</span>
             </button>
             <HeaderAuth />
-            {siteConfig.discordInvite && (
-              <a
-                href={siteConfig.discordInvite}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden rounded border border-[#5865F2]/40 bg-[#5865F2]/10 px-3 py-2 text-xs font-mono text-[#aab1ff] transition-colors hover:border-[#5865F2] hover:text-white sm:block"
-                aria-label={siteConfig.discordLabel}
-              >
-                <MessageCircle className="mr-1 inline h-3 w-3" />
-                DISCORD
-              </a>
-            )}
             <Link
               href="/connexion"
-              className="rounded border border-metal p-2 text-gray-400 sm:hidden"
+              className="flex h-9 w-9 items-center justify-center border border-line text-gray-400 sm:hidden"
+              aria-label="Connexion"
             >
               <User className="h-4 w-4" />
             </Link>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="rounded border border-metal p-2 text-gray-400 lg:hidden"
+              className="flex h-9 w-9 items-center justify-center border border-line text-gray-300 lg:hidden"
+              aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-expanded={mobileOpen}
             >
               {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
@@ -200,12 +228,12 @@ export function Header() {
         </div>
 
         {mobileOpen && (
-          <nav className="border-t border-redlake/20 bg-black/95 px-4 py-4 lg:hidden">
+          <nav className="border-t border-line bg-[#07090c] px-4 py-4 lg:hidden" aria-label="Navigation mobile">
             {visibleNavItems.map((item) => (
-              <div key={item.label} className="mb-2">
+              <div key={item.label} className="mb-3">
                 <Link
                   href={item.href}
-                  className="block py-2 font-medium text-white"
+                  className="font-display block py-2 text-lg font-semibold uppercase tracking-[0.1em] text-white"
                   onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
@@ -214,7 +242,7 @@ export function Header() {
                   <Link
                     key={child.href}
                     href={child.href}
-                    className="block py-1 pl-4 text-sm text-gray-400"
+                    className="block border-l border-line py-1.5 pl-4 text-sm text-gray-400"
                     onClick={() => setMobileOpen(false)}
                   >
                     {child.label}

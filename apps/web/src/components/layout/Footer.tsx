@@ -2,74 +2,87 @@ import Link from "next/link";
 import { Shield, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/config/site";
 
+const COLUMNS = [
+  {
+    title: "Encyclopédie",
+    links: [
+      { label: "Wiki SCP", href: "/wiki" },
+      { label: "Lore", href: "/lore" },
+      { label: "Carte interactive", href: "/carte" },
+      { label: "Chronologie", href: "/chronologie" },
+    ],
+  },
+  {
+    title: "Organisations",
+    links: [
+      { label: "Fondation SCP", href: "/factions/fondation" },
+      { label: "A.E.G.I.S.", href: "/factions/aegis" },
+      { label: "Départements", href: "/departements" },
+      { label: "Grades", href: "/grades" },
+    ],
+  },
+  {
+    title: "Systèmes",
+    links: [
+      { label: "Candidatures", href: "/candidatures" },
+      { label: "OPHIS", href: "/ophis" },
+      { label: "Tableau de bord", href: "/dashboard" },
+      { label: "Archives classifiées", href: "/archives" },
+    ],
+  },
+];
+
 export function Footer() {
   return (
-    <footer className="mt-auto border-t border-redlake/20 bg-classified">
-      <div className="mx-auto max-w-7xl px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-4">
+    <footer className="mt-auto border-t border-line bg-[#05070a]">
+      <div className="hazard-stripes h-1 opacity-80" aria-hidden />
+      <div className="mx-auto max-w-[1440px] px-6 py-14">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <div className="mb-4 flex items-center gap-2">
-              <Shield className="h-5 w-5 text-redlake-glow" />
-              <span className="font-mono text-sm font-bold tracking-widest">
-                REDLAKES RP
+            <div className="mb-4 flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center border border-redlake/60 bg-redlake/10">
+                <Shield className="h-4 w-4 text-redlake-glow" />
+              </span>
+              <span className="font-display text-2xl font-bold uppercase tracking-[0.08em] text-white">
+                Redlakes RP
               </span>
             </div>
-            <p className="text-sm text-gray-500">
-              Le secret doit être préservé. Encyclopédie officielle du serveur SCP
-              / DarkRP.
+            <p className="max-w-sm text-sm leading-relaxed text-gray-400">
+              Sécuriser. Contenir. Protéger. L&apos;encyclopédie officielle du serveur SCP / DarkRP
+              du Site-12.
             </p>
             {siteConfig.discordInvite && (
               <a
                 href={siteConfig.discordInvite}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-2 rounded border border-[#5865F2]/40 bg-[#5865F2]/10 px-3 py-2 text-sm text-[#aab1ff] transition-colors hover:border-[#5865F2] hover:text-white"
+                className="mt-5 inline-flex items-center gap-2 border border-[#5865F2]/50 bg-[#5865F2]/10 px-4 py-2 text-sm text-[#c3c8ff] transition-colors hover:border-[#5865F2] hover:bg-[#5865F2]/20 hover:text-white"
               >
                 <MessageCircle className="h-4 w-4" />
                 {siteConfig.discordLabel}
               </a>
             )}
           </div>
-          <div>
-            <h4 className="mb-3 font-mono text-xs tracking-wider text-redlake-glow">
-              ENCYCLOPÉDIE
-            </h4>
-            <ul className="space-y-2 text-sm text-gray-500">
-              <li><Link href="/wiki" className="hover:text-white">Wiki SCP</Link></li>
-              <li><Link href="/lore" className="hover:text-white">Lore</Link></li>
-              <li><Link href="/carte" className="hover:text-white">Carte interactive</Link></li>
-              <li><Link href="/chronologie" className="hover:text-white">Chronologie</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-3 font-mono text-xs tracking-wider text-redlake-glow">
-              ORGANISATIONS
-            </h4>
-            <ul className="space-y-2 text-sm text-gray-500">
-              <li><Link href="/factions/fondation" className="hover:text-white">Fondation SCP</Link></li>
-              <li><Link href="/factions/aegis" className="hover:text-white">A.E.G.I.S.</Link></li>
-              <li><Link href="/departements" className="hover:text-white">Départements</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="mb-3 font-mono text-xs tracking-wider text-redlake-glow">
-              SYSTÈMES
-            </h4>
-            <ul className="space-y-2 text-sm text-gray-500">
-              <li><Link href="/candidatures" className="hover:text-white">Candidatures</Link></li>
-              <li><Link href="/ophis" className="hover:text-white">OPHIS</Link></li>
-              <li><Link href="/dashboard" className="hover:text-white">Tableau de bord</Link></li>
-              <li><Link href="/archives" className="hover:text-white">Archives classifiées</Link></li>
-            </ul>
-          </div>
+          {COLUMNS.map((col) => (
+            <div key={col.title}>
+              <h4 className="label-mono mb-4 text-redlake-glow">{col.title}</h4>
+              <ul className="space-y-2.5 text-sm">
+                {col.links.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-gray-400 transition-colors hover:text-white">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-metal pt-8 sm:flex-row">
-          <p className="font-mono text-xs text-gray-600">
-            © 2026 REDLAKES RP — Site-12 // Classification : Interne
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-line pt-6 sm:flex-row sm:items-center">
+          <p className="label-mono text-[10px] text-gray-600">
+            © 2026 Redlakes RP — Site-12 // Classification : interne
           </p>
-          <p className="font-mono text-xs text-gray-600">
-            SCP RP × DarkRP × Univers Original
-          </p>
+          <p className="label-mono text-[10px] text-gray-600">SCP RP × DarkRP × univers original</p>
         </div>
       </div>
     </footer>

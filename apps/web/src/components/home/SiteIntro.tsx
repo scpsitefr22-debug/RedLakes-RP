@@ -67,7 +67,7 @@ export function SiteIntro({ children }: { children: React.ReactNode }) {
   return (
     <div className="scanlines crt-noise flex min-h-[85vh] items-center justify-center px-4 py-16">
       <div className="w-full max-w-lg">
-        <div className="mb-8 font-mono text-sm text-green-500/90">
+        <div className="mb-8 font-mono text-sm text-emerald-400/90">
           {BOOT_LINES.slice(0, lineCount).map((line, i) => (
             <p key={i} className="animate-in fade-in slide-in-from-left-2 duration-300">
               {line}
@@ -77,40 +77,40 @@ export function SiteIntro({ children }: { children: React.ReactNode }) {
         </div>
 
         {done && (
-          <div className="hologram-border animate-in fade-in duration-500 space-y-6 rounded-lg p-8 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded border border-redlake/50 bg-redlake/10">
+          <div className="hologram-border animate-in fade-in duration-500 space-y-6 p-10 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center border border-redlake/60 bg-redlake/10">
               <ShieldAlert className="h-7 w-7 text-redlake-glow" />
             </div>
 
             {me.authenticated ? (
               <>
-                <p className="font-mono text-xs tracking-[0.3em] text-redlake-glow">
+                <p className="label-mono text-redlake-glow">
                   ACCÈS AUTORISÉ
                 </p>
-                <h1 className="text-2xl font-bold text-white">
+                <h1 className="font-display text-5xl font-extrabold text-white">
                   Bonjour, {name ?? "agent"}.
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm leading-relaxed text-gray-400">
                   Votre habilitation est confirmée. Le réseau REDLAKES vous
                   attend.
                 </p>
                 <button
                   type="button"
                   onClick={() => setRevealed(true)}
-                  className="w-full rounded border border-redlake bg-redlake/20 py-3 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-redlake/30"
+                  className="font-display w-full bg-redlake-glow py-4 text-lg font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#ff4a3f]"
                 >
                   Entrer sur le réseau
                 </button>
               </>
             ) : (
               <>
-                <p className="font-mono text-xs tracking-[0.3em] text-redlake-glow">
+                <p className="label-mono text-redlake-glow">
                   SITE-12 // ACCÈS RESTREINT
                 </p>
-                <h1 className="text-2xl font-bold text-white">
+                <h1 className="font-display text-5xl font-extrabold text-white">
                   Bonjour, visiteur.
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm leading-relaxed text-gray-400">
                   Le contenu du réseau REDLAKES est réservé aux agents
                   habilités. Identifiez-vous ou demandez une habilitation
                   pour continuer.
@@ -118,14 +118,14 @@ export function SiteIntro({ children }: { children: React.ReactNode }) {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Link
                     href="/connexion"
-                    className="flex items-center justify-center gap-2 rounded border border-redlake bg-redlake/20 py-3 font-mono text-sm uppercase tracking-wider text-white transition-colors hover:bg-redlake/30"
+                    className="font-display flex items-center justify-center gap-2 bg-redlake-glow py-3.5 text-base font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#ff4a3f]"
                   >
                     <LogIn className="h-4 w-4" />
                     Se connecter
                   </Link>
                   <Link
                     href="/connexion"
-                    className="flex items-center justify-center gap-2 rounded border border-metal bg-black/30 py-3 font-mono text-sm uppercase tracking-wider text-gray-300 transition-colors hover:border-redlake/50"
+                    className="font-display flex items-center justify-center gap-2 border border-line-strong py-3.5 text-base font-bold uppercase tracking-[0.12em] text-gray-200 transition-colors hover:border-white hover:text-white"
                   >
                     <UserPlus className="h-4 w-4" />
                     Créer un compte
