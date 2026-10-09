@@ -90,7 +90,7 @@ function ContainmentMonitor({ alert }: { alert: AlertLevel }) {
             <pattern id="hero-grid" width="20" height="20" patternUnits="userSpaceOnUse">
               <path d="M20 0H0V20" fill="none" stroke="rgba(150,170,200,0.08)" strokeWidth="1" />
             </pattern>
-            <radialGradient id="hero-sweep" cx="0" cy="0" r="1">
+            <radialGradient id="hero-sweep" gradientUnits="userSpaceOnUse" cx="200" cy="150" r="175">
               <stop offset="0" stopColor="rgba(229,57,47,0.35)" />
               <stop offset="1" stopColor="rgba(229,57,47,0)" />
             </radialGradient>
@@ -128,11 +128,8 @@ function ContainmentMonitor({ alert }: { alert: AlertLevel }) {
 
           {/* Balayage radar autour de la cellule centrale */}
           {!reduce && (
-            <g transform="translate(200 150)">
-              <g>
-                <path d="M0 0 L170 -40 A175 175 0 0 1 170 40 Z" fill="url(#hero-sweep)" opacity="0.9" />
-                <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="6s" repeatCount="indefinite" />
-              </g>
+            <g className="animate-[hero-sweep_6s_linear_infinite]" style={{ transformOrigin: "200px 150px", transformBox: "view-box" }}>
+              <path d="M200 150 L370 110 A175 175 0 0 1 370 190 Z" fill="url(#hero-sweep)" opacity="0.9" />
             </g>
           )}
           <g fill="none" stroke="rgba(229,57,47,0.25)">
