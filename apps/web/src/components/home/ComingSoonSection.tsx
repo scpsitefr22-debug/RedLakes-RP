@@ -78,9 +78,6 @@ export function ComingSoonSection() {
             )}
           </div>
 
-          <p className="mt-6 font-mono text-xs text-gray-600">
-            IP serveur : {siteConfig.serverIp} (inactive)
-          </p>
         </motion.div>
       </div>
     </section>

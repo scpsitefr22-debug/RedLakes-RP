@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Check, Copy, MessageCircle } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { useSystemStatus, type AlertLevel } from "@/hooks/useSystemStatus";
 
@@ -31,35 +31,6 @@ function useClock() {
     return () => clearInterval(id);
   }, []);
   return now;
-}
-
-function ServerAddress() {
-  const [copied, setCopied] = useState(false);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(siteConfig.serverIp);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* presse-papiers refusé : l'adresse reste lisible et sélectionnable */
-    }
-  };
-  return (
-    <button
-      type="button"
-      onClick={copy}
-      className="group flex items-center gap-3 border border-line bg-black/40 px-4 py-3 text-left transition-colors hover:border-line-strong"
-      title="Copier l'adresse du serveur"
-    >
-      <span>
-        <span className="label-mono block text-[10px] text-gray-500">Adresse du serveur</span>
-        <span className="mt-0.5 block select-all font-mono text-sm text-white">{siteConfig.serverIp}</span>
-      </span>
-      <span className="ml-2 flex h-8 w-8 items-center justify-center border border-line text-gray-400 group-hover:text-white">
-        {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-      </span>
-    </button>
-  );
 }
 
 /**
@@ -234,14 +205,14 @@ export function HeroBanner() {
             )}
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-4">
-            <ServerAddress />
-            {recruitmentOpen && (
-              <Link href="/candidatures" className="label-mono text-gray-400 transition-colors hover:text-white">
-                Recrutement ouvert — postuler →
-              </Link>
-            )}
-          </div>
+          {recruitmentOpen && (
+            <Link
+              href="/candidatures"
+              className="label-mono mt-6 inline-block text-gray-400 transition-colors hover:text-white"
+            >
+              Recrutement ouvert — postuler →
+            </Link>
+          )}
         </motion.div>
 
         <motion.div
