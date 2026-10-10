@@ -2,7 +2,6 @@ import { scpObjects } from "@/data/scp";
 import { factions } from "@/data/factions";
 import { loreSections, characters, gameEvents } from "@/data/lore";
 import { newsArticles } from "@/data/news";
-import { mapLocations } from "@/data/map";
 import { site12Departments } from "@/data/site12";
 
 export interface SearchResult {
@@ -95,17 +94,6 @@ export function searchAll(query: string): SearchResult[] {
     }
   });
 
-  mapLocations.forEach((l) => {
-    if (l.name.toLowerCase().includes(q) || l.description.toLowerCase().includes(q)) {
-      results.push({
-        id: l.id,
-        title: l.name,
-        type: "location",
-        href: `/carte#${l.id}`,
-        excerpt: l.description.slice(0, 120),
-      });
-    }
-  });
 
   site12Departments.forEach((d) => {
     if (d.name.toLowerCase().includes(q)) {

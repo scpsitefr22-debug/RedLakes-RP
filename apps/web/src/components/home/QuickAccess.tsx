@@ -2,16 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { MapPin, Skull, FileLock, Users, Image } from "lucide-react";
+import { Skull, FileLock, Users, Image } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const quickLinks = [
-  {
-    icon: MapPin,
-    title: "Carte Interactive",
-    description: "Explorez Site-12, la ville, les égouts et les zones criminelles.",
-    href: "/carte",
-  },
   {
     icon: Skull,
     title: "OPHIS",

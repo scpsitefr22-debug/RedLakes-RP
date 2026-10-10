@@ -589,6 +589,11 @@ body {
 }
 
 /* Rotation du balayage radar du moniteur de l'accueil. */
+@keyframes monitor-in {
+  from { opacity: 0.45; transform: translateY(6px); filter: brightness(1.8); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
 @keyframes hero-sweep {
   to { transform: rotate(360deg); }
 }

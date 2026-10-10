@@ -5,7 +5,7 @@ import { useCoreShell } from "./CoreShellProvider";
 
 export function CoreAppGrid() {
   const { session, openApp } = useCoreShell();
-  const apps = getCoreApps(session.factionSlug);
+  const apps = getCoreApps(session.factionSlug, session.role);
 
   return (
     <div className="grid grid-cols-3 gap-4 p-6 sm:grid-cols-4 md:grid-cols-6">

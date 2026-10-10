@@ -8,7 +8,6 @@ const COLUMNS = [
     links: [
       { label: "Wiki SCP", href: "/wiki" },
       { label: "Lore", href: "/lore" },
-      { label: "Carte interactive", href: "/carte" },
       { label: "Chronologie", href: "/chronologie" },
     ],
   },

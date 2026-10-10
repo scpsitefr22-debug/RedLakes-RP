@@ -22,11 +22,17 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { MinRank } from '../auth/rank.decorator';
 
+/**
+ * La carte est un outil HRP réservé au staff (décision du fondateur,
+ * 2026-10-10) : même la lecture exige un compte STAFF/ADMIN.
+ */
 @Controller('map')
 export class MapController {
   constructor(private map: MapService) {}
 
   @Get()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
   findAll() {
     return this.map.findAll();
   }
@@ -41,6 +47,8 @@ export class MapController {
   }
 
   @Get(':slug')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.STAFF, UserRole.ADMIN)
   async findOne(@Param('slug') slug: string) {
     const location = await this.map.findOne(slug);
     if (!location) throw new NotFoundException('Emplacement introuvable');

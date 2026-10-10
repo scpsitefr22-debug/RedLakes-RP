@@ -7,8 +7,8 @@ import type { NextRequest } from "next/server";
  * etc.) exige desormais un compte, la ou seules /intranet, /dashboard,
  * /staff, /lore/cms et /archives l'exigeaient auparavant.
  *
- * Exception deliberee : /wiki, /personnages, /factions, /chronologie,
- * /carte et /lore (hors /lore/cms) restent publiques — /integration (le
+ * Exception deliberee : /wiki, /personnages, /factions, /chronologie
+ * et /lore (hors /lore/cms) restent publiques — /integration (le
  * quiz d'onboarding pre-compte, voir IntegrationDossier.tsx) envoie les
  * visiteurs PAS ENCORE inscrits y chercher des indices ; les verrouiller
  * casserait ce parcours pour quiconque n'a pas encore de compte.
@@ -21,7 +21,7 @@ const PUBLIC_PATHS = [
   "/personnages",
   "/factions",
   "/chronologie",
-  "/carte",
+  // /carte n'est plus publique : outil HRP réservé au staff (2026-10-10).
   "/lore",
 ];
 

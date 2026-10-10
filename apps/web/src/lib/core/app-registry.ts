@@ -138,9 +138,15 @@ const FACTION_LABEL_OVERRIDES: Partial<Record<string, Partial<Record<AppId, stri
   },
 };
 
-export function getCoreApps(factionSlug: string): CoreAppDef[] {
+/** La carte est un outil HRP réservé au staff : l'app Carte n'apparaît que pour lui. */
+const STAFF_ONLY_APPS = new Set<AppId>(["carte"]);
+
+export function getCoreApps(factionSlug: string, role?: string | null): CoreAppDef[] {
   const overrides = FACTION_LABEL_OVERRIDES[factionSlug] ?? {};
-  return (Object.keys(BASE_APPS) as AppId[]).map((id) => ({
+  const isStaff = role === "STAFF" || role === "ADMIN";
+  return (Object.keys(BASE_APPS) as AppId[])
+    .filter((id) => isStaff || !STAFF_ONLY_APPS.has(id))
+    .map((id) => ({
     ...BASE_APPS[id],
     label: overrides[id] ?? DEFAULT_LABELS[id],
   }));

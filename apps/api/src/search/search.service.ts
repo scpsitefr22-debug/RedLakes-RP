@@ -115,6 +115,7 @@ export class SearchService implements OnModuleInit {
     limit = 20,
     departmentId: string | null = null,
     clearanceLevel = 1,
+    includeMapLocations = false,
   ): Promise<SearchHit[]> {
     if (!query.trim()) return [];
 
@@ -150,6 +151,7 @@ export class SearchService implements OnModuleInit {
           filterByDepartment(hits, departmentId),
           clearanceLevel,
         )
+          .filter((hit) => includeMapLocations || hit.type !== 'location')
           .slice(0, limit)
           .map(({ restrictedDepartmentIds: _omit, minClearanceLevel: _omit2, ...hit }) => hit);
       } catch {
@@ -157,7 +159,13 @@ export class SearchService implements OnModuleInit {
       }
     }
 
-    return this.fallbackSearch(query, limit, departmentId, clearanceLevel);
+    return this.fallbackSearch(
+      query,
+      limit,
+      departmentId,
+      clearanceLevel,
+      includeMapLocations,
+    );
   }
 
   /**
@@ -174,6 +182,7 @@ export class SearchService implements OnModuleInit {
     limit: number,
     departmentId: string | null = null,
     clearanceLevel = 1,
+    includeMapLocations = false,
   ): Promise<SearchHit[]> {
     const insensitive = { contains: query, mode: 'insensitive' as const };
 
@@ -231,10 +240,13 @@ export class SearchService implements OnModuleInit {
         where: { OR: [{ title: insensitive }, { excerpt: insensitive }] },
         take: limit,
       }),
-      this.prisma.mapLocation.findMany({
-        where: { OR: [{ name: insensitive }, { description: insensitive }] },
-        take: limit,
-      }),
+      // La carte est un outil HRP réservé au staff.
+      includeMapLocations
+        ? this.prisma.mapLocation.findMany({
+            where: { OR: [{ name: insensitive }, { description: insensitive }] },
+            take: limit,
+          })
+        : Promise.resolve([]),
       this.prisma.faction.findMany({
         where: { OR: [{ name: insensitive }, { description: insensitive }] },
         take: limit,
@@ -323,7 +335,7 @@ export class SearchService implements OnModuleInit {
         type: 'location',
         title: l.name,
         excerpt: l.description.slice(0, 120),
-        href: `/carte#${l.slug}`,
+        href: `/staff/carte/vue#${l.slug}`,
         score: 1,
       })),
       ...factions.map((f) => ({

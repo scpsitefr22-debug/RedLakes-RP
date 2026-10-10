@@ -76,15 +76,6 @@ const BLANKS: Blank[] = [
     accepted: ["juin"],
   },
   {
-    id: "carte",
-    before: "Sur la carte opérationnelle, la ville principale près du lac, à l'ouest, s'appelle «",
-    after: "».",
-    prompt: "Nom du lieu",
-    hintLabel: "Carte",
-    hintHref: "/carte",
-    accepted: ["redlakes"],
-  },
-  {
     id: "scp009",
     before: "Le SCP surnommé « Glace Rouge » porte le numéro",
     after: ".",

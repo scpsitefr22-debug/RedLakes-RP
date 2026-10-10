@@ -1,0 +1,177 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { locationTypeLabels } from "@/data/map";
+import { Badge } from "@/components/ui/Badge";
+import { MapPin, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
+import { SiteMapBackground } from "@/components/carte/SiteMapBackground";
+import { EditableText } from "@/components/staff/EditableText";
+
+interface ApiMapLocation {
+  id: string;
+  slug: string;
+  name: string;
+  type: string;
+  x: number;
+  y: number;
+  description: string;
+  history: string;
+  danger: number;
+  faction: string | null;
+  factionRef: { slug: string; name: string; color: string | null } | null;
+}
+
+const typeColors: Record<string, string> = {
+  site: "bg-redlake/20 border-redlake/40",
+  surface: "bg-blue-400/10 border-blue-400/30",
+  ville: "bg-green-400/10 border-green-400/30",
+  egouts: "bg-purple-400/10 border-purple-400/30",
+  criminel: "bg-orange-400/10 border-orange-400/30",
+  labo: "bg-yellow-400/10 border-yellow-400/30",
+  scp: "bg-red-400/10 border-red-400/30",
+  portail: "bg-pink-400/10 border-pink-400/30",
+  ennemi: "bg-gray-400/10 border-gray-400/30",
+  village: "bg-lime-400/10 border-lime-400/30",
+  nature: "bg-emerald-400/10 border-emerald-400/30",
+  incident: "bg-red-500/10 border-red-500/30",
+  ferme: "bg-yellow-600/10 border-yellow-600/30",
+};
+
+export default function StaffCarteVuePage() {
+  const [locations, setLocations] = useState<ApiMapLocation[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    apiFetch<ApiMapLocation[]>("/map")
+      .then(setLocations)
+      .catch(() => undefined);
+  }, []);
+
+  const location = locations.find((l) => l.id === selected);
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-12">
+      <div className="mb-8">
+        <p className="label-mono mb-3 flex items-center gap-2 text-redlake-glow">
+          <span className="h-px w-8 bg-redlake-glow" aria-hidden />
+          Outil staff — hors RP
+        </p>
+        <h1 className="font-display text-5xl font-extrabold text-white">Carte du serveur</h1>
+        <p className="mt-4 max-w-2xl text-gray-400">
+          Réservée au staff : elle ne doit pas servir en jeu ni être montrée aux joueurs.
+          Cliquez sur un lieu pour afficher son histoire et sa description.
+        </p>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-3">
+        <div className="relative lg:col-span-2">
+          <div className="relative aspect-[1126/923] overflow-hidden rounded-lg border border-redlake/30 bg-black">
+            <SiteMapBackground />
+            {locations.map((loc) => (
+              <button
+                key={loc.id}
+                onClick={() => setSelected(loc.id)}
+                className={cn(
+                  "absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border transition-all hover:scale-125",
+                  typeColors[loc.type],
+                  selected === loc.id && "scale-125 ring-2 ring-redlake-glow"
+                )}
+                style={{ left: `${loc.x}%`, top: `${loc.y}%` }}
+                title={loc.name}
+              >
+                <MapPin className="h-4 w-4" />
+              </button>
+            ))}
+            <div className="absolute bottom-4 left-4 rounded border border-metal/50 bg-black/80 px-3 py-2 font-mono text-xs text-gray-500">
+              REDLAKES — SECTEUR ████
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {Array.from(new Set(locations.map((l) => l.type))).map((type) => (
+              <Badge key={type} className={cn("border", typeColors[type])}>
+                {locationTypeLabels[type as keyof typeof locationTypeLabels] ?? type}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        <div className="hologram-border rounded-lg p-6">
+          {location ? (
+            <>
+              <div className="mb-4 flex items-start justify-between">
+                <div>
+                  <Badge className={cn("mb-2 border", typeColors[location.type])}>
+                    {locationTypeLabels[location.type as keyof typeof locationTypeLabels] ?? location.type}
+                  </Badge>
+                  <EditableText
+                    as="h2"
+                    className="text-xl font-bold text-white"
+                    value={location.name}
+                    endpoint={`/map/${location.id}`}
+                    field="name"
+                  />
+                </div>
+                <button onClick={() => setSelected(null)} className="text-gray-500 hover:text-white">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <EditableText
+                value={location.description}
+                endpoint={`/map/${location.id}`}
+                field="description"
+                multiline
+                markdown
+                className="mb-4 text-sm text-gray-400"
+              />
+              <div className="mb-4">
+                <p className="mb-1 font-mono text-xs text-redlake-glow">HISTORIQUE</p>
+                <EditableText
+                  value={location.history}
+                  endpoint={`/map/${location.id}`}
+                  field="history"
+                  multiline
+                  markdown
+                  className="text-sm text-gray-500"
+                />
+              </div>
+              <div className="flex gap-4 font-mono text-xs">
+                <span className="text-gray-600">
+                  Danger : <span className="text-white">{location.danger}/5</span>
+                </span>
+                {location.factionRef ? (
+                  <span className="flex items-center gap-1.5 text-gray-600">
+                    Faction :
+                    <Link
+                      href={`/factions/${location.factionRef.slug}`}
+                      className="rounded border px-1.5 py-0.5 text-white transition-colors hover:bg-white/5"
+                      style={{ borderColor: `${location.factionRef.color ?? "#888"}66` }}
+                    >
+                      {location.factionRef.name}
+                    </Link>
+                  </span>
+                ) : (
+                  location.faction && (
+                    <span className="text-gray-600">
+                      Faction : <span className="text-white">{location.faction}</span>
+                    </span>
+                  )
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="flex h-full min-h-[300px] items-center justify-center text-center">
+              <div>
+                <MapPin className="mx-auto mb-4 h-8 w-8 text-gray-700" />
+                <p className="text-gray-600">Sélectionnez un point sur la carte</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

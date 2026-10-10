@@ -37,12 +37,20 @@ export default function StaffCartePage() {
             Créez, modifiez et supprimez les emplacements de la carte interactive.
           </p>
         </div>
+        <div className="flex flex-wrap gap-2">
+        <Link
+          href="/staff/carte/vue"
+          className="flex items-center gap-2 rounded border border-line px-4 py-2 font-mono text-sm text-gray-200 hover:border-line-strong hover:text-white"
+        >
+          <MapPin className="h-4 w-4" /> Voir la carte
+        </Link>
         <Link
           href="/staff/carte/nouveau"
           className="flex items-center gap-2 rounded border border-redlake bg-redlake/20 px-4 py-2 font-mono text-sm text-white hover:bg-redlake/30"
         >
           <Plus className="h-4 w-4" /> Nouvel emplacement
         </Link>
+        </div>
       </div>
 
       {error && (

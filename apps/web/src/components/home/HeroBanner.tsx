@@ -7,6 +7,7 @@ import { ArrowRight, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { useSystemStatus, type AlertLevel } from "@/hooks/useSystemStatus";
 import { apiFetch } from "@/lib/api";
+import type { SCPClass } from "@/data/scp";
 
 const ALERT: Record<AlertLevel, { label: string; color: string }> = {
   NORMAL: { label: "Normal", color: "#34d399" },
@@ -34,91 +35,100 @@ function useClock() {
   return now;
 }
 
-interface MapPoint {
+interface MonitoredScp {
   id: string;
+  slug: string;
+  number: string;
   name: string;
-  type: string;
-  x: number;
-  y: number;
+  class: SCPClass;
+  threatLevel: number;
+  description: string;
 }
 
-/** Couleur d'un lieu selon son type — mêmes familles que la carte interactive (/carte). */
-const POINT_COLORS: Record<string, string> = {
-  site: "#e5392f",
-  surface: "#60a5fa",
-  ville: "#4ade80",
-  egouts: "#c084fc",
-  criminel: "#fb923c",
-  labo: "#facc15",
-  scp: "#f87171",
-  portail: "#f472b6",
-  ennemi: "#9ca3af",
-  village: "#a3e635",
-  nature: "#34d399",
-  incident: "#ef4444",
-  ferme: "#ca8a04",
+/** Couleur d'une classe d'objet, en valeur brute pour les styles inline. */
+const CLASS_HEX: Record<SCPClass, string> = {
+  Safe: "#4ade80",
+  Euclid: "#facc15",
+  Keter: "#f87171",
+  Thaumiel: "#c084fc",
+  Apollyon: "#fb923c",
 };
 
+/** Première phrase lisible d'une description (sans balisage markdown). */
+function excerpt(text: string) {
+  const plain = text.replace(/[#*_>`[\]]/g, "").replace(/\s+/g, " ").trim();
+  return plain.length > 150 ? `${plain.slice(0, 150).trimEnd()}…` : plain;
+}
+
 /**
- * Moniteur de confinement : la vraie carte de REDLAKES (celle de /carte) vue
- * par une caméra de sécurité. Les lieux sont ceux de la carte interactive, à
- * leur place exacte ; la caméra cible chacun à tour de rôle.
+ * Moniteur de confinement : les vrais dossiers du wiki SCP défilent sur le
+ * terminal de surveillance (numéro, classe, niveau de menace). Contenu RP
+ * uniquement — la carte du serveur est un outil HRP réservé au staff.
+ * Aucun statut de brèche n'est affiché : les brèches restent décidées par le staff.
  */
 function ContainmentMonitor({ alert }: { alert: AlertLevel }) {
   const now = useClock();
   const reduce = useReducedMotion();
   const level = ALERT[alert];
-  const [points, setPoints] = useState<MapPoint[]>([]);
+  const [files, setFiles] = useState<MonitoredScp[]>([]);
   const [focus, setFocus] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    apiFetch<MapPoint[]>("/map")
-      .then(setPoints)
-      .catch(() => setPoints([]));
+    apiFetch<MonitoredScp[]>("/scp")
+      .then((list) => {
+        setFiles(list);
+        // Chaque visite démarre sur un dossier différent.
+        if (list.length) setFocus(Math.floor(Math.random() * list.length));
+      })
+      .catch(() => setFiles([]));
   }, []);
 
   useEffect(() => {
-    if (points.length < 2 || reduce) return;
-    const id = setInterval(() => setFocus((i) => (i + 1) % points.length), 2800);
+    if (files.length < 2 || reduce || paused) return;
+    const id = setInterval(() => setFocus((i) => (i + 1) % files.length), 4200);
     return () => clearInterval(id);
-  }, [points.length, reduce]);
+  }, [files.length, reduce, paused]);
 
-  const target = points.length ? points[focus % points.length] : null;
-  const hub = points.find((p) => p.type === "site") ?? { x: 50, y: 50 };
+  const current = files.length ? files[focus % files.length] : null;
+  const color = current ? CLASS_HEX[current.class] ?? "#e6eaf0" : "#e6eaf0";
+  const threat = current ? Math.max(0, Math.min(5, current.threatLevel)) : 0;
+  const keterCount = files.filter((f) => f.class === "Keter").length;
   const time = now
     ? now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
     : "--:--:--";
+  const step = (delta: number) =>
+    setFocus((i) => (files.length ? (i + delta + files.length) % files.length : 0));
 
   return (
-    <div className="hologram-border relative overflow-hidden p-4 sm:p-5">
+    <div
+      className="hologram-border relative overflow-hidden p-4 sm:p-5"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+    >
       <div className="flex items-center justify-between gap-3">
         <p className="label-mono text-[10px] text-gray-400">
           <span className="mr-2 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-redlake-glow align-middle motion-reduce:animate-none" />
-          CAM-07 // Carte de Redlakes
+          Terminal de surveillance // Confinement
         </p>
         <p className="font-mono text-xs tabular-nums text-gray-300">{time}</p>
       </div>
 
-      <Link
-        href="/carte"
-        className="group relative mt-4 block aspect-[1126/923] overflow-hidden border border-line bg-black"
-        aria-label="Ouvrir la carte interactive"
-      >
-        {/* La carte de base, passée en « image de caméra » : désaturée, assombrie, grain. */}
+      <div className="relative mt-4 aspect-[5/4] overflow-hidden border border-line bg-[#05070a]">
         <div
-          className="absolute inset-0 bg-cover bg-center transition-[filter] duration-500 group-hover:saturate-100"
+          className="absolute inset-0 opacity-60"
           style={{
-            backgroundImage: "url(/carte/redlakes-map.png)",
-            filter: "saturate(0.45) brightness(0.72) contrast(1.08)",
+            backgroundImage:
+              "linear-gradient(rgba(230,234,240,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(230,234,240,0.05) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
           }}
           aria-hidden
         />
         <div
           className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(rgba(10,20,30,0.25), rgba(10,20,30,0.25)), radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0,0,0,0.65) 100%)",
-          }}
+          style={{ background: `radial-gradient(ellipse at 70% 30%, ${color}26, transparent 65%), radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.7) 100%)` }}
           aria-hidden
         />
         <div
@@ -127,58 +137,91 @@ function ContainmentMonitor({ alert }: { alert: AlertLevel }) {
           aria-hidden
         />
 
-        {/* Balayage radar centré sur le complexe du Site-12. */}
-        {!reduce && (
-          <span
-            className="pointer-events-none absolute aspect-square w-[85%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{ left: `${hub.x}%`, top: `${hub.y}%` }}
-            aria-hidden
+        {current ? (
+          <Link
+            key={current.id}
+            href={`/wiki/${current.slug}`}
+            className="group absolute inset-0 flex flex-col justify-between p-5 sm:p-7 motion-safe:animate-[monitor-in_420ms_ease-out]"
           >
             <span
-              className="absolute inset-0 animate-[hero-sweep_6s_linear_infinite] rounded-full"
-              style={{ background: "conic-gradient(from 0deg, rgba(229,57,47,0.32), rgba(229,57,47,0) 16%, transparent 100%)" }}
-            />
-          </span>
+              className="font-display pointer-events-none absolute -right-2 -top-6 select-none text-[clamp(5rem,14vw,9rem)] font-extrabold leading-none text-transparent"
+              style={{ WebkitTextStroke: `1px ${color}40` }}
+              aria-hidden
+            >
+              {current.number.replace(/^SCP-/i, "")}
+            </span>
+
+            <div className="relative">
+              <span
+                className="label-mono inline-block border px-2 py-1 text-[10px]"
+                style={{ color, borderColor: `${color}66`, background: `${color}14` }}
+              >
+                Classe {current.class}
+              </span>
+            </div>
+
+            <div className="relative">
+              <p className="label-mono text-[10px] text-gray-500">Dossier d&apos;objet</p>
+              <p className="font-display text-[clamp(2.5rem,6vw,4rem)] font-extrabold uppercase leading-none text-white">
+                {current.number}
+              </p>
+              <p className="font-display mt-1 text-xl font-bold uppercase tracking-wide text-gray-200">
+                {current.name}
+              </p>
+              {current.description && (
+                <p className="mt-3 line-clamp-2 max-w-md text-sm text-gray-400">{excerpt(current.description)}</p>
+              )}
+              <div className="mt-4 flex items-center gap-3">
+                <span className="label-mono text-[9px] text-gray-500">Menace</span>
+                <span className="flex gap-1" aria-label={`Niveau de menace ${threat} sur 5`}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className="h-2.5 w-6"
+                      style={{ background: i < threat ? color : "rgba(230,234,240,0.1)" }}
+                    />
+                  ))}
+                </span>
+                <span className="label-mono ml-auto text-[9px] text-gray-400 opacity-0 transition-opacity group-hover:opacity-100">
+                  Ouvrir le dossier →
+                </span>
+              </div>
+            </div>
+          </Link>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="label-mono text-[10px] text-gray-500">Connexion aux archives…</p>
+          </div>
         )}
 
-        {points.map((p) => {
-          const color = POINT_COLORS[p.type] ?? "#e6eaf0";
-          const isTarget = target?.id === p.id;
-          return (
-            <span
-              key={p.id}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${p.x}%`, top: `${p.y}%` }}
-              title={p.name}
-            >
-              <span
-                className="block h-2.5 w-2.5 rounded-full ring-2 ring-black/70"
-                style={{ background: color, boxShadow: `0 0 10px ${color}` }}
-              />
-              {isTarget && (
-                <>
-                  <span className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2" aria-hidden>
-                    <span className="absolute left-0 top-0 h-2 w-2 border-l-2 border-t-2 border-white" />
-                    <span className="absolute right-0 top-0 h-2 w-2 border-r-2 border-t-2 border-white" />
-                    <span className="absolute bottom-0 left-0 h-2 w-2 border-b-2 border-l-2 border-white" />
-                    <span className="absolute bottom-0 right-0 h-2 w-2 border-b-2 border-r-2 border-white" />
-                  </span>
-                  <span className="label-mono absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap bg-black/80 px-1.5 py-0.5 text-[9px] text-white">
-                    {p.name}
-                  </span>
-                </>
-              )}
-            </span>
-          );
-        })}
-
         <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-redlake-glow/60 shadow-[0_0_12px_2px_rgba(229,57,47,0.45)] motion-safe:animate-[hero-scan_5s_linear_infinite]" />
-        <span className="label-mono absolute bottom-2 right-2 bg-black/70 px-1.5 py-0.5 text-[9px] text-gray-300 opacity-0 transition-opacity group-hover:opacity-100">
-          Ouvrir la carte →
-        </span>
-      </Link>
+      </div>
 
-      <dl className="mt-4 grid grid-cols-[auto_auto_1fr] gap-x-5 gap-y-1 text-left">
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => step(-1)}
+          disabled={files.length < 2}
+          className="label-mono border border-line px-2.5 py-1 text-[10px] text-gray-400 transition-colors hover:border-line-strong hover:text-white disabled:opacity-40"
+          aria-label="Dossier précédent"
+        >
+          ←
+        </button>
+        <p className="label-mono text-[10px] tabular-nums text-gray-500">
+          {files.length ? `${String((focus % files.length) + 1).padStart(2, "0")} / ${files.length}` : "— / —"}
+        </p>
+        <button
+          type="button"
+          onClick={() => step(1)}
+          disabled={files.length < 2}
+          className="label-mono border border-line px-2.5 py-1 text-[10px] text-gray-400 transition-colors hover:border-line-strong hover:text-white disabled:opacity-40"
+          aria-label="Dossier suivant"
+        >
+          →
+        </button>
+      </div>
+
+      <dl className="mt-4 grid grid-cols-3 gap-x-5 gap-y-1 text-left">
         <div className="border-l-2 pl-3" style={{ borderColor: level.color }}>
           <dt className="label-mono text-[9px] text-gray-500">Alerte</dt>
           <dd className="font-display text-lg font-bold uppercase" style={{ color: level.color }}>
@@ -186,12 +229,12 @@ function ContainmentMonitor({ alert }: { alert: AlertLevel }) {
           </dd>
         </div>
         <div className="border-l-2 border-line pl-3">
-          <dt className="label-mono text-[9px] text-gray-500">Lieux suivis</dt>
-          <dd className="font-display text-lg font-bold uppercase text-white">{points.length || "—"}</dd>
+          <dt className="label-mono text-[9px] text-gray-500">Dossiers</dt>
+          <dd className="font-display text-lg font-bold uppercase text-white">{files.length || "—"}</dd>
         </div>
-        <div className="min-w-0 border-l-2 border-line pl-3">
-          <dt className="label-mono text-[9px] text-gray-500">Cible caméra</dt>
-          <dd className="font-display truncate text-lg font-bold uppercase text-white">{target?.name ?? "—"}</dd>
+        <div className="border-l-2 border-line pl-3">
+          <dt className="label-mono text-[9px] text-gray-500">Classe Keter</dt>
+          <dd className="font-display text-lg font-bold uppercase text-white">{files.length ? keterCount : "—"}</dd>
         </div>
       </dl>
     </div>

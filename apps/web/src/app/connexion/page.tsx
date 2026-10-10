@@ -15,13 +15,14 @@ const PROMISES = [
 export default function ConnexionPage() {
   return (
     <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-[1440px] lg:grid-cols-[1.1fr_1fr]">
-      {/* Panneau d'ambiance : la carte de Redlakes vue par une caméra de sécurité. */}
+      {/* Panneau d'ambiance — sans la carte du serveur, outil HRP réservé au staff. */}
       <aside className="relative hidden overflow-hidden border-r border-line lg:block">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 opacity-70"
           style={{
-            backgroundImage: "url(/carte/redlakes-map.png)",
-            filter: "saturate(0.35) brightness(0.45) contrast(1.1)",
+            backgroundImage:
+              "linear-gradient(rgba(230,234,240,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(230,234,240,0.05) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
           }}
           aria-hidden
         />

@@ -29,7 +29,7 @@ export function CoreWindow({
     containerTop: number;
   } | null>(null);
 
-  const app = getCoreApps(session.factionSlug).find((a) => a.id === win.appId);
+  const app = getCoreApps(session.factionSlug, session.role).find((a) => a.id === win.appId);
   if (!app || win.minimized) return null;
 
   const AppComponent = app.component;

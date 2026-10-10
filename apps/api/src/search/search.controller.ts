@@ -4,7 +4,7 @@ import { SearchService } from './search.service';
 import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 import { PlayersService } from '../players/players.service';
 
-type OptionalAuthRequest = Request & { user?: { id: string } };
+type OptionalAuthRequest = Request & { user?: { id: string; role?: string } };
 
 @Controller('search')
 export class SearchController {
@@ -32,11 +32,15 @@ export class SearchController {
       this.departmentIdOf(req),
       this.clearanceLevelOf(req),
     ]);
+    // Les lieux de la carte (outil HRP) ne remontent que pour le staff.
+    const includeMapLocations =
+      req.user?.role === 'STAFF' || req.user?.role === 'ADMIN';
     return this.searchService.search(
       q ?? '',
       limit ? parseInt(limit) : 20,
       departmentId,
       clearanceLevel,
+      includeMapLocations,
     );
   }
 }

@@ -7,7 +7,7 @@ export function CoreTaskbar() {
   const { session, windows, order, toggleMinimize, focusApp } = useCoreShell();
   if (windows.length === 0) return null;
 
-  const apps = getCoreApps(session.factionSlug);
+  const apps = getCoreApps(session.factionSlug, session.role);
   const topId = order[order.length - 1];
 
   return (
