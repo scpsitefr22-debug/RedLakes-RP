@@ -24,7 +24,6 @@ const COLUMNS = [
     title: "Systèmes",
     links: [
       { label: "Candidatures", href: "/candidatures" },
-      { label: "OPHIS", href: "/ophis" },
       { label: "Tableau de bord", href: "/dashboard" },
       { label: "Archives classifiées", href: "/archives" },
     ],

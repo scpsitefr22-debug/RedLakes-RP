@@ -67,7 +67,6 @@ const navItems: NavItem[] = [
       { label: "Archives classifiées", href: "/archives" },
       { label: "Documents classifiés", href: "/documents" },
       { label: "Rapports d'incident", href: "/rapports-incidents" },
-      { label: "OPHIS", href: "/ophis" },
       { label: "CMS Lore (Staff)", href: "/lore/cms", staffOnly: true },
       { label: "Gestion Grades (Staff)", href: "/staff/grades", staffOnly: true },
       { label: "Gestion Rapports (Staff)", href: "/staff/rapports-incidents", staffOnly: true },

@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import type { LucideIcon } from "lucide-react";
-import { UserSquare2, Bell, FileText, Map, Target, Users, Lock, MessageSquare, Skull, Mail } from "lucide-react";
+import { UserSquare2, Bell, FileText, Map, Target, Users, Lock, MessageSquare, Mail } from "lucide-react";
 import { ProfileApp } from "@/components/core/apps/ProfileApp";
 import { NotificationsApp } from "@/components/core/apps/NotificationsApp";
 import { ReportsApp } from "@/components/core/apps/ReportsApp";
@@ -10,7 +10,6 @@ import { PersonnelApp } from "@/components/core/apps/PersonnelApp";
 import { EquipesApp } from "@/components/core/apps/EquipesApp";
 import { DocumentsApp } from "@/components/core/apps/DocumentsApp";
 import { CommunicationsApp } from "@/components/core/apps/CommunicationsApp";
-import { OphisApp } from "@/components/core/apps/OphisApp";
 import { MessagerieApp } from "@/components/core/apps/MessagerieApp";
 
 export interface CoreAppDef {
@@ -30,8 +29,7 @@ type AppId =
   | "equipes"
   | "documents"
   | "communications"
-  | "messagerie"
-  | "ophis";
+  | "messagerie";
 
 const BASE_APPS: Record<AppId, Omit<CoreAppDef, "label">> = {
   profil: { id: "profil", icon: UserSquare2, component: ProfileApp },
@@ -44,7 +42,6 @@ const BASE_APPS: Record<AppId, Omit<CoreAppDef, "label">> = {
   documents: { id: "documents", icon: Lock, component: DocumentsApp },
   communications: { id: "communications", icon: MessageSquare, component: CommunicationsApp },
   messagerie: { id: "messagerie", icon: Mail, component: MessagerieApp },
-  ophis: { id: "ophis", icon: Skull, component: OphisApp },
 };
 
 const DEFAULT_LABELS: Record<AppId, string> = {
@@ -58,12 +55,11 @@ const DEFAULT_LABELS: Record<AppId, string> = {
   documents: "Documents",
   communications: "Communications",
   messagerie: "Messagerie",
-  ophis: "OPHIS",
 };
 
 /**
- * Vocabulaire par faction — même moteur, mêmes 11 apps partout (pas d'app
- * ajoutée/retirée), seul le libellé change pour coller à l'identité de
+ * Vocabulaire par faction — même moteur, mêmes apps partout (seule la
+ * Carte est réservée au staff), seul le libellé change pour coller à l'identité de
  * chaque faction. S'appuie sur les mêmes flavor déjà établis ailleurs
  * (lib/faction-theme.ts::reportLabels, ops boards de l'Intranet) plutôt que
  * d'inventer un nouveau vocabulaire isolé.

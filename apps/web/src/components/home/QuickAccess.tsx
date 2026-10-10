@@ -2,16 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Skull, FileLock, Users, Image } from "lucide-react";
+import { FileLock, Users, Image } from "lucide-react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const quickLinks = [
-  {
-    icon: Skull,
-    title: "OPHIS",
-    description: "Entité anormale reliée au réseau CORE — répond aux questions, à contrecœur.",
-    href: "/ophis",
-  },
   {
     icon: FileLock,
     title: "Archives Classifiées",
