@@ -188,7 +188,12 @@ export function IntranetTerminal() {
       });
       setSubject("");
       setContent("");
-      setMessage("Rapport transmis au secrétariat du Site-12. Référence enregistrée.");
+      // Hors Fondation, personne ne sait ce qu'est le Site-12 (pour la ville, c'est une base militaire).
+      setMessage(
+        player?.factionInfo?.slug === "fondation"
+          ? "Rapport transmis au secrétariat du Site-12. Référence enregistrée."
+          : "Rapport transmis à votre hiérarchie. Référence enregistrée.",
+      );
       setReportsRefresh((k) => k + 1);
     } catch {
       setMessage("Échec de transmission — vérifiez votre session.");
