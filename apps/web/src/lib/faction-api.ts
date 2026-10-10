@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { API_URL } from "@/lib/api";
 import type { ApiFaction, ApiFactionRelation, FactionMember } from "@/lib/faction-types";
+import type { LiveGradeValues } from "@/data/faction-role-catalog";
 
 export type {
   ApiDepartment,
@@ -33,6 +34,17 @@ export async function getFactionMembers(slug: string): Promise<FactionMember[]> 
       cache: "no-store",
       headers: await authHeaders(),
     });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
+
+/** Grades en base (publics) : salaires, habilitations et branches réglés par le staff. */
+export async function getLiveGrades(): Promise<LiveGradeValues[]> {
+  try {
+    const res = await fetch(`${API_URL}/grades`, { cache: "no-store" });
     if (!res.ok) return [];
     return res.json();
   } catch {

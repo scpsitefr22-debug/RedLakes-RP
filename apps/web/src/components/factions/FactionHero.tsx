@@ -106,7 +106,7 @@ export function FactionHero({ faction, theme, icon, totalRoles, roleCategoryCoun
             Jouable
           </span>
         )}
-        {faction.departments.length > 0 && (
+        {faction.departments.length > 1 && (
           <Badge>
             {faction.departments.length} département{faction.departments.length > 1 ? "s" : ""}
           </Badge>

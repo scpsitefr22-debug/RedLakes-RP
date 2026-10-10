@@ -18,11 +18,26 @@ export class FactionsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(authenticated = false) {
-    const factions = await this.prisma.faction.findMany({
-      where: { playable: true },
-      include: { departments: true },
-      orderBy: { name: 'asc' },
-    });
+    const [rows, memberCounts] = await Promise.all([
+      this.prisma.faction.findMany({
+        where: { playable: true },
+        include: { departments: true },
+        orderBy: { name: 'asc' },
+      }),
+      // Même définition que findOne : personnages actifs rattachés à la faction.
+      this.prisma.player.groupBy({
+        by: ['factionId'],
+        where: { factionId: { not: null }, activeForUser: { isNot: null } },
+        _count: { _all: true },
+      }),
+    ]);
+    const countByFaction = new Map(
+      memberCounts.map((row) => [row.factionId, row._count._all]),
+    );
+    const factions = rows.map((faction) => ({
+      ...faction,
+      memberCount: countByFaction.get(faction.id) ?? 0,
+    }));
     if (authenticated) return factions;
     return factions.map(({ chefId: _fc, deputyIds: _fd, budget: _fb, ...faction }) => ({
       ...faction,

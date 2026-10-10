@@ -40,7 +40,8 @@ export interface ApiFaction {
   budget?: number;
   departments: ApiDepartment[];
   memberCount: number;
-  topGrade: { name: string; pay: number } | null;
+  /** Absent de la liste (/factions) : seulement sur la fiche d'une faction. */
+  topGrade?: { name: string; pay: number } | null;
 }
 
 export interface FactionMember {

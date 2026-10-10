@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
   getFaction,
+  getFactions,
+  getLiveGrades,
   getFactionRelations,
   getFactionMembers,
   FACTION_RELATION_LABELS,
@@ -12,7 +14,8 @@ import {
 } from "@/lib/faction-api";
 import type { ClassifiedDocumentSummary } from "@/lib/classified-documents-api";
 import { getFactionTheme } from "@/lib/faction-themes";
-import { getFactionRoleCategories, type LiveGradeValues } from "@/data/faction-role-catalog";
+import { getFactionRoleCategories } from "@/data/faction-role-catalog";
+import { formatDollars, formatPayRange, gradesForFaction, payRange, topClearance } from "@/lib/faction-stats";
 import { API_URL } from "@/lib/api";
 import { FactionThemeScope } from "@/components/factions/FactionThemeScope";
 import { FactionHero } from "@/components/factions/FactionHero";
@@ -29,6 +32,8 @@ import {
   Banknote,
   Coins,
   Swords,
+  ShieldCheck,
+  Layers,
   FileLock2,
   Radio,
   BookOpen,
@@ -58,17 +63,6 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
  * standard, sans cookie) ne montrerait jamais les evenements reserves aux
  * membres habilites de la faction elle-meme.
  */
-/** Grades en base : salaires, habilitations et accès tels que réglés par le staff. */
-async function getLiveGrades(): Promise<LiveGradeValues[]> {
-  try {
-    const res = await fetch(`${API_URL}/grades`, { cache: "no-store" });
-    if (!res.ok) return [];
-    return res.json();
-  } catch {
-    return [];
-  }
-}
-
 async function getFactionEvents(slug: string): Promise<FactionEvent[]> {
   const cookieStore = await cookies();
   const token = cookieStore.get("redlakes_token")?.value;
@@ -147,19 +141,42 @@ export default async function FactionDetailPage({ params }: Props) {
 
   const theme = getFactionTheme(faction.slug);
   const { icon: Icon, ...heroTheme } = theme;
-  const [relations, members, allDocuments, events, scpObjects, liveGrades] = await Promise.all([
+  const [relations, members, allDocuments, events, scpObjects, liveGrades, allFactions] = await Promise.all([
     getFactionRelations(faction.id),
     getFactionMembers(faction.slug),
     getFactionDocuments(),
     getFactionEvents(faction.slug),
     getFactionScpObjects(faction.slug),
-    faction.slug === "fondation" ? getLiveGrades() : Promise.resolve([]),
+    getLiveGrades(),
+    getFactions(),
   ]);
-  const roleCategories = getFactionRoleCategories(faction.slug, liveGrades);
+  const roleCategories = getFactionRoleCategories(
+    faction.slug,
+    faction.slug === "fondation" ? liveGrades : [],
+  );
+  const factionGrades = gradesForFaction(
+    liveGrades,
+    faction.slug,
+    allFactions.map((f) => f.slug),
+  );
   const totalRoles = roleCategories.reduce((n, c) => n + c.roles.length, 0);
   const documents = allDocuments.filter((d) => d.faction?.slug === faction.slug);
   const allyCount = relations.filter((r) => r.status === "ALLIE").length;
   const hostileCount = relations.filter((r) => r.status === "HOSTILE").length;
+  const pay = payRange(factionGrades);
+  const clearance = topClearance(factionGrades);
+
+  // Seulement les chiffres qui existent : une case « 0 » ou « — » donne une page morte.
+  const stats = [
+    faction.memberCount > 0 && { icon: UserCheck, value: String(faction.memberCount), label: "Membres actifs" },
+    factionGrades.length > 0 && { icon: Layers, value: String(factionGrades.length), label: "Grades" },
+    clearance > 0 && { icon: ShieldCheck, value: `Niv. ${clearance}`, label: "Habilitation max." },
+    pay && { icon: Banknote, value: formatPayRange(pay), label: "Salaires / semaine" },
+    faction.departments.length > 1 && { icon: Building2, value: String(faction.departments.length), label: "Départements" },
+    relations.length > 0 && { icon: Swords, value: `${allyCount} / ${hostileCount}`, label: "Alliées / Hostiles" },
+    (faction.budget ?? 0) > 0 && { icon: Coins, value: formatDollars(faction.budget ?? 0), label: "Budget" },
+  ].filter((stat): stat is { icon: typeof UserCheck; value: string; label: string } => Boolean(stat));
+  const statColumns = ["", "sm:grid-cols-1", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-4", "sm:grid-cols-5", "sm:grid-cols-3 lg:grid-cols-6", "sm:grid-cols-4 lg:grid-cols-7"][stats.length];
 
   return (
     <FactionThemeScope theme={theme} as="section" className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -171,41 +188,17 @@ export default async function FactionDetailPage({ params }: Props) {
         roleCategoryCount={roleCategories.length}
       />
 
-      <div
-        className={`mb-8 grid grid-cols-2 gap-3 ${faction.budget != null ? "sm:grid-cols-5" : "sm:grid-cols-4"}`}
-      >
-        <div className="faction-card p-4 text-center">
-          <UserCheck className="mx-auto mb-2 h-5 w-5 faction-accent" />
-          <p className="text-2xl font-bold text-white">{faction.memberCount}</p>
-          <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Membres actifs</p>
+      {stats.length > 0 && (
+        <div className={`mb-8 grid grid-cols-2 gap-3 ${statColumns}`}>
+          {stats.map((stat) => (
+            <div key={stat.label} className="faction-card p-4 text-center">
+              <stat.icon className="mx-auto mb-2 h-5 w-5 faction-accent" />
+              <p className="whitespace-nowrap text-2xl font-bold text-white">{stat.value}</p>
+              <p className="font-mono text-[10px] uppercase tracking-wide text-gray-400">{stat.label}</p>
+            </div>
+          ))}
         </div>
-        <div className="faction-card p-4 text-center">
-          <Building2 className="mx-auto mb-2 h-5 w-5 faction-accent" />
-          <p className="text-2xl font-bold text-white">{faction.departments.length}</p>
-          <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Départements</p>
-        </div>
-        <div className="faction-card p-4 text-center">
-          <Banknote className="mx-auto mb-2 h-5 w-5 faction-accent" />
-          <p className="text-2xl font-bold text-white">
-            {faction.topGrade ? `${faction.topGrade.pay.toLocaleString("fr-FR")} $` : "—"}
-          </p>
-          <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">
-            {faction.topGrade ? `Meilleur salaire (${faction.topGrade.name})` : "Salaires"}
-          </p>
-        </div>
-        <div className="faction-card p-4 text-center">
-          <Swords className="mx-auto mb-2 h-5 w-5 faction-accent" />
-          <p className="text-2xl font-bold text-white">{allyCount} / {hostileCount}</p>
-          <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Alliées / Hostiles</p>
-        </div>
-        {faction.budget != null && (
-          <div className="faction-card p-4 text-center">
-            <Coins className="mx-auto mb-2 h-5 w-5 faction-accent" />
-            <p className="text-2xl font-bold text-white">{faction.budget.toLocaleString("fr-FR")} $</p>
-            <p className="font-mono text-[10px] uppercase tracking-wide text-gray-500">Budget</p>
-          </div>
-        )}
-      </div>
+      )}
 
       <div className="prose-redlake space-y-8">
         {roleCategories.length > 0 && (

@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 interface Props {
   faction: ApiFaction;
   index: number;
+  /** Nombre de grades de la faction (réglés dans Grades & accès). */
+  gradeCount: number;
 }
 
 /**
@@ -14,7 +16,7 @@ interface Props {
  * elle-même (police, texture, couleurs) pour donner un avant-goût de
  * l'identité de la faction avant même le clic.
  */
-export function FactionCard({ faction, index }: Props) {
+export function FactionCard({ faction, index, gradeCount }: Props) {
   const theme = getFactionTheme(faction.slug);
   const Icon = theme.icon;
 
@@ -50,13 +52,21 @@ export function FactionCard({ faction, index }: Props) {
           <p className="line-clamp-3 text-sm text-gray-500">{faction.description}</p>
         )}
 
-        <div className="mt-4 flex gap-3 font-mono text-xs">
+        <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 font-mono text-xs">
           {faction.playable && <span className="text-green-400">JOUABLE</span>}
-          {faction.departments.length > 0 && (
-            <span className="text-gray-600">
-              {faction.departments.length} département{faction.departments.length > 1 ? "s" : ""}
+          {gradeCount > 0 && (
+            <span className="text-gray-400">
+              {gradeCount} grade{gradeCount > 1 ? "s" : ""}
             </span>
           )}
+          {faction.memberCount > 0 && (
+            <span className="text-gray-400">
+              {faction.memberCount} membre{faction.memberCount > 1 ? "s" : ""}
+            </span>
+          )}
+          <span className="ml-auto text-gray-500 transition-colors group-hover:text-[var(--f-accent)]">
+            Voir la faction →
+          </span>
         </div>
       </Link>
     </FactionThemeScope>
