@@ -186,7 +186,6 @@ export default async function FactionDetailPage({ params }: Props) {
     relations.length > 0 && { icon: Swords, value: `${allyCount} / ${hostileCount}`, label: "Alliées / Hostiles" },
     (faction.budget ?? 0) > 0 && { icon: Coins, value: formatDollars(faction.budget ?? 0), label: "Budget" },
   ].filter((stat): stat is { icon: typeof UserCheck; value: string; label: string } => Boolean(stat));
-  const statColumns = ["", "sm:grid-cols-1", "sm:grid-cols-2", "sm:grid-cols-3", "sm:grid-cols-4", "sm:grid-cols-5", "sm:grid-cols-3 lg:grid-cols-6", "sm:grid-cols-4 lg:grid-cols-7"][stats.length];
 
   return (
     <FactionThemeScope theme={theme} as="section" className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -199,9 +198,10 @@ export default async function FactionDetailPage({ params }: Props) {
       />
 
       {stats.length > 0 && (
-        <div className={`mb-8 grid grid-cols-2 gap-3 ${statColumns}`}>
+        // Cases de taille fixe, centrées : un seul chiffre ne s'étire pas sur toute la largeur.
+        <div className="mb-8 flex flex-wrap justify-center gap-3">
           {stats.map((stat) => (
-            <div key={stat.label} className="faction-card p-4 text-center">
+            <div key={stat.label} className="faction-card w-[calc(50%-0.375rem)] p-4 text-center sm:w-44">
               <stat.icon className="mx-auto mb-2 h-5 w-5 faction-accent" />
               <p className="whitespace-nowrap text-2xl font-bold text-white">{stat.value}</p>
               <p className="font-mono text-[10px] uppercase tracking-wide text-gray-400">{stat.label}</p>
