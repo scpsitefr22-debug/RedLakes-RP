@@ -49,6 +49,12 @@ public final class SessionSyncService {
                 cache.remove(uuid);
                 return SyncResult.notLinked();
             }
+            if (response.status == 401) {
+                connectionManager.recordFailure();
+                logger.warning("Le CORE refuse la clé de synchronisation (401) — core.sync-key doit être "
+                        + "identique à SYNC_API_KEY sur l'API.");
+                return SyncResult.failed();
+            }
             if (response.status < 200 || response.status >= 300) {
                 connectionManager.recordFailure();
                 logger.warning("Sync CORE échouée (" + response.status + ") pour " + usernameForLogs);

@@ -12,6 +12,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public final class PlayerConnectionListener implements Listener {
 
+    /**
+     * Le CORE hébergé gratuitement s'endort sans visite et met jusqu'à une
+     * minute à se réveiller : à la connexion, on retente pendant ~1 min 30
+     * au lieu d'attendre le rafraîchissement périodique (5 min).
+     */
+    private static final int JOIN_RETRIES = 6;
+    private static final long JOIN_RETRY_DELAY_TICKS = 15L * 20L;
+    private static final String PREFIX = ChatColor.GOLD + "[REDLAKES] " + ChatColor.WHITE;
+
     private final RedLakesPlugin plugin;
 
     public PlayerConnectionListener(RedLakesPlugin plugin) {
@@ -22,7 +31,31 @@ public final class PlayerConnectionListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         // Léger délai pour laisser la connexion se stabiliser avant le premier appel réseau.
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> syncPlayer(player), 40L);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> syncOnJoin(player, JOIN_RETRIES), 40L);
+    }
+
+    private void syncOnJoin(Player player, int retriesLeft) {
+        if (!player.isOnline() || syncPlayer(player)) {
+            return;
+        }
+        if (retriesLeft == JOIN_RETRIES) {
+            tell(player, "Connexion au CORE en cours… ton identité RP s'affichera dans un instant.");
+        }
+        if (retriesLeft <= 0) {
+            tell(player, "Le CORE ne répond pas pour l'instant. Nouvel essai automatique dans "
+                    + plugin.getCoreConfig().getPollIntervalMinutes() + " min, ou tape /rl sync.");
+            return;
+        }
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin,
+                () -> syncOnJoin(player, retriesLeft - 1), JOIN_RETRY_DELAY_TICKS);
+    }
+
+    private void tell(Player player, String message) {
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (player.isOnline()) {
+                player.sendMessage(PREFIX + message);
+            }
+        });
     }
 
     @EventHandler
@@ -38,14 +71,14 @@ public final class PlayerConnectionListener implements Listener {
      * lors de la première sync ou d'un vrai changement, jamais à chaque poll
      * silencieux. Une panne CORE (FAILED) ne modifie jamais l'identité
      * affichée : seul un refus explicite du CORE (404, plus de personnage
-     * actif) la retire.
+     * actif) la retire. Renvoie false si le CORE n'a pas répondu.
      */
-    public void syncPlayer(Player player) {
+    public boolean syncPlayer(Player player) {
         MinecraftSession previous = plugin.getSessionCache().getStale(player.getUniqueId());
         SyncResult result = plugin.getSessionSyncService().fetch(player.getUniqueId(), player.getName());
 
         if (result.status == SyncResult.Status.FAILED) {
-            return;
+            return false;
         }
 
         MinecraftSession session = result.session;
@@ -59,7 +92,7 @@ public final class PlayerConnectionListener implements Listener {
         logChanges(player, previous, session, change);
 
         if (!change.isRelevant()) {
-            return;
+            return true;
         }
 
         // Team/nametag = API Bukkit, doit s'exécuter sur le thread principal.
@@ -73,6 +106,7 @@ public final class PlayerConnectionListener implements Listener {
             plugin.getTabListManager().applyToPlayer(player, session);
             notifyPlayer(player, session, change);
         });
+        return true;
     }
 
     private void logChanges(Player player, MinecraftSession previous, MinecraftSession session, SessionChange change) {

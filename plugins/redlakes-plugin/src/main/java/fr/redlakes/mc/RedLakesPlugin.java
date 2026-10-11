@@ -55,6 +55,11 @@ public final class RedLakesPlugin extends JavaPlugin {
     private static final int OUTBOX_MAX_ENTRIES = 500;
     /** Passage de la file d'envoi : toutes les 60 s. */
     private static final long OUTBOX_FLUSH_TICKS = 60L * 20L;
+    /** UUID qu'aucun compte ne portera jamais : un 404 prouve que le CORE répond et accepte la clé. */
+    private static final String PROBE_UUID = "00000000-0000-0000-0000-000000000000";
+    /** Vérification au démarrage : jusqu'à 6 essais espacés de 15 s (~1 min 30, le temps d'un réveil). */
+    private static final int STARTUP_CHECK_ATTEMPTS = 6;
+    private static final long STARTUP_CHECK_DELAY_TICKS = 15L * 20L;
 
     @Override
     public void onEnable() {
@@ -106,8 +111,45 @@ public final class RedLakesPlugin extends JavaPlugin {
         long intervalTicks = coreConfig.getPollIntervalMinutes() * 60L * 20L;
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::refreshOnlinePlayers, intervalTicks, intervalTicks);
 
+        // Réveille le CORE dès le démarrage (l'hébergement gratuit s'endort
+        // sans visite) pour qu'il soit prêt quand les joueurs arrivent.
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> checkCore(STARTUP_CHECK_ATTEMPTS));
+
         getLogger().info("RedLakesPlugin actif — CORE " + coreConfig.getApiUrl()
                 + " (serveur '" + coreConfig.getServerId() + "')");
+    }
+
+    private void checkCore(int attemptsLeft) {
+        long start = System.currentTimeMillis();
+        try {
+            CoreClient.Response response = coreClient.get("/sync/minecraft/" + PROBE_UUID, 1);
+            if (response.status == 404) {
+                connectionManager.recordSuccess(System.currentTimeMillis() - start);
+                getLogger().info("CORE joignable, clé de synchronisation acceptée.");
+            } else if (response.status == 401) {
+                getLogger().warning("Le CORE refuse la clé de synchronisation (401) — core.sync-key doit être "
+                        + "identique à SYNC_API_KEY sur l'API.");
+            } else if (response.status >= 500 && attemptsLeft > 1) {
+                retryCoreCheck(attemptsLeft);
+            } else {
+                getLogger().warning("Vérification du CORE au démarrage : réponse " + response.status + ".");
+            }
+        } catch (CoreClient.CoreClientException e) {
+            if (attemptsLeft > 1) {
+                retryCoreCheck(attemptsLeft);
+            } else {
+                getLogger().warning("CORE toujours injoignable après ~1 min 30 — les joueurs seront "
+                        + "synchronisés dès qu'il répond.");
+            }
+        }
+    }
+
+    private void retryCoreCheck(int attemptsLeft) {
+        if (attemptsLeft == STARTUP_CHECK_ATTEMPTS) {
+            getLogger().info("CORE pas encore joignable (réveil en cours ?) — nouvel essai toutes les 15 s.");
+        }
+        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> checkCore(attemptsLeft - 1),
+                STARTUP_CHECK_DELAY_TICKS);
     }
 
     private void refreshOnlinePlayers() {
