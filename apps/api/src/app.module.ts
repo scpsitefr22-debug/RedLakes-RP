@@ -15,6 +15,7 @@ import { PlatformModule } from './platform/platform.module';
 import { HealthModule } from './health/health.module';
 import { GradesModule } from './grades/grades.module';
 import { FactionsModule } from './factions/factions.module';
+import { SkinsModule } from './skins/skins.module';
 import { FactionRelationsModule } from './faction-relations/faction-relations.module';
 import { ClassifiedDocumentsModule } from './classified-documents/classified-documents.module';
 import { DepartmentsModule } from './departments/departments.module';
@@ -52,6 +53,7 @@ import { RpEventsModule } from './rp-events/rp-events.module';
     ReportsModule,
     GradesModule,
     FactionsModule,
+    SkinsModule,
     FactionRelationsModule,
     ClassifiedDocumentsModule,
     DepartmentsModule,

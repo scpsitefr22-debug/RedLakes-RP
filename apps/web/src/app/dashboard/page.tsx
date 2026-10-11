@@ -28,6 +28,8 @@ import { JargonTooltip } from "@/components/ui/JargonTooltip";
 import { CareerTimeline } from "@/components/dashboard/CareerTimeline";
 import { MissionsWidget } from "@/components/dashboard/MissionsWidget";
 import { CharacterSwitcher } from "@/components/dashboard/CharacterSwitcher";
+import { MinecraftHead } from "@/components/ui/MinecraftHead";
+import { isCityFaction } from "@/lib/faction-stats";
 import { getFactionTheme } from "@/lib/faction-theme";
 
 interface PlayerData {
@@ -99,29 +101,25 @@ function formatSeniority(iso?: string) {
  * image ne répond (ex. avatar Discord périmé).
  */
 function AgentPhoto({ minecraftUsername, fallbackUrl }: { minecraftUsername: string; fallbackUrl?: string | null }) {
-  const sources = [
-    minecraftUsername ? `https://mc-heads.net/avatar/${encodeURIComponent(minecraftUsername)}/128` : null,
-    fallbackUrl || null,
-  ].filter((src): src is string => Boolean(src));
-  const [index, setIndex] = useState(0);
-  if (index >= sources.length) {
-    return (
+  const [fallbackFailed, setFallbackFailed] = useState(false);
+  // Repli : l'avatar du compte (Discord), puis une icône neutre.
+  const fallback =
+    fallbackUrl && !fallbackFailed ? (
+      <Image
+        src={fallbackUrl}
+        alt={minecraftUsername}
+        width={112}
+        height={112}
+        unoptimized
+        onError={() => setFallbackFailed(true)}
+        className="h-full w-full object-cover [image-rendering:pixelated]"
+      />
+    ) : (
       <span className="flex h-full w-full items-center justify-center bg-black/40 text-gray-600">
         <User className="h-10 w-10" />
       </span>
     );
-  }
-  return (
-    <Image
-      src={sources[index]}
-      alt={minecraftUsername}
-      width={112}
-      height={112}
-      unoptimized
-      onError={() => setIndex((i) => i + 1)}
-      className="h-full w-full object-cover [image-rendering:pixelated]"
-    />
-  );
+  return minecraftUsername ? <MinecraftHead username={minecraftUsername} fallback={fallback} /> : fallback;
 }
 
 export default function DashboardPage() {
@@ -332,11 +330,20 @@ export default function DashboardPage() {
           { label: "Faction", value: player.faction, term: "faction" as const },
           ...(player.teamName ? [{ label: "Équipe", value: player.teamName, term: "equipe" as const }] : []),
         ];
+        // La ville ignore tout de la Fondation : carte d'identité municipale, sans habilitation.
+        const factionSlug = player.factionInfo?.slug ?? "civil";
+        const city = isCityFaction(factionSlug);
+        const cardTitle =
+          factionSlug === "fondation"
+            ? "Fondation SCP — Carte d'accès — Site-12"
+            : city
+              ? "Ville de Redlakes — Carte d'identité"
+              : `${theme.label} — Carte de membre`;
         return (
           <section className="relative mb-8 overflow-hidden border border-line-strong bg-gradient-to-br from-[#121821] to-[#0a0e13] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9)]">
             <div className="h-1.5" style={{ background: theme.color }} aria-hidden />
             <div className="flex items-center justify-between border-b border-line px-6 py-2.5">
-              <p className="label-mono text-[10px] text-gray-400">Fondation SCP — Carte d&apos;accès — Site-12</p>
+              <p className="label-mono text-[10px] text-gray-400">{cardTitle}</p>
               <p className="label-mono text-[10px] text-gray-500">Matricule {matricule}</p>
             </div>
 
@@ -374,15 +381,17 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex items-stretch gap-4 sm:col-span-2 lg:col-span-1 lg:flex-col lg:items-end">
-                <div className="flex min-w-[8.5rem] flex-col justify-center border px-4 py-3 text-center" style={{ borderColor: levelColor }}>
-                  <span className="label-mono text-[9px] text-gray-400">Habilitation</span>
-                  <span className="font-display text-5xl font-extrabold leading-none" style={{ color: levelColor }}>
-                    {level}
-                  </span>
-                  <span className="label-mono text-[9px]" style={{ color: levelColor }}>
-                    sur 5
-                  </span>
-                </div>
+                {!city && (
+                  <div className="flex min-w-[8.5rem] flex-col justify-center border px-4 py-3 text-center" style={{ borderColor: levelColor }}>
+                    <span className="label-mono text-[9px] text-gray-400">Habilitation</span>
+                    <span className="font-display text-5xl font-extrabold leading-none" style={{ color: levelColor }}>
+                      {level}
+                    </span>
+                    <span className="label-mono text-[9px]" style={{ color: levelColor }}>
+                      sur 5
+                    </span>
+                  </div>
+                )}
                 <div
                   className="h-12 flex-1 opacity-70 lg:w-[8.5rem] lg:flex-none"
                   style={{

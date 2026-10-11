@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { User, Award } from "lucide-react";
+import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
 interface ApiPlayer {
   id: string;
@@ -114,13 +114,12 @@ export function JoueursCatalog({ players }: { players: ApiPlayer[] }) {
               className="hologram-border block rounded-lg p-5 transition-colors hover:border-redlake/40"
             >
               <div className="mb-4 flex items-center gap-3">
-                {player.user.avatarUrl ? (
-                  <Image
-                    src={player.user.avatarUrl}
+                {player.user.avatarUrl || player.user.minecraftUsername ? (
+                  <PlayerAvatar
+                    avatarUrl={player.user.avatarUrl}
+                    minecraftUsername={player.user.minecraftUsername}
                     alt={identifierOf(player)}
-                    width={48}
-                    height={48}
-                    className="rounded-full border border-redlake/30"
+                    className="h-12 w-12 rounded-full border border-redlake/30"
                   />
                 ) : (
                   <div className="flex h-12 w-12 items-center justify-center rounded-full border border-redlake/30 bg-redlake/10">

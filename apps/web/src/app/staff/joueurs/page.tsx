@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { User, ShieldAlert } from "lucide-react";
 import { API_URL } from "@/lib/api";
+import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
 export const metadata = { title: "Gestion des joueurs — Staff" };
 
@@ -53,13 +53,12 @@ export default async function StaffJoueursPage() {
               className="flex items-center justify-between hologram-border rounded-lg p-4 transition-colors hover:border-redlake/40"
             >
               <div className="flex items-center gap-3">
-                {player.user.avatarUrl ? (
-                  <Image
-                    src={player.user.avatarUrl}
+                {player.user.avatarUrl || player.user.minecraftUsername ? (
+                  <PlayerAvatar
+                    avatarUrl={player.user.avatarUrl}
+                    minecraftUsername={player.user.minecraftUsername}
                     alt={identifier}
-                    width={40}
-                    height={40}
-                    className="rounded-full border border-redlake/30"
+                    className="h-10 w-10 rounded-full border border-redlake/30"
                   />
                 ) : (
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border border-redlake/30 bg-redlake/10">

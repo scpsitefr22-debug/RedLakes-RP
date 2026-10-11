@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft, Send, User, MessageCircle, Briefcase } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
+import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
 type Channel = "PERSONNEL" | "PROFESSIONNEL";
 
@@ -234,10 +235,10 @@ export function MessagerieApp() {
               onClick={() => openThread(c.partner)}
               className="flex w-full items-center gap-3 rounded border border-metal/40 bg-black/30 p-3 text-left hover:border-redlake/40"
             >
-              {c.partner.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={c.partner.avatarUrl}
+              {c.partner.avatarUrl || c.partner.minecraftUsername ? (
+                <PlayerAvatar
+                  avatarUrl={c.partner.avatarUrl}
+                  minecraftUsername={c.partner.minecraftUsername}
                   alt={partnerName(c.partner)}
                   className="h-9 w-9 rounded-full border border-metal/50"
                 />

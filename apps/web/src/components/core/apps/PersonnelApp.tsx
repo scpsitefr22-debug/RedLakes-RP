@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { User } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { useCoreShell } from "@/components/core/CoreShellProvider";
+import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
 interface ApiRosterPlayer {
   id: string;
@@ -66,10 +67,10 @@ export function PersonnelApp() {
                 key={p.id}
                 className="flex items-center gap-3 rounded border border-metal/40 bg-black/30 p-3"
               >
-                {p.user.avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={p.user.avatarUrl}
+                {p.user.avatarUrl || p.user.minecraftUsername ? (
+                  <PlayerAvatar
+                    avatarUrl={p.user.avatarUrl}
+                    minecraftUsername={p.user.minecraftUsername}
                     alt={name || p.user.minecraftUsername}
                     className="h-9 w-9 rounded-full border border-metal/50"
                   />

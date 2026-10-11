@@ -45,6 +45,7 @@ import {
   Radio,
   BookOpen,
 } from "lucide-react";
+import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
 const SCP_CLASS_COLORS: Record<FactionScpObject["class"], string> = {
   Safe: "text-green-400",
@@ -356,9 +357,13 @@ export default async function FactionDetailPage({ params }: Props) {
                 const name = [m.rpFirstName, m.rpLastName].filter(Boolean).join(" ") || identifier || "Agent";
                 const card = (
                   <div className="flex items-center gap-3 rounded border border-metal/40 p-3 transition-colors hover:border-redlake/30">
-                    {m.avatarUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.avatarUrl} alt="" className="h-8 w-8 rounded" />
+                    {(m.avatarUrl || m.minecraftUsername) && (
+                      <PlayerAvatar
+                        avatarUrl={m.avatarUrl}
+                        minecraftUsername={m.minecraftUsername}
+                        alt=""
+                        className="h-8 w-8 rounded"
+                      />
                     )}
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-white">{name}</p>

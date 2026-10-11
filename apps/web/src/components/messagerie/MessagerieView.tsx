@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Send, User, MessageCircle, Briefcase, UserPlus, Search } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
+import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
 type Channel = "PERSONNEL" | "PROFESSIONNEL";
 
@@ -69,11 +70,11 @@ function ContactAvatar({
   channel: Channel;
   className?: string;
 }) {
-  if (user.avatarUrl) {
+  if (user.avatarUrl || user.minecraftUsername) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={user.avatarUrl}
+      <PlayerAvatar
+        avatarUrl={user.avatarUrl}
+        minecraftUsername={user.minecraftUsername}
         alt={partnerName(user, channel)}
         className={`${className} shrink-0 rounded-full border border-metal/50`}
       />

@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { User, Award, ArrowLeft, Clock } from "lucide-react";
 import { API_URL } from "@/lib/api";
 import { findGradeMeta } from "@/data/rp-grades";
+import { PlayerAvatar } from "@/components/ui/PlayerAvatar";
 
 export async function generateMetadata({
   params,
@@ -66,13 +66,12 @@ export default async function JoueurProfilePage({
 
       <div className="hologram-border rounded-lg p-6">
         <div className="mb-6 flex flex-wrap items-center gap-4">
-          {player.user.avatarUrl ? (
-            <Image
-              src={player.user.avatarUrl}
+          {player.user.avatarUrl || player.user.minecraftUsername ? (
+            <PlayerAvatar
+              avatarUrl={player.user.avatarUrl}
+              minecraftUsername={player.user.minecraftUsername}
               alt={player.user.minecraftUsername ?? "Joueur"}
-              width={80}
-              height={80}
-              className="rounded-full border border-redlake/30"
+              className="h-20 w-20 rounded-full border border-redlake/30"
             />
           ) : (
             <div className="flex h-20 w-20 items-center justify-center rounded-full border border-redlake/30 bg-redlake/10">
