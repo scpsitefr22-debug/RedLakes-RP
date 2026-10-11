@@ -15,7 +15,14 @@ import {
 import type { ClassifiedDocumentSummary } from "@/lib/classified-documents-api";
 import { getFactionTheme } from "@/lib/faction-themes";
 import { getFactionRoleCategories } from "@/data/faction-role-catalog";
-import { formatDollars, formatPayRange, gradesForFaction, payRange, topClearance } from "@/lib/faction-stats";
+import {
+  formatDollars,
+  formatPayRange,
+  gradesForFaction,
+  isCityFaction,
+  payRange,
+  topClearance,
+} from "@/lib/faction-stats";
 import { API_URL } from "@/lib/api";
 import { FactionThemeScope } from "@/components/factions/FactionThemeScope";
 import { FactionHero } from "@/components/factions/FactionHero";
@@ -150,15 +157,17 @@ export default async function FactionDetailPage({ params }: Props) {
     getLiveGrades(),
     getFactions(),
   ]);
-  const roleCategories = getFactionRoleCategories(
-    faction.slug,
-    faction.slug === "fondation" ? liveGrades : [],
-  );
   const factionGrades = gradesForFaction(
     liveGrades,
     faction.slug,
     allFactions.map((f) => f.slug),
   );
+  // Hors Fondation, la liste des rôles suit les grades en base de la faction.
+  const roleCategories = getFactionRoleCategories(
+    faction.slug,
+    faction.slug === "fondation" ? liveGrades : factionGrades,
+  );
+  const city = isCityFaction(faction.slug);
   const totalRoles = roleCategories.reduce((n, c) => n + c.roles.length, 0);
   const documents = allDocuments.filter((d) => d.faction?.slug === faction.slug);
   const allyCount = relations.filter((r) => r.status === "ALLIE").length;
@@ -170,7 +179,8 @@ export default async function FactionDetailPage({ params }: Props) {
   const stats = [
     faction.memberCount > 0 && { icon: UserCheck, value: String(faction.memberCount), label: "Membres actifs" },
     factionGrades.length > 0 && { icon: Layers, value: String(factionGrades.length), label: "Grades" },
-    clearance > 0 && { icon: ShieldCheck, value: `Niv. ${clearance}`, label: "Habilitation max." },
+    // La ville ne connaît pas la Fondation : pas d'habilitation affichée.
+    !city && clearance > 0 && { icon: ShieldCheck, value: `Niv. ${clearance}`, label: "Habilitation max." },
     pay && { icon: Banknote, value: formatPayRange(pay), label: "Salaires / semaine" },
     faction.departments.length > 1 && { icon: Building2, value: String(faction.departments.length), label: "Départements" },
     relations.length > 0 && { icon: Swords, value: `${allyCount} / ${hostileCount}`, label: "Alliées / Hostiles" },
@@ -215,7 +225,9 @@ export default async function FactionDetailPage({ params }: Props) {
                 ? "Organigramme Site-12. Promotions au mérite RP — pas de niveaux auto. Elite/Prestige = titres en plus, pas des grades."
                 : faction.slug === "crime"
                   ? "Organisations illégales créées librement par les joueurs (gang, mafia, MC, cartel…). Pas de rôles fixes à prendre."
-                  : "Hiérarchie et rôles de cette faction, avec missions et accès site."}
+                  : city
+                    ? "Hiérarchie et rôles de cette faction, avec leurs missions."
+                    : "Hiérarchie et rôles de cette faction, avec missions et accès site."}
             </p>
             <FactionRoleCategoriesPanel categories={roleCategories} accentColor={theme.colors.primary} />
           </section>

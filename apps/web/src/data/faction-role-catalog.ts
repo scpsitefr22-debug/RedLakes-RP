@@ -2,11 +2,14 @@
  * Catégories de rôles par faction — affichage site (onglets Factions).
  * Fondation : généré depuis rp-grades.ts (Google Sheet Site-12).
  */
+import { isCityFaction } from "@/lib/faction-stats";
 import { rpGrades, type RpBranch } from "./rp-grades";
 import { honoraryTitles, isHonoraryGradeName, redlakesRpRules } from "./redlakes-rp-rules";
 
 export interface FactionRoleEntry {
   name: string;
+  /** Anciens noms en base qui reprennent ce texte (grade renommé entre-temps). */
+  aliases?: string[];
   description: string;
   missions?: string[];
   clearance?: 1 | 2 | 3 | 4 | 5;
@@ -511,15 +514,15 @@ const STATIC_CATALOG: Record<string, FactionRoleCategory[]> = {
       ],
     },
     {
-      id: "liaison",
-      label: "Liaison Fondation",
-      summary: "Interface entre le public et le Site-12.",
+      id: "conseil",
+      label: "Conseil & dossiers",
+      summary: "Élus et agents qui suivent les décisions et les dossiers de la ville.",
       color: "#2d4a6f",
       roles: [
         {
           name: "Conseiller municipal",
-          description: "Lien officiel avec la direction du site.",
-          missions: ["Conseiller", "Médiation"],
+          description: "Élu au conseil municipal : vote le budget et les décisions de la ville.",
+          missions: ["Voter", "Conseiller le maire", "Représenter un quartier"],
           clearance: 3,
         },
         {
@@ -550,60 +553,91 @@ const STATIC_CATALOG: Record<string, FactionRoleCategory[]> = {
     {
       id: "commandement",
       label: "Commandement",
-      summary: "REDLAKES Police Department (RPD).",
+      summary: "Direction de la police de Redlakes, de Millbrook et de Pine Hollow.",
       color: "#2563eb",
       roles: [
         {
-          name: "Chief of Police",
-          description: "Chef du département de police REDLAKES.",
-          missions: ["Diriger", "Superviser enquêtes"],
-          clearance: 3,
+          name: "Chef de la police",
+          aliases: ["Chief of Police"],
+          description: "Dirige la police et rend des comptes au maire.",
+          missions: ["Diriger", "Fixer les priorités", "Rendre des comptes au maire"],
         },
         {
-          name: "Lieutenant",
-          description: "Supervise les patrouilles et enquêteurs.",
-          missions: ["Patrouiller", "Coordonner"],
-          clearance: 2,
+          name: "Chef adjoint",
+          aliases: ["Deputy Chief"],
+          description: "Remplace le chef et s'occupe du personnel et de la discipline.",
+          missions: ["Remplacer le chef", "Gérer le personnel", "Faire respecter la discipline"],
+        },
+        {
+          name: "Capitaine",
+          aliases: ["Captain"],
+          description: "Commande les patrouilles ou les enquêtes.",
+          missions: ["Commander une division", "Organiser les effectifs"],
         },
       ],
     },
     {
-      id: "patrouille",
-      label: "Patrouille",
-      summary: "Maintien de l'ordre en surface.",
+      id: "encadrement",
+      label: "Encadrement",
+      summary: "Organise les services et tient les postes de Millbrook et de Pine Hollow.",
       color: "#3b82f6",
       roles: [
         {
-          name: "Police Officer",
-          description: "Patrouille urbaine standard.",
-          missions: ["Patrouiller", "Intervenir", "Avertir"],
-          clearance: 1,
+          name: "Lieutenant",
+          description: "Chef d'équipe de service : organise les patrouilles.",
+          missions: ["Organiser le service", "Répartir les patrouilles"],
         },
         {
-          name: "Deputy",
-          description: "Première ligne, contact public.",
-          missions: ["Accueillir", "Rapporter"],
-          clearance: 1,
+          name: "Sergent",
+          aliases: ["Sergeant"],
+          description: "Encadre les agents sur le terrain ; responsable d'un poste de village.",
+          missions: ["Encadrer les agents", "Tenir un poste de village"],
         },
       ],
     },
     {
-      id: "enquetes",
-      label: "Enquêtes",
-      summary: "Crimes et incidents liés aux anomalies (conscience limitée).",
+      id: "terrain",
+      label: "Terrain",
+      summary: "Patrouilles, interventions et enquêtes, en ville comme dans les villages.",
       color: "#1d4ed8",
       roles: [
         {
-          name: "Detective",
+          name: "Inspecteur",
+          aliases: ["Detective", "Investigator"],
           description: "Mène les enquêtes criminelles.",
-          missions: ["Enquêter", "Interroger", "Rédiger"],
-          clearance: 2,
+          missions: ["Enquêter", "Interroger", "Rédiger les rapports"],
         },
         {
-          name: "Investigator",
-          description: "Support terrain et collecte de preuves.",
-          missions: ["Collecter", "Surveiller"],
-          clearance: 1,
+          name: "Caporal",
+          aliases: ["Corporal"],
+          description: "Agent expérimenté qui forme les nouveaux.",
+          missions: ["Former les recrues", "Patrouiller"],
+        },
+        {
+          name: "Agent de police",
+          aliases: ["Police Officer"],
+          description: "Patrouille, intervient et verbalise.",
+          missions: ["Patrouiller", "Intervenir", "Verbaliser"],
+        },
+        {
+          name: "Agent stagiaire",
+          aliases: ["Deputy", "Probationary Officer"],
+          description: "Nouvelle recrue : patrouille toujours avec un caporal.",
+          missions: ["Apprendre le métier", "Patrouiller accompagné"],
+        },
+      ],
+    },
+    {
+      id: "services",
+      label: "Services",
+      summary: "Postes au service des agents.",
+      color: "#60a5fa",
+      roles: [
+        {
+          name: "Opérateur 911",
+          aliases: ["Dispatcher"],
+          description: "Répond aux appels d'urgence et envoie les agents par radio.",
+          missions: ["Répondre au 911", "Envoyer les agents"],
         },
       ],
     },
@@ -730,11 +764,80 @@ const STATIC_CATALOG: Record<string, FactionRoleCategory[]> = {
   ],
 };
 
+function normalizeRoleName(name: string) {
+  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+/**
+ * Grades en base d'une faction hors Site-12 (noms, ordre, salaires réglés par
+ * le staff ou le chef) habillés du texte du catalogue quand le nom — ou un
+ * ancien nom — correspond. Un grade sans texte connu va dans « Autres grades ».
+ * Les factions de la ville n'affichent ni habilitation ni accès au Site-12.
+ */
+function buildFromLive(factionId: string, live: LiveGradeValues[]): FactionRoleCategory[] {
+  const catalog = STATIC_CATALOG[factionId] ?? [];
+  const known = new Map<string, { category: FactionRoleCategory; role: FactionRoleEntry }>();
+  for (const category of catalog) {
+    for (const role of category.roles) {
+      for (const name of [role.name, ...(role.aliases ?? [])]) {
+        known.set(normalizeRoleName(name), { category, role });
+      }
+    }
+  }
+
+  const city = isCityFaction(factionId);
+  const groups = new Map<string, FactionRoleCategory>();
+  const others: FactionRoleEntry[] = [];
+  for (const grade of live) {
+    const match = known.get(normalizeRoleName(grade.name));
+    const entry: FactionRoleEntry = {
+      name: grade.name,
+      description: grade.description || match?.role.description || "",
+      missions: grade.objectives.length ? grade.objectives : match?.role.missions,
+      clearance: city ? undefined : fromLive(grade).clearance,
+      siteAccess: city
+        ? undefined
+        : grade.siteSections.length
+          ? grade.siteSections.map((s) => SITE_LABELS[s] ?? s)
+          : match?.role.siteAccess,
+      pay: grade.pay,
+      quota: grade.quota,
+    };
+    if (!match) {
+      others.push(entry);
+      continue;
+    }
+    const group = groups.get(match.category.id) ?? { ...match.category, roles: [] };
+    group.roles.push(entry);
+    groups.set(match.category.id, group);
+  }
+
+  const categories = catalog
+    .map((c) => groups.get(c.id))
+    .filter((c): c is FactionRoleCategory => Boolean(c));
+  if (others.length) {
+    categories.push({
+      id: "autres",
+      label: categories.length ? "Autres grades" : "Hiérarchie",
+      summary: "",
+      color: catalog[0]?.color ?? "#9ca3af",
+      roles: others,
+    });
+  }
+  return categories;
+}
+
+/**
+ * liveGrades : pour la Fondation, tous les grades en base ; pour une autre
+ * faction, ses propres grades (voir gradesForFaction). Sans réponse de l'API,
+ * on retombe sur le catalogue figé.
+ */
 export function getFactionRoleCategories(
   factionId: string,
   liveGrades: LiveGradeValues[] = [],
 ): FactionRoleCategory[] {
   if (factionId === "fondation") return buildFondationCategories(liveGrades);
+  if (liveGrades.length) return buildFromLive(factionId, liveGrades);
   return STATIC_CATALOG[factionId] ?? [];
 }
 

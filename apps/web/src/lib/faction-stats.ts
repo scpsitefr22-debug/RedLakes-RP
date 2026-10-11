@@ -1,6 +1,16 @@
 import type { LiveGradeValues } from "@/data/faction-role-catalog";
 
 /**
+ * Factions de la ville : pour elles, le Site-12 n'est qu'une base militaire
+ * de l'État. Aucune habilitation ni section du Site-12 ne doit s'y afficher.
+ */
+const CITY_FACTIONS = new Set(["civil", "gouvernement", "police", "crime"]);
+
+export function isCityFaction(slug: string | null | undefined): boolean {
+  return Boolean(slug && CITY_FACTIONS.has(slug));
+}
+
+/**
  * Grades d'une faction. Les autres factions ont une branche à leur nom ;
  * la Fondation regroupe toutes les branches du Site-12 (sécurité,
  * scientifique, maintenance…), c'est-à-dire tout ce qui n'est pas une autre faction.
