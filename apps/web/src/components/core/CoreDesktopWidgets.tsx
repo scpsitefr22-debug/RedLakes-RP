@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Bell, Wifi, WifiOff, Wrench } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import type { NotificationsPage } from "@/lib/platform-types";
+import { isCityFaction } from "@/lib/faction-stats";
 import { useCoreShell } from "./CoreShellProvider";
 
 interface ApiSystemStatus {
@@ -61,13 +62,16 @@ export function CoreDesktopWidgets() {
           <div className="space-y-2 font-mono text-xs">
             <StatusRow ok={status.serverOpen} label="Serveur ouvert" />
             <StatusRow ok={!status.maintenance} label={status.maintenance ? "Maintenance en cours" : "Aucune maintenance"} />
-            <div className="flex items-center gap-2 pt-1">
-              <span
-                className="h-2 w-2 rounded-full"
-                style={{ background: ALERT_COLORS[status.alertLevel], boxShadow: `0 0 6px ${ALERT_COLORS[status.alertLevel]}` }}
-              />
-              <span className="text-gray-300">Niveau d&apos;alerte : {status.alertLevel}</span>
-            </div>
+            {/* Niveau d'alerte du Site-12 : la ville ignore tout de la Fondation. */}
+            {!isCityFaction(session.factionSlug) && (
+              <div className="flex items-center gap-2 pt-1">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ background: ALERT_COLORS[status.alertLevel], boxShadow: `0 0 6px ${ALERT_COLORS[status.alertLevel]}` }}
+                />
+                <span className="text-gray-300">Niveau d&apos;alerte : {status.alertLevel}</span>
+              </div>
+            )}
             {status.maintenance && (
               <p className="flex items-center gap-1.5 pt-1 text-[10px] text-yellow-400">
                 <Wrench className="h-3 w-3" /> Le site est en maintenance.

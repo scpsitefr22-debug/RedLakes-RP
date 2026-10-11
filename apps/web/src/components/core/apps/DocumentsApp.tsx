@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Folder, FileText, ChevronRight, Lock } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { DiscordMarkdown } from "@/components/ui/DiscordMarkdown";
+import { isCityFaction } from "@/lib/faction-stats";
+import { useCoreShell } from "@/components/core/CoreShellProvider";
 
 interface DocItem {
   id: string;
@@ -26,6 +28,9 @@ interface FolderDef {
  * dossiers par catégorie plutôt qu'en liste plate.
  */
 export function DocumentsApp() {
+  // La ville ne sait rien de la Fondation : ni dossiers SCP, ni « lore classifié » sur ses postes.
+  const { session } = useCoreShell();
+  const city = isCityFaction(session.factionSlug);
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [folders, setFolders] = useState<FolderDef[] | null>(null);
   const [openFolder, setOpenFolder] = useState<string | null>(null);
@@ -50,17 +55,17 @@ export function DocumentsApp() {
           ),
         ]);
 
-        setFolders([
+        const folders: FolderDef[] = [
           {
             id: "lore",
-            label: "Lore classifié",
+            label: city ? "Dossiers internes" : "Lore classifié",
             items: articles
               .filter((a) => a.restrictedDepartmentIds.length > 0)
               .map((a) => ({ id: a.id, title: a.title, content: a.content, href: `/lore/${a.slug}` })),
           },
           {
             id: "evenements",
-            label: "Événements classifiés",
+            label: city ? "Événements suivis" : "Événements classifiés",
             items: events
               .filter((e) => e.restrictedDepartmentIds.length > 0)
               .map((e) => ({ id: e.id, title: e.title, content: e.description, href: `/evenements/${e.slug}` })),
@@ -72,12 +77,13 @@ export function DocumentsApp() {
               .filter((s) => s.restrictedDepartmentIds.length > 0)
               .map((s) => ({ id: s.id, title: s.number, content: s.description, href: `/wiki/${s.slug}` })),
           },
-        ]);
+        ];
+        setFolders(city ? folders.filter((f) => f.id !== "scp") : folders);
       } catch {
         /* API indisponible — dossiers vides plutôt que figés */
       }
     })();
-  }, []);
+  }, [city]);
 
   const totalCount = useMemo(
     () => folders?.reduce((n, f) => n + f.items.length, 0) ?? 0,
