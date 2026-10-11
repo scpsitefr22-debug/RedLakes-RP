@@ -10,6 +10,7 @@ interface ApiNewsArticle {
   excerpt: string;
   date: string;
   category: string;
+  featured?: boolean;
 }
 
 async function getNewsArticles(): Promise<ApiNewsArticle[]> {
@@ -26,11 +27,15 @@ export default async function ActualitesPage() {
   const newsArticles = await getNewsArticles();
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold text-white">Actualités</h1>
-        <p className="mt-4 text-gray-500">
-          Mises à jour, nouveaux SCP, événements et changements de lore.
+    <div className="mx-auto max-w-6xl px-4 py-12">
+      <div className="mb-8">
+        <p className="label-mono mb-3 flex items-center gap-2 text-redlake-glow">
+          <span className="h-px w-8 bg-redlake-glow" aria-hidden />
+          Fil d&apos;information
+        </p>
+        <h1 className="font-display text-5xl font-extrabold text-white">Actualités</h1>
+        <p className="mt-4 max-w-2xl text-gray-400">
+          Ce qui se passe en RP, les nouveaux dossiers SCP et les annonces du serveur.
         </p>
       </div>
 

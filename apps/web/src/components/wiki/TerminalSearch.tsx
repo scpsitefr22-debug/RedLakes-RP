@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
+/** Accès direct à un dossier : « ACCÉDER SCP-682 » ouvre la fiche. */
 export function TerminalSearch() {
   const router = useRouter();
   const [value, setValue] = useState("");
@@ -12,7 +13,7 @@ export function TerminalSearch() {
     e.preventDefault();
     const match = /(\d{2,4})/.exec(value);
     if (!match) {
-      setError("FORMAT INVALIDE — exemple : ACCÉDER SCP-682");
+      setError("Format : ACCÉDER SCP-682");
       return;
     }
     setError(null);
@@ -20,20 +21,19 @@ export function TerminalSearch() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="mb-6 rounded-lg border border-terminal/30 bg-black/60 p-3 font-mono text-sm"
-    >
-      <div className="flex items-center gap-2 text-terminal">
-        <span>&gt;_</span>
+    <form onSubmit={handleSubmit} className="relative">
+      <label className="flex items-center gap-2 border border-terminal/30 bg-black/60 px-3 py-2.5 font-mono text-sm text-terminal focus-within:border-terminal/70">
+        <span aria-hidden>&gt;_</span>
         <input
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="ACCÉDER SCP-682"
+          aria-label="Ouvrir un dossier par son numéro"
           className="flex-1 bg-transparent text-terminal outline-none placeholder:text-terminal/40"
         />
-      </div>
-      {error && <p className="mt-2 text-xs text-redlake-glow">{error}</p>}
+        <span className="label-mono hidden text-[9px] text-terminal/50 sm:inline">Entrée</span>
+      </label>
+      {error && <p className="mt-1.5 text-xs text-redlake-glow">{error}</p>}
     </form>
   );
 }

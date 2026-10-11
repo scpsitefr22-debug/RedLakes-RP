@@ -11,11 +11,7 @@ function clampClearance(n: number): ClearanceLevel {
   return Math.min(Math.max(Math.round(n), 1), 5) as ClearanceLevel;
 }
 
-export function TransmissionsFeedConnected({
-  transmissions,
-}: {
-  transmissions: Transmission[];
-}) {
+export function TransmissionsFeedConnected({ transmissions }: { transmissions: Transmission[] }) {
   const [authenticated, setAuthenticated] = useState(false);
   const [clearance, setClearance] = useState<ClearanceLevel>(1);
 
@@ -40,21 +36,14 @@ export function TransmissionsFeedConnected({
   return (
     <div className="space-y-4">
       {!authenticated && (
-        <div className="rounded-lg border border-metal/50 bg-metal/10 p-4 text-sm text-gray-500">
-          <p>Connectez-vous pour accéder à l&apos;ensemble des transmissions.</p>
-          <Link
-            href="/connexion"
-            className="mt-2 inline-block font-mono text-xs text-redlake-glow hover:underline"
-          >
-            Ouvrir le terminal d&apos;identification →
+        <div className="flex flex-wrap items-center justify-between gap-3 border border-line bg-black/30 p-4 text-sm text-gray-300">
+          <p>Connectez-vous pour lire les transmissions selon votre vraie habilitation.</p>
+          <Link href="/connexion" className="font-display text-sm font-bold uppercase tracking-[0.12em] text-redlake-glow hover:text-white">
+            Se connecter →
           </Link>
         </div>
       )}
-      <TransmissionsFeed
-        transmissions={transmissions}
-        playerClearance={authenticated ? clearance : undefined}
-        authenticated={authenticated}
-      />
+      <TransmissionsFeed transmissions={transmissions} playerClearance={authenticated ? clearance : undefined} authenticated={authenticated} />
     </div>
   );
 }

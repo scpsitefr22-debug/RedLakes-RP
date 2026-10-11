@@ -70,6 +70,14 @@ export const newsArticles: NewsArticle[] = [
   },
 ];
 
+/** Couleur de chaque catégorie d'actualité (pastilles, liserés). */
+export const categoryHex: Record<string, string> = {
+  "mise-a-jour": "#60a5fa",
+  scp: "#f87171",
+  evenement: "#fb923c",
+  lore: "#c084fc",
+};
+
 export const categoryLabels: Record<NewsArticle["category"], string> = {
   "mise-a-jour": "Mise à jour",
   scp: "Nouveau SCP",

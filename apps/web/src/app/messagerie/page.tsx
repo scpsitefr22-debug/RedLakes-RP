@@ -6,24 +6,25 @@ export const metadata = { title: "Messagerie" };
 
 export default function MessageriePage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
+    <div className="mx-auto max-w-6xl px-4 py-12">
       <div className="mb-8">
-        <p className="mb-2 flex items-center gap-2 font-mono text-xs tracking-widest text-gray-500">
-          <Terminal className="h-3 w-3" />
-          TERMINAL — MESSAGERIE
+        <p className="label-mono mb-3 flex items-center gap-2 text-redlake-glow">
+          <Terminal className="h-3.5 w-3.5" />
+          Terminal — Messagerie
         </p>
-        <h1 className="text-4xl font-bold text-white">Messagerie</h1>
-        <p className="mt-4 text-gray-500">
-          Correspondance directe entre agents. Personnel pour le hors-RP entre joueurs,
-          Professionnel pour les échanges en personnage dans la voie hiérarchique.
+        <h1 className="font-display text-5xl font-extrabold text-white">Messagerie</h1>
+        <p className="mt-4 max-w-2xl text-gray-400">
+          Correspondance directe entre agents : <span className="text-gray-200">Personnel</span> pour le
+          hors-RP entre joueurs, <span className="text-gray-200">Professionnel</span> pour les échanges en
+          personnage, dans la voie hiérarchique.
         </p>
       </div>
 
-      <div className="hologram-border rounded-lg p-6">
+      <div className="panel-elevated overflow-hidden">
         {/* MessagerieView lit ?dm= (useSearchParams) : sans Suspense, le build
             de production échoue sur cette page (prerender impossible). */}
-        <Suspense fallback={<p className="text-sm text-gray-500">Chargement de la messagerie...</p>}>
-          <MessagerieView />
+        <Suspense fallback={<p className="p-6 text-sm text-gray-500">Chargement de la messagerie…</p>}>
+          <MessagerieView heightClass="h-[70vh] min-h-[520px]" />
         </Suspense>
       </div>
     </div>

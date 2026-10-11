@@ -122,6 +122,15 @@ export const scpObjects: SCPObject[] = [
   },
 ];
 
+/** Couleur brute de chaque classe d'objet, pour les styles inline (barres, liserés). */
+export const classHex: Record<SCPClass, string> = {
+  Safe: "#4ade80",
+  Euclid: "#facc15",
+  Keter: "#f87171",
+  Thaumiel: "#c084fc",
+  Apollyon: "#fb923c",
+};
+
 export const classColors: Record<SCPClass, string> = {
   Safe: "text-green-400 border-green-400/30 bg-green-400/10",
   Euclid: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",

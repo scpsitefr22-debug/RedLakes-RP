@@ -35,8 +35,8 @@ export function MessagerieWidget() {
   return (
     <>
       {open && (
-        <div className="fixed bottom-24 right-6 z-[60] flex w-[360px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-lg border border-redlake/40 bg-black/95 shadow-2xl backdrop-blur">
-          <div className="flex items-center justify-between border-b border-metal/40 px-4 py-3">
+        <div className="fixed bottom-24 right-6 z-[60] flex w-[380px] max-w-[calc(100vw-3rem)] flex-col overflow-hidden border border-line-strong bg-[#0b0f14] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)]">
+          <div className="flex items-center justify-between border-b border-line px-4 py-3" style={{ boxShadow: "inset 0 2px 0 #e5392f" }}>
             <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-redlake-glow">
               <MessageCircle className="h-3.5 w-3.5" />
               Messagerie
@@ -50,8 +50,8 @@ export function MessagerieWidget() {
               <X className="h-4 w-4" />
             </button>
           </div>
-          <div className="p-4">
-            <MessagerieView heightClass="h-[420px]" onActivity={refreshUnread} />
+          <div>
+            <MessagerieView heightClass="h-[460px]" onActivity={refreshUnread} />
           </div>
         </div>
       )}

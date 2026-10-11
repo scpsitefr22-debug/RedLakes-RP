@@ -7,7 +7,7 @@ import { ArrowRight, MessageCircle } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { useSystemStatus, type AlertLevel } from "@/hooks/useSystemStatus";
 import { apiFetch } from "@/lib/api";
-import type { SCPClass } from "@/data/scp";
+import { classHex, type SCPClass } from "@/data/scp";
 
 const ALERT: Record<AlertLevel, { label: string; color: string }> = {
   NORMAL: { label: "Normal", color: "#34d399" },
@@ -46,13 +46,7 @@ interface MonitoredScp {
 }
 
 /** Couleur d'une classe d'objet, en valeur brute pour les styles inline. */
-const CLASS_HEX: Record<SCPClass, string> = {
-  Safe: "#4ade80",
-  Euclid: "#facc15",
-  Keter: "#f87171",
-  Thaumiel: "#c084fc",
-  Apollyon: "#fb923c",
-};
+const CLASS_HEX = classHex;
 
 /** Première phrase lisible d'une description (sans balisage markdown). */
 function excerpt(text: string) {

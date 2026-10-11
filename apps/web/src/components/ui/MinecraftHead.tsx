@@ -10,6 +10,21 @@ interface Skin {
 
 type State = { status: "loading" } | { status: "missing" } | { status: "ready"; url: string; height: number };
 
+/** Un même joueur apparaît souvent plusieurs fois sur une page : une seule requête par pseudo. */
+const skinRequests = new Map<string, Promise<Skin>>();
+
+function requestSkin(username: string): Promise<Skin> {
+  const key = username.toLowerCase();
+  let request = skinRequests.get(key);
+  if (!request) {
+    request = apiFetch<Skin>(`/skins/${encodeURIComponent(username)}`);
+    // Un échec (Mojang indisponible) pourra être retenté plus tard.
+    request.catch(() => skinRequests.delete(key));
+    skinRequests.set(key, request);
+  }
+  return request;
+}
+
 /**
  * Tête Minecraft dessinée à partir du vrai skin du joueur (lu chez Mojang
  * par l'API, /skins/:pseudo) : le visage, puis le calque du dessus (cheveux,
@@ -30,7 +45,7 @@ export function MinecraftHead({
 
   useEffect(() => {
     let cancelled = false;
-    apiFetch<Skin>(`/skins/${encodeURIComponent(username)}`)
+    requestSkin(username)
       .then(({ skinUrl }) => {
         // Les anciens skins font 64×32 : la hauteur change le calcul du cadrage.
         const img = new Image();

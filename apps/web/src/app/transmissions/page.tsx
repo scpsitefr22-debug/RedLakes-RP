@@ -17,60 +17,57 @@ export default async function TransmissionsPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
+    <div className="mx-auto max-w-5xl px-4 py-12">
       <div className="mb-8">
-        <p className="mb-2 flex items-center gap-2 font-mono text-xs tracking-widest text-redlake-glow">
-          <Radio className="h-3 w-3" />
-          RÉSEAU SITE-12 // FLUX CLASSIFIÉ
+        <p className="label-mono mb-3 flex items-center gap-2 text-redlake-glow">
+          <Radio className="h-3.5 w-3.5" />
+          Réseau Site-12 — Journal radio
         </p>
-        <h1 className="text-4xl font-bold text-white">
-          Transmissions de la Fondation
-        </h1>
-        <p className="mt-4 text-gray-500">
-          Le bot du Site-12 surveille les canaux de la Fondation et consigne ici
-          chaque transmission sous forme de rapport. Les identités sont codifiées et
-          le contenu reste soumis à votre niveau d&apos;habilitation. Aucune
-          communication classifiée n&apos;est exposée en clair.
+        <h1 className="font-display text-5xl font-extrabold text-white">Transmissions</h1>
+        <p className="mt-4 max-w-2xl text-gray-400">
+          Le bot du Site-12 consigne ici chaque transmission des canaux de la Fondation. Les
+          identités sont codées et chaque message reste soumis à votre habilitation : rien de
+          classifié n&apos;apparaît en clair.
         </p>
       </div>
 
       {!serverOpen && (
-        <div className="mb-8 flex items-start gap-3 rounded-lg border border-yellow-400/30 bg-yellow-400/5 p-4">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-400" />
-          <div className="text-sm text-gray-400">
-            <p className="font-mono text-xs uppercase tracking-wider text-yellow-400">
-              Phase pré-ouverture
-            </p>
-            <p className="mt-1">
-              Le Site-12 n&apos;est pas encore pleinement opérationnel. Les
-              transmissions ci-dessous proviennent des préparatifs et des essais du
-              réseau. Rejoignez le{" "}
-              <a
-                href={siteConfig.discordInvite}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#aab1ff] underline-offset-2 hover:underline"
-              >
-                Discord de la Fondation
-              </a>{" "}
-              pour participer.
-            </p>
+        <div className="mb-6 overflow-hidden border border-yellow-400/30">
+          <div className="hazard-stripes h-1.5" aria-hidden />
+          <div className="flex items-start gap-3 bg-yellow-400/5 p-4">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-400" />
+            <div className="text-sm text-gray-300">
+              <p className="label-mono text-[10px] text-yellow-400">Phase pré-ouverture</p>
+              <p className="mt-1">
+                Le Site-12 n&apos;est pas encore pleinement opérationnel : ces transmissions viennent
+                des préparatifs du réseau. Rejoignez le{" "}
+                <a
+                  href={siteConfig.discordInvite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#aab1ff] underline-offset-2 hover:underline"
+                >
+                  Discord de la Fondation
+                </a>{" "}
+                pour participer.
+              </p>
+            </div>
           </div>
         </div>
       )}
 
       <TransmissionsFeedConnected transmissions={transmissions} />
 
-      <div className="mt-10 flex flex-col items-center gap-3 rounded-lg border border-[#5865F2]/30 bg-[#5865F2]/5 p-6 text-center">
-        <MessageCircle className="h-6 w-6 text-[#aab1ff]" />
-        <p className="text-sm text-gray-400">
+      <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border border-[#5865F2]/30 bg-[#5865F2]/5 p-5">
+        <p className="flex items-center gap-3 text-sm text-gray-300">
+          <MessageCircle className="h-5 w-5 shrink-0 text-[#aab1ff]" />
           Toute l&apos;activité de la Fondation transite par le Discord officiel.
         </p>
         <a
           href={siteConfig.discordInvite}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded border border-[#5865F2]/40 bg-[#5865F2]/10 px-4 py-2 font-mono text-xs text-[#aab1ff] transition-colors hover:border-[#5865F2] hover:text-white"
+          className="font-display border border-[#5865F2]/50 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-[#c3c8ff] transition-colors hover:border-[#5865F2] hover:text-white"
         >
           Rejoindre le Discord
         </a>

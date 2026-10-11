@@ -33,12 +33,14 @@ export default async function EvenementsPage() {
   const gameEvents = await getGameEvents();
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12">
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold text-white">Archives d&apos;événements</h1>
-        <p className="mt-4 text-gray-500">
-          Brèches, invasions, guerres, crises XK et expériences ratées.
+    <div className="mx-auto max-w-5xl px-4 py-12">
+      <div className="mb-8">
+        <p className="label-mono mb-3 flex items-center gap-2 text-redlake-glow">
+          <span className="h-px w-8 bg-redlake-glow" aria-hidden />
+          Rapports d&apos;événements
         </p>
+        <h1 className="font-display text-5xl font-extrabold text-white">Archives d&apos;événements</h1>
+        <p className="mt-4 max-w-2xl text-gray-400">Brèches, invasions, guerres, crises XK et expériences ratées.</p>
       </div>
 
       <EvenementsCatalog gameEvents={gameEvents} />
