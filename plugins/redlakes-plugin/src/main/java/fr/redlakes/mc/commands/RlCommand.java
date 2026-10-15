@@ -3,13 +3,21 @@ package fr.redlakes.mc.commands;
 import fr.redlakes.mc.RedLakesPlugin;
 import fr.redlakes.mc.chat.OperationCard;
 import fr.redlakes.mc.core.ConnectionState;
+import fr.redlakes.mc.frames.FrameUpdate;
+import fr.redlakes.mc.frames.FrameUpdater;
 import fr.redlakes.mc.player.MinecraftSession;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,7 +73,47 @@ public final class RlCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.GREEN + "Resynchronisation CORE lancée pour tous les joueurs connectés.");
             return true;
         }
-        sender.sendMessage(ChatColor.GRAY + "Usage: /rl staff <status|sync>");
+        if (args.length >= 2 && args[1].equalsIgnoreCase("cadres")) {
+            return handleFrames(sender, args.length >= 3 ? args[2] : "cadres.txt");
+        }
+        sender.sendMessage(ChatColor.GRAY + "Usage: /rl staff <status|sync|cadres [fichier]>");
+        return true;
+    }
+
+    /**
+     * Re-pointe les cadres photo listés dans un fichier du dossier du plugin
+     * (« x y z lien » par ligne). Fichier entier refusé à la moindre ligne
+     * invalide : rien n'est appliqué à moitié.
+     */
+    private boolean handleFrames(CommandSender sender, String fileName) {
+        if (!fileName.matches("[A-Za-z0-9._-]+\\.txt")) {
+            sender.sendMessage(ChatColor.RED + "Nom de fichier invalide (ex. cadres.txt, dans le dossier du plugin).");
+            return true;
+        }
+        File file = new File(plugin.getDataFolder(), fileName);
+        if (!file.isFile()) {
+            sender.sendMessage(ChatColor.RED + "Fichier introuvable : plugins/RedLakesPlugin/" + fileName);
+            return true;
+        }
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            sender.sendMessage(ChatColor.RED + "Lecture impossible : " + e.getMessage());
+            return true;
+        }
+        FrameUpdate.ParseResult result = FrameUpdate.parse(lines);
+        if (!result.errors.isEmpty()) {
+            sender.sendMessage(ChatColor.RED + fileName + " refusé (" + result.errors.size() + " ligne(s) invalide(s)) :");
+            result.errors.stream().limit(5).forEach(error -> sender.sendMessage(ChatColor.GRAY + "  " + error));
+            return true;
+        }
+        if (result.updates.isEmpty()) {
+            sender.sendMessage(ChatColor.YELLOW + fileName + " ne contient aucun cadre.");
+            return true;
+        }
+        sender.sendMessage(ChatColor.GOLD + "Re-pointage de " + result.updates.size() + " cadre(s) photo en cours…");
+        new FrameUpdater(plugin).apply(sender, Bukkit.getWorlds().get(0), result.updates);
         return true;
     }
 
