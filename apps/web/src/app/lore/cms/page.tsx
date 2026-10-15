@@ -25,7 +25,7 @@ export default function LoreCmsPage() {
       .then(setArticles)
       .catch(() => {
         setUsingStatic(true);
-        setError("API hors ligne — articles statiques affichés en lecture seule. Lancez Lancer-REDLAKES.bat pour éditer.");
+        setError("API hors ligne — articles statiques affichés en lecture seule. Lancez Lancer-Site-Dev.bat pour éditer.");
       });
   }, []);
 

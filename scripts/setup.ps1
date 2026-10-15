@@ -34,5 +34,5 @@ npx prisma db seed 2>&1
 Set-Location $root
 Write-Host "`n=== SETUP TERMINE ===" -ForegroundColor Green
 Write-Host "Lancez la plateforme :" -ForegroundColor Cyan
-Write-Host "  REDLAKES.bat   ou   npm run dev" -ForegroundColor White
-Write-Host "  Lancer-HUB.bat pour le centre de commandement complet" -ForegroundColor Gray
+Write-Host "  Lancer-Site-Dev.bat   ou   npm run dev   (site + API de test)" -ForegroundColor White
+Write-Host "  Lancer-TOUT.bat pour faire tourner le RP (bot Discord + serveur Minecraft)" -ForegroundColor Gray

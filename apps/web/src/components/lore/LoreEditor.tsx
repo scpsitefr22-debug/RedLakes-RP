@@ -89,7 +89,7 @@ export function LoreEditor({ initial, articleId, mode }: LoreEditorProps) {
     } catch (err) {
       setError(
         err instanceof Error
-          ? `${err.message} — Lancez l'API (Lancer-REDLAKES.bat) et connectez-vous en staff.`
+          ? `${err.message} — Lancez l'API (Lancer-Site-Dev.bat) et connectez-vous en staff.`
           : "Erreur de sauvegarde"
       );
     } finally {

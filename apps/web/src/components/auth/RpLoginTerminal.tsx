@@ -217,8 +217,7 @@ export function RpLoginTerminal() {
                   <p className="font-bold font-mono text-xs">API HORS LIGNE</p>
                   <p className="mt-1 text-yellow-400/80">
                     1. Verifiez que l&apos;API tourne : <strong>npm run dev</strong> ou{" "}
-                    <strong>Lancer-HUB.bat</strong> → option <strong>2</strong> ou{" "}
-                    <strong>3</strong>
+                    <strong>Lancer-Site-Dev.bat</strong>
                     <br />
                     2. Laissez-lui quelques secondes pour compiler, puis rechargez
                     cette page

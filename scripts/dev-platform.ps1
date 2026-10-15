@@ -1,5 +1,5 @@
 # Lanceur professionnel REDLAKES RP — Site + API (+ Bot optionnel)
-# Usage : npm run dev  |  .\scripts\dev-platform.ps1  |  REDLAKES.bat
+# Usage : npm run dev  |  .\scripts\dev-platform.ps1  |  Lancer-Site-Dev.bat
 
 param(
     [switch]$AvecBot,

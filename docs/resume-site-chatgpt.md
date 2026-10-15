@@ -357,7 +357,7 @@ Cookie session posé par l'API sur le domaine du site (proxy `/api`).
 
 ```powershell
 # Tout lancer
-.\Lancer-REDLAKES.bat
+.\Lancer-Site-Dev.bat
 
 # Site seul
 cd apps/web && npm run dev

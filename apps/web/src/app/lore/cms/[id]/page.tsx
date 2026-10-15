@@ -19,7 +19,7 @@ export default function EditLorePage() {
         if (found) setArticle(found as Record<string, unknown>);
         else setError("Article introuvable");
       })
-      .catch(() => setError("API indisponible — lancez Lancer-REDLAKES.bat"));
+      .catch(() => setError("API indisponible — lancez Lancer-Site-Dev.bat"));
   }, [id]);
 
   if (error) {

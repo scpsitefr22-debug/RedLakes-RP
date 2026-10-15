@@ -14,6 +14,15 @@ Encyclopédie immersive SCP / DarkRP pour le serveur Minecraft **REDLAKES RP**.
 
 ## Démarrage rapide (Windows)
 
+### Faire tourner le RP
+
+Le site et l'API tournent en ligne (Render) : rien à lancer pour eux.
+Double-cliquez **`Lancer-TOUT.bat`** : il ouvre le bot Discord et le serveur
+Minecraft. Pour arrêter le serveur Minecraft, tapez `stop` dans sa fenêtre.
+
+Les sections suivantes concernent le **développement** : le site et l'API de
+test qu'elles lancent utilisent une base locale, pas les vrais comptes.
+
 ### Première installation (une seule fois)
 
 ```powershell
@@ -21,12 +30,12 @@ cd C:\Users\flech\Projects\redlakes-rp
 .\scripts\setup.ps1
 ```
 
-Ou double-cliquez sur **`Lancer-REDLAKES.bat`** après le setup.
+Ou double-cliquez sur **`Lancer-Site-Dev.bat`** après le setup.
 
 ### Lancer le projet (3 méthodes)
 
-**Méthode 1 — Tout en un (recommandé)**  
-Double-cliquez `Lancer-REDLAKES.bat`  
+**Méthode 1 — Site + API de test (recommandé)**  
+Double-cliquez `Lancer-Site-Dev.bat`  
 Ou en PowerShell :
 ```powershell
 cd C:\Users\flech\Projects\redlakes-rp

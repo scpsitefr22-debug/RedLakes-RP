@@ -71,13 +71,14 @@ redlakes-rp/
 ├── docs/
 │   └── REDLAKES-CORE-SPEC.md → Spec vivante de la transformation CORE (mise à jour à chaque lot livré)
 ├── docker-compose.yml    → PostgreSQL 16 + Elasticsearch 8.15 (local, PostgreSQL n'est plus utilisé — Neon le remplace)
-├── *.bat                 → Raccourcis Windows (Lancer-REDLAKES.bat, Arreter-REDLAKES.bat, etc.)
+├── *.bat                 → Raccourcis Windows (Lancer-Site-Dev.bat, Arreter-REDLAKES.bat, etc.)
 └── package.json           → workspaces npm + scripts racine
 ```
 
 ### Démarrage (Windows)
 
-- Tout-en-un : `Lancer-REDLAKES.bat` ou `.\scripts\start.ps1` → ouvre API (3001) + Site (3000).
+- Faire tourner le RP : `Lancer-TOUT.bat` → bot Discord + serveur Minecraft (le site et l'API de production tournent sur Render).
+- Développement : `Lancer-Site-Dev.bat` ou `.\scripts\start.ps1` → ouvre API (3001) + Site (3000) de test, base locale.
 - Manuel : `cd apps/api && npm run start:dev` puis `cd apps/web && npm run dev`.
 - Arrêt propre : `.\scripts\stop.ps1` ou `Arreter-REDLAKES.bat`.
 - ⚠️ **Piège récurrent rencontré en session** : des instances `npm run dev`/`start:dev` lancées en arrière-plan sans nettoyage s'accumulent (jusqu'à 10 process Node dupliqués observés), ce qui a fait planter le pool de workers Turbopack (message trompeur « Jest worker encountered child process exceptions » — n'a **rien** à voir avec des tests Jest, c'est l'infra interne de compilation parallèle de Turbopack). Fix systématique : `taskkill //F //IM node.exe`, vider `.next`, relancer une seule instance propre de chaque serveur, et être patient (20-30s+ de démarrage sous charge avant de conclure à un échec).
