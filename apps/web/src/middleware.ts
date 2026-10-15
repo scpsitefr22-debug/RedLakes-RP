@@ -25,8 +25,18 @@ const PUBLIC_PATHS = [
   "/lore",
 ];
 
+/**
+ * Images de public/ affichees sur des pages publiques (logo A.E.G.I.S. sur
+ * /factions/aegis, galerie) : sans cette exception, un visiteur recevait la
+ * page de connexion a la place de l'image. Seuls les fichiers a la racine et
+ * public/gallery sont concernes — public/carte (carte HRP, staff) reste protege.
+ */
+const PUBLIC_ASSET = /^\/(?:gallery\/)?[^/]+\.(?:svg|png|jpe?g|webp|gif|ico)$/i;
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (PUBLIC_ASSET.test(pathname)) return NextResponse.next();
 
   // /lore/cms reste protege malgre /lore public juste au-dessus.
   if (pathname === "/lore/cms" || pathname.startsWith("/lore/cms/")) {
